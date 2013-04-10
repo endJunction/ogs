@@ -146,6 +146,11 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 							ERR("Cannot read binary data.");
 							return nullptr;
 						}
+						else
+						{
+							ERR("BoostVtuInterface::readVTUFile():: unknown format \"%s\"", format->data());
+							return nullptr;
+						}
 
 						// Decompress if necessary.
 						if (is_compressed)
