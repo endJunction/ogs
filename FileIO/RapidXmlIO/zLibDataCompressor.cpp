@@ -23,6 +23,20 @@
 
 #include "zLibDataCompressor.h"
 
+void printZlibErrorMessage(int const error)
+{
+	ERR("zLibDataCompressor::UncompressBuffer(): Zlib error while uncompressing data:");
+
+	switch (error)
+	{
+		case Z_MEM_ERROR:    ERR("Not enought memory."); break;
+		case Z_BUF_ERROR:    ERR("Not enough room in the output buffer."); break;
+		case Z_DATA_ERROR:   ERR("Input data corrupted or incomplete."); break;
+		case Z_STREAM_ERROR: ERR("Some stream state is inconsistent. zlib returned Z_STREAM_ERROR."); break;
+		default:             ERR("Unknown zlib result: %d.", error);
+	}
+}
+
 unsigned long zLibDataCompressor::CompressBuffer(const unsigned char* uncompressedData,
                                                  unsigned long uncompressedSize,
                                                  unsigned char* compressedData,
@@ -33,10 +47,11 @@ unsigned long zLibDataCompressor::CompressBuffer(const unsigned char* uncompress
 	Bytef* cd = reinterpret_cast<Bytef*>(compressedData);
 	const Bytef* ud = reinterpret_cast<const Bytef*>(uncompressedData);
 
-	// Call zlib's compress function.
-	if(compress2(cd, &compressedSize, ud, uncompressedSize, CompressionLevel) != Z_OK)
+	// zlib call
+	int const zlibResult = compress2(cd, &compressedSize, ud, uncompressedSize, CompressionLevel);
+	if (zlibResult != Z_OK)
 	{
-		ERR("zLibDataCompressor::CompressBuffer(): Zlib error while compressing data.");
+		printZlibErrorMessage(zlibResult);
 		return 0;
 	}
 
@@ -52,10 +67,11 @@ unsigned long zLibDataCompressor::UncompressBuffer(const unsigned char* compress
 	Bytef* ud = reinterpret_cast<Bytef*>(uncompressedData);
 	const Bytef* cd = reinterpret_cast<const Bytef*>(compressedData);
 
-	// Call zlib's uncompress function.
-	if(uncompress(ud, &decSize, cd, compressedSize) != Z_OK)
+	// zlib call
+	int const zlibResult = uncompress(ud, &decSize, cd, compressedSize);
+	if (zlibResult != Z_OK)
 	{
-		ERR("zLibDataCompressor::UncompressBuffer(): Zlib error while uncompressing data.");
+		printZlibErrorMessage(zlibResult);
 		return 0;
 	}
 
