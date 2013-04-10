@@ -114,24 +114,30 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 					const OptionalPtree& cell_data_node = findDataArray(
 					        "MaterialIDs",
 					        grid_piece.second);
-					if (cell_data_node)
+					if (!cell_data_node)
 					{
-						optional<std::string> const& format =
-						        getXmlAttribute("format", *cell_data_node);
-						std::stringstream iss (cell_data_node->data()); //v.second.get<std::string>("DataArray"));
-						if (format)
-						{
-							if (*format == "ascii")
-								for(unsigned i = 0; i < nElems; i++)
-									iss >> mat_ids[i];
-							else if (*format == "appended")
-							{
-								//uncompress
-							}
-						}
-					}
-					else
 						WARN("BoostVtuInterface::readVTUFile(): MaterialIDs not found, setting every cell to 0.");
+						continue;
+					}
+
+					optional<std::string> const& format =
+							getXmlAttribute("format", *cell_data_node);
+					if (!format)
+					{
+						ERR("BoostVtuInterface::readVTUFile(): \"format\" xml attribute not found.");
+						return nullptr;
+					}
+
+					if (*format == "ascii")
+					{
+						std::stringstream iss (cell_data_node->data());
+						for(unsigned i = 0; i < nElems; i++)
+							iss >> mat_ids[i];
+					}
+					else if (*format == "appended")
+					{
+						//uncompress
+					}
 				}
 
 				if (grid_piece.first == "Points")
