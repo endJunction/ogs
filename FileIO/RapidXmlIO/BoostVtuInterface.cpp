@@ -134,9 +134,25 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 						for(unsigned i = 0; i < nElems; i++)
 							iss >> mat_ids[i];
 					}
-					else if (*format == "appended")
+					else
 					{
-						//uncompress
+						if (*format == "appended")
+						{
+							ERR("Cannot read appended data.");
+							return nullptr;
+						}
+						else if (*format == "binary")
+						{
+							ERR("Cannot read binary data.");
+							return nullptr;
+						}
+
+						// Decompress if necessary.
+						if (is_compressed)
+						{
+							ERR("Cannot read compressed data.");
+							return nullptr;
+						}
 					}
 				}
 
