@@ -55,7 +55,7 @@ unsigned long zLibDataCompressor::UncompressBuffer(const unsigned char* compress
 	// Call zlib's uncompress function.
 	if(uncompress(ud, &decSize, cd, compressedSize) != Z_OK)
 	{
-		ERR("zLibDataCompressor::CompressBuffer(): Zlib error while uncompressing data.");
+		ERR("zLibDataCompressor::UncompressBuffer(): Zlib error while uncompressing data.");
 		return 0;
 	}
 
