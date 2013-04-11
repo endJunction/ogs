@@ -217,30 +217,17 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 					// However, there shouldn't be any other DataArray nodes so most likely not checking the name isn't a problem.
 					ptree const& data_array_node = grid_piece.second.get_child(
 					        "DataArray");
-					optional<std::string> const& format = getXmlAttribute(
-					        "format",
-					        data_array_node);
 
-					if (format)
-					{
-						if (*format == "ascii")
-						{
-							std::stringstream iss (data_array_node.data());
-							double x,y,z;
-							for(unsigned i = 0; i < nNodes; i++)
-							{
-								iss >> x >> y >> z;
-								nodes[i] = new MeshLib::Node(x,
-								                             y,
-								                             z,
-								                             i);
-							}
-						}
-						else if (*format == "appended")
-						{
-							//uncompress
-						}
-					}
+					std::vector<float> data_array
+					        = readDataArray<float>(data_array_node,
+					                               is_compressed,
+					                               nNodes,
+					                               3);
+					for(unsigned i = 0; i < nNodes; i++)
+						nodes[i] = new MeshLib::Node(data_array[i * 3],
+						                             data_array[i * 3 + 1],
+						                             data_array[i * 3 + 2],
+						                             i);
 				}
 
 				if (grid_piece.first == "Cells")
