@@ -81,9 +81,6 @@ private:
 	/// Check if the file really specifies a VTK Unstructured Grid
 	static bool isVTKUnstructuredGrid(const boost::property_tree::ptree &vtk_root);
 
-	/// Construct an Element-object from the data given to the method and the data at the current stream position.
-	static MeshLib::Element* readElement(std::stringstream &iss, const std::vector<MeshLib::Node*> &nodes, unsigned material, unsigned type);
-
 	static unsigned char* uncompressData(boost::property_tree::ptree const& compressed_data_node);
 
 	bool _use_compressor;

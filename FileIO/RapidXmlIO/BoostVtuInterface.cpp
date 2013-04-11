@@ -137,6 +137,112 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 	return data;
 }
 
+/// Construct an Element-object from element type and nodes extracting
+/// connectivity from the input iterator.
+template <typename InputIterator>
+MeshLib::Element* readElement(InputIterator& connectivity_it,
+                              const std::vector<MeshLib::Node*> &nodes,
+                              unsigned material, unsigned type)
+{
+	unsigned node_ids[8];
+	switch (type)
+	{
+	case 3: { //line
+		for (unsigned i(0); i < 2; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** edge_nodes = new MeshLib::Node*[2];
+		edge_nodes[0] = nodes[node_ids[0]];
+		edge_nodes[1] = nodes[node_ids[1]];
+		return new MeshLib::Edge(edge_nodes, material);
+		break;
+	}
+	case 5: { //triangle
+		for (unsigned i(0); i < 3; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** tri_nodes = new MeshLib::Node*[3];
+		tri_nodes[0] = nodes[node_ids[0]];
+		tri_nodes[1] = nodes[node_ids[1]];
+		tri_nodes[2] = nodes[node_ids[2]];
+		return new MeshLib::Tri(tri_nodes, material);
+		break;
+	}
+	case 9: { //quad
+		for (unsigned i(0); i < 4; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** quad_nodes = new MeshLib::Node*[4];
+		for (unsigned k(0); k < 4; k++)
+			quad_nodes[k] = nodes[node_ids[k]];
+		return new MeshLib::Quad(quad_nodes, material);
+		break;
+	}
+	case 8: { //pixel
+		for (unsigned i(0); i < 4; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** quad_nodes = new MeshLib::Node*[4];
+		quad_nodes[0] = nodes[node_ids[0]];
+		quad_nodes[1] = nodes[node_ids[1]];
+		quad_nodes[2] = nodes[node_ids[3]];
+		quad_nodes[3] = nodes[node_ids[2]];
+		return new MeshLib::Quad(quad_nodes, material);
+		break;
+	}
+	case 10: {
+		for (unsigned i(0); i < 4; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** tet_nodes = new MeshLib::Node*[4];
+		for (unsigned k(0); k < 4; k++)
+			tet_nodes[k] = nodes[node_ids[k]];
+		return new MeshLib::Tet(tet_nodes, material);
+		break;
+	}
+	case 12: { //hexahedron
+		for (unsigned i(0); i < 8; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** hex_nodes = new MeshLib::Node*[8];
+		for (unsigned k(0); k < 8; k++)
+			hex_nodes[k] = nodes[node_ids[k]];
+		return new MeshLib::Hex(hex_nodes, material);
+		break;
+	}
+	case 11: { //voxel
+		for (unsigned i(0); i < 8; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** voxel_nodes = new MeshLib::Node*[8];
+		voxel_nodes[0] = nodes[node_ids[0]];
+		voxel_nodes[1] = nodes[node_ids[1]];
+		voxel_nodes[2] = nodes[node_ids[3]];
+		voxel_nodes[3] = nodes[node_ids[2]];
+		voxel_nodes[4] = nodes[node_ids[4]];
+		voxel_nodes[5] = nodes[node_ids[5]];
+		voxel_nodes[6] = nodes[node_ids[7]];
+		voxel_nodes[7] = nodes[node_ids[6]];
+		return new MeshLib::Hex(voxel_nodes, material);
+		break;
+	}
+	case 14: { //pyramid
+		for (unsigned i(0); i < 5; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** pyramid_nodes = new MeshLib::Node*[5];
+		for (unsigned k(0); k < 5; k++)
+			pyramid_nodes[k] = nodes[node_ids[k]];
+		return new MeshLib::Pyramid(pyramid_nodes, material);
+		break;
+	}
+	case 13: { //wedge
+		for (unsigned i(0); i < 6; i++)
+			node_ids[i] = *connectivity_it++;
+		MeshLib::Node** prism_nodes = new MeshLib::Node*[6];
+		for (unsigned k(0); k < 6; k++)
+			prism_nodes[k] = nodes[node_ids[k]];
+		return new MeshLib::Prism(prism_nodes, material);
+		break;
+	}
+	default:
+		ERR("BoostVtuInterface::readElement(): Unknown mesh element type \"%d\".", type);
+		return nullptr;
+	}
+}
+
 MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 {
 	INFO("BoostVtuInterface::readVTUFile(): Reading OGS mesh.");
@@ -248,25 +354,21 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 						          cell_types.begin());
 					}
 
-					// connectivity / element nodes
-					OptionalPtree const& connectivity = findDataArray("connectivity", cells);
-					if (!connectivity)
-						ERR("BoostVtuInterface::readVTUFile(): Cannot find \"connectivity\" data array.");
+					{ // connectivity / element nodes
+						OptionalPtree const& connectivity = findDataArray("connectivity",
+																		  cells);
+						if (!connectivity)
+							ERR("BoostVtuInterface::readVTUFile(): Cannot find \"connectivity\" data array.");
 
-					std::string conn_string = connectivity->data();
+						std::vector<long> data_array
+						        = readDataArray<long>(*connectivity,
+						                              is_compressed,
+						                              nElems,
+						                              8); // Estimated number of nodes/element.
 
-					if (!conn_string.empty())
-					{
-						optional<std::string> const& format =
-						        getXmlAttribute("format", *connectivity);
-						if (*format == "appended")
-						{
-							//uncompress
-						}
-
-						std::stringstream iss (conn_string);
+						std::vector<long>::const_iterator position = data_array.cbegin();
 						for(unsigned i = 0; i < nElems; i++)
-							elements[i] = readElement(iss,
+							elements[i] = readElement(position,
 							                          nodes,
 							                          mat_ids[i],
 							                          cell_types[i]);
@@ -284,109 +386,6 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 	} // unstructured grid
 
 	return nullptr;
-}
-
-MeshLib::Element* BoostVtuInterface::readElement(std::stringstream &iss,
-                                                 const std::vector<MeshLib::Node*> &nodes,
-                                                 unsigned material, unsigned type)
-{
-	unsigned node_ids[8];
-	switch (type)
-	{
-	case 3: { //line
-		for (unsigned i(0); i < 2; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** edge_nodes = new MeshLib::Node*[2];
-		edge_nodes[0] = nodes[node_ids[0]];
-		edge_nodes[1] = nodes[node_ids[1]];
-		return new MeshLib::Edge(edge_nodes, material);
-		break;
-	}
-	case 5: { //triangle
-		for (unsigned i(0); i < 3; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** tri_nodes = new MeshLib::Node*[3];
-		tri_nodes[0] = nodes[node_ids[0]];
-		tri_nodes[1] = nodes[node_ids[1]];
-		tri_nodes[2] = nodes[node_ids[2]];
-		return new MeshLib::Tri(tri_nodes, material);
-		break;
-	}
-	case 9: { //quad
-		for (unsigned i(0); i < 4; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** quad_nodes = new MeshLib::Node*[4];
-		for (unsigned k(0); k < 4; k++)
-			quad_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Quad(quad_nodes, material);
-		break;
-	}
-	case 8: { //pixel
-		for (unsigned i(0); i < 4; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** quad_nodes = new MeshLib::Node*[4];
-		quad_nodes[0] = nodes[node_ids[0]];
-		quad_nodes[1] = nodes[node_ids[1]];
-		quad_nodes[2] = nodes[node_ids[3]];
-		quad_nodes[3] = nodes[node_ids[2]];
-		return new MeshLib::Quad(quad_nodes, material);
-		break;
-	}
-	case 10: {
-		for (unsigned i(0); i < 4; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** tet_nodes = new MeshLib::Node*[4];
-		for (unsigned k(0); k < 4; k++)
-			tet_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Tet(tet_nodes, material);
-		break;
-	}
-	case 12: { //hexahedron
-		for (unsigned i(0); i < 8; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** hex_nodes = new MeshLib::Node*[8];
-		for (unsigned k(0); k < 8; k++)
-			hex_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Hex(hex_nodes, material);
-		break;
-	}
-	case 11: { //voxel
-		for (unsigned i(0); i < 8; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** voxel_nodes = new MeshLib::Node*[8];
-		voxel_nodes[0] = nodes[node_ids[0]];
-		voxel_nodes[1] = nodes[node_ids[1]];
-		voxel_nodes[2] = nodes[node_ids[3]];
-		voxel_nodes[3] = nodes[node_ids[2]];
-		voxel_nodes[4] = nodes[node_ids[4]];
-		voxel_nodes[5] = nodes[node_ids[5]];
-		voxel_nodes[6] = nodes[node_ids[7]];
-		voxel_nodes[7] = nodes[node_ids[6]];
-		return new MeshLib::Hex(voxel_nodes, material);
-		break;
-	}
-	case 14: { //pyramid
-		for (unsigned i(0); i < 5; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** pyramid_nodes = new MeshLib::Node*[5];
-		for (unsigned k(0); k < 5; k++)
-			pyramid_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Pyramid(pyramid_nodes, material);
-		break;
-	}
-	case 13: { //wedge
-		for (unsigned i(0); i < 6; i++)
-			iss >> node_ids[i];
-		MeshLib::Node** prism_nodes = new MeshLib::Node*[6];
-		for (unsigned k(0); k < 6; k++)
-			prism_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Prism(prism_nodes, material);
-		break;
-	}
-	default:
-		ERR("BoostVtuInterface::readElement(): Unknown mesh element type \"%d\".", type);
-		return nullptr;
-	}
 }
 
 bool BoostVtuInterface::isVTKFile(const property_tree::ptree &vtk_root)
