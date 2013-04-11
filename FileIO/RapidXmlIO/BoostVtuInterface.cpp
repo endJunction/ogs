@@ -234,21 +234,18 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 				{
 					ptree const& cells = grid_piece.second;
 
-					// cell types
-					OptionalPtree const& types = findDataArray("types", cells);
-					if (!types)
-						ERR("BoostVtuInterface::readVTUFile(): Cannot find \"types\" data array.");
+					{ // cell types
+						OptionalPtree const& types = findDataArray("types",
+						                                           cells);
+						if (!types)
+							ERR("BoostVtuInterface::readVTUFile(): Cannot find \"types\" data array.");
 
-					std::stringstream iss (types->data());
-					optional<std::string> const& format = getXmlAttribute("format", *types);
-					if (*format == "ascii")
-					{
-						for(unsigned i = 0; i < nElems; i++)
-							iss >> cell_types[i];
-					}
-					else if (*format == "appended")
-					{
-						//uncompress
+						std::vector<unsigned> data_array
+						        = readDataArray<unsigned>(*types,
+						                                  is_compressed,
+						                                  nElems);
+						std::copy(data_array.cbegin(), data_array.cend(),
+						          cell_types.begin());
 					}
 
 					// connectivity / element nodes
