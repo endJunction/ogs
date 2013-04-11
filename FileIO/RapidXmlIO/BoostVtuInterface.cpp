@@ -18,7 +18,9 @@
 
 #include "BoostVtuInterface.h"
 #include "zLibDataCompressor.h"
+#include <cstdint>
 #include <fstream>
+#include <type_traits>
 
 #include <boost/foreach.hpp>
 
@@ -94,6 +96,21 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 	std::vector<T> data;
 	data.reserve(n_elements * n_components);
 
+	optional<std::string> const& type = getXmlAttribute("type", tree);
+	if (!type)
+	{
+		ERR("BoostVtuInterface::readVTUFile(): \"type\" xml attribute not found.");
+		return data;
+	}
+	if (!((*type == "UInt8" && typeid(T) == typeid(std::uint8_t))
+	      || (*type == "Int32" && typeid(T) == typeid(std::int32_t))
+	      || (*type == "Int64" && typeid(T) == typeid(std::int64_t))
+	      || (*type == "Float32" && typeid(T) == typeid(float))))
+	{
+		ERR("Input data type mismatch. Expected size %d, input data type %s.", sizeof(T), type->c_str());
+		return data;
+	}
+
 	optional<std::string> const& format = getXmlAttribute("format", tree);
 	if (!format)
 	{
@@ -104,8 +121,18 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 	if (*format == "ascii")
 	{
 		std::stringstream iss (tree.data());
-		std::copy(std::istream_iterator<T>(iss), std::istream_iterator<T>(),
-		          std::back_inserter(data));
+		if (sizeof(T) == 1) // Read chars as ints.
+		{
+			if (std::is_signed<T>::value)
+				std::copy(std::istream_iterator<int>(iss), std::istream_iterator<int>(),
+				          std::back_inserter(data));
+			else
+				std::copy(std::istream_iterator<unsigned int>(iss), std::istream_iterator<unsigned int>(),
+				          std::back_inserter(data));
+		}
+		else
+			std::copy(std::istream_iterator<T>(iss), std::istream_iterator<T>(),
+			          std::back_inserter(data));
 	}
 	else
 	{
@@ -309,10 +336,10 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 						WARN("BoostVtuInterface::readVTUFile(): MaterialIDs not found, setting every cell to 0.");
 						continue;
 					}
-					std::vector<unsigned> data_array
-					        = readDataArray<unsigned>(*cell_data_node,
-					                                  is_compressed,
-					                                  nElems);
+					std::vector<std::int32_t> data_array
+					        = readDataArray<std::int32_t>(*cell_data_node,
+					                                      is_compressed,
+					                                      nElems);
 					std::copy(data_array.cbegin(), data_array.cend(),
 					          mat_ids.begin());
 				}
@@ -346,10 +373,10 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 						if (!types)
 							ERR("BoostVtuInterface::readVTUFile(): Cannot find \"types\" data array.");
 
-						std::vector<unsigned> data_array
-						        = readDataArray<unsigned>(*types,
-						                                  is_compressed,
-						                                  nElems);
+						std::vector<std::uint8_t> data_array
+						        = readDataArray<std::uint8_t>(*types,
+						                                      is_compressed,
+						                                      nElems);
 						std::copy(data_array.cbegin(), data_array.cend(),
 						          cell_types.begin());
 					}
@@ -360,13 +387,13 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 						if (!connectivity)
 							ERR("BoostVtuInterface::readVTUFile(): Cannot find \"connectivity\" data array.");
 
-						std::vector<long> data_array
-						        = readDataArray<long>(*connectivity,
-						                              is_compressed,
-						                              nElems,
-						                              8); // Estimated number of nodes/element.
+						std::vector<std::int64_t> data_array
+						        = readDataArray<std::int64_t>(*connectivity,
+						                                      is_compressed,
+						                                      nElems,
+						                                      8); // Estimated number of nodes/element.
 
-						std::vector<long>::const_iterator position = data_array.cbegin();
+						std::vector<std::int64_t>::const_iterator position = data_array.cbegin();
 						for(unsigned i = 0; i < nElems; i++)
 							elements[i] = readElement(position,
 							                          nodes,
