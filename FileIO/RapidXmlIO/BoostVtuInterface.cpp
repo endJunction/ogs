@@ -73,6 +73,19 @@ const optional<std::string> getXmlAttribute(std::string const& key,
 	return optional<std::string>();
 }
 
+/// Get an XML attribute value corresponding to given string from a property tree.
+/// If the attribute is not found an empty string is returned.
+const std::string getRequiredXmlAttribute(std::string const& key,
+                                          ptree const& tree)
+{
+	optional<std::string> xmlattr = getXmlAttribute(key, tree);
+	if (xmlattr)
+		return *xmlattr;
+
+	ERR("Could not find required <xmlattr> %s in the tree.", key.c_str());
+	return std::string();
+}
+
 /// Find first child of a tree, which is a DataArray and has requested name.
 const OptionalPtree findDataArray(std::string const& array_name,
                                   ptree const& tree)
@@ -99,29 +112,18 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 	std::vector<T> data;
 	data.reserve(n_elements * n_components);
 
-	optional<std::string> const& type = getXmlAttribute("type", tree);
-	if (!type)
+	std::string const type = getRequiredXmlAttribute("type", tree);
+	if (!((type == "UInt8" && typeid(T) == typeid(std::uint8_t))
+	      || (type == "Int32" && typeid(T) == typeid(std::int32_t))
+	      || (type == "Int64" && typeid(T) == typeid(std::int64_t))
+	      || (type == "Float32" && typeid(T) == typeid(float))))
 	{
-		ERR("BoostVtuInterface::readVTUFile(): \"type\" xml attribute not found.");
-		return data;
-	}
-	if (!((*type == "UInt8" && typeid(T) == typeid(std::uint8_t))
-	      || (*type == "Int32" && typeid(T) == typeid(std::int32_t))
-	      || (*type == "Int64" && typeid(T) == typeid(std::int64_t))
-	      || (*type == "Float32" && typeid(T) == typeid(float))))
-	{
-		ERR("Input data type mismatch. Expected size %d, input data type %s.", sizeof(T), type->c_str());
+		ERR("Input data type mismatch. Expected size %d, input data type %s.", sizeof(T), type.c_str());
 		return data;
 	}
 
-	optional<std::string> const& format = getXmlAttribute("format", tree);
-	if (!format)
-	{
-		ERR("BoostVtuInterface::readVTUFile(): \"format\" xml attribute not found.");
-		return data;
-	}
-
-	if (*format == "ascii")
+	std::string const format = getRequiredXmlAttribute("format", tree);
+	if (format == "ascii")
 	{
 		std::stringstream iss (tree.data());
 		if (sizeof(T) == 1) // Read chars as ints.
@@ -142,12 +144,12 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 		using boost::archive::iterators::transform_width;
 		using boost::archive::iterators::binary_from_base64;
 
-		if (*format == "appended")
+		if (format == "appended")
 		{
 			ERR("Cannot read appended data.");
 			return data;
 		}
-		else if (*format == "binary")
+		else if (format == "binary")
 		{
 			// Trimmed copy of input.
 			std::string base64(trim_copy(tree.data()));
@@ -184,7 +186,7 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 		else
 		{
 			ERR("BoostVtuInterface::readVTUFile():: unknown format \"%s\"",
-			    format->data());
+			    format.c_str());
 			return data;
 		}
 
