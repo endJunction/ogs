@@ -83,6 +83,60 @@ const OptionalPtree findDataArray(std::string const& array_name,
 
 	return OptionalPtree();
 }
+//
+// n_elements is the number of expected entries in the DataArray.
+// n_elements is the number of expected components of an entry.
+//
+template <typename T>
+std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
+                             std::size_t const n_elements, short const n_components = 1)
+{
+	std::vector<T> data;
+	data.reserve(n_elements * n_components);
+
+	optional<std::string> const& format = getXmlAttribute("format", tree);
+	if (!format)
+	{
+		ERR("BoostVtuInterface::readVTUFile(): \"format\" xml attribute not found.");
+		return data;
+	}
+
+	if (*format == "ascii")
+	{
+		std::stringstream iss (tree.data());
+		std::copy(std::istream_iterator<T>(iss), std::istream_iterator<T>(),
+		          std::back_inserter(data));
+	}
+	else
+	{
+		if (*format == "appended")
+		{
+			ERR("Cannot read appended data.");
+			return data;
+		}
+		else if (*format == "binary")
+		{
+			ERR("Cannot read binary data.");
+			return data;
+		}
+		else
+		{
+			ERR("BoostVtuInterface::readVTUFile():: unknown format \"%s\"",
+			    format->data());
+			return data;
+		}
+
+		// Decompress if necessary.
+		if (is_compressed)
+		{
+			ERR("Cannot read compressed data.");
+			return data;
+		}
+	}
+
+	return data;
+}
+
 MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 {
 	INFO("BoostVtuInterface::readVTUFile(): Reading OGS mesh.");
@@ -149,46 +203,12 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 						WARN("BoostVtuInterface::readVTUFile(): MaterialIDs not found, setting every cell to 0.");
 						continue;
 					}
-
-					optional<std::string> const& format =
-							getXmlAttribute("format", *cell_data_node);
-					if (!format)
-					{
-						ERR("BoostVtuInterface::readVTUFile(): \"format\" xml attribute not found.");
-						return nullptr;
-					}
-
-					if (*format == "ascii")
-					{
-						std::stringstream iss (cell_data_node->data());
-						for(unsigned i = 0; i < nElems; i++)
-							iss >> mat_ids[i];
-					}
-					else
-					{
-						if (*format == "appended")
-						{
-							ERR("Cannot read appended data.");
-							return nullptr;
-						}
-						else if (*format == "binary")
-						{
-							ERR("Cannot read binary data.");
-							return nullptr;
-						}
-						else
-						{
-							ERR("BoostVtuInterface::readVTUFile():: unknown format \"%s\"", format->data());
-							return nullptr;
-						}
-
-						// Decompress if necessary.
-						if (is_compressed)
-						{
-							ERR("Cannot read compressed data.");
-							return nullptr;
-						}
-					}
+					std::vector<unsigned> data_array
+					        = readDataArray<unsigned>(*cell_data_node,
+					                                  is_compressed,
+					                                  nElems);
+					std::copy(data_array.cbegin(), data_array.cend(),
+					          mat_ids.begin());
 				}
 
 				if (grid_piece.first == "Points")
