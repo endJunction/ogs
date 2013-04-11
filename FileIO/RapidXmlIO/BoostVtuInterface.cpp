@@ -321,135 +321,132 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 	ptree doc;
 	read_xml(in, doc);
 
-	if (isVTKUnstructuredGrid(doc))
-	{
-		ptree const& root_node = doc.get_child("VTKFile");
-		optional<std::string> const& compressor (getXmlAttribute("compressor", root_node));
-		bool is_compressed = static_cast<bool>(compressor);
-		if (is_compressed)
-		{
-			if (*compressor != "vtkZLibDataCompressor")
-			{
-				ERR("BoostVtuInterface::readVTUFile(): Unknown compression method.");
-				return nullptr;
-			}
+	if (!isVTKUnstructuredGrid(doc))
+		return nullptr;
 
-			// TODO: remove this once compressed data can be handled!!
-			INFO("Handling of compressed meshes not yet implemented.");
+	ptree const& root_node = doc.get_child("VTKFile");
+	optional<std::string> const& compressor (getXmlAttribute("compressor", root_node));
+	bool is_compressed = static_cast<bool>(compressor);
+	if (is_compressed)
+	{
+		if (*compressor != "vtkZLibDataCompressor")
+		{
+			ERR("BoostVtuInterface::readVTUFile(): Unknown compression method.");
 			return nullptr;
 		}
 
-		//skip to <Piece>-tag and start parsing content
-		OptionalPtree const& piece_node = root_node.get_child_optional(
-		        "UnstructuredGrid.Piece");
-		if (piece_node)
+		// TODO: remove this once compressed data can be handled!!
+		INFO("Handling of compressed meshes not yet implemented.");
+		return nullptr;
+	}
+
+	//skip to <Piece>-tag and start parsing content
+	OptionalPtree const& piece_node = root_node.get_child_optional(
+			"UnstructuredGrid.Piece");
+	if (!piece_node)
+		return nullptr;
+
+	const unsigned nNodes =
+			static_cast<unsigned>(piece_node->get("<xmlattr>.NumberOfPoints", 0));
+	const unsigned nElems =
+			static_cast<unsigned>(piece_node->get("<xmlattr>.NumberOfCells", 0));
+
+	if ((nNodes == 0) || (nElems == 0))
+	{
+		ERR("BoostVtuInterface::readVTUFile() - Number of nodes is %d, number of elements is %d.",
+			nNodes, nElems);
+		return nullptr;
+	}
+
+	std::vector<MeshLib::Node*> nodes(nNodes);
+	std::vector<MeshLib::Element*> elements(nElems);
+	std::vector<unsigned> mat_ids(nElems, 0);
+	std::vector<unsigned> cell_types(nElems);
+
+	BOOST_FOREACH( ptree::value_type const & grid_piece, *piece_node )
+	{
+		if (grid_piece.first == "CellData")
 		{
-			const unsigned nNodes =
-			        static_cast<unsigned>(piece_node->get("<xmlattr>.NumberOfPoints", 0));
-			const unsigned nElems =
-			        static_cast<unsigned>(piece_node->get("<xmlattr>.NumberOfCells", 0));
-
-			if ((nNodes == 0) || (nElems == 0))
+			const OptionalPtree& cell_data_node = findDataArray(
+					"MaterialIDs",
+					grid_piece.second);
+			if (!cell_data_node)
 			{
-				ERR("BoostVtuInterface::readVTUFile() - Number of nodes is %d, number of elements is %d.",
-				    nNodes, nElems);
-				return nullptr;
+				WARN("BoostVtuInterface::readVTUFile(): MaterialIDs not found, setting every cell to 0.");
+				continue;
+			}
+			std::vector<std::int32_t> data_array
+					= readDataArray<std::int32_t>(*cell_data_node,
+												  is_compressed,
+												  nElems);
+			std::copy(data_array.cbegin(), data_array.cend(),
+					  mat_ids.begin());
+		}
+
+		if (grid_piece.first == "Points")
+		{
+			// This node may or may not have an attribute "Name" with the value "Points".
+			// However, there shouldn't be any other DataArray nodes so most likely not checking the name isn't a problem.
+			ptree const& data_array_node = grid_piece.second.get_child(
+			        "DataArray");
+
+			std::vector<float> data_array
+					= readDataArray<float>(data_array_node,
+										   is_compressed,
+										   nNodes,
+										   3);
+			for(unsigned i = 0; i < nNodes; i++)
+				nodes[i] = new MeshLib::Node(data_array[i * 3],
+											 data_array[i * 3 + 1],
+											 data_array[i * 3 + 2],
+											 i);
+		}
+
+		if (grid_piece.first == "Cells")
+		{
+			ptree const& cells = grid_piece.second;
+
+			{ // cell types
+				OptionalPtree const& types = findDataArray("types",
+														   cells);
+				if (!types)
+					ERR("BoostVtuInterface::readVTUFile(): Cannot find \"types\" data array.");
+
+				std::vector<std::uint8_t> data_array
+						= readDataArray<std::uint8_t>(*types,
+													  is_compressed,
+													  nElems);
+				std::copy(data_array.cbegin(), data_array.cend(),
+						  cell_types.begin());
 			}
 
-			std::vector<MeshLib::Node*> nodes(nNodes);
-			std::vector<MeshLib::Element*> elements(nElems);
-			std::vector<unsigned> mat_ids(nElems, 0);
-			std::vector<unsigned> cell_types(nElems);
+			{ // connectivity / element nodes
+				OptionalPtree const& connectivity = findDataArray("connectivity",
+																  cells);
+				if (!connectivity)
+					ERR("BoostVtuInterface::readVTUFile(): Cannot find \"connectivity\" data array.");
 
-			BOOST_FOREACH( ptree::value_type const & grid_piece, *piece_node )
-			{
-				if (grid_piece.first == "CellData")
-				{
-					const OptionalPtree& cell_data_node = findDataArray(
-					        "MaterialIDs",
-					        grid_piece.second);
-					if (!cell_data_node)
-					{
-						WARN("BoostVtuInterface::readVTUFile(): MaterialIDs not found, setting every cell to 0.");
-						continue;
-					}
-					std::vector<std::int32_t> data_array
-					        = readDataArray<std::int32_t>(*cell_data_node,
-					                                      is_compressed,
-					                                      nElems);
-					std::copy(data_array.cbegin(), data_array.cend(),
-					          mat_ids.begin());
-				}
+				std::vector<std::int64_t> data_array
+						= readDataArray<std::int64_t>(*connectivity,
+													  is_compressed,
+													  nElems,
+													  8); // Estimated number of nodes/element.
 
-				if (grid_piece.first == "Points")
-				{
-					// This node may or may not have an attribute "Name" with the value "Points".
-					// However, there shouldn't be any other DataArray nodes so most likely not checking the name isn't a problem.
-					ptree const& data_array_node = grid_piece.second.get_child(
-					        "DataArray");
-
-					std::vector<float> data_array
-					        = readDataArray<float>(data_array_node,
-					                               is_compressed,
-					                               nNodes,
-					                               3);
-					for(unsigned i = 0; i < nNodes; i++)
-						nodes[i] = new MeshLib::Node(data_array[i * 3],
-						                             data_array[i * 3 + 1],
-						                             data_array[i * 3 + 2],
-						                             i);
-				}
-
-				if (grid_piece.first == "Cells")
-				{
-					ptree const& cells = grid_piece.second;
-
-					{ // cell types
-						OptionalPtree const& types = findDataArray("types",
-						                                           cells);
-						if (!types)
-							ERR("BoostVtuInterface::readVTUFile(): Cannot find \"types\" data array.");
-
-						std::vector<std::uint8_t> data_array
-						        = readDataArray<std::uint8_t>(*types,
-						                                      is_compressed,
-						                                      nElems);
-						std::copy(data_array.cbegin(), data_array.cend(),
-						          cell_types.begin());
-					}
-
-					{ // connectivity / element nodes
-						OptionalPtree const& connectivity = findDataArray("connectivity",
-																		  cells);
-						if (!connectivity)
-							ERR("BoostVtuInterface::readVTUFile(): Cannot find \"connectivity\" data array.");
-
-						std::vector<std::int64_t> data_array
-						        = readDataArray<std::int64_t>(*connectivity,
-						                                      is_compressed,
-						                                      nElems,
-						                                      8); // Estimated number of nodes/element.
-
-						std::vector<std::int64_t>::const_iterator position = data_array.cbegin();
-						for(unsigned i = 0; i < nElems; i++)
-							elements[i] = readElement(position,
-							                          nodes,
-							                          mat_ids[i],
-							                          cell_types[i]);
-					}
-				}
+				std::vector<std::int64_t>::const_iterator position = data_array.cbegin();
+				for(unsigned i = 0; i < nElems; i++)
+					elements[i] = readElement(position,
+											  nodes,
+											  mat_ids[i],
+											  cell_types[i]);
 			}
+		}
+	}
 
-			INFO("BoostVtuInterface::readVTUFile(): \tfinished.");
-			INFO("BoostVtuInterface::readVTUFile(): Nr. Nodes: %d", nodes.size());
-			INFO("BoostVtuInterface::readVTUFile(): Nr. Elements: %d", elements.size());
-			return new MeshLib::Mesh(BaseLib::extractBaseNameWithoutExtension(file_name), nodes,
-			                         elements);
-
-		} // piece
-	} // unstructured grid
-
-	return nullptr;
+	INFO("BoostVtuInterface::readVTUFile(): \tfinished.");
+	INFO("BoostVtuInterface::readVTUFile(): Nr. Nodes: %d", nodes.size());
+	INFO("BoostVtuInterface::readVTUFile(): Nr. Elements: %d", elements.size());
+	return new MeshLib::Mesh(BaseLib::extractBaseNameWithoutExtension(file_name), nodes,
+							 elements);
 }
 
 bool BoostVtuInterface::isVTKFile(const property_tree::ptree &vtk_root)
@@ -476,15 +473,16 @@ bool BoostVtuInterface::isVTKFile(const property_tree::ptree &vtk_root)
 
 bool BoostVtuInterface::isVTKUnstructuredGrid(const property_tree::ptree &vtk_root)
 {
-	if (isVTKFile(vtk_root))
+	if (!isVTKFile(vtk_root))
+		return false;
+
+	if (!vtk_root.get_child_optional("VTKFile.UnstructuredGrid"))
 	{
-		const OptionalPtree &u_grid_node = vtk_root.get_child_optional(
-		        "VTKFile.UnstructuredGrid");
-		if (u_grid_node)
-			return true;
 		ERR("Error in BoostVtuInterface::isVTKUnstructuredGrid(): Not an unstructured grid.");
+		return false;
 	}
-	return false;
+
+	return true;
 }
 
 unsigned char* BoostVtuInterface::uncompressData(property_tree::ptree const& compressed_data_node)
