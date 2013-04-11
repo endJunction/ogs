@@ -101,6 +101,29 @@ const OptionalPtree findDataArray(std::string const& array_name,
 
 	return OptionalPtree();
 }
+
+/// Reads data of type T from input stream into data vector. Reading of char and
+/// unsigned char data is done via conversion to int and unsigned int types
+/// because of formatted operator>>() input.
+template <typename T>
+void readNumericAsciiData(std::istream& is, std::vector<T>& data)
+{
+	if (sizeof(T) == 1) // Read chars as ints.
+	{
+		if (std::is_signed<T>::value)
+			std::copy(std::istream_iterator<int>(is), std::istream_iterator<int>(),
+			          std::back_inserter(data));
+		else
+			std::copy(std::istream_iterator<unsigned int>(is),
+			          std::istream_iterator<unsigned int>(),
+			          std::back_inserter(data));
+		return;
+	}
+	else
+		std::copy(std::istream_iterator<T>(is), std::istream_iterator<T>(),
+		          std::back_inserter(data));
+}
+
 //
 // n_elements is the number of expected entries in the DataArray.
 // n_elements is the number of expected components of an entry.
@@ -125,19 +148,8 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 	std::string const format = getRequiredXmlAttribute("format", tree);
 	if (format == "ascii")
 	{
-		std::stringstream iss (tree.data());
-		if (sizeof(T) == 1) // Read chars as ints.
-		{
-			if (std::is_signed<T>::value)
-				std::copy(std::istream_iterator<int>(iss), std::istream_iterator<int>(),
-				          std::back_inserter(data));
-			else
-				std::copy(std::istream_iterator<unsigned int>(iss), std::istream_iterator<unsigned int>(),
-				          std::back_inserter(data));
-		}
-		else
-			std::copy(std::istream_iterator<T>(iss), std::istream_iterator<T>(),
-			          std::back_inserter(data));
+		std::istringstream iss(tree.data());
+		readNumericAsciiData<T>(iss, data);
 	}
 	else
 	{
