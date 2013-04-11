@@ -43,6 +43,7 @@
 namespace FileIO
 {
 using namespace boost;
+using boost::property_tree::ptree;
 
 BoostVtuInterface::BoostVtuInterface() :
 	_export_name(""), _mesh(nullptr), _use_compressor(false)
@@ -52,6 +53,36 @@ BoostVtuInterface::BoostVtuInterface() :
 BoostVtuInterface::~BoostVtuInterface()
 {}
 
+/// Get an XML attribute value corresponding to given string from a property tree.
+const optional<std::string> getXmlAttribute(std::string const& key,
+                                            ptree const& tree)
+{
+	for (property_tree::ptree::const_iterator it = tree.begin(); it != tree.end(); ++it)
+	{
+		if (it->first != "<xmlattr>")
+			continue;
+		if (it->second.get_child_optional(key))
+			return it->second.get_child(key).data();
+	}
+
+	return optional<std::string>();
+}
+
+/// Find first child of a tree, which is a DataArray and has requested name.
+const OptionalPtree findDataArray(std::string const& array_name,
+                                  ptree const& tree)
+{
+	// Loop over all "DataArray" children.
+	for (property_tree::ptree::const_iterator it = tree.begin(); it != tree.end(); ++it)
+		if (it->first == "DataArray")
+		{
+			optional<std::string> const& value = getXmlAttribute("Name", it->second);
+			if (value && *value == array_name)
+				return it->second;
+		}
+
+	return OptionalPtree();
+}
 MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 {
 	INFO("BoostVtuInterface::readVTUFile(): Reading OGS mesh.");
@@ -63,7 +94,6 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 	}
 
 	// build DOM tree
-	using boost::property_tree::ptree;
 	ptree doc;
 	read_xml(in, doc);
 
@@ -398,35 +428,6 @@ unsigned char* BoostVtuInterface::uncompressData(property_tree::ptree const& com
 	unsigned long uncompressed_size = 0;
 	unsigned long result = zLibDataCompressor::UncompressBuffer(compressed_data, compressed_size, uncompressed_data, uncompressed_size);
 	return uncompressed_data;
-}
-
-const optional<std::string> BoostVtuInterface::getXmlAttribute(std::string const& key,
-                                                               property_tree::ptree const& tree)
-{
-	for (property_tree::ptree::const_iterator it = tree.begin(); it != tree.end(); ++it)
-	{
-		if (it->first != "<xmlattr>")
-			continue;
-		if (it->second.get_child_optional(key))
-			return it->second.get_child(key).data();
-	}
-
-	return optional<std::string>();
-}
-
-const OptionalPtree BoostVtuInterface::findDataArray(std::string const& array_name,
-                                                     property_tree::ptree const& tree)
-{
-	// Loop over all "DataArray" children.
-	for (property_tree::ptree::const_iterator it = tree.begin(); it != tree.end(); ++it)
-		if (it->first == "DataArray")
-		{
-			optional<std::string> const& value = getXmlAttribute("Name", it->second);
-			if (value && *value == array_name)
-				return it->second;
-		}
-
-	return OptionalPtree();
 }
 
 int BoostVtuInterface::write(std::ostream& stream)

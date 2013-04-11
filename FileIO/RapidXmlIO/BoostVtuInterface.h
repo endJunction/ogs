@@ -86,12 +86,6 @@ private:
 
 	static unsigned char* uncompressData(boost::property_tree::ptree const& compressed_data_node);
 
-	/// Get an XML attribute value corresponding to given string from a property tree.
-	static const boost::optional<std::string> getXmlAttribute(std::string const& key, boost::property_tree::ptree const& tree);
-
-	/// Find first child of a tree, which is a DataArray and has requested name.
-	static const OptionalPtree findDataArray(std::string const& array_name, boost::property_tree::ptree const& tree);
-
 	bool _use_compressor;
 };
 
