@@ -145,6 +145,11 @@ std::size_t decodeBase64ToBinary(std::istream& is, char* const data, std::size_t
 	// The first int32 is the length of base64 encoded data.
 	int data_length;
 	{
+		if (!is)
+		{
+			ERR("Error reading data from input stream.");
+			return -1;
+		}
 		char* data_length_char = reinterpret_cast<char*>(&data_length);
 		for (int i = 0; i < 4; i++)
 			data_length_char[i] = *binary_it++;
@@ -152,10 +157,14 @@ std::size_t decodeBase64ToBinary(std::istream& is, char* const data, std::size_t
 
 	// The data array has the correct type already. Copy at most bytes into the
 	// data array.
-	char* const end = std::copy_n(binary_it,
-	                              std::min(bytes, std::size_t(data_length)),
-	                              data);
-	return std::distance(data, end);
+	std::size_t bytes_count = 0;
+	char* position = data;
+	while (is && bytes_count < std::min(bytes, std::size_t(data_length)))
+	{
+		*position++ = *binary_it++;
+		bytes_count++;
+	}
+	return bytes_count;
 }
 
 //
