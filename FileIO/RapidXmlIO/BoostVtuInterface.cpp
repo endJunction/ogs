@@ -172,9 +172,12 @@ std::size_t decodeBase64ToBinary(std::istream& is, char* const data, std::size_t
 // n_elements is the number of expected components of an entry.
 //
 template <typename T>
-std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
-                             std::size_t const n_elements, short const n_components = 1)
+optional<std::vector<T>> readDataArray(ptree const & tree,
+                                       bool const is_compressed,
+                                       std::size_t const n_elements,
+                                       short const n_components = 1)
 {
+	typedef optional<std::vector<T>> OptionalVector;
 	std::vector<T> data;
 	data.reserve(n_elements * n_components);
 
@@ -185,7 +188,7 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 	      || (type == "Float32" && typeid(T) == typeid(float))))
 	{
 		ERR("Input data type mismatch. Expected size %d, input data type %s.", sizeof(T), type.c_str());
-		return data;
+		return OptionalVector();
 	}
 
 	std::string const format = getRequiredXmlAttribute("format", tree);
@@ -199,7 +202,7 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 		if (format == "appended")
 		{
 			ERR("Cannot read appended data.");
-			return data;
+			return OptionalVector();
 		}
 		else if (format == "binary")
 		{
@@ -216,25 +219,25 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 			if (bytes_decoded != data.size() * sizeof(T))
 			{
 				ERR("BoostVtuInterface::readVTUFile(): number of decoded data elments %d differs from expected number of %d.", bytes_decoded / sizeof(T), data.size());
-				return data;
+				return OptionalVector();
 			}
 		}
 		else
 		{
 			ERR("BoostVtuInterface::readVTUFile():: unknown format \"%s\"",
 			    format.c_str());
-			return data;
+			return OptionalVector();
 		}
 
 		// Decompress if necessary.
 		if (is_compressed)
 		{
 			ERR("Cannot read compressed data.");
-			return data;
+			return OptionalVector();
 		}
 	}
 
-	return data;
+	return OptionalVector(data);
 }
 
 /// Construct an Element-object from element type and nodes extracting
@@ -411,12 +414,18 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 				WARN("BoostVtuInterface::readVTUFile(): MaterialIDs not found, setting every cell to 0.");
 				continue;
 			}
-			std::vector<std::int32_t> data_array
-					= readDataArray<std::int32_t>(*cell_data_node,
-												  is_compressed,
-												  nElems);
-			std::copy(data_array.cbegin(), data_array.cend(),
-					  mat_ids.begin());
+			optional<std::vector<std::int32_t>> data_array
+			        = readDataArray<std::int32_t>(*cell_data_node,
+			                                      is_compressed,
+			                                      nElems);
+			if (!data_array)
+			{
+				WARN("Error reading MaterialIDs. Keep MaterialIDs zero for all cells.");
+				continue;
+			}
+
+			std::copy(data_array->cbegin(), data_array->cend(),
+			          mat_ids.begin());
 		}
 
 		if (grid_piece.first == "Points")
@@ -426,16 +435,21 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 			ptree const& data_array_node = grid_piece.second.get_child(
 			        "DataArray");
 
-			std::vector<float> data_array
-					= readDataArray<float>(data_array_node,
-										   is_compressed,
-										   nNodes,
-										   3);
+			optional<std::vector<float>> data_array
+			        = readDataArray<float>(data_array_node,
+			                               is_compressed,
+			                               nNodes,
+			                               3);
+			if (!data_array)
+			{
+				ERR("Error reading points.");
+				return nullptr;
+			}
 			for(unsigned i = 0; i < nNodes; i++)
-				nodes[i] = new MeshLib::Node(data_array[i * 3],
-											 data_array[i * 3 + 1],
-											 data_array[i * 3 + 2],
-											 i);
+				nodes[i] = new MeshLib::Node((*data_array)[i * 3],
+				                             (*data_array)[i * 3 + 1],
+				                             (*data_array)[i * 3 + 2],
+				                             i);
 		}
 
 		if (grid_piece.first == "Cells")
@@ -448,12 +462,17 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 				if (!types)
 					ERR("BoostVtuInterface::readVTUFile(): Cannot find \"types\" data array.");
 
-				std::vector<std::uint8_t> data_array
-						= readDataArray<std::uint8_t>(*types,
-													  is_compressed,
-													  nElems);
-				std::copy(data_array.cbegin(), data_array.cend(),
-						  cell_types.begin());
+				optional<std::vector<std::uint8_t>> data_array
+				        = readDataArray<std::uint8_t>(*types,
+				                                      is_compressed,
+				                                      nElems);
+				if (!data_array)
+				{
+					ERR("Error reading cell types.");
+					return nullptr;
+				}
+				std::copy(data_array->cbegin(), data_array->cend(),
+				          cell_types.begin());
 			}
 
 			{ // connectivity / element nodes
@@ -462,18 +481,24 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 				if (!connectivity)
 					ERR("BoostVtuInterface::readVTUFile(): Cannot find \"connectivity\" data array.");
 
-				std::vector<std::int64_t> data_array
-						= readDataArray<std::int64_t>(*connectivity,
-													  is_compressed,
-													  nElems,
-													  8); // Estimated number of nodes/element.
 
-				std::vector<std::int64_t>::const_iterator position = data_array.cbegin();
+				optional<std::vector<std::int64_t>> data_array
+				        = readDataArray<std::int64_t>(*connectivity,
+				                                      is_compressed,
+				                                      nElems,
+				                                      8); // Estimated number of nodes/element.
+
+				if (!data_array)
+				{
+					ERR("Error reading cells' connectivity.");
+					return nullptr;
+				}
+				std::vector<std::int64_t>::const_iterator position = data_array->cbegin();
 				for(unsigned i = 0; i < nElems; i++)
 					elements[i] = readElement(position,
-											  nodes,
-											  mat_ids[i],
-											  cell_types[i]);
+					                          nodes,
+					                          mat_ids[i],
+					                          cell_types[i]);
 			}
 		}
 	}
