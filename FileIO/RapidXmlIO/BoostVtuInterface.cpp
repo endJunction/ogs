@@ -22,9 +22,9 @@
 #include <fstream>
 #include <type_traits>
 
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/foreach.hpp>
 
 // ThirdParty/logog
@@ -124,6 +124,40 @@ void readNumericAsciiData(std::istream& is, std::vector<T>& data)
 		          std::back_inserter(data));
 }
 
+/// Decodes base64 encoded data and writes the result into given memory
+/// location. The size of written data is less or equal to the given limit.
+std::size_t decodeBase64ToBinary(std::istream& is, char* const data, std::size_t const bytes)
+{
+	//
+	// Convert to binary
+	//
+	using boost::archive::iterators::transform_width;
+	using boost::archive::iterators::binary_from_base64;
+	using boost::archive::iterators::remove_whitespace;
+	typedef transform_width<
+	        binary_from_base64<
+	        remove_whitespace<
+	        std::istream_iterator<char>>>, 8, 6> BinaryIt;
+
+	std::istream_iterator<char> is_it(is);
+	BinaryIt binary_it(is_it);
+
+	// The first int32 is the length of base64 encoded data.
+	int data_length;
+	{
+		char* data_length_char = reinterpret_cast<char*>(&data_length);
+		for (int i = 0; i < 4; i++)
+			data_length_char[i] = *binary_it++;
+	}
+
+	// The data array has the correct type already. Copy at most bytes into the
+	// data array.
+	char* const end = std::copy_n(binary_it,
+	                              std::min(bytes, std::size_t(data_length)),
+	                              data);
+	return std::distance(data, end);
+}
+
 //
 // n_elements is the number of expected entries in the DataArray.
 // n_elements is the number of expected components of an entry.
@@ -153,9 +187,6 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 	}
 	else
 	{
-		using boost::archive::iterators::transform_width;
-		using boost::archive::iterators::binary_from_base64;
-
 		if (format == "appended")
 		{
 			ERR("Cannot read appended data.");
@@ -163,36 +194,20 @@ std::vector<T> readDataArray(ptree const& tree, bool const is_compressed,
 		}
 		else if (format == "binary")
 		{
-			// Trimmed copy of input.
-			std::string base64(trim_copy(tree.data()));
+			std::istringstream base64_iss(tree.data());
 
-			//
-			// Convert to binary
-			//
-			typedef transform_width<binary_from_base64<std::string::const_iterator>, 8, 6> BinaryIt;
-			BinaryIt binary_it = base64.begin();
+			data.resize(n_elements * n_components);
+			std::size_t const bytes_decoded =
+			        decodeBase64ToBinary(
+			                base64_iss,
+			                reinterpret_cast<char*>(&data.front()),
+			                data.size() * sizeof(T));
 
-			// The first int32 is the length of base64 encoded data.
-			int data_length;
+			// Compare size of decoded data to the expected.
+			if (bytes_decoded != data.size() * sizeof(T))
 			{
-				char* data_length_char = reinterpret_cast<char*>(&data_length);
-				for (int i = 0; i < 4; i++)
-					data_length_char[i] = *binary_it++;
-			}
-
-			// The data array has the correct type already. Copy at most
-			// data_length/sizeof(T) elements directly into the data array.
-			{
-				std::size_t const n = data_length / sizeof(T);
-				// Compare number of elements in decoded data to expected.
-				if (n != n_elements * n_components)
-				{
-					ERR("BoostVtuInterface::readVTUFile(): number of decoded data elments %d differs from expected number of %d.", n, n_elements * n_components);
-					return data;
-				}
-				data.resize(n);
-				char* data_char_ptr = reinterpret_cast<char*>(&data.front());
-				std::copy_n(binary_it, data_length, data_char_ptr);
+				ERR("BoostVtuInterface::readVTUFile(): number of decoded data elments %d differs from expected number of %d.", bytes_decoded / sizeof(T), data.size());
+				return data;
 			}
 		}
 		else
