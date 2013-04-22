@@ -267,99 +267,30 @@ MeshLib::Element* readElement(InputIterator& connectivity_it,
                               const std::vector<MeshLib::Node*> &nodes,
                               unsigned material, unsigned type)
 {
-	unsigned node_ids[8];
+	std::size_t const nodes_size = cellTypeToNodeNumber(type);
+	MeshLib::Node** element_nodes = new MeshLib::Node*[nodes_size];
+
+	for (std::size_t i = 0; i < nodes_size; i++)
+		element_nodes[i] = nodes[*connectivity_it++];
+
 	switch (type)
 	{
-	case 3: { //line
-		for (unsigned i(0); i < 2; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** edge_nodes = new MeshLib::Node*[2];
-		edge_nodes[0] = nodes[node_ids[0]];
-		edge_nodes[1] = nodes[node_ids[1]];
-		return new MeshLib::Edge(edge_nodes, material);
-		break;
-	}
-	case 5: { //triangle
-		for (unsigned i(0); i < 3; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** tri_nodes = new MeshLib::Node*[3];
-		tri_nodes[0] = nodes[node_ids[0]];
-		tri_nodes[1] = nodes[node_ids[1]];
-		tri_nodes[2] = nodes[node_ids[2]];
-		return new MeshLib::Tri(tri_nodes, material);
-		break;
-	}
-	case 9: { //quad
-		for (unsigned i(0); i < 4; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** quad_nodes = new MeshLib::Node*[4];
-		for (unsigned k(0); k < 4; k++)
-			quad_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Quad(quad_nodes, material);
-		break;
-	}
+	case 3: return new MeshLib::Edge(element_nodes, material);
+	case 5: return new MeshLib::Tri(element_nodes, material);
+	case 9: return new MeshLib::Quad(element_nodes, material);
 	case 8: { //pixel
-		for (unsigned i(0); i < 4; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** quad_nodes = new MeshLib::Node*[4];
-		quad_nodes[0] = nodes[node_ids[0]];
-		quad_nodes[1] = nodes[node_ids[1]];
-		quad_nodes[2] = nodes[node_ids[3]];
-		quad_nodes[3] = nodes[node_ids[2]];
-		return new MeshLib::Quad(quad_nodes, material);
-		break;
+		std::swap(element_nodes[2], element_nodes[3]);
+		return new MeshLib::Quad(element_nodes, material);
 	}
-	case 10: {
-		for (unsigned i(0); i < 4; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** tet_nodes = new MeshLib::Node*[4];
-		for (unsigned k(0); k < 4; k++)
-			tet_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Tet(tet_nodes, material);
-		break;
-	}
-	case 12: { //hexahedron
-		for (unsigned i(0); i < 8; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** hex_nodes = new MeshLib::Node*[8];
-		for (unsigned k(0); k < 8; k++)
-			hex_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Hex(hex_nodes, material);
-		break;
-	}
+	case 10: return new MeshLib::Tet(element_nodes, material);
+	case 12: return new MeshLib::Hex(element_nodes, material);
 	case 11: { //voxel
-		for (unsigned i(0); i < 8; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** voxel_nodes = new MeshLib::Node*[8];
-		voxel_nodes[0] = nodes[node_ids[0]];
-		voxel_nodes[1] = nodes[node_ids[1]];
-		voxel_nodes[2] = nodes[node_ids[3]];
-		voxel_nodes[3] = nodes[node_ids[2]];
-		voxel_nodes[4] = nodes[node_ids[4]];
-		voxel_nodes[5] = nodes[node_ids[5]];
-		voxel_nodes[6] = nodes[node_ids[7]];
-		voxel_nodes[7] = nodes[node_ids[6]];
-		return new MeshLib::Hex(voxel_nodes, material);
-		break;
+		std::swap(element_nodes[2], element_nodes[3]);
+		std::swap(element_nodes[6], element_nodes[7]);
+		return new MeshLib::Hex(element_nodes, material);
 	}
-	case 14: { //pyramid
-		for (unsigned i(0); i < 5; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** pyramid_nodes = new MeshLib::Node*[5];
-		for (unsigned k(0); k < 5; k++)
-			pyramid_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Pyramid(pyramid_nodes, material);
-		break;
-	}
-	case 13: { //wedge
-		for (unsigned i(0); i < 6; i++)
-			node_ids[i] = *connectivity_it++;
-		MeshLib::Node** prism_nodes = new MeshLib::Node*[6];
-		for (unsigned k(0); k < 6; k++)
-			prism_nodes[k] = nodes[node_ids[k]];
-		return new MeshLib::Prism(prism_nodes, material);
-		break;
-	}
+	case 14: return new MeshLib::Pyramid(element_nodes, material);
+	case 13: return new MeshLib::Prism(element_nodes, material);
 	default:
 		ERR("BoostVtuInterface::readElement(): Unknown mesh element type \"%d\".", type);
 		return nullptr;
