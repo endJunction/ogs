@@ -240,6 +240,26 @@ optional<std::vector<T>> readDataArray(ptree const & tree,
 	return OptionalVector(data);
 }
 
+/// Lookup table giving number of elements for a given cell type.
+unsigned cellTypeToNodeNumber(unsigned const type)
+{
+	switch (type)
+	{
+	case 3:  return 2; //line
+	case 5:  return 3; //triangle
+	case 9:  return 4; //quad
+	case 8:  return 4; //pixel
+	case 10: return 4;
+	case 12: return 8; //hexahedron
+	case 11: return 8; //voxel
+	case 14: return 5; //pyramid
+	case 13: return 6; //wedge
+	}
+
+	ERR("BoostVtuInterface: Unknown mesh element type \"%d\".", type);
+	return 0;
+}
+
 /// Construct an Element-object from element type and nodes extracting
 /// connectivity from the input iterator.
 template <typename InputIterator>
@@ -481,12 +501,16 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 				if (!connectivity)
 					ERR("BoostVtuInterface::readVTUFile(): Cannot find \"connectivity\" data array.");
 
+				// Sum up number of nodes for each cell type.
+				std::size_t const connectivity_size
+				        = std::accumulate(cell_types.cbegin(), cell_types.cend(), 0,
+				                          [](std::size_t const& size, std::size_t const& type)
+				                          { return size + cellTypeToNodeNumber(type); });
 
 				optional<std::vector<std::int64_t>> data_array
 				        = readDataArray<std::int64_t>(*connectivity,
 				                                      is_compressed,
-				                                      nElems,
-				                                      8); // Estimated number of nodes/element.
+				                                      connectivity_size);
 
 				if (!data_array)
 				{
