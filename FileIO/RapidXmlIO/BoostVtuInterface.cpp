@@ -317,16 +317,9 @@ MeshLib::Mesh* BoostVtuInterface::readVTUFile(const std::string &file_name)
 	ptree const& root_node = doc.get_child("VTKFile");
 	optional<std::string> const& compressor (getXmlAttribute("compressor", root_node));
 	bool is_compressed = static_cast<bool>(compressor);
-	if (is_compressed)
+	if (is_compressed && *compressor != "vtkZLibDataCompressor")
 	{
-		if (*compressor != "vtkZLibDataCompressor")
-		{
-			ERR("BoostVtuInterface::readVTUFile(): Unknown compression method.");
-			return nullptr;
-		}
-
-		// TODO: remove this once compressed data can be handled!!
-		INFO("Handling of compressed meshes not yet implemented.");
+		ERR("BoostVtuInterface::readVTUFile(): Unknown compression method.");
 		return nullptr;
 	}
 
