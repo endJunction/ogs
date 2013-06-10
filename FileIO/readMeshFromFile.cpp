@@ -27,7 +27,7 @@
 
 // FileIO
 #include "Legacy/MeshIO.h"
-#include "RapidXmlIO/BoostVtuInterface.h"
+#include "BoostXmlIO/BoostVtuInterface.h"
 #include "readMeshFromFile.h"
 
 namespace FileIO

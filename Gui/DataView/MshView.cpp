@@ -34,7 +34,7 @@
 
 #include "Legacy/MeshIO.h"
 //#include "RapidXmlIO/RapidVtuInterface.h"
-#include "RapidXmlIO/BoostVtuInterface.h"
+#include "BoostXmlIO/BoostVtuInterface.h"
 #include "Writer.h" // necessary to avoid Linker Error in Windows
 
 MshView::MshView( QWidget* parent /*= 0*/ )
