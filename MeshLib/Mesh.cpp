@@ -92,13 +92,11 @@ Mesh::Mesh(const Mesh &mesh)
 
 Mesh::~Mesh()
 {
-    const std::size_t nElements (_elements.size());
-    for (std::size_t i=0; i<nElements; ++i)
-        delete _elements[i];
+	for (auto e : _elements)
+		delete e;
 
-    const std::size_t nNodes (_nodes.size());
-    for (std::size_t i=0; i<nNodes; ++i)
-        delete _nodes[i];
+	for (auto n : _nodes)
+		delete n;
 }
 
 void Mesh::addNode(Node* node)
