@@ -99,10 +99,10 @@ GeoLib::Point const& Surface::getTrianglesPoint(std::size_t const tri_index, std
 	return *_sfc_pnts[this->getTrianglesPointId(tri_index, point_index)];
 }
 
-const Triangle* Surface::operator[](std::size_t i) const
+Triangle Surface::operator[] (std::size_t i) const
 {
     assert(i < _sfc_triangles.size());
-    return _sfc_triangles[i];
+	return Triangle(*_sfc_triangles[i]);
 }
 
 bool Surface::isPntInBoundingVolume(MathLib::Point3d const& pnt,
