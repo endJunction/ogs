@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <array>
 #include <vector>
 #include <memory>
 
@@ -94,8 +95,8 @@ public:
 protected:
     /** a vector of pointers to Points */
     const std::vector<Point*>& _sfc_pnts;
-    /** position of pointers to the geometric points */
-    std::vector<Triangle*> _sfc_triangles;
+	/// Point indices forming triangles.
+	std::vector<std::array<std::size_t, 3>> _sfc_triangles;
     /** bounding volume is an axis aligned bounding box */
     std::unique_ptr<AABB> _bounding_volume;
     /// The surface grid is a helper data structure to accelerate the point
