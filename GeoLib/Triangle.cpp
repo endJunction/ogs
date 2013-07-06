@@ -68,11 +68,9 @@ bool Triangle::containsPoint2D (Point const& pnt) const
            y[0] + y[1] <= upper;
 }
 
-void getPlaneCoefficients(Triangle const& tri, double c[3])
+void getPlaneCoefficients(GeoLib::Point const& p0, GeoLib::Point const& p1,
+	GeoLib::Point const& p2, double c[3])
 {
-    GeoLib::Point const& p0 (*(tri.getPoint(0)));
-    GeoLib::Point const& p1 (*(tri.getPoint(1)));
-    GeoLib::Point const& p2 (*(tri.getPoint(2)));
     Eigen::Matrix3d mat;
     mat(0,0) = p0[0];
     mat(0,1) = p0[1];

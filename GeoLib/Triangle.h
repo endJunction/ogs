@@ -83,6 +83,7 @@ private:
     std::array<std::size_t, 3> _pnt_ids;
 };
 
-void getPlaneCoefficients(Triangle const& tri, double c[3]);
+void getPlaneCoefficients(GeoLib::Point const& p0, GeoLib::Point const& p1,
+	GeoLib::Point const& p2, double c[3]);
 
 } // end namespace GeoLib
