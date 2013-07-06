@@ -259,13 +259,10 @@ void GEOModels::addNameForObjectPoints(const std::string &geometry_name,
         std::size_t nTriangles = sfc->getNumberOfTriangles();
         for (std::size_t i = 0; i < nTriangles; i++)
         {
-            const GeoLib::Triangle* tri = (*sfc)[i];
-            pnt_vec->setNameForElement(
-                (*tri)[0], new_name + "_Point" + std::to_string((*tri)[0]));
-            pnt_vec->setNameForElement(
-                (*tri)[1], new_name + "_Point" + std::to_string((*tri)[1]));
-            pnt_vec->setNameForElement(
-                (*tri)[2], new_name + "_Point" + std::to_string((*tri)[2]));
+			for (std::size_t j = 0; j < 3; j++) {
+				pnt_vec->setNameForElement(sfc->getTrianglesPointId(i, j), new_name + "_Point" +
+				    std::to_string(sfc->getTrianglesPoint(i, j)));
+			}
         }
     }
     else

@@ -59,6 +59,13 @@ public:
     */
     const Triangle* operator[](std::size_t i) const;
 
+	/// Returns point id of a triangle in surface's points vector.
+	/// \see getPointVec().
+	std::size_t getTrianglesPointId(std::size_t const tri_index, std::size_t const point_index) const;
+
+	/// Returns reference to surface's point of a triangle.
+	GeoLib::Point const& getTrianglesPoint(std::size_t const tri_index, std::size_t const point_index) const;
+
     /**
      * is the given point in the bounding volume of the surface
      */

@@ -88,6 +88,17 @@ std::size_t Surface::getNumberOfTriangles() const
     return _sfc_triangles.size();
 }
 
+std::size_t Surface::getTrianglesPointId(std::size_t const tri_index, std::size_t const point_index) const
+{
+	assert (tri_index < _sfc_triangles.size());
+	return (*_sfc_triangles[tri_index])[point_index % 3];
+}
+
+GeoLib::Point const& Surface::getTrianglesPoint(std::size_t const tri_index, std::size_t const point_index) const
+{
+	return *_sfc_pnts[this->getTrianglesPointId(tri_index, point_index)];
+}
+
 const Triangle* Surface::operator[](std::size_t i) const
 {
     assert(i < _sfc_triangles.size());

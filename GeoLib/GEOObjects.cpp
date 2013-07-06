@@ -488,10 +488,9 @@ void GEOObjects::mergeSurfaces(std::vector<std::string> const & geo_names,
                 const std::size_t size_of_kth_sfc (kth_sfc_old->getNumberOfTriangles());
                 // clone surface elements using new ids
                 for (std::size_t i(0); i < size_of_kth_sfc; i++) {
-                    const GeoLib::Triangle* tri ((*kth_sfc_old)[i]);
-                    const std::size_t id0 (id_map[pnt_offsets[j] + (*tri)[0]]);
-                    const std::size_t id1 (id_map[pnt_offsets[j] + (*tri)[1]]);
-                    const std::size_t id2 (id_map[pnt_offsets[j] + (*tri)[2]]);
+					const std::size_t id0 (id_map[pnt_offsets[j] + kth_sfc_old->getTrianglesPointId(i, 0)]);
+					const std::size_t id1 (id_map[pnt_offsets[j] + kth_sfc_old->getTrianglesPointId(i, 1)]);
+					const std::size_t id2 (id_map[pnt_offsets[j] + kth_sfc_old->getTrianglesPointId(i, 2)]);
                     kth_sfc_new->addTriangle (id0, id1, id2);
                 }
                 merged_sfcs->push_back (kth_sfc_new);

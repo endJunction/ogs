@@ -100,9 +100,8 @@ int VtkSurfacesSource::RequestData( vtkInformation* request,
             vtkTriangle* new_tri = vtkTriangle::New();
             new_tri->GetPointIds()->SetNumberOfIds(3);
 
-            const GeoLib::Triangle* triangle = (*surface)[i];
             for (std::size_t j = 0; j < 3; ++j)
-                new_tri->GetPointIds()->SetId(j, ((*triangle)[j]));
+				new_tri->GetPointIds()->SetId(j, (**surface).getTrianglesPointId(i, j));
             newPolygons->InsertNextCell(new_tri);
             sfcIDs->InsertNextValue(count);
             new_tri->Delete();
