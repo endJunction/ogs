@@ -18,6 +18,7 @@
 
 namespace
 {
+    constexpr
     double square(double const x)
     {
         return x*x;
@@ -26,7 +27,15 @@ namespace
 
 TEST(MathLib, IntegrationGaussLegendre)
 {
-    double const eps = 10 * std::numeric_limits<double>::epsilon();
+    constexpr double eps = 10 * std::numeric_limits<double>::epsilon();
+
+    static_assert(
+        0. == MathLib::WeightedSum<MathLib::GaussLegendre<1>>::add(square),
+        "MathLib::WeightedSum<MathLib::GaussLegendre<1>::add(square) is not constexpr.");
+
+    static_assert(eps > std::abs(
+        2./3 - MathLib::WeightedSum<MathLib::GaussLegendre<4>>::add(square)),
+        "MathLib::WeightedSum<MathLib::GaussLegendre<4>::add(square) is not constexpr.");
 
     EXPECT_EQ(0.0, MathLib::WeightedSum<MathLib::GaussLegendre<1>>::add(square));
     EXPECT_NEAR(2./3, MathLib::WeightedSum<MathLib::GaussLegendre<2>>::add(square),

@@ -19,6 +19,7 @@ struct SUM
 {
     template <typename F>
     static
+    constexpr
     double
     add(F const& f)
     {
@@ -33,6 +34,7 @@ struct SUM<0, Method>
 {
     template <typename F>
     static
+    constexpr
     double
     add(F const&)
     {
@@ -54,6 +56,7 @@ struct WeightedSum
     /// \tparam Func    Function type.
     template <typename Func>
     static
+    constexpr
     double
     add(Func const& f)
     {
