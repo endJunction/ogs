@@ -1,0 +1,49 @@
+IF (WIN32)
+	SET ( ADDITIONAL_LIBS Winmm.lib )
+ENDIF()
+
+IF (OGS_USE_EIGEN)
+	INCLUDE_DIRECTORIES (SYSTEM ${EIGEN3_INCLUDE_DIR})
+ENDIF()
+
+INCLUDE_DIRECTORIES(
+	.
+	${CMAKE_SOURCE_DIR}/BaseLib/
+	${CMAKE_BINARY_DIR}/BaseLib/
+	${CMAKE_SOURCE_DIR}/FileIO/
+	${CMAKE_SOURCE_DIR}/GeoLib/
+	${CMAKE_SOURCE_DIR}/MathLib/
+	${CMAKE_SOURCE_DIR}/MeshLib/
+	${CMAKE_SOURCE_DIR}/MeshGeoToolsLib/
+	${CMAKE_SOURCE_DIR}/OGS/
+)
+
+ADD_EXECUTABLE(SimpleGroundWaterFlow
+	SimpleGroundWaterFlow.cpp
+	${SOURCES}
+	${HEADERS}
+)
+
+TARGET_LINK_LIBRARIES (SimpleGroundWaterFlow
+	AssemblerLib
+	BaseLib
+	FileIO
+	GeoLib
+	MathLib
+	MeshGeoToolsLib
+	MeshLib
+	OgsLib
+	logog
+	zlib
+	${ADDITIONAL_LIBS}
+	${BOOST_LIBRARIES}
+)
+
+IF(OGS_BUILD_GUI)
+	INCLUDE(${VTK_USE_FILE})
+	TARGET_LINK_LIBRARIES(SimpleGroundWaterFlow
+		QtDataView
+		VtkVis
+		${VTK_LIBRARIES}
+	)
+ENDIF()
