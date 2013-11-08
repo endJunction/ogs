@@ -12,6 +12,10 @@
 
 #include <cstdlib>
 
+// AssemblerLib
+#include "AssemblerLib/SerialDenseSetup.h"
+#include "AssemblerLib/VectorMatrixAssembler.h"
+
 // ThirdParty/logog
 #include "logog/include/logog.hpp"
 
@@ -34,9 +38,11 @@
 
 // MeshGeoToolsLib
 #include "MeshNodeSearcher.h"
+#include "MeshNodesToPoints.h"
 
 // MeshLib
-#include "Mesh.h"
+#include "MeshLib/Mesh.h"
+#include "MeshLib/MeshSubsets.h"
 
 // OGS
 #include "BoundaryCondition.h"
@@ -106,6 +112,18 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+
+	//--------------------------------------------------------------------------
+	// Prepare mesh items where data is assigned
+	//--------------------------------------------------------------------------
+	MeshLib::Mesh const& mesh(*project_data.getMesh(mesh_name));
+	const MeshLib::MeshSubset mesh_items_all_nodes(mesh, mesh.getNodes());
+
+	// define a mesh item composition in a vector
+	std::vector<MeshLib::MeshSubsets*> vec_comp_dis;
+	vec_comp_dis.push_back(new MeshLib::MeshSubsets(&mesh_items_all_nodes));
+	AssemblerLib::MeshComponentMap vec1_composition(vec_comp_dis,
+			AssemblerLib::ComponentOrder::BY_COMPONENT);
 
 
 	delete custom_format;
