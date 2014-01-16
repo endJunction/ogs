@@ -36,6 +36,9 @@
 #include "GEOObjects.h"
 #include "GeoObject.h"
 
+// MathLib
+#include "MathLib/LinAlg/Solvers/GaussAlgorithm.h"
+
 // MeshGeoToolsLib
 #include "MeshNodeSearcher.h"
 #include "MeshNodesToPoints.h"
@@ -47,6 +50,47 @@
 // OGS
 #include "BoundaryCondition.h"
 #include "ProjectData.h"
+
+class LocalGWAssembler
+{
+public:
+	LocalGWAssembler() :
+			_m(4, 4)
+	{
+		_m(0, 0) = 4.0;
+		_m(0, 1) = -1.0;
+		_m(0, 2) = -2.0;
+		_m(0, 3) = -1.0;
+		_m(1, 1) = 4.0;
+		_m(1, 2) = -1.0;
+		_m(1, 3) = -2.0;
+		_m(2, 2) = 4.0;
+		_m(2, 3) = -1.0;
+		_m(3, 3) = 4.0;
+
+		// copy upper triangle to lower to make symmetric
+		for (std::size_t i = 0; i < 4; i++)
+			for (std::size_t j = 0; j < i; j++)
+				_m(i, j) = _m(j, i);
+
+		//_m *= 1.e-11/6.0;
+		for (std::size_t i = 0; i < 4; i++)
+			for (std::size_t j = 0; j < 4; j++)
+				_m(i, j) *= 1.0;
+	}
+
+	void operator()(const MeshLib::Element & /*e*/, MathLib::DenseMatrix<double> &localA,
+			MathLib::DenseVector<double> & /*rhs*/)
+	{
+		for (std::size_t i = 0; i < 4; i++)
+			for (std::size_t j = 0; j < 4; j++)
+				localA(i, j) = _m(i, j);
+	}
+
+private:
+	MathLib::DenseMatrix<double> _m;
+};
+
 
 int main(int argc, char *argv[])
 {
@@ -119,12 +163,89 @@ int main(int argc, char *argv[])
 	MeshLib::Mesh const& mesh(*project_data.getMesh(mesh_name));
 	const MeshLib::MeshSubset mesh_items_all_nodes(mesh, mesh.getNodes());
 
+	//-------------------------------------------------------------------------
+	// Allocate a (global) coefficient matrix, RHS and solution vectors
+	//-------------------------------------------------------------------------
 	// define a mesh item composition in a vector
 	std::vector<MeshLib::MeshSubsets*> vec_comp_dis;
 	vec_comp_dis.push_back(new MeshLib::MeshSubsets(&mesh_items_all_nodes));
 	AssemblerLib::MeshComponentMap vec1_composition(vec_comp_dis,
 			AssemblerLib::ComponentOrder::BY_COMPONENT);
 
+	//--------------------------------------------------------------------------
+	// Choose implementation type
+	//--------------------------------------------------------------------------
+	typedef AssemblerLib::SerialDenseSetup GlobalSetup;
+	const GlobalSetup global_setup;
+
+	// allocate a vector and matrix
+	typedef GlobalSetup::VectorType GlobalVector;
+	typedef GlobalSetup::MatrixType GlobalMatrix;
+	std::unique_ptr < GlobalMatrix > A(global_setup.createMatrix(vec1_composition));
+	A->setZero();
+	std::unique_ptr < GlobalVector > rhs(global_setup.createVector(vec1_composition));
+	std::unique_ptr < GlobalVector > x(global_setup.createVector(vec1_composition));
+
+	//--------------------------------------------------------------------------
+	// Construct a linear system
+	//--------------------------------------------------------------------------
+	// create a mapping table from element nodes to entries in the linear system
+	std::vector<MeshLib::Element*> const& all_eles = mesh.getElements();
+
+	std::vector < std::vector<std::size_t> > map_ele_nodes2vec_entries;
+	map_ele_nodes2vec_entries.reserve(all_eles.size());
+	for (auto e = all_eles.cbegin(); e != all_eles.cend(); ++e) {
+		std::size_t const nnodes = (*e)->getNNodes();
+		std::size_t const mesh_id = mesh.getID();
+		std::vector<MeshLib::Location> vec_items;
+		vec_items.reserve(nnodes);
+		for (std::size_t j = 0; j < nnodes; j++)
+			vec_items.emplace_back(mesh_id, MeshLib::MeshItemType::Node, (*e)->getNode(j)->getID());
+
+		map_ele_nodes2vec_entries.push_back(
+				vec1_composition.getGlobalIndices<AssemblerLib::ComponentOrder::BY_COMPONENT>(
+						vec_items));
+	}
+
+	//
+	// Local and global assemblers.
+	//
+	LocalGWAssembler local_gw_assembler;
+
+	typedef AssemblerLib::VectorMatrixAssembler<GlobalMatrix, GlobalVector, MeshLib::Element,
+			LocalGWAssembler, MathLib::DenseMatrix<double>, MathLib::DenseVector<double> > GlobalAssembler;
+
+	GlobalAssembler global_assembler(*A.get(), *rhs.get(), local_gw_assembler,
+			AssemblerLib::LocalToGlobalIndexMap(map_ele_nodes2vec_entries));
+
+	// Call global assembler for each mesh element.
+	global_setup.execute(global_assembler, mesh.getElements());
+
+	//--------------------------------------------------------------------------
+	// solve x=A^-1 rhs
+	//--------------------------------------------------------------------------
+	std::cout << "A=\n";
+	for (std::size_t i = 0; i < 30; i++) {
+		for (std::size_t j = 0; j < 30; j++)
+			std::cout << (*A)(i, j) << " ";
+		std::cout << std::endl;
+	}
+
+	MathLib::GaussAlgorithm<GlobalMatrix, GlobalVector> ls(*A);
+	ls.solve(*rhs, *x);
+
+	if (x->size() > 1000) {
+		std::ofstream out("results.txt");
+		for (std::size_t i = 0; i < x->size(); i++) {
+			out << (*x)[i] << " ";
+		}
+		out << std::endl;
+		out.close();
+	} else {
+		for (std::size_t i = 0; i < x->size(); i++) {
+			std::cout << (*x)[i] << " ";
+		}
+	}
 
 	delete custom_format;
 	delete logog_cout;
