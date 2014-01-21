@@ -69,7 +69,8 @@ void
 GlobalDenseMatrix<FP_TYPE, IDX_TYPE>::add(std::vector<IDX_TYPE> const& row_pos, std::vector<IDX_TYPE> const& col_pos,
 		const T_DENSE_MATRIX &sub_matrix, FP_TYPE fkt)
 {
-	if (row_pos.size() != sub_matrix.getNRows() || col_pos.size() != sub_matrix.getNCols())
+	//if (row_pos.size() != sub_matrix.getNRows() || col_pos.size() != sub_matrix.getNCols())
+	if (row_pos.size() != sub_matrix.rows() || col_pos.size() != sub_matrix.cols())
 		return;
 
 	const std::size_t n_rows = row_pos.size();
