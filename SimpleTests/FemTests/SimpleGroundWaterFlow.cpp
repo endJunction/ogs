@@ -47,9 +47,15 @@
 #include "MeshLib/Mesh.h"
 #include "MeshLib/MeshSubsets.h"
 
+// NumLib
+#include "NumLib/Fem/ShapeFunction/ShapeQuad4.h"
+
 // OGS
 #include "BoundaryCondition.h"
 #include "ProjectData.h"
+
+const std::size_t NumLib::ShapeQuad4::DIM;
+const std::size_t NumLib::ShapeQuad4::NPOINTS;
 
 class LocalGWAssembler
 {

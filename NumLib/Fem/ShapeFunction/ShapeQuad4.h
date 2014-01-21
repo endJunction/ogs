@@ -49,6 +49,9 @@ public:
      */
     template <class T_X, class T_N>
     static void computeGradShapeFunction(const T_X &r, T_N &dN);
+
+    static const std::size_t DIM = 2;
+    static const std::size_t NPOINTS = 4;
 };
 
 }
