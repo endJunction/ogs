@@ -12,6 +12,10 @@
 
 #include <cstdlib>
 
+#ifdef OGS_USE_EIGEN
+#include <Eigen/Eigen>
+#endif
+
 // AssemblerLib
 #include "AssemblerLib/SerialDenseSetup.h"
 #include "AssemblerLib/VectorMatrixAssembler.h"
@@ -38,6 +42,7 @@
 
 // MathLib
 #include "MathLib/LinAlg/Solvers/GaussAlgorithm.h"
+#include "MathLib/TemplateWeightedPoint.h"
 
 // MeshGeoToolsLib
 #include "MeshNodeSearcher.h"
@@ -46,9 +51,13 @@
 // MeshLib
 #include "MeshLib/Mesh.h"
 #include "MeshLib/MeshSubsets.h"
+#include "MeshLib/Elements/Quad.h"
 
 // NumLib
+#include "NumLib/Fem/Integration/IntegrationGaussRegular.h"
+#include "NumLib/Fem/CoordinatesMapping/ShapeMatrices.h"
 #include "NumLib/Fem/ShapeFunction/ShapeQuad4.h"
+#include "NumLib/Fem/FiniteElement/C0IsoparametricElements.h"
 
 // OGS
 #include "BoundaryCondition.h"
