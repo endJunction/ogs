@@ -186,6 +186,7 @@ int main(int argc, char *argv[])
 					FEMCondition::BOUNDARY_CONDITION));
 
 	std::vector < std::size_t > bc_mesh_node_ids;
+	std::vector <double> bc_values;
 	MeshGeoToolsLib::MeshNodeSearcher searcher(*project_data.getMesh(mesh_name));
 	for (auto it(bcs.cbegin()); it != bcs.cend(); it++) {
 		// fetch geometry obj from condition obj
@@ -193,11 +194,14 @@ int main(int argc, char *argv[])
 		if (dynamic_cast<GeoLib::Point const*>(geom_obj) != nullptr) {
 			GeoLib::Point const& pnt(*dynamic_cast<GeoLib::Point const*>(geom_obj));
 			bc_mesh_node_ids.push_back(searcher.getMeshNodeIDForPoint(pnt));
+			bc_values.push_back((*it)->getDisValues()[0]);
 		} else {
 			if (dynamic_cast<GeoLib::Polyline const*>(geom_obj) != nullptr) {
 				GeoLib::Polyline const& ply(*dynamic_cast<GeoLib::Polyline const*>(geom_obj));
 				std::vector<std::size_t> const& ids(searcher.getMeshNodeIDsAlongPolyline(ply));
 				bc_mesh_node_ids.insert(bc_mesh_node_ids.end(), ids.cbegin(), ids.cend());
+				for (std::size_t k(0); k<bc_mesh_node_ids.size(); k++)
+					bc_values.push_back((*it)->getDisValues()[0]);
 			}
 		}
 	}
@@ -280,8 +284,7 @@ int main(int argc, char *argv[])
 	global_setup.execute(global_assembler, mesh.getElements());
 
 	// apply Dirichlet BC
-	//MathLib::applyKnownSolution(*A, *rhs, ex1.vec_DirichletBC_id,
-	                                //ex1.vec_DirichletBC_value);
+	MathLib::applyKnownSolution(*A, *rhs, bc_mesh_node_ids, bc_values);
 	//--------------------------------------------------------------------------
 	// solve x=A^-1 rhs
 	//--------------------------------------------------------------------------
