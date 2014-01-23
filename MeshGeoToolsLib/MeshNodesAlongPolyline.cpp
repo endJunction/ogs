@@ -28,6 +28,7 @@ MeshNodesAlongPolyline::MeshNodesAlongPolyline(
 		double epsilon_radius) :
 	_ply(ply)
 {
+	assert(epsilon_radius > 0);
 	const std::size_t n_nodes (mesh_nodes.size());
 	// loop over all line segments of the polyline
 	for (size_t k = 0; k < _ply.getNumberOfPoints() - 1; k++) {
