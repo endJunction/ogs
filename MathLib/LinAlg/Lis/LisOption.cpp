@@ -23,7 +23,7 @@ LisOption::LisOption()
     precon_type = PreconType::NONE;
     matrix_type = MatrixType::CRS;
     max_iterations = 500;
-    error_tolerance = 1.e-10;
+    error_tolerance = 1.e-15;
 }
 
 LisOption::SolverType LisOption::getSolverType(const std::string &solver_name)
