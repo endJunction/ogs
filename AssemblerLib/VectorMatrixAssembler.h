@@ -50,7 +50,8 @@ public:
     /// The positions in the global matrix/vector are taken from
     /// the LocalToGlobalIndexMap provided in the constructor at index \c id.
     /// \attention The index \c id is not necesserily the mesh item's id.
-    void operator()(const MESH_ITEM_* item, std::size_t id) const
+    template <typename... Args>
+    void operator()(const MESH_ITEM_* item, std::size_t id, Args&& ... args) const
     {
         assert(_data_pos.size() > id);
 
@@ -58,7 +59,7 @@ public:
         LOCAL_MATRIX_ local_A(indices.rows.size(), indices.columns.size());
         LOCAL_VECTOR_ local_rhs(indices.rows.size());
 
-        _local_assembler(*item, local_A, local_rhs);
+        _local_assembler(*item, local_A, local_rhs, std::forward<Args>(args)...);
         _A.add(indices, local_A);
         _rhs.add(indices.rows, local_rhs);
     }
