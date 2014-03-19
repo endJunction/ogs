@@ -40,6 +40,30 @@ struct SerialExecutor
             f(c[i], i);
     }
 
+    /// Same as execute(f, c), but with two containers.
+    ///
+    /// \tparam F   \c f type.
+    /// \tparam C1  input container 1 type.
+    /// \tparam C2  input container 2 type.
+    ///
+    /// \param f    a function that accepts a pointer to container's elements,
+    ///             an index, and a second container element as arguments.
+    /// \param c1   a container supporting access over operator[].
+    /// \param c2   a container supporting access over operator[].
+    template <typename F, typename C1, typename C2>
+    static
+    void
+#if defined(_MSC_VER) && (_MSC_VER >= 1700)
+    execute(F& f, C1 const& c1, C2& c2)
+#else
+    execute(F const& f, C1 const& c1, C2& c2)
+#endif
+    {
+        assert(c1.size() == c2.size());
+
+        for (std::size_t i = 0; i < c1.size(); i++)
+            f(c1[i], i, c2[i]);
+    }
 };
 
 }   // namespace AssemblerLib
