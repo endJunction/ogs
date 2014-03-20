@@ -81,6 +81,34 @@ const std::size_t NumLib::ShapeQuad4::DIM;
 const std::size_t NumLib::ShapeQuad4::NPOINTS;
 
 template <typename ElemType>
+class LocalFeQuad4AssemblyItem
+{
+public:
+	// definition of vector and matrix types
+	typedef Eigen::Matrix<double, ElemType::NPOINTS, ElemType::NPOINTS, Eigen::RowMajor> NodalMatrixType;
+	typedef Eigen::Matrix<double, ElemType::NPOINTS, 1> NodalVectorType;
+	typedef Eigen::Matrix<double, ElemType::DIM, ElemType::NPOINTS, Eigen::RowMajor> DimNodalMatrixType;
+	typedef Eigen::Matrix<double, ElemType::DIM, ElemType::DIM, Eigen::RowMajor> DimMatrixType;
+
+	// type definition of FeQuad4 type
+	typedef typename NumLib::FeQUAD4<
+		NodalVectorType,
+		DimNodalMatrixType,
+		DimMatrixType>::type FeQuad4;
+
+	// type definition of ShapeMatricesType
+	typedef typename FeQuad4::ShapeMatricesType ShapeMatricesType;
+
+	LocalFeQuad4AssemblyItem() :
+		_shape_mat(ShapeMatricesType(3,4)),
+		_material(1.0)
+	{}
+
+	ShapeMatricesType _shape_mat;
+	double _material;
+};
+
+template <typename ElemType>
 class LocalGWAssembler
 {
 
