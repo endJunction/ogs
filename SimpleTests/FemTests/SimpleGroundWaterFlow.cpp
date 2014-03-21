@@ -144,7 +144,7 @@ public:
 
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
 			_fe_quad4.computeShapeFunctions(wp.getCoords(), shape);
-			localA += shape.dNdx.transpose() * shape.dNdx * shape.detJ * wp.getWeight();
+			localA += shape.dNdx.transpose() * data._material * shape.dNdx * shape.detJ * wp.getWeight();
 		}
 	}
 
@@ -300,6 +300,13 @@ int main(int argc, char *argv[])
 	// create data structures for properties
 	std::vector<LocalFeQuad4AssemblyItem<NumLib::ShapeQuad4>> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
+
+	std::array<double,4> mat_values({{1e-10, 2e-10, 4e-10, 8e-10}});
+
+	// set properties according to materials in mesh elements
+	for (std::size_t k(0); k<mesh.getNElements(); k++) {
+		local_assembly_item_vec[k]._material = mat_values[mesh.getElements()[k]->getValue()];
+	}
 
 	// Call global assembler for each mesh element.
 	global_setup.execute(global_assembler, mesh.getElements(), local_assembly_item_vec);
