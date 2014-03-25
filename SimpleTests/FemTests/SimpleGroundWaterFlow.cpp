@@ -73,6 +73,12 @@ public:
     typedef Eigen::Matrix<double, ElemType::DIM, ElemType::NPOINTS, Eigen::RowMajor> DimNodalMatrixType;
     typedef Eigen::Matrix<double, ElemType::DIM, ElemType::DIM, Eigen::RowMajor> DimMatrixType;
 
+	// Dynamic size local matrices are much slower.
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> NodalMatrixType;
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, 1> NodalVectorType;
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::RowMajor> DimNodalMatrixType;
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
+
 public:
 	LocalGWAssembler() :
 			_m(ElemType::NPOINTS, ElemType::NPOINTS),
