@@ -10,6 +10,9 @@
  *
  */
 
+//#undef LIS
+#define LIS
+
 #include <cstdlib>
 
 #ifdef OGS_USE_EIGEN
@@ -17,11 +20,14 @@
 #endif
 
 // AssemblerLib
-//#include "AssemblerLib/SerialDenseSetup.h"
 #include "AssemblerLib/GlobalSetup.h"
-#include "AssemblerLib/SerialExecutor.h"
-#include "AssemblerLib/SerialLisVectorMatrixBuilder.h"
 #include "AssemblerLib/VectorMatrixAssembler.h"
+#ifdef LIS
+    #include "AssemblerLib/SerialExecutor.h"
+    #include "AssemblerLib/SerialLisVectorMatrixBuilder.h"
+#else
+    #include "AssemblerLib/SerialDenseSetup.h"
+#endif
 
 // ThirdParty/logog
 #include "logog/include/logog.hpp"
@@ -44,8 +50,15 @@
 #include "GeoObject.h"
 
 // MathLib
-//#include "MathLib/LinAlg/Solvers/GaussAlgorithm.h"
-#include "MathLib/LinAlg/Lis/LisLinearSolver.h"
+#ifdef LIS
+    #include "MathLib/LinAlg/Lis/LisTools.h"
+    #include "MathLib/LinAlg/Lis/LisLinearSolver.h"
+#else
+    #include "MathLib/LinAlg/Dense/DenseTools.h"
+    #include "MathLib/LinAlg/Solvers/GaussAlgorithm.h"
+#endif
+#include "MathLib/LinAlg/FinalizeMatrixAssembly.h"
+
 #include "MathLib/TemplateWeightedPoint.h"
 
 // MeshGeoToolsLib
@@ -207,10 +220,13 @@ int main(int argc, char *argv[])
 	//--------------------------------------------------------------------------
 	// Choose implementation type
 	//--------------------------------------------------------------------------
-	//typedef AssemblerLib::SerialDenseSetup GlobalSetup;
+#ifdef LIS
 	typedef AssemblerLib::GlobalSetup<
 		AssemblerLib::SerialLisVectorMatrixBuilder,
 		AssemblerLib::SerialExecutor> GlobalSetup;
+#else
+	typedef AssemblerLib::SerialDenseSetup GlobalSetup;
+#endif
 	const GlobalSetup global_setup;
 
 	// allocate a vector and matrix
@@ -269,16 +285,11 @@ int main(int argc, char *argv[])
 	//--------------------------------------------------------------------------
 	// solve x=A^-1 rhs
 	//--------------------------------------------------------------------------
-//	std::cout << "A=\n";
-//	for (std::size_t i = 0; i < 30; i++) {
-//		for (std::size_t j = 0; j < 30; j++)
-//			std::cout << (*A)(i, j) << " ";
-//		std::cout << std::endl;
-//	}
-
-	MathLib::finalizeMatrixAssembly(*A);
-	//MathLib::GaussAlgorithm<GlobalMatrix, GlobalVector> ls(*A);
+#ifdef LIS
 	MathLib::LisLinearSolver ls(*A);
+#else
+	MathLib::GaussAlgorithm<GlobalMatrix, GlobalVector> ls(*A);
+#endif
 	ls.solve(*rhs, *x);
 
 	if (x->size() > 1000) {
