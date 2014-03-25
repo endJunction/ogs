@@ -89,17 +89,15 @@ public:
 		_fe_quad4.setMeshElement(*static_cast<const MeshLib::Quad*>(&e));
 
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
-			std::cout << ip << " (r,s) = " << _integration_method.getWeightedPoint(ip) << " w = " << _integration_method.getWeightedPoint(ip).getWeight() << "\n";
 
 			_shape.setZero();
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
 			_fe_quad4.computeShapeFunctions(wp.getCoords(), _shape);
-			std::cout << "dNdx = " << _shape.dNdx << " J = " << _shape.detJ << std::endl;
-			std::cout << "m_" << ip << " = " << _m << std::endl;
+			//std::cout << "m_" << ip << " = " << _m << std::endl;
 			_m += _shape.dNdx.transpose() * _shape.dNdx * _shape.detJ * wp.getWeight();
 		}
 
-		std::cout << "ip = " << _m << std::endl;
+		//std::cout << "ip = " << _m << std::endl;
 
 		for (std::size_t i = 0; i < _integration_method.getNPoints(); i++)
 			for (std::size_t j = 0; j < _integration_method.getNPoints(); j++)
@@ -258,12 +256,12 @@ int main(int argc, char *argv[])
 	//--------------------------------------------------------------------------
 	// solve x=A^-1 rhs
 	//--------------------------------------------------------------------------
-	std::cout << "A=\n";
-	for (std::size_t i = 0; i < 30; i++) {
-		for (std::size_t j = 0; j < 30; j++)
-			std::cout << (*A)(i, j) << " ";
-		std::cout << std::endl;
-	}
+//	std::cout << "A=\n";
+//	for (std::size_t i = 0; i < 30; i++) {
+//		for (std::size_t j = 0; j < 30; j++)
+//			std::cout << (*A)(i, j) << " ";
+//		std::cout << std::endl;
+//	}
 
 	MathLib::GaussAlgorithm<GlobalMatrix, GlobalVector> ls(*A);
 	ls.solve(*rhs, *x);
