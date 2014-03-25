@@ -39,6 +39,10 @@ class LisVector;
 class LisMatrix
 {
 public:
+	typedef LIS_SCALAR FP_T;
+	typedef LIS_INT IDX_T;
+
+public:
     /**
      * constructor
      * @param n_rows the number of rows (that is equal to the number of columns)
