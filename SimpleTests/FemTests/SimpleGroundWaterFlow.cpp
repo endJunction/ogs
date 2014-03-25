@@ -106,11 +106,12 @@ public:
 
 public:
 	LocalFeQuad4AssemblyItem() :
-		_shape_mat(ShapeMatricesType(3,4)),
+		_shape_matrices({{ShapeMatricesType(3,4), ShapeMatricesType(3,4), ShapeMatricesType(3,4), ShapeMatricesType(3,4)}}),
 		_material(1.0)
 	{}
 
-	ShapeMatricesType _shape_mat;
+	// The length of the array is as long as there are Gauss points.
+	std::array<ShapeMatricesType, 4>  _shape_matrices;
 	double _material;
 };
 
@@ -138,13 +139,11 @@ public:
 		// init FeQUAD4
 		_fe_quad4.setMeshElement(*static_cast<const MeshLib::Quad*>(&e));
 
-		typedef typename ItemType::FeQuad4::ShapeMatricesType ShapeMatricesType;
-		ShapeMatricesType& shape = data._shape_mat;
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
 
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
-			_fe_quad4.computeShapeFunctions(wp.getCoords(), shape);
-			localA += shape.dNdx.transpose() * data._material * shape.dNdx * shape.detJ * wp.getWeight();
+			_fe_quad4.computeShapeFunctions(wp.getCoords(), data._shape_matrices[ip]);
+			localA += data._shape_matrices[ip].dNdx.transpose() * data._material * data._shape_matrices[ip].dNdx * data._shape_matrices[ip].detJ * wp.getWeight();
 		}
 	}
 
