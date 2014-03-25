@@ -201,6 +201,7 @@ TYPED_TEST(NumLibFemIsoQuad4Test, CheckMassMatrix)
 
     // evaluate a mass matrix M = int{ N^T D N }dA_e
     NodalMatrix M(e_nnodes, e_nnodes);
+    M.setZero();
     ShapeMatricesType shape(dim, e_nnodes);
     for (std::size_t i=0; i < this->integration_method.getNPoints(); i++) {
         shape.setZero();
@@ -224,6 +225,7 @@ TYPED_TEST(NumLibFemIsoQuad4Test, CheckLaplaceMatrix)
 
     // evaluate a Laplace matrix K = int{ dNdx^T D dNdx }dA_e
     NodalMatrix K(e_nnodes, e_nnodes);
+    K.setZero();
     ShapeMatricesType shape(dim, e_nnodes);
     for (std::size_t i=0; i < this->integration_method.getNPoints(); i++) {
         shape.setZero();
@@ -247,6 +249,8 @@ TYPED_TEST(NumLibFemIsoQuad4Test, CheckMassLaplaceMatrices)
     // evaluate both mass and laplace matrices at once
     NodalMatrix M(e_nnodes, e_nnodes);
     NodalMatrix K(e_nnodes, e_nnodes);
+    M.setZero();
+    K.setZero();
     ShapeMatricesType shape(dim, e_nnodes);
     for (std::size_t i=0; i < this->integration_method.getNPoints(); i++) {
         shape.setZero();
@@ -271,6 +275,7 @@ TYPED_TEST(NumLibFemIsoQuad4Test, CheckGaussIntegrationLevel)
 
     // evaluate a mass matrix
     NodalMatrix M(e_nnodes, e_nnodes);
+    M.setZero();
     ShapeMatricesType shape(dim, e_nnodes);
     ASSERT_EQ(4u, this->integration_method.getNPoints());
     for (std::size_t i=0; i < this->integration_method.getNPoints(); i++) {
