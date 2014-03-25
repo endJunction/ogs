@@ -116,6 +116,36 @@ public:
 };
 
 template <typename ElemType>
+class ShapeMatricesInitializer
+{
+public:
+	typedef LocalFeQuad4AssemblyItem<ElemType> ItemType;
+	typedef typename ItemType::NodalMatrixType NodalMatrixType;
+	typedef typename ItemType::NodalVectorType NodalVectorType;
+
+public:
+	ShapeMatricesInitializer() :
+		_integration_method(2)
+	{}
+
+	void operator()(const MeshLib::Element& e, NodalMatrixType & /*localA*/,
+		NodalVectorType & /*rhs*/,
+		LocalFeQuad4AssemblyItem<ElemType>& data)
+	{
+		// create FeQuad4
+		typename ItemType::FeQuad4 fe_quad4(*static_cast<const MeshLib::Quad*>(&e));
+
+		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
+			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
+			fe_quad4.computeShapeFunctions(wp.getCoords(), data._shape_matrices[ip]);
+		}
+	}
+
+private:
+	typename ItemType::FeQuad4::IntegrationMethod _integration_method;
+};
+
+template <typename ElemType>
 class LocalGWAssembler
 {
 public:
