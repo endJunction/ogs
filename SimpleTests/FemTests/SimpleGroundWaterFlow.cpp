@@ -109,7 +109,8 @@ public:
 	{}
 
 	void operator()(const MeshLib::Element& e, NodalMatrixType &localA,
-			NodalVectorType & /*rhs*/)
+			NodalVectorType & /*rhs*/,
+			ShapeMatricesType& shape)
 	{
 		localA.setZero();
 
@@ -120,8 +121,8 @@ public:
 
 			_shape.setZero();
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
-			_fe_quad4.computeShapeFunctions(wp.getCoords(), _shape);
-			localA += _shape.dNdx.transpose() * _shape.dNdx * _shape.detJ * wp.getWeight();
+			_fe_quad4.computeShapeFunctions(wp.getCoords(), shape);
+			localA += shape.dNdx.transpose() * shape.dNdx * shape.detJ * wp.getWeight();
 		}
 	}
 
@@ -286,7 +287,7 @@ int main(int argc, char *argv[])
 	std::fill_n(std::back_inserter(shape_matrix_vec), mesh.getNElements(), typename FeQuad4::ShapeMatricesType(3,4));
 	
 	// Call global assembler for each mesh element.
-	global_setup.execute(global_assembler, mesh.getElements());
+	global_setup.execute(global_assembler, mesh.getElements(), shape_matrix_vec);
 
 	// apply Dirichlet BC
 	MathLib::applyKnownSolution(*A, *rhs, bc_mesh_node_ids, bc_values);
