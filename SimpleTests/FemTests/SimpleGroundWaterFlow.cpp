@@ -98,7 +98,6 @@ public:
 
 public:
 	LocalGWAssembler() :
-			_m(ElemType::NPOINTS, ElemType::NPOINTS),
 			_shape(ElemType::DIM, ElemType::NPOINTS),
 			_integration_method(2)
 	{}
@@ -106,7 +105,7 @@ public:
 	void operator()(const MeshLib::Element& e, NodalMatrixType &localA,
 			NodalVectorType & /*rhs*/)
 	{
-		_m.setZero();
+		localA.setZero();
 
 		// init FeQUAD4
 		_fe_quad4.setMeshElement(*static_cast<const MeshLib::Quad*>(&e));
@@ -116,19 +115,11 @@ public:
 			_shape.setZero();
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
 			_fe_quad4.computeShapeFunctions(wp.getCoords(), _shape);
-			//std::cout << "m_" << ip << " = " << _m << std::endl;
-			_m += _shape.dNdx.transpose() * _shape.dNdx * _shape.detJ * wp.getWeight();
+			localA += _shape.dNdx.transpose() * _shape.dNdx * _shape.detJ * wp.getWeight();
 		}
-
-		//std::cout << "ip = " << _m << std::endl;
-
-		for (std::size_t i = 0; i < _integration_method.getNPoints(); i++)
-			for (std::size_t j = 0; j < _integration_method.getNPoints(); j++)
-				localA(i, j) = _m(i, j);
 	}
 
 private:
-	NodalMatrixType _m;
 	typedef typename NumLib::FeQUAD4<NodalVectorType, DimNodalMatrixType, DimMatrixType>::type FeQuad4;
 	typename FeQuad4::ShapeMatricesType _shape;
 	typename FeQuad4::IntegrationMethod _integration_method;
