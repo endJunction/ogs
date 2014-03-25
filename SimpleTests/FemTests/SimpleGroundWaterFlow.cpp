@@ -285,6 +285,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	std::remove_if(vec_comp_dis.begin(), vec_comp_dis.end(),
+			[](MeshLib::MeshSubsets* v) { delete v; return true; });
 	delete custom_format;
 	delete logog_cout;
 	LOGOG_SHUTDOWN();
