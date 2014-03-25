@@ -108,7 +108,12 @@ public:
 	LocalFeQuad4AssemblyItem() :
 		_shape_matrices({{ShapeMatricesType(3,4), ShapeMatricesType(3,4), ShapeMatricesType(3,4), ShapeMatricesType(3,4)}}),
 		_material(1.0)
-	{}
+	{
+		_shape_matrices[0].setZero();
+		_shape_matrices[1].setZero();
+		_shape_matrices[2].setZero();
+		_shape_matrices[3].setZero();
+	}
 
 	// The length of the array is as long as there are Gauss points.
 	std::array<ShapeMatricesType, 4>  _shape_matrices;
