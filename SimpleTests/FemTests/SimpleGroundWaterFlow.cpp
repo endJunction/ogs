@@ -43,6 +43,7 @@
 // FileIO
 #include "XmlIO/Boost/BoostXmlCndInterface.h"
 #include "XmlIO/Boost/BoostXmlGmlInterface.h"
+#include "XmlIO/Boost/BoostVtuInterface.h"
 #include "readMeshFromFile.h"
 
 // GeoLib
@@ -357,17 +358,17 @@ int main(int argc, char *argv[])
 #endif
 	ls.solve(*rhs, *x);
 
-	if (x->size() > 1000) {
-		std::ofstream out("results.txt");
-		for (std::size_t i = 0; i < x->size(); i++) {
-			out << (*x)[i] << " ";
-		}
-		out << std::endl;
-		out.close();
-	} else {
-		for (std::size_t i = 0; i < x->size(); i++) {
-			std::cout << (*x)[i] << " ";
-		}
+	{
+		std::vector<double> heads;
+		heads.reserve(x->size());
+		for (std::size_t i = 0; i < x->size(); i++)
+			heads.push_back((*x)[i]);
+
+		FileIO::BoostVtuInterface vtu_io;
+		vtu_io.setMesh(project_data.getMesh(mesh_name));
+		vtu_io.addScalarPointProperty("Head", heads);
+		std::string const res_mesh_name(BaseLib::dropFileExtension(mesh_arg.getValue()));
+		vtu_io.writeToFile(res_mesh_name+"_with_results.vtu");
 	}
 
 	std::remove_if(vec_comp_dis.begin(), vec_comp_dis.end(),
