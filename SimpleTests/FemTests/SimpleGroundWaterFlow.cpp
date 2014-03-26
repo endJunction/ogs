@@ -10,9 +10,6 @@
  *
  */
 
-//#undef LIS
-#define LIS
-
 #include <cstdlib>
 
 #ifdef OGS_USE_EIGEN
@@ -22,12 +19,6 @@
 // AssemblerLib
 #include "AssemblerLib/GlobalSetup.h"
 #include "AssemblerLib/VectorMatrixAssembler.h"
-#ifdef LIS
-    #include "AssemblerLib/SerialExecutor.h"
-    #include "AssemblerLib/SerialLisVectorMatrixBuilder.h"
-#else
-    #include "AssemblerLib/SerialDenseSetup.h"
-#endif
 
 // ThirdParty/logog
 #include "logog/include/logog.hpp"
@@ -51,15 +42,7 @@
 #include "GeoObject.h"
 
 // MathLib
-#ifdef LIS
-    #include "MathLib/LinAlg/Lis/LisTools.h"
-    #include "MathLib/LinAlg/Lis/LisLinearSolver.h"
-#else
-    #include "MathLib/LinAlg/Dense/DenseTools.h"
-    #include "MathLib/LinAlg/Solvers/GaussAlgorithm.h"
-#endif
 #include "MathLib/LinAlg/FinalizeMatrixAssembly.h"
-
 #include "MathLib/TemplateWeightedPoint.h"
 
 // MeshGeoToolsLib
@@ -80,6 +63,34 @@
 
 const std::size_t NumLib::ShapeQuad4::DIM;
 const std::size_t NumLib::ShapeQuad4::NPOINTS;
+
+// The following defines types depending on Lis or DirectSolver choice.
+// Right includes are also made.
+
+//#undef LIS
+#define LIS
+
+#ifdef LIS
+	#include "AssemblerLib/SerialExecutor.h"
+	#include "AssemblerLib/SerialLisVectorMatrixBuilder.h"
+
+	#include "MathLib/LinAlg/Lis/LisTools.h"
+	#include "MathLib/LinAlg/Lis/LisLinearSolver.h"
+
+	typedef AssemblerLib::GlobalSetup<
+		AssemblerLib::SerialLisVectorMatrixBuilder,
+		AssemblerLib::SerialExecutor> GlobalSetup;
+
+	typedef MathLib::LisLinearSolver LinearSolver;
+#else	// LIS
+	#include "AssemblerLib/SerialDenseSetup.h"
+	#include "MathLib/LinAlg/Dense/DenseTools.h"
+
+	#include "MathLib/LinAlg/Solvers/GaussAlgorithm.h"
+	typedef AssemblerLib::SerialDenseSetup GlobalSetup;
+
+	typedef MathLib::GaussAlgorithm<GlobalSetup::MatrixType, GlobalSetup::VectorType> LinearSolver;
+#endif	// LIS
 
 template <typename ElemType>
 class LocalFeQuad4AssemblyItem
@@ -276,13 +287,6 @@ int main(int argc, char *argv[])
 	//--------------------------------------------------------------------------
 	// Choose implementation type
 	//--------------------------------------------------------------------------
-#ifdef LIS
-	typedef AssemblerLib::GlobalSetup<
-		AssemblerLib::SerialLisVectorMatrixBuilder,
-		AssemblerLib::SerialExecutor> GlobalSetup;
-#else
-	typedef AssemblerLib::SerialDenseSetup GlobalSetup;
-#endif
 	const GlobalSetup global_setup;
 
 	// allocate a vector and matrix
@@ -351,11 +355,7 @@ int main(int argc, char *argv[])
 	//--------------------------------------------------------------------------
 	// solve x=A^-1 rhs
 	//--------------------------------------------------------------------------
-#ifdef LIS
-	MathLib::LisLinearSolver ls(*A);
-#else
-	MathLib::GaussAlgorithm<GlobalMatrix, GlobalVector> ls(*A);
-#endif
+	LinearSolver ls(*A);
 	ls.solve(*rhs, *x);
 
 	{
