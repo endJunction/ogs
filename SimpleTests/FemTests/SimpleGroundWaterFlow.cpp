@@ -189,20 +189,15 @@ public:
 	{
 		localA.setZero();
 
-		// init FeQUAD4
-		_fe_quad4.setMeshElement(*static_cast<const MeshLib::Quad*>(&e));
-
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
 
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
-			_fe_quad4.computeShapeFunctions(wp.getCoords(), data._shape_matrices[ip]);
 			localA += data._shape_matrices[ip].dNdx.transpose() * data._material * data._shape_matrices[ip].dNdx * data._shape_matrices[ip].detJ * wp.getWeight();
 		}
 	}
 
 private:
 	typename ItemType::FeQuad4::IntegrationMethod _integration_method;
-	typename ItemType::FeQuad4 _fe_quad4;
 };
 
 
@@ -336,24 +331,47 @@ int main(int argc, char *argv[])
 	}
 
 	//
-	// Local and global assemblers.
+	// Shape matrices initializer
 	//
-	LocalGWAssembler<NumLib::ShapeQuad4> local_gw_assembler;
-	typedef typename LocalGWAssembler<NumLib::ShapeQuad4>::NodalMatrixType LocalMatrix;
-	typedef typename LocalGWAssembler<NumLib::ShapeQuad4>::NodalVectorType LocalVector;
+	typedef ShapeMatricesInitializer<NumLib::ShapeQuad4> SMI;
+	SMI shape_matrices_initializer;
+	typedef typename SMI::NodalMatrixType LocalMatrix;
+	typedef typename SMI::NodalVectorType LocalVector;
 
 	typedef AssemblerLib::VectorMatrixAssembler<
 			GlobalMatrix,
 			GlobalVector,
 			MeshLib::Element,
-			LocalGWAssembler<NumLib::ShapeQuad4>,
+			ShapeMatricesInitializer<NumLib::ShapeQuad4>,
+			LocalMatrix,
+			LocalVector > GlobalInitializer;
+
+	GlobalInitializer global_initializer(*A.get(), *rhs.get(), shape_matrices_initializer,
+			AssemblerLib::LocalToGlobalIndexMap(map_ele_nodes2vec_entries));
+
+	// Call global initializer for each mesh element.
+	global_setup.execute(global_initializer, mesh.getElements(), local_assembly_item_vec);
+
+	//
+	// Local and global assemblers.
+	//
+	typedef LocalGWAssembler<NumLib::ShapeQuad4> LA;
+	LA local_gw_assembler;
+	typedef typename LA::NodalMatrixType LocalMatrix;
+	typedef typename LA::NodalVectorType LocalVector;
+
+	typedef AssemblerLib::VectorMatrixAssembler<
+			GlobalMatrix,
+			GlobalVector,
+			MeshLib::Element,
+			LA,
 			LocalMatrix,
 			LocalVector > GlobalAssembler;
 
 	GlobalAssembler global_assembler(*A.get(), *rhs.get(), local_gw_assembler,
 			AssemblerLib::LocalToGlobalIndexMap(map_ele_nodes2vec_entries));
 
-	// Call global assembler for each mesh element.
+	// Call global assembler for each local assembly item.
 	global_setup.execute(global_assembler, mesh.getElements(), local_assembly_item_vec);
 
 	// apply Dirichlet BC
