@@ -53,6 +53,34 @@ struct ShapeMatrices
     JacobianType invJ;  ///< Inverse matrix of the Jacobian
     DShapeType dNdx;    ///< Matrix of gradient of shape functions in physical coordinates, dN(r)/dx
 
+    /*
+    ShapeMatrices() = delete;
+    //: N(), dNdr(), J(), detJ(0), invJ(), dNdx()
+    //{ std::cout << "SM() ctor\n"; };
+
+    ShapeMatrices(ShapeMatrices const& sm)
+    : N(sm.N), dNdr(sm.dNdr), J(sm.J), detJ(sm.detJ), invJ(sm.invJ),
+        dNdx(sm.dNdx)
+    { std::cout << "SM copy ctor\n"; }
+
+    ShapeMatrices& operator=(ShapeMatrices const& sm) = delete;
+    //{
+    //    std::cout << "SM copy op\n";
+    //    N = sm.N;
+    //    dNdr = sm.dNdr;
+    //    J = sm.J;
+    //    detJ = sm.detJ;
+    //    invJ = sm.invJ;
+    //    dNdx = sm.dNdx;
+    //    return *this;
+    //}
+
+    ShapeMatrices(ShapeMatrices&&) = delete;
+    //{ std::cout << "SM would move\n"; }
+
+    ShapeMatrices& operator=(ShapeMatrices&&) = delete;
+    */
+
     /**
      * Initialize matrices and vectors
      *
@@ -63,6 +91,7 @@ struct ShapeMatrices
     : N(n_nodes), dNdr(dim, n_nodes), J(dim, dim), detJ(.0),
       invJ(dim, dim), dNdx(dim, n_nodes)
     {
+        //std::cout << "SM (dim, nodes) ctor\n";
         this->setZero();
     }
 
