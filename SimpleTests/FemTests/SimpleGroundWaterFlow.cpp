@@ -196,6 +196,36 @@ private:
 	typename ItemType::FeQuad4::IntegrationMethod _integration_method;
 };
 
+void prepareBCForSimulation(ProjectData const& project_data,
+	std::string const& mesh_name,
+	std::vector<std::size_t> & bc_mesh_node_ids,
+	std::vector<double> & bc_values)
+{
+	std::string unique_name;
+	// get boundary conditions from ProjectData instance
+	std::vector<FEMCondition*> bcs(
+		project_data.getConditions(FiniteElement::GROUNDWATER_FLOW, unique_name,
+			FEMCondition::BOUNDARY_CONDITION));
+
+	MeshGeoToolsLib::MeshNodeSearcher searcher(*project_data.getMesh(mesh_name));
+	for (auto it(bcs.cbegin()); it != bcs.cend(); it++) {
+		// fetch geometry obj from condition obj
+		GeoLib::GeoObject const* geom_obj((*it)->getGeoObj());
+		if (dynamic_cast<GeoLib::Point const*>(geom_obj) != nullptr) {
+			GeoLib::Point const& pnt(*dynamic_cast<GeoLib::Point const*>(geom_obj));
+			bc_mesh_node_ids.push_back(searcher.getMeshNodeIDForPoint(pnt));
+			bc_values.push_back((*it)->getDisValues()[0]);
+		} else {
+			if (dynamic_cast<GeoLib::Polyline const*>(geom_obj) != nullptr) {
+				GeoLib::Polyline const& ply(*dynamic_cast<GeoLib::Polyline const*>(geom_obj));
+				std::vector<std::size_t> const& ids(searcher.getMeshNodeIDsAlongPolyline(ply));
+				bc_mesh_node_ids.insert(bc_mesh_node_ids.end(), ids.cbegin(), ids.cend());
+				for (std::size_t k(0); k<bc_mesh_node_ids.size(); k++)
+					bc_values.push_back((*it)->getDisValues()[0]);
+			}
+		}
+	}
+}
 
 int main(int argc, char *argv[])
 {
@@ -230,7 +260,6 @@ int main(int argc, char *argv[])
 		FileIO::BoostXmlGmlInterface geo_io(project_data);
 		geo_io.readFile(geometry_arg.getValue());
 	}
-	std::string unique_name;
 
 	// *** read mesh
 	std::string mesh_name(mesh_arg.getValue());
@@ -241,30 +270,10 @@ int main(int argc, char *argv[])
 	FileIO::BoostXmlCndInterface xml_io(project_data);
 	xml_io.readFile(bc_arg.getValue());
 
-	std::vector<FEMCondition*> bcs(
-			project_data.getConditions(FiniteElement::GROUNDWATER_FLOW, unique_name,
-					FEMCondition::BOUNDARY_CONDITION));
-
-	std::vector < std::size_t > bc_mesh_node_ids;
-	std::vector <double> bc_values;
-	MeshGeoToolsLib::MeshNodeSearcher searcher(*project_data.getMesh(mesh_name));
-	for (auto it(bcs.cbegin()); it != bcs.cend(); it++) {
-		// fetch geometry obj from condition obj
-		GeoLib::GeoObject const* geom_obj((*it)->getGeoObj());
-		if (dynamic_cast<GeoLib::Point const*>(geom_obj) != nullptr) {
-			GeoLib::Point const& pnt(*dynamic_cast<GeoLib::Point const*>(geom_obj));
-			bc_mesh_node_ids.push_back(searcher.getMeshNodeIDForPoint(pnt));
-			bc_values.push_back((*it)->getDisValues()[0]);
-		} else {
-			if (dynamic_cast<GeoLib::Polyline const*>(geom_obj) != nullptr) {
-				GeoLib::Polyline const& ply(*dynamic_cast<GeoLib::Polyline const*>(geom_obj));
-				std::vector<std::size_t> const& ids(searcher.getMeshNodeIDsAlongPolyline(ply));
-				bc_mesh_node_ids.insert(bc_mesh_node_ids.end(), ids.cbegin(), ids.cend());
-				for (std::size_t k(0); k<bc_mesh_node_ids.size(); k++)
-					bc_values.push_back((*it)->getDisValues()[0]);
-			}
-		}
-	}
+	// *** prepare boundary condition for using in simulation
+	std::vector<std::size_t> bc_mesh_node_ids;
+	std::vector<double> bc_values;
+	prepareBCForSimulation(project_data, mesh_name, bc_mesh_node_ids, bc_values);
 
 	//--------------------------------------------------------------------------
 	// Prepare mesh items where data is assigned
