@@ -95,6 +95,12 @@ public:
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, 1> NodalVectorType;
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::RowMajor> DimNodalMatrixType;
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
+	typedef typename NumLib::FeQUAD4<
+		NodalVectorType,
+		DimNodalMatrixType,
+		DimMatrixType>::type FeQuad4;
+
+	typedef typename FeQuad4::ShapeMatricesType ShapeMatricesType;
 
 public:
 	LocalGWAssembler() :
@@ -120,10 +126,8 @@ public:
 	}
 
 private:
-	typedef typename NumLib::FeQUAD4<NodalVectorType, DimNodalMatrixType, DimMatrixType>::type FeQuad4;
 	typename FeQuad4::ShapeMatricesType _shape;
 	typename FeQuad4::IntegrationMethod _integration_method;
-
 	FeQuad4 _fe_quad4;
 };
 
