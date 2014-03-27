@@ -104,7 +104,6 @@ public:
 
 public:
 	LocalGWAssembler() :
-			_shape(ElemType::DIM, ElemType::NPOINTS),
 			_integration_method(2)
 	{}
 
@@ -119,7 +118,6 @@ public:
 
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
 
-			_shape.setZero();
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
 			_fe_quad4.computeShapeFunctions(wp.getCoords(), shape);
 			localA += shape.dNdx.transpose() * shape.dNdx * shape.detJ * wp.getWeight();
@@ -127,7 +125,6 @@ public:
 	}
 
 private:
-	typename FeQuad4::ShapeMatricesType _shape;
 	typename FeQuad4::IntegrationMethod _integration_method;
 	FeQuad4 _fe_quad4;
 };
