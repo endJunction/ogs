@@ -267,8 +267,10 @@ int main(int argc, char *argv[])
 	mesh_name = BaseLib::extractBaseNameWithoutExtension(mesh_name);
 
 	// *** read boundary conditions
-	FileIO::BoostXmlCndInterface xml_io(project_data);
-	xml_io.readFile(bc_arg.getValue());
+	{
+		FileIO::BoostXmlCndInterface cnd_io(project_data);
+		cnd_io.readFile(bc_arg.getValue());
+	}
 
 	// *** prepare boundary condition for using in simulation
 	std::vector<std::size_t> bc_mesh_node_ids;
