@@ -93,15 +93,21 @@ const std::size_t NumLib::ShapeQuad4::NPOINTS;
 	typedef MathLib::GaussAlgorithm<GlobalSetup::MatrixType, GlobalSetup::VectorType> LinearSolver;
 #endif	// LIS
 
-template <typename ElemType>
-class LocalFeQuad4AssemblyItem
+template <typename ShapeType>
+struct X { };
+
+template <>
+struct X<NumLib::ShapeQuad4>
 {
-public:
-	// definition of vector and matrix types
-	typedef Eigen::Matrix<double, ElemType::NPOINTS, ElemType::NPOINTS, Eigen::RowMajor> NodalMatrixType;
-	typedef Eigen::Matrix<double, ElemType::NPOINTS, 1> NodalVectorType;
-	typedef Eigen::Matrix<double, ElemType::DIM, ElemType::NPOINTS, Eigen::RowMajor> DimNodalMatrixType;
-	typedef Eigen::Matrix<double, ElemType::DIM, ElemType::DIM, Eigen::RowMajor> DimMatrixType;
+	typedef NumLib::ShapeQuad4 ShapeType;
+
+	static std::size_t const NPOINTS = ShapeType::NPOINTS;
+	static std::size_t const DIM = ShapeType::DIM;
+
+	typedef Eigen::Matrix<double, NPOINTS, NPOINTS, Eigen::RowMajor> NodalMatrixType;
+	typedef Eigen::Matrix<double, NPOINTS, 1> NodalVectorType;
+	typedef Eigen::Matrix<double, DIM, NPOINTS, Eigen::RowMajor> DimNodalMatrixType;
+	typedef Eigen::Matrix<double, DIM, DIM, Eigen::RowMajor> DimMatrixType;
 
 	// Dynamic size local matrices are much slower.
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> NodalMatrixType;
@@ -109,23 +115,41 @@ public:
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimNodalMatrixType;
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
 
-	// type definition of FeQuad4 type
+
 	typedef typename NumLib::FeQUAD4<
 		NodalVectorType,
 		DimNodalMatrixType,
-		DimMatrixType>::type FeQuad4;
+		DimMatrixType>::type FemType;
 
-	typedef typename FeQuad4::ShapeMatricesType ShapeMatricesType;
+	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
+};
+
+template <typename ElemType>
+class LocalFeQuad4AssemblyItem
+{
+public:
+	typedef X<ElemType> XType;
+
+	typedef typename XType::NodalMatrixType NodalMatrixType;
+	typedef typename XType::NodalVectorType NodalVectorType;
+	typedef typename XType::DimNodalMatrixType DimNodalMatrixType;
+	typedef typename XType::DimMatrixType DimMatrixType;
+
+	typedef typename XType::FemType FemType;
+
+	typedef typename XType::ShapeMatricesType ShapeMatricesType;
 
 public:
 	LocalFeQuad4AssemblyItem() :
-		_shape_matrices({{ShapeMatricesType(3,4), ShapeMatricesType(3,4), ShapeMatricesType(3,4), ShapeMatricesType(3,4)}}),
+		_shape_matrices({{
+				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS),
+				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS),
+				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS),
+				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS)}}),
 		_material(1.0)
 	{
-		_shape_matrices[0].setZero();
-		_shape_matrices[1].setZero();
-		_shape_matrices[2].setZero();
-		_shape_matrices[3].setZero();
+		for (std::size_t i = 0; i < X<ElemType>::NPOINTS; ++i)
+			_shape_matrices[i].setZero();
 	}
 
 	// The length of the array is as long as there are Gauss points.
@@ -145,8 +169,8 @@ public:
 	void operator()(const MeshLib::Element& e,
 		LocalFeQuad4AssemblyItem<ElemType>& data)
 	{
-		// create FeQuad4
-		typename ItemType::FeQuad4 fe_quad4(*static_cast<const MeshLib::Quad*>(&e));
+		// create FEM Element
+		typename ItemType::FemType fe(*static_cast<const MeshLib::Quad*>(&e));
 
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
@@ -156,12 +180,12 @@ public:
 			static std::size_t const NODES = Data::FemType::ShapeFunctionType::NPOINTS ;
 			data._shape_matrices[ip].init(DIM, NODES);
 			*/
-			fe_quad4.computeShapeFunctions(wp.getCoords(), data._shape_matrices[ip]);
+			fe.computeShapeFunctions(wp.getCoords(), data._shape_matrices[ip]);
 		}
 	}
 
 private:
-	typename ItemType::FeQuad4::IntegrationMethod _integration_method;
+	typename ItemType::FemType::IntegrationMethod _integration_method;
 };
 
 template <typename Data>
@@ -192,7 +216,7 @@ public:
 	}
 
 private:
-	typename Data::FeQuad4::IntegrationMethod _integration_method;
+	typename Data::FemType::IntegrationMethod _integration_method;
 };
 
 void prepareBCForSimulation(ProjectData const& project_data,
