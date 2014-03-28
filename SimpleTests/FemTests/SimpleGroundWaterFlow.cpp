@@ -169,8 +169,9 @@ public:
 	void operator()(const MeshLib::Element& e,
 		LocalFeQuad4AssemblyItem<ElemType>& data)
 	{
+		typedef typename ItemType::FemType::MeshElementType MeshElementType;
 		// create FEM Element
-		typename ItemType::FemType fe(*static_cast<const MeshLib::Quad*>(&e));
+		typename ItemType::FemType fe(*static_cast<const MeshElementType*>(&e));
 
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
