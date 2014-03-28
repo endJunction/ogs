@@ -164,15 +164,14 @@ private:
 	typename ItemType::FeQuad4::IntegrationMethod _integration_method;
 };
 
-template <typename ElemType>
+template <typename Data>
 class LocalGWAssembler
 {
 public:
-	typedef LocalFeQuad4AssemblyItem<ElemType> ItemType;
-	typedef typename ItemType::NodalVectorType NodalVectorType;
-	typedef typename ItemType::NodalMatrixType NodalMatrixType;
-	typedef typename ItemType::DimNodalMatrixType DimNodalMatrixType;
-	typedef typename ItemType::DimMatrixType DimMatrixType;
+	typedef typename Data::NodalVectorType NodalVectorType;
+	typedef typename Data::NodalMatrixType NodalMatrixType;
+	typedef typename Data::DimNodalMatrixType DimNodalMatrixType;
+	typedef typename Data::DimMatrixType DimMatrixType;
 
 public:
 	LocalGWAssembler() :
@@ -181,7 +180,7 @@ public:
 
 	void operator()(const MeshLib::Element& e, NodalMatrixType &localA,
 			NodalVectorType & /*rhs*/,
-			ItemType& data)
+			Data& data) const
 	{
 		localA.setZero();
 
@@ -193,7 +192,7 @@ public:
 	}
 
 private:
-	typename ItemType::FeQuad4::IntegrationMethod _integration_method;
+	typename Data::FeQuad4::IntegrationMethod _integration_method;
 };
 
 void prepareBCForSimulation(ProjectData const& project_data,
@@ -347,7 +346,7 @@ int main(int argc, char *argv[])
 	// Construct a linear system
 	//--------------------------------------------------------------------------
 	// create a mapping table from element nodes to entries in the linear system
-	std::vector < std::vector<std::size_t> > map_ele_nodes2vec_entries =
+	std::vector <std::vector<std::size_t>> const map_ele_nodes2vec_entries =
 		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
@@ -380,7 +379,7 @@ int main(int argc, char *argv[])
 	//
 	// Local and global assemblers.
 	//
-	typedef LocalGWAssembler<NumLib::ShapeQuad4> LA;
+	typedef LocalGWAssembler<LocalFeQuad4AssemblyItem<NumLib::ShapeQuad4>> LA;
 	LA local_gw_assembler;
 	typedef typename LA::NodalMatrixType LocalMatrix;
 	typedef typename LA::NodalVectorType LocalVector;
