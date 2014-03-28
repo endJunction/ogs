@@ -251,15 +251,9 @@ createDOFMapping(MeshLib::Mesh const& mesh,
 	return map_ele_nodes2vec_entries;
 }
 
-int main(int argc, char *argv[])
+std::tuple<std::string, std::string, std::string>
+parseCLI(int argc, char *argv[])
 {
-	// logog
-	LOGOG_INITIALIZE();
-	BaseLib::LogogSimpleFormatter *custom_format(new BaseLib::LogogSimpleFormatter);
-	logog::Cout *logog_cout(new logog::Cout);
-	logog_cout->SetFormatter(*custom_format);
-
-	// tclap
 	TCLAP::CmdLine cmd(
 			"Simple ground water flow test, reading mesh (only 2d quad elements), geometry and bc and simulate ground water flow",
 			' ', "0.1");
@@ -277,23 +271,43 @@ int main(int argc, char *argv[])
 
 	cmd.parse(argc, argv);
 
+	return std::make_tuple(
+			mesh_arg.getValue(),
+			geometry_arg.getValue(),
+			bc_arg.getValue());
+}
+
+int main(int argc, char *argv[])
+{
+	// logog
+	LOGOG_INITIALIZE();
+	BaseLib::LogogSimpleFormatter *custom_format(new BaseLib::LogogSimpleFormatter);
+	logog::Cout *logog_cout(new logog::Cout);
+	logog_cout->SetFormatter(*custom_format);
+
+	// Parse CLI arguments.
+	std::string mesh_file;
+	std::string geometry_file;
+	std::string boundary_condition_file;
+	std::tie(mesh_file, geometry_file, boundary_condition_file)
+		= parseCLI(argc, argv);
+
 	ProjectData project_data;
 
 	// *** read geometry
 	{
 		FileIO::BoostXmlGmlInterface geo_io(project_data);
-		geo_io.readFile(geometry_arg.getValue());
+		geo_io.readFile(geometry_file);
 	}
 
 	// *** read mesh
-	std::string mesh_name(mesh_arg.getValue());
-	project_data.addMesh(FileIO::readMeshFromFile(mesh_name));
-	mesh_name = BaseLib::extractBaseNameWithoutExtension(mesh_name);
+	project_data.addMesh(FileIO::readMeshFromFile(mesh_file));
+	std::string const mesh_name = BaseLib::extractBaseNameWithoutExtension(mesh_file);
 
 	// *** read boundary conditions
 	{
 		FileIO::BoostXmlCndInterface cnd_io(project_data);
-		cnd_io.readFile(bc_arg.getValue());
+		cnd_io.readFile(boundary_condition_file);
 	}
 
 	// *** prepare boundary condition for using in simulation
@@ -402,7 +416,7 @@ int main(int argc, char *argv[])
 		FileIO::BoostVtuInterface vtu_io;
 		vtu_io.setMesh(project_data.getMesh(mesh_name));
 		vtu_io.addScalarPointProperty("Head", heads);
-		std::string const res_mesh_name(BaseLib::dropFileExtension(mesh_arg.getValue()));
+		std::string const res_mesh_name(BaseLib::dropFileExtension(mesh_file));
 		vtu_io.writeToFile(res_mesh_name+"_with_results.vtu");
 	}
 
