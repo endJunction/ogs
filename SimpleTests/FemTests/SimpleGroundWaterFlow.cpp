@@ -227,6 +227,30 @@ void prepareBCForSimulation(ProjectData const& project_data,
 	}
 }
 
+std::vector<std::vector<std::size_t>>
+createDOFMapping(MeshLib::Mesh const& mesh,
+	AssemblerLib::MeshComponentMap vec1_composition)
+{
+	std::vector<std::vector<std::size_t>> map_ele_nodes2vec_entries;
+	std::vector<MeshLib::Element*> const& all_eles = mesh.getElements();
+	map_ele_nodes2vec_entries.reserve(all_eles.size());
+	for (auto e = all_eles.cbegin(); e != all_eles.cend(); ++e) {
+		std::size_t const nnodes = (*e)->getNNodes();
+		std::size_t const mesh_id = mesh.getID();
+		std::vector<MeshLib::Location> vec_items;
+		vec_items.reserve(nnodes);
+		for (std::size_t j = 0; j < nnodes; j++) {
+			vec_items.emplace_back(mesh_id, MeshLib::MeshItemType::Node, (*e)->getNode(j)->getID());
+		}
+
+		map_ele_nodes2vec_entries.push_back(
+			vec1_composition.getGlobalIndices<AssemblerLib::ComponentOrder::BY_COMPONENT>(
+				vec_items));
+	}
+
+	return map_ele_nodes2vec_entries;
+}
+
 int main(int argc, char *argv[])
 {
 	// logog
@@ -309,22 +333,8 @@ int main(int argc, char *argv[])
 	// Construct a linear system
 	//--------------------------------------------------------------------------
 	// create a mapping table from element nodes to entries in the linear system
-	std::vector<MeshLib::Element*> const& all_eles = mesh.getElements();
-
-	std::vector < std::vector<std::size_t> > map_ele_nodes2vec_entries;
-	map_ele_nodes2vec_entries.reserve(all_eles.size());
-	for (auto e = all_eles.cbegin(); e != all_eles.cend(); ++e) {
-		std::size_t const nnodes = (*e)->getNNodes();
-		std::size_t const mesh_id = mesh.getID();
-		std::vector<MeshLib::Location> vec_items;
-		vec_items.reserve(nnodes);
-		for (std::size_t j = 0; j < nnodes; j++)
-			vec_items.emplace_back(mesh_id, MeshLib::MeshItemType::Node, (*e)->getNode(j)->getID());
-
-		map_ele_nodes2vec_entries.push_back(
-				vec1_composition.getGlobalIndices<AssemblerLib::ComponentOrder::BY_COMPONENT>(
-						vec_items));
-	}
+	std::vector < std::vector<std::size_t> > map_ele_nodes2vec_entries =
+		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
 	std::vector<LocalFeQuad4AssemblyItem<NumLib::ShapeQuad4>> local_assembly_item_vec;
