@@ -53,6 +53,8 @@ struct ShapeMatrices
     JacobianType invJ;  ///< Inverse matrix of the Jacobian
     DShapeType dNdx;    ///< Matrix of gradient of shape functions in physical coordinates, dN(r)/dx
 
+    ShapeMatrices() = default;
+
     /*
     ShapeMatrices() = delete;
     //: N(), dNdr(), J(), detJ(0), invJ(), dNdx()
