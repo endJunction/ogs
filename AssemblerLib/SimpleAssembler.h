@@ -27,7 +27,7 @@ public:
     /// Executes given assembler for the given mesh item and a data item.
     /// \attention The index \c id is not necesserily the mesh item's id.
     template <typename ITEM_DATA>
-    void operator()(const MESH_ITEM_* item, std::size_t id, ITEM_DATA& item_data) const
+    void operator()(std::size_t const id, const MESH_ITEM_* item, ITEM_DATA& item_data) const
     {
         _assembler(*item, item_data);
     }

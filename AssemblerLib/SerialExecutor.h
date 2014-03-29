@@ -37,7 +37,7 @@ struct SerialExecutor
 #endif
     {
         for (std::size_t i = 0; i < c.size(); i++)
-            f(c[i], i);
+            f(i, c[i]);
     }
 
     /// Same as execute(f, c), but with two containers.
@@ -62,7 +62,7 @@ struct SerialExecutor
         assert(c1.size() == c2.size());
 
         for (std::size_t i = 0; i < c1.size(); i++)
-            f(c1[i], i, c2[i]);
+            f(i, c1[i], c2[i]);
     }
 };
 

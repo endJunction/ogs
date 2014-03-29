@@ -50,7 +50,7 @@ public:
     /// The positions in the global matrix/vector are taken from
     /// the LocalToGlobalIndexMap provided in the constructor at index \c id.
     /// \attention The index \c id is not necesserily the mesh item's id.
-    void operator()(const MESH_ITEM_* item, std::size_t id) const
+    void operator()(std::size_t const id, const MESH_ITEM_* item) const
     {
         assert(_data_pos.size() > id);
 
@@ -64,7 +64,7 @@ public:
     }
 
     template <typename ITEM_DATA>
-    void operator()(const MESH_ITEM_* item, std::size_t id, ITEM_DATA& item_data) const
+    void operator()(std::size_t const id, const MESH_ITEM_* item, ITEM_DATA& item_data) const
     {
         assert(_data_pos.size() > id);
 
