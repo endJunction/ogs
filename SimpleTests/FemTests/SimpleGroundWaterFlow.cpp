@@ -368,7 +368,8 @@ int main(int argc, char *argv[])
 		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
-	std::vector<LocalGWAssemblerData<NumLib::ShapeQuad4, 2>> local_assembly_item_vec;
+	typedef LocalGWAssemblerData<NumLib::ShapeQuad4, 2> LAData;
+	std::vector<LAData> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
 
 	std::array<double,4> mat_values({{1e-10, 2e-10, 4e-10, 8e-10}});
