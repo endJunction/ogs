@@ -120,20 +120,10 @@ struct X<NumLib::ShapeQuad4, ShapeMatrixTypes_>
 	typedef NumLib::ShapeQuad4 ShapeType;
 	typedef ShapeMatrixTypes_ ShapeMatrixTypes;
 
-	static std::size_t const NPOINTS = ShapeType::NPOINTS;
-	static std::size_t const DIM = ShapeType::DIM;
-
-	typedef Eigen::Matrix<double, NPOINTS, NPOINTS, Eigen::RowMajor> NodalMatrixType;
-	typedef Eigen::Matrix<double, NPOINTS, 1> NodalVectorType;
-	typedef Eigen::Matrix<double, DIM, NPOINTS, Eigen::RowMajor> DimNodalMatrixType;
-	typedef Eigen::Matrix<double, DIM, DIM, Eigen::RowMajor> DimMatrixType;
-
-	// Dynamic size local matrices are much slower.
-	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> NodalMatrixType;
-	//typedef Eigen::Matrix<double, Eigen::Dynamic, 1> NodalVectorType;
-	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimNodalMatrixType;
-	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
-
+	typedef typename ShapeMatrixTypes::NodalMatrixType NodalMatrixType;
+	typedef typename ShapeMatrixTypes::NodalVectorType NodalVectorType;
+	typedef typename ShapeMatrixTypes::DimNodalMatrixType DimNodalMatrixType;
+	typedef typename ShapeMatrixTypes::DimMatrixType DimMatrixType;
 
 	typedef typename NumLib::FeQUAD4<
 		NodalVectorType,
