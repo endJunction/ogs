@@ -203,7 +203,7 @@ public:
 			_integration_method(2)
 	{}
 
-	void operator()(const MeshLib::Element& e, NodalMatrixType &localA,
+	void operator()(NodalMatrixType &localA,
 			NodalVectorType & /*rhs*/,
 			Data& data) const
 	{
@@ -412,7 +412,6 @@ int main(int argc, char *argv[])
 	typedef AssemblerLib::VectorMatrixAssembler<
 			GlobalMatrix,
 			GlobalVector,
-			MeshLib::Element,
 			LA,
 			LocalMatrix,
 			LocalVector > GlobalAssembler;
@@ -421,7 +420,7 @@ int main(int argc, char *argv[])
 			AssemblerLib::LocalToGlobalIndexMap(map_ele_nodes2vec_entries));
 
 	// Call global assembler for each local assembly item.
-	global_setup.execute(global_assembler, mesh.getElements(), local_assembly_item_vec);
+	global_setup.execute(global_assembler, local_assembly_item_vec);
 
 	// apply Dirichlet BC
 	MathLib::applyKnownSolution(*A, *rhs, bc_mesh_node_ids, bc_values);
