@@ -149,22 +149,20 @@ struct LocalGWAssemblerData
 	double _material;
 };
 
-template <typename ElemType>
+template <typename Data>
 class ShapeMatricesInitializer
 {
 public:
-	typedef LocalGWAssemblerData<ElemType, 2> ItemType;
-public:
 	ShapeMatricesInitializer() :
-		_integration_method(ItemType::INTEGRATION_ORDER)
+		_integration_method(Data::INTEGRATION_ORDER)
 	{}
 
 	void operator()(const MeshLib::Element& e,
-		ItemType& data)
+		Data& data)
 	{
-		typedef typename ItemType::FemType::MeshElementType MeshElementType;
+		typedef typename Data::FemType::MeshElementType MeshElementType;
 		// create FEM Element
-		typename ItemType::FemType fe(*static_cast<const MeshElementType*>(&e));
+		typename Data::FemType fe(*static_cast<const MeshElementType*>(&e));
 
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
@@ -179,7 +177,7 @@ public:
 	}
 
 private:
-	typename ItemType::FemType::IntegrationMethod _integration_method;
+	typename Data::FemType::IntegrationMethod _integration_method;
 };
 
 template <typename Data>
@@ -382,7 +380,7 @@ int main(int argc, char *argv[])
 	//
 	// Shape matrices initializer
 	//
-	typedef ShapeMatricesInitializer<NumLib::ShapeQuad4> SMI;
+	typedef ShapeMatricesInitializer<LAData> SMI;
 	SMI shape_matrices_initializer;
 
 	typedef AssemblerLib::SimpleAssembler<
@@ -398,7 +396,7 @@ int main(int argc, char *argv[])
 	//
 	// Local and global assemblers.
 	//
-	typedef LocalGWAssembler<LocalGWAssemblerData<NumLib::ShapeQuad4, 2>> LA;
+	typedef LocalGWAssembler<LAData> LA;
 	LA local_gw_assembler;
 	typedef typename LA::NodalMatrixType LocalMatrix;
 	typedef typename LA::NodalVectorType LocalVector;
