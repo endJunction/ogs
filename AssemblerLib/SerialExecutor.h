@@ -31,9 +31,9 @@ struct SerialExecutor
     static
     void
 #if defined(_MSC_VER) && (_MSC_VER >= 1700)
-    execute(F& f, C const& c)
+    execute(F& f, C& c)
 #else
-    execute(F const& f, C const& c)
+    execute(F const& f, C& c)
 #endif
     {
         for (std::size_t i = 0; i < c.size(); i++)
