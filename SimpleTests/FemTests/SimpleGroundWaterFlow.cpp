@@ -94,13 +94,29 @@ const std::size_t NumLib::ShapeQuad4::NPOINTS;
 	typedef MathLib::GaussAlgorithm<GlobalSetup::MatrixType, GlobalSetup::VectorType> LinearSolver;
 #endif	// LIS
 
-template <typename ShapeType>
+template <std::size_t NPOINTS_, std::size_t DIM_>
+struct EigenFixedSizeShapeMatrices
+{
+	typedef Eigen::Matrix<double, NPOINTS_, NPOINTS_, Eigen::RowMajor> NodalMatrixType;
+	typedef Eigen::Matrix<double, NPOINTS_, 1> NodalVectorType;
+	typedef Eigen::Matrix<double, DIM_, NPOINTS_, Eigen::RowMajor> DimNodalMatrixType;
+	typedef Eigen::Matrix<double, DIM_, DIM_, Eigen::RowMajor> DimMatrixType;
+
+	// Dynamic size local matrices are much slower.
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> NodalMatrixType;
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, 1> NodalVectorType;
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimNodalMatrixType;
+	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
+};
+
+template <typename ShapeType, typename ShapeMatrixTypes>
 struct X { };
 
-template <>
-struct X<NumLib::ShapeQuad4>
+template <typename ShapeMatrixTypes_>
+struct X<NumLib::ShapeQuad4, ShapeMatrixTypes_>
 {
 	typedef NumLib::ShapeQuad4 ShapeType;
+	typedef ShapeMatrixTypes_ ShapeMatrixTypes;
 
 	static std::size_t const NPOINTS = ShapeType::NPOINTS;
 	static std::size_t const DIM = ShapeType::DIM;
@@ -125,10 +141,10 @@ struct X<NumLib::ShapeQuad4>
 	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
 };
 
-template <typename ElemType, std::size_t _INTEGRATION_ORDER>
+template <typename ElemType, typename ShapeMatricesType_, std::size_t _INTEGRATION_ORDER>
 struct LocalGWAssemblerData
 {
-	typedef X<ElemType> XType;
+	typedef X<ElemType, ShapeMatricesType_> XType;
 
 	typedef typename XType::NodalMatrixType NodalMatrixType;
 	typedef typename XType::NodalVectorType NodalVectorType;
@@ -365,7 +381,9 @@ int main(int argc, char *argv[])
 		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
-	typedef LocalGWAssemblerData<NumLib::ShapeQuad4, 2> LAData;
+	typedef LocalGWAssemblerData<NumLib::ShapeQuad4,
+			EigenFixedSizeShapeMatrices<NumLib::ShapeQuad4::NPOINTS, NumLib::ShapeQuad4::DIM>,
+			2> LAData;
 	std::vector<LAData> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
 
