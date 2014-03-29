@@ -140,18 +140,6 @@ public:
 	typedef typename XType::ShapeMatricesType ShapeMatricesType;
 
 public:
-	LocalFeQuad4AssemblyItem() :
-		_shape_matrices({{
-				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS),
-				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS),
-				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS),
-				ShapeMatricesType(X<ElemType>::DIM, X<ElemType>::NPOINTS)}}),
-		_material(1.0)
-	{
-		for (std::size_t i = 0; i < X<ElemType>::NPOINTS; ++i)
-			_shape_matrices[i].setZero();
-	}
-
 	// The length of the array is as long as there are Gauss points.
 	std::array<ShapeMatricesType, 4>  _shape_matrices;
 	double _material;
