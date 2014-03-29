@@ -101,7 +101,7 @@ TEST(AssemblerLibSerialLinearSolver, Steady2DdiffusionQuadElem)
 
     typedef AssemblerLib::VectorMatrixAssembler<
             GlobalMatrix, GlobalVector,
-            MeshLib::Element, LocalAssembler,
+            LocalAssembler,
             MathLib::DenseMatrix<double>,
             MathLib::DenseVector<double>
         > GlobalAssembler;

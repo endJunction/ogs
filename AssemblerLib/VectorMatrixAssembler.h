@@ -23,7 +23,6 @@ namespace AssemblerLib
 template<
     typename GLOBAL_MATRIX_,
     typename GLOBAL_VECTOR_,
-    typename MESH_ITEM_,
     typename ASSEMBLER_,
     typename LOCAL_MATRIX_,
     typename LOCAL_VECTOR_>
@@ -50,21 +49,9 @@ public:
     /// The positions in the global matrix/vector are taken from
     /// the LocalToGlobalIndexMap provided in the constructor at index \c id.
     /// \attention The index \c id is not necesserily the mesh item's id.
-    void operator()(std::size_t const id, const MESH_ITEM_* item) const
-    {
-        assert(_data_pos.size() > id);
-
-        LocalToGlobalIndexMap::RowColumnIndices const& indices = _data_pos[id];
-        LOCAL_MATRIX_ local_A(indices.rows.size(), indices.columns.size());
-        LOCAL_VECTOR_ local_rhs(indices.rows.size());
-
-        _local_assembler(*item, local_A, local_rhs);
-        _A.add(indices, local_A);
-        _rhs.add(indices.rows, local_rhs);
-    }
-
+	/// TODO: update doc due to removed MESH_ITEM
     template <typename ITEM_DATA>
-    void operator()(std::size_t const id, const MESH_ITEM_* item, ITEM_DATA& item_data) const
+    void operator()(std::size_t const id, ITEM_DATA& item_data) const
     {
         assert(_data_pos.size() > id);
 
@@ -72,7 +59,7 @@ public:
         LOCAL_MATRIX_ local_A(indices.rows.size(), indices.columns.size());
         LOCAL_VECTOR_ local_rhs(indices.rows.size());
 
-        _local_assembler(*item, local_A, local_rhs, item_data);
+        _local_assembler(local_A, local_rhs, item_data);
         _A.add(indices, local_A);
         _rhs.add(indices.rows, local_rhs);
     }

@@ -48,9 +48,9 @@ struct SteadyDiffusion2DExample1
 					_m(i,j) *= 1.e-11 / 6.0;
 		}
 
-		void operator()(const MeshLib::Element & /*e*/,
-		                MathLib::DenseMatrix<double> &localA,
-		                MathLib::DenseVector<double> & /*rhs*/)
+		void operator()(MathLib::DenseMatrix<double> &localA,
+		                MathLib::DenseVector<double> & /*rhs*/,
+		                const MeshLib::Element* /*e*/)
 		{
 			for (std::size_t i = 0; i < 4; i++)
 				for (std::size_t j = 0; j < 4; j++)
