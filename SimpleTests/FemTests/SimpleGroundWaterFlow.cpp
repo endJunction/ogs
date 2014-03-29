@@ -125,9 +125,8 @@ struct X<NumLib::ShapeQuad4>
 };
 
 template <typename ElemType>
-class LocalFeQuad4AssemblyItem
+struct LocalGWAssemblerData
 {
-public:
 	typedef X<ElemType> XType;
 
 	typedef typename XType::NodalMatrixType NodalMatrixType;
@@ -139,7 +138,7 @@ public:
 
 	typedef typename XType::ShapeMatricesType ShapeMatricesType;
 
-public:
+
 	// The length of the array is as long as there are Gauss points.
 	std::array<ShapeMatricesType, 4>  _shape_matrices;
 	double _material;
@@ -149,13 +148,14 @@ template <typename ElemType>
 class ShapeMatricesInitializer
 {
 public:
-	typedef LocalFeQuad4AssemblyItem<ElemType> ItemType;
+	typedef LocalGWAssemblerData<ElemType> ItemType;
+public:
 	ShapeMatricesInitializer() :
 		_integration_method(2)
 	{}
 
 	void operator()(const MeshLib::Element& e,
-		LocalFeQuad4AssemblyItem<ElemType>& data)
+		LocalGWAssemblerData<ElemType>& data)
 	{
 		typedef typename ItemType::FemType::MeshElementType MeshElementType;
 		// create FEM Element
@@ -363,7 +363,7 @@ int main(int argc, char *argv[])
 		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
-	std::vector<LocalFeQuad4AssemblyItem<NumLib::ShapeQuad4>> local_assembly_item_vec;
+	std::vector<LocalGWAssemblerData<NumLib::ShapeQuad4>> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
 
 	std::array<double,4> mat_values({{1e-10, 2e-10, 4e-10, 8e-10}});
@@ -392,7 +392,7 @@ int main(int argc, char *argv[])
 	//
 	// Local and global assemblers.
 	//
-	typedef LocalGWAssembler<LocalFeQuad4AssemblyItem<NumLib::ShapeQuad4>> LA;
+	typedef LocalGWAssembler<LocalGWAssemblerData<NumLib::ShapeQuad4>> LA;
 	LA local_gw_assembler;
 	typedef typename LA::NodalMatrixType LocalMatrix;
 	typedef typename LA::NodalVectorType LocalVector;
