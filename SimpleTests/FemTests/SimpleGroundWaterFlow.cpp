@@ -28,6 +28,7 @@
 #include "ThirdParty/tclap/CmdLine.h"
 
 // BaseLib
+#include "BaseLib/metaprogramming.h"
 #include "BaseLib/LogogSimpleFormatter.h"
 #include "BaseLib/FileTools.h"
 #include "Configure.h"
@@ -138,11 +139,13 @@ struct LocalGWAssemblerData
 
 	typedef typename XType::ShapeMatricesType ShapeMatricesType;
 
+	static std::size_t constexpr DIM = ElemType::DIM;
 	static std::size_t constexpr INTEGRATION_ORDER = _INTEGRATION_ORDER;
-	
+	static std::size_t constexpr N_INTEGRATION_POINTS =
+		BaseLib::pow(INTEGRATION_ORDER, DIM);
 
-	// The length of the array is as long as there are Gauss points.
-	std::array<ShapeMatricesType, 4>  _shape_matrices;
+
+	std::array<ShapeMatricesType, N_INTEGRATION_POINTS> _shape_matrices;
 	double _material;
 };
 
