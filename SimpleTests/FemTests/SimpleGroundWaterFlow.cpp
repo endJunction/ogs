@@ -54,9 +54,6 @@
 #include "MeshLib/Elements/Quad.h"
 
 // NumLib
-#include "NumLib/Fem/Integration/IntegrationGaussRegular.h"
-#include "NumLib/Fem/CoordinatesMapping/ShapeMatrices.h"
-#include "NumLib/Fem/ShapeFunction/ShapeQuad4.h"
 #include "NumLib/Fem/FiniteElement/C0IsoparametricElements.h"
 
 // OGS
