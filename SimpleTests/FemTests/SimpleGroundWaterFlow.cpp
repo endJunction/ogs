@@ -94,13 +94,13 @@ const std::size_t NumLib::ShapeQuad4::NPOINTS;
 	typedef MathLib::GaussAlgorithm<GlobalSetup::MatrixType, GlobalSetup::VectorType> LinearSolver;
 #endif	// LIS
 
-template <std::size_t NPOINTS_, std::size_t DIM_>
+template <typename ShapeType>
 struct EigenFixedSizeShapeMatrices
 {
-	typedef Eigen::Matrix<double, NPOINTS_, NPOINTS_, Eigen::RowMajor> NodalMatrixType;
-	typedef Eigen::Matrix<double, NPOINTS_, 1> NodalVectorType;
-	typedef Eigen::Matrix<double, DIM_, NPOINTS_, Eigen::RowMajor> DimNodalMatrixType;
-	typedef Eigen::Matrix<double, DIM_, DIM_, Eigen::RowMajor> DimMatrixType;
+	typedef Eigen::Matrix<double, ShapeType::NPOINTS, ShapeType::NPOINTS, Eigen::RowMajor> NodalMatrixType;
+	typedef Eigen::Matrix<double, ShapeType::NPOINTS, 1> NodalVectorType;
+	typedef Eigen::Matrix<double, ShapeType::DIM, ShapeType::NPOINTS, Eigen::RowMajor> DimNodalMatrixType;
+	typedef Eigen::Matrix<double, ShapeType::DIM, ShapeType::DIM, Eigen::RowMajor> DimMatrixType;
 
 	// Dynamic size local matrices are much slower.
 	// XXX This is not working because the matrices are not properly
@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
 
 	// create data structures for properties
 	typedef LocalGWAssemblerData<NumLib::ShapeQuad4,
-			EigenFixedSizeShapeMatrices<NumLib::ShapeQuad4::NPOINTS, NumLib::ShapeQuad4::DIM>,
+			EigenFixedSizeShapeMatrices<NumLib::ShapeQuad4>,
 			2> LAData;
 	std::vector<LAData> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
