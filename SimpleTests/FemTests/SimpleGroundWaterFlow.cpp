@@ -129,10 +129,10 @@ struct X<NumLib::ShapeQuad4, ShapeMatrixTypePolicy>
 	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
 };
 
-template <typename ElemType, template <typename> class ShapeMatrixTypePolicy, std::size_t _INTEGRATION_ORDER>
+template <typename ShapeType, template <typename> class ShapeMatrixTypePolicy, std::size_t _INTEGRATION_ORDER>
 struct LocalGWAssemblerData
 {
-	typedef X<ElemType, ShapeMatrixTypePolicy> XType;
+	typedef X<ShapeType, ShapeMatrixTypePolicy> XType;
 
 	typedef typename XType::NodalMatrixType NodalMatrixType;
 	typedef typename XType::NodalVectorType NodalVectorType;
@@ -145,7 +145,7 @@ struct LocalGWAssemblerData
 
 	static std::size_t constexpr INTEGRATION_ORDER = _INTEGRATION_ORDER;
 	static std::size_t constexpr N_INTEGRATION_POINTS =
-		BaseLib::pow(INTEGRATION_ORDER, ElemType::DIM);
+		BaseLib::pow(INTEGRATION_ORDER, ShapeType::DIM);
 
 
 	std::array<ShapeMatricesType, N_INTEGRATION_POINTS> _shape_matrices;
