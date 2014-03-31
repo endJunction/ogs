@@ -125,6 +125,7 @@ struct X<NumLib::ShapeQuad4, ShapeMatrixTypePolicy>
 	typedef typename ShapeMatrixTypePolicy::DimMatrixType DimMatrixType;
 
 	typedef typename NumLib::FeQUAD4<
+		ShapeMatrixTypePolicy,
 		NodalVectorType,
 		DimNodalMatrixType,
 		DimMatrixType>::type FemType;

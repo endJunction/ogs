@@ -37,6 +37,7 @@ template <
     class T_MESH_ELEMENT,
     class T_SHAPE,
     class T_INTEGRAL,
+    class T_SHAPE_MATRIX_POLICY,
     class T_NODAL_VECTOR,
     class T_DIM_NODAL_MATRIX,
     class T_DIM_MATRIX
