@@ -48,9 +48,9 @@ public:
     typedef T_MESH_ELEMENT MeshElementType;
     typedef T_SHAPE ShapeFunctionType;
     typedef T_INTEGRAL IntegrationMethod;
-    typedef T_NODAL_VECTOR NodalVectorType;
-    typedef T_DIM_NODAL_MATRIX DimNodalMatrixType;
-    typedef T_DIM_MATRIX DimMatrixType;
+    typedef typename T_SHAPE_MATRIX_POLICY::NodalVectorType NodalVectorType;
+    typedef typename T_SHAPE_MATRIX_POLICY::DimNodalMatrixType DimNodalMatrixType;
+    typedef typename T_SHAPE_MATRIX_POLICY::DimMatrixType DimMatrixType;
     typedef ShapeMatrices<NodalVectorType, DimNodalMatrixType, DimMatrixType> ShapeMatricesType;
     typedef NaturalCoordinatesMapping<MeshElementType, ShapeFunctionType, ShapeMatricesType> NaturalCoordsMappingType;
 
