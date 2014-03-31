@@ -37,10 +37,7 @@ template <
     class T_MESH_ELEMENT,
     class T_SHAPE,
     class T_INTEGRAL,
-    class T_SHAPE_MATRIX_POLICY,
-    class T_NODAL_VECTOR,
-    class T_DIM_NODAL_MATRIX,
-    class T_DIM_MATRIX
+    class T_SHAPE_MATRICES
     >
 class TemplateIsoparametric
 {
@@ -48,9 +45,10 @@ public:
     typedef T_MESH_ELEMENT MeshElementType;
     typedef T_SHAPE ShapeFunctionType;
     typedef T_INTEGRAL IntegrationMethod;
-    typedef typename T_SHAPE_MATRIX_POLICY::NodalVectorType NodalVectorType;
-    typedef typename T_SHAPE_MATRIX_POLICY::DimNodalMatrixType DimNodalMatrixType;
-    typedef typename T_SHAPE_MATRIX_POLICY::DimMatrixType DimMatrixType;
+    typedef typename T_SHAPE_MATRICES::NodalVectorType NodalVectorType;
+    typedef typename T_SHAPE_MATRICES::NodalMatrixType NodalMatrixType;
+    typedef typename T_SHAPE_MATRICES::DimNodalMatrixType DimNodalMatrixType;
+    typedef typename T_SHAPE_MATRICES::DimMatrixType DimMatrixType;
     typedef ShapeMatrices<NodalVectorType, DimNodalMatrixType, DimMatrixType> ShapeMatricesType;
     typedef NaturalCoordinatesMapping<MeshElementType, ShapeFunctionType, ShapeMatricesType> NaturalCoordsMappingType;
 

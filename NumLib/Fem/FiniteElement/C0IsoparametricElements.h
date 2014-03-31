@@ -23,10 +23,15 @@
 namespace NumLib
 {
 
-template <typename T_SHAPE_MATRIX_POLICY, class T_SHAPE_VECTOR, class T_DSHAPE_MATRIX, class T_JACOBIAN_MATRIX>
+template <template <typename> class T_SHAPE_MATRIX_POLICY>
 struct FeQUAD4
 {
-    typedef TemplateIsoparametric<MeshLib::Quad, ShapeQuad4, IntegrationGaussRegular<2>, T_SHAPE_MATRIX_POLICY, T_SHAPE_VECTOR, T_DSHAPE_MATRIX, T_JACOBIAN_MATRIX> type;
+    typedef TemplateIsoparametric
+        < MeshLib::Quad
+        , ShapeQuad4
+        , IntegrationGaussRegular<2>
+        , T_SHAPE_MATRIX_POLICY<ShapeQuad4>
+        > type;
 };
 
 } // NumLib
