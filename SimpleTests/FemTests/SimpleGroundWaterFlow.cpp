@@ -111,25 +111,25 @@ struct EigenFixedSizeShapeMatrices
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
 };
 
-template <typename ShapeType, typename ShapeMatrixTypePolicy>
+template <typename ShapeType, template <typename> class ShapeMatrixTypePolicy>
 struct X { };
 
-template <typename ShapeMatrixTypePolicy>
+template <template <typename> class ShapeMatrixTypePolicy>
 struct X<NumLib::ShapeQuad4, ShapeMatrixTypePolicy>
 {
 	typedef NumLib::ShapeQuad4 ShapeType;
 
-	typedef typename ShapeMatrixTypePolicy::NodalMatrixType NodalMatrixType;
-	typedef typename ShapeMatrixTypePolicy::NodalVectorType NodalVectorType;
-	typedef typename ShapeMatrixTypePolicy::DimNodalMatrixType DimNodalMatrixType;
-	typedef typename ShapeMatrixTypePolicy::DimMatrixType DimMatrixType;
+	typedef typename ShapeMatrixTypePolicy<ShapeType>::NodalMatrixType NodalMatrixType;
+	typedef typename ShapeMatrixTypePolicy<ShapeType>::NodalVectorType NodalVectorType;
+	typedef typename ShapeMatrixTypePolicy<ShapeType>::DimNodalMatrixType DimNodalMatrixType;
+	typedef typename ShapeMatrixTypePolicy<ShapeType>::DimMatrixType DimMatrixType;
 
-	typedef typename NumLib::FeQUAD4<ShapeMatrixTypePolicy>::type FemType;
+	typedef typename NumLib::FeQUAD4<ShapeMatrixTypePolicy<ShapeType>>::type FemType;
 
 	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
 };
 
-template <typename ElemType, typename ShapeMatrixTypePolicy, std::size_t _INTEGRATION_ORDER>
+template <typename ElemType, template <typename> class ShapeMatrixTypePolicy, std::size_t _INTEGRATION_ORDER>
 struct LocalGWAssemblerData
 {
 	typedef X<ElemType, ShapeMatrixTypePolicy> XType;
@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
 
 	// create data structures for properties
 	typedef LocalGWAssemblerData<NumLib::ShapeQuad4,
-			EigenFixedSizeShapeMatrices<NumLib::ShapeQuad4>,
+			EigenFixedSizeShapeMatrices,
 			2> LAData;
 	std::vector<LAData> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
