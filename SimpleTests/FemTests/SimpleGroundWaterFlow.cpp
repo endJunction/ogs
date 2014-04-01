@@ -154,6 +154,12 @@ public:
 
 		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
+
+			/*
+			static std::size_t const DIM = Data::FemType::ShapeFunctionType::DIM;
+			static std::size_t const NODES = Data::FemType::ShapeFunctionType::NPOINTS ;
+			data._shape_matrices[ip].init(DIM, NODES);
+			*/
 			fe_quad4.computeShapeFunctions(wp.getCoords(), data._shape_matrices[ip]);
 		}
 	}

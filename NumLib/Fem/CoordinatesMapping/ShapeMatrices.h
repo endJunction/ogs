@@ -95,6 +95,26 @@ struct ShapeMatrices
         this->setZero();
     }
 
+    /**
+     * Initialize matrices and vectors
+     *
+     * @param dim       Spatial dimension
+     * @param n_nodes   The number of element nodes
+     */
+    /*
+    void
+    init(std::size_t dim, std::size_t n_nodes)
+    {
+        N = N.setZero(n_nodes);
+        dNdr = dNdr.setZero(dim, n_nodes);
+        J = J.setZero(dim, dim);
+        invJ = invJ.setZero(dim, dim);
+        dNdx = dNdx.setZero(dim, n_nodes);
+
+        this->setZero();
+    }
+    */
+
     ~ShapeMatrices() {}
 
     /// reset all data with zero
