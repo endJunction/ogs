@@ -103,6 +103,8 @@ struct EigenFixedSizeShapeMatrices
 	typedef Eigen::Matrix<double, DIM_, DIM_, Eigen::RowMajor> DimMatrixType;
 
 	// Dynamic size local matrices are much slower.
+	// XXX This is not working because the matrices are not properly
+	// initialized.
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> NodalMatrixType;
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, 1> NodalVectorType;
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimNodalMatrixType;
