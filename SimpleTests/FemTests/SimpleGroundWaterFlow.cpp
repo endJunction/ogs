@@ -129,21 +129,19 @@ struct X<NumLib::ShapeQuad4, ShapeMatrixTypePolicy>
 	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
 };
 
-template <typename ShapeType, template <typename> class ShapeMatrixTypePolicy, std::size_t _INTEGRATION_ORDER>
+template <typename FemType_, std::size_t _INTEGRATION_ORDER>
 struct LocalGWAssemblerData
 {
-	typedef X<ShapeType, ShapeMatrixTypePolicy> XType;
+	typedef typename FemType_::type FemType;
+	typedef typename FemType::NodalMatrixType NodalMatrixType;
+	typedef typename FemType::NodalVectorType NodalVectorType;
 
-	typedef typename XType::NodalMatrixType NodalMatrixType;
-	typedef typename XType::NodalVectorType NodalVectorType;
 
-	typedef typename XType::FemType FemType;
-
-	typedef typename XType::ShapeMatricesType ShapeMatricesType;
+	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
 
 	static std::size_t constexpr INTEGRATION_ORDER = _INTEGRATION_ORDER;
 	static std::size_t constexpr N_INTEGRATION_POINTS =
-		BaseLib::pow(INTEGRATION_ORDER, ShapeType::DIM);
+		BaseLib::pow(INTEGRATION_ORDER, FemType::ShapeFunctionType::DIM);
 
 
 	std::array<ShapeMatricesType, N_INTEGRATION_POINTS> _shape_matrices;
@@ -364,8 +362,7 @@ int main(int argc, char *argv[])
 		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
-	typedef LocalGWAssemblerData<NumLib::ShapeQuad4,
-			EigenFixedSizeShapeMatrices,
+	typedef LocalGWAssemblerData<NumLib::FeQUAD4<EigenFixedSizeShapeMatrices>,
 			2> LAData;
 	std::vector<LAData> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
