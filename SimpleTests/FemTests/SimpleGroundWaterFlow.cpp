@@ -164,7 +164,7 @@ public:
 		// create FEM Element
 		typename Data::FemType fe(*static_cast<const MeshElementType*>(&e));
 
-		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
+		for (std::size_t ip(0); ip < Data::N_INTEGRATION_POINTS; ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
 
 			/*
@@ -200,8 +200,7 @@ public:
 	{
 		localA.setZero();
 
-		for (std::size_t ip(0); ip < _integration_method.getNPoints(); ip++) { // ip == number of gauss point
-
+		for (std::size_t ip(0); ip < Data::N_INTEGRATION_POINTS; ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
 			localA += data._shape_matrices[ip].dNdx.transpose() * data._material * data._shape_matrices[ip].dNdx * data._shape_matrices[ip].detJ * wp.getWeight();
 		}
