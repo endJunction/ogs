@@ -134,13 +134,15 @@ template <typename Data>
 class ShapeMatricesInitializer
 {
 public:
-	ShapeMatricesInitializer() :
+	ShapeMatricesInitializer(std::array<double, 4> mat_values_) :
 		_integration_method(Data::INTEGRATION_ORDER)
+		, mat_values(mat_values_)
 	{}
 
 	void operator()(const MeshLib::Element& e,
 		Data& data)
 	{
+		data._material = mat_values[e.getValue()];
 		typedef typename Data::FemType::MeshElementType MeshElementType;
 		// create FEM Element
 		typename Data::FemType fe(*static_cast<const MeshElementType*>(&e));
@@ -159,6 +161,7 @@ public:
 
 private:
 	typename Data::FemType::IntegrationMethod _integration_method;
+	std::array<double, 4> mat_values;
 };
 
 template <typename Data>
@@ -351,16 +354,11 @@ int main(int argc, char *argv[])
 
 	std::array<double,4> mat_values({{1e-10, 2e-10, 4e-10, 8e-10}});
 
-	// set properties according to materials in mesh elements
-	for (std::size_t k(0); k<mesh.getNElements(); k++) {
-		local_assembly_item_vec[k]._material = mat_values[mesh.getElements()[k]->getValue()];
-	}
-
 	//
 	// Shape matrices initializer
 	//
 	typedef ShapeMatricesInitializer<LAData> SMI;
-	SMI shape_matrices_initializer;
+	SMI shape_matrices_initializer(mat_values);
 
 	typedef AssemblerLib::SimpleAssembler<
 			MeshLib::Element,
