@@ -136,8 +136,6 @@ struct LocalGWAssemblerData
 
 	typedef typename XType::NodalMatrixType NodalMatrixType;
 	typedef typename XType::NodalVectorType NodalVectorType;
-	typedef typename XType::DimNodalMatrixType DimNodalMatrixType;
-	typedef typename XType::DimMatrixType DimMatrixType;
 
 	typedef typename XType::FemType FemType;
 
@@ -189,8 +187,6 @@ class LocalGWAssembler
 public:
 	typedef typename Data::NodalVectorType NodalVectorType;
 	typedef typename Data::NodalMatrixType NodalMatrixType;
-	typedef typename Data::DimNodalMatrixType DimNodalMatrixType;
-	typedef typename Data::DimMatrixType DimMatrixType;
 
 public:
 	LocalGWAssembler() :
