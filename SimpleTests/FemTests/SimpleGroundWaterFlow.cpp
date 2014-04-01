@@ -140,8 +140,10 @@ public:
 	{}
 
 	void operator()(const MeshLib::Element& e,
-		Data& data)
+		Data*& data_ptr)
 	{
+		data_ptr = new Data;
+		Data& data = *data_ptr;
 		data._material = mat_values[e.getValue()];
 		typedef typename Data::FemType::MeshElementType MeshElementType;
 		// create FEM Element
@@ -178,10 +180,11 @@ public:
 
 	void operator()(NodalMatrixType &localA,
 			NodalVectorType & /*rhs*/,
-			Data& data) const
+			Data*& data_ptr) const
 	{
 		localA.setZero();
 
+		Data& data = *data_ptr;
 		for (std::size_t ip(0); ip < Data::N_INTEGRATION_POINTS; ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
 			localA += data._shape_matrices[ip].dNdx.transpose() * data._material * data._shape_matrices[ip].dNdx * data._shape_matrices[ip].detJ * wp.getWeight();
@@ -356,7 +359,7 @@ int main(int argc, char *argv[])
 	// create data structures for properties
 	typedef LocalGWAssemblerData<NumLib::FeQUAD4<EigenFixedSizeShapeMatrices>,
 			2> LAData;
-	std::vector<LAData> local_assembly_item_vec;
+	std::vector<LAData*> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
 
 	std::array<double,4> mat_values({{1e-10, 2e-10, 4e-10, 8e-10}});
