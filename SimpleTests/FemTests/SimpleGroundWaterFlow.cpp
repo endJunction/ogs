@@ -124,7 +124,7 @@ struct X<NumLib::ShapeQuad4>
 	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
 };
 
-template <typename ElemType>
+template <typename ElemType, std::size_t _INTEGRATION_ORDER>
 struct LocalGWAssemblerData
 {
 	typedef X<ElemType> XType;
@@ -138,6 +138,8 @@ struct LocalGWAssemblerData
 
 	typedef typename XType::ShapeMatricesType ShapeMatricesType;
 
+	static std::size_t constexpr INTEGRATION_ORDER = _INTEGRATION_ORDER;
+	
 
 	// The length of the array is as long as there are Gauss points.
 	std::array<ShapeMatricesType, 4>  _shape_matrices;
@@ -148,14 +150,14 @@ template <typename ElemType>
 class ShapeMatricesInitializer
 {
 public:
-	typedef LocalGWAssemblerData<ElemType> ItemType;
+	typedef LocalGWAssemblerData<ElemType, 2> ItemType;
 public:
 	ShapeMatricesInitializer() :
-		_integration_method(2)
+		_integration_method(ItemType::INTEGRATION_ORDER)
 	{}
 
 	void operator()(const MeshLib::Element& e,
-		LocalGWAssemblerData<ElemType>& data)
+		ItemType& data)
 	{
 		typedef typename ItemType::FemType::MeshElementType MeshElementType;
 		// create FEM Element
@@ -188,7 +190,7 @@ public:
 
 public:
 	LocalGWAssembler() :
-			_integration_method(2)
+			_integration_method(Data::INTEGRATION_ORDER)
 	{}
 
 	void operator()(NodalMatrixType &localA,
@@ -363,7 +365,7 @@ int main(int argc, char *argv[])
 		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
-	std::vector<LocalGWAssemblerData<NumLib::ShapeQuad4>> local_assembly_item_vec;
+	std::vector<LocalGWAssemblerData<NumLib::ShapeQuad4, 2>> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
 
 	std::array<double,4> mat_values({{1e-10, 2e-10, 4e-10, 8e-10}});
@@ -392,7 +394,7 @@ int main(int argc, char *argv[])
 	//
 	// Local and global assemblers.
 	//
-	typedef LocalGWAssembler<LocalGWAssemblerData<NumLib::ShapeQuad4>> LA;
+	typedef LocalGWAssembler<LocalGWAssemblerData<NumLib::ShapeQuad4, 2>> LA;
 	LA local_gw_assembler;
 	typedef typename LA::NodalMatrixType LocalMatrix;
 	typedef typename LA::NodalVectorType LocalVector;
