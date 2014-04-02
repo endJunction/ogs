@@ -395,28 +395,34 @@ int main(int argc, char *argv[])
 	GlobalAssembler global_assembler(*A.get(), *rhs.get(), local_gw_assembler,
 			AssemblerLib::LocalToGlobalIndexMap(map_ele_nodes2vec_entries));
 
-	// Call global assembler for each local assembly item.
-	global_setup.execute(global_assembler, local_assembly_item_vec);
-
-	// apply Dirichlet BC
-	MathLib::applyKnownSolution(*A, *rhs, bc_mesh_node_ids, bc_values);
-	//--------------------------------------------------------------------------
-	// solve x=A^-1 rhs
-	//--------------------------------------------------------------------------
-	LinearSolver ls(*A);
-	ls.solve(*rhs, *x);
-
+	// For steady-state problems use 1, which is the default value in CLI.
+	for (std::size_t time = 0; time < end_time; ++time)
 	{
-		std::vector<double> heads;
-		heads.reserve(x->size());
-		for (std::size_t i = 0; i < x->size(); i++)
-			heads.push_back((*x)[i]);
+		A->setZero();
 
-		FileIO::BoostVtuInterface vtu_io;
-		vtu_io.setMesh(project_data.getMesh(mesh_name));
-		vtu_io.addScalarPointProperty("Head", heads);
-		std::string const res_mesh_name(BaseLib::dropFileExtension(mesh_file));
-		vtu_io.writeToFile(res_mesh_name+"_with_results.vtu");
+		// Call global assembler for each local assembly item.
+		global_setup.execute(global_assembler, local_assembly_item_vec);
+
+		// apply Dirichlet BC
+		MathLib::applyKnownSolution(*A, *rhs, bc_mesh_node_ids, bc_values);
+		//--------------------------------------------------------------------------
+		// solve x=A^-1 rhs
+		//--------------------------------------------------------------------------
+		LinearSolver ls(*A);
+		ls.solve(*rhs, *x);
+
+		{
+			std::vector<double> heads;
+			heads.reserve(x->size());
+			for (std::size_t i = 0; i < x->size(); i++)
+				heads.push_back((*x)[i]);
+
+			FileIO::BoostVtuInterface vtu_io;
+			vtu_io.setMesh(project_data.getMesh(mesh_name));
+			vtu_io.addScalarPointProperty("Head", heads);
+			std::string const res_mesh_name(BaseLib::dropFileExtension(mesh_file));
+			vtu_io.writeToFile(res_mesh_name+"_with_results.vtu");
+		}
 	}
 
 	std::remove_if(vec_comp_dis.begin(), vec_comp_dis.end(),
