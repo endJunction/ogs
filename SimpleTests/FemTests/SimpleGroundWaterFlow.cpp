@@ -247,7 +247,7 @@ createDOFMapping(MeshLib::Mesh const& mesh,
 	return map_ele_nodes2vec_entries;
 }
 
-std::tuple<std::string, std::string, std::string>
+std::tuple<std::string, std::string, std::string, std::size_t>
 parseCLI(int argc, char *argv[])
 {
 	TCLAP::CmdLine cmd(
@@ -265,12 +265,18 @@ parseCLI(int argc, char *argv[])
 			"file name of the boundary condition", true, "", "string");
 	cmd.add(bc_arg);
 
+	TCLAP::ValueArg<std::size_t> time_steps_arg("t", "time_steps",
+			"Timesteps to perform [default 1]. Use 1 for steady-state.",
+			false, 1, "int");
+	cmd.add(time_steps_arg);
+
 	cmd.parse(argc, argv);
 
 	return std::make_tuple(
 			mesh_arg.getValue(),
 			geometry_arg.getValue(),
-			bc_arg.getValue());
+			bc_arg.getValue(),
+			time_steps_arg.getValue());
 }
 
 int main(int argc, char *argv[])
@@ -285,7 +291,8 @@ int main(int argc, char *argv[])
 	std::string mesh_file;
 	std::string geometry_file;
 	std::string boundary_condition_file;
-	std::tie(mesh_file, geometry_file, boundary_condition_file)
+	std::size_t end_time;
+	std::tie(mesh_file, geometry_file, boundary_condition_file, end_time)
 		= parseCLI(argc, argv);
 
 	ProjectData project_data;
