@@ -166,10 +166,12 @@ private:
 	std::array<double, 4> mat_values;
 };
 
-template <typename Data>
+template <typename Data_>
 class LocalGWAssembler
 {
 public:
+	typedef Data_ Data;
+
 	typedef typename Data::NodalVectorType NodalVectorType;
 	typedef typename Data::NodalMatrixType NodalMatrixType;
 
@@ -367,7 +369,8 @@ int main(int argc, char *argv[])
 	//
 	// Shape matrices initializer
 	//
-	typedef ShapeMatricesInitializer<LAData> SMI;
+	typedef LocalGWAssembler<LAData> LA;
+	typedef ShapeMatricesInitializer<LA::Data> SMI;
 	SMI shape_matrices_initializer(mat_values);
 
 	typedef AssemblerLib::SimpleAssembler<
@@ -383,7 +386,6 @@ int main(int argc, char *argv[])
 	//
 	// Local and global assemblers.
 	//
-	typedef LocalGWAssembler<LAData> LA;
 	LA local_gw_assembler;
 	typedef typename LA::NodalMatrixType LocalMatrix;
 	typedef typename LA::NodalVectorType LocalVector;
