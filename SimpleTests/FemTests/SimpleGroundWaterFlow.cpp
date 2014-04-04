@@ -118,8 +118,9 @@ struct LocalGWAssemblerData
 	typedef typename FemType::NodalMatrixType NodalMatrixType;
 	typedef typename FemType::NodalVectorType NodalVectorType;
 
-
 	typedef typename FemType::ShapeMatricesType ShapeMatricesType;
+
+	typedef PROPERTY_TYPE PropertyType;
 
 	static std::size_t constexpr INTEGRATION_ORDER = _INTEGRATION_ORDER;
 	static std::size_t constexpr N_INTEGRATION_POINTS =
@@ -144,7 +145,7 @@ template <typename Data>
 class ShapeMatricesInitializer
 {
 public:
-	ShapeMatricesInitializer(std::array<double, 4> material_values_) :
+	ShapeMatricesInitializer(std::array<typename Data::PropertyType, 4> material_values_) :
 		_integration_method(Data::INTEGRATION_ORDER),
 		_material_values(material_values_)
 	{}
@@ -173,7 +174,7 @@ public:
 
 private:
 	typename Data::FemType::IntegrationMethod _integration_method;
-	std::array<double, 4> _material_values;
+	std::array<typename Data::PropertyType, 4> _material_values;
 };
 
 template <typename Data_>
