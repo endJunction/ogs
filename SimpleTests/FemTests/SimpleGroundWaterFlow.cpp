@@ -111,7 +111,7 @@ struct EigenFixedSizeShapeMatrices
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
 };
 
-template <typename FemType_, std::size_t _INTEGRATION_ORDER>
+template <typename FemType_, std::size_t _INTEGRATION_ORDER, typename PROPERTY_TYPE>
 struct LocalGWAssemblerData
 {
 	typedef typename FemType_::type FemType;
@@ -127,7 +127,7 @@ struct LocalGWAssemblerData
 
 
 	std::array<ShapeMatricesType, N_INTEGRATION_POINTS> _shape_matrices;
-	double _material;
+	PROPERTY_TYPE _material;
 };
 
 template <typename Data>
@@ -359,8 +359,10 @@ int main(int argc, char *argv[])
 		createDOFMapping(mesh, vec1_composition);
 
 	// create data structures for properties
-	typedef LocalGWAssemblerData<NumLib::FeQUAD4<EigenFixedSizeShapeMatrices>,
-			2> LAData;
+	typedef LocalGWAssemblerData<
+		NumLib::FeQUAD4<EigenFixedSizeShapeMatrices>,
+		2,
+		double> LAData;
 	std::vector<LAData*> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
 
