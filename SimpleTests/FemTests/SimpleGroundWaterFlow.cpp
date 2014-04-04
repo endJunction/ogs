@@ -134,9 +134,9 @@ template <typename Data>
 class ShapeMatricesInitializer
 {
 public:
-	ShapeMatricesInitializer(std::array<double, 4> mat_values_) :
-		_integration_method(Data::INTEGRATION_ORDER)
-		, mat_values(mat_values_)
+	ShapeMatricesInitializer(std::array<double, 4> material_values_) :
+		_integration_method(Data::INTEGRATION_ORDER),
+		_material_values(material_values_)
 	{}
 
 	void operator()(const MeshLib::Element& e,
@@ -144,7 +144,7 @@ public:
 	{
 		data_ptr = new Data;
 		Data& data = *data_ptr;
-		data._material = mat_values[e.getValue()];
+		data._material = _material_values[e.getValue()];
 		typedef typename Data::FemType::MeshElementType MeshElementType;
 		// create FEM Element
 		typename Data::FemType fe(*static_cast<const MeshElementType*>(&e));
@@ -163,7 +163,7 @@ public:
 
 private:
 	typename Data::FemType::IntegrationMethod _integration_method;
-	std::array<double, 4> mat_values;
+	std::array<double, 4> _material_values;
 };
 
 template <typename Data_>
@@ -364,14 +364,14 @@ int main(int argc, char *argv[])
 	std::vector<LAData*> local_assembly_item_vec;
 	local_assembly_item_vec.resize(mesh.getNElements());
 
-	std::array<double,4> mat_values({{1e-10, 2e-10, 4e-10, 8e-10}});
+	std::array<double,4> material_values({{1e-10, 2e-10, 4e-10, 8e-10}});
 
 	//
 	// Shape matrices initializer
 	//
 	typedef LocalGWAssembler<LAData> LA;
 	typedef ShapeMatricesInitializer<LA::Data> SMI;
-	SMI shape_matrices_initializer(mat_values);
+	SMI shape_matrices_initializer(material_values);
 
 	typedef AssemblerLib::SimpleAssembler<
 			MeshLib::Element,
