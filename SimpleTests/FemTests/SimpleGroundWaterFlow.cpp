@@ -125,8 +125,18 @@ struct LocalGWAssemblerData
 	static std::size_t constexpr N_INTEGRATION_POINTS =
 		BaseLib::pow(INTEGRATION_ORDER, FemType::ShapeFunctionType::DIM);
 
+	typename std::remove_pointer<PROPERTY_TYPE>::type getMaterial()
+	{
+		return _material;
+	}
+
+	void setMaterial(PROPERTY_TYPE const& material)
+	{
+		_material = material;
+	}
 
 	std::array<ShapeMatricesType, N_INTEGRATION_POINTS> _shape_matrices;
+private:
 	PROPERTY_TYPE _material;
 };
 
@@ -144,7 +154,7 @@ public:
 	{
 		data_ptr = new Data;
 		Data& data = *data_ptr;
-		data._material = _material_values[e.getValue()];
+		data.setMaterial(_material_values[e.getValue()]);
 		typedef typename Data::FemType::MeshElementType MeshElementType;
 		// create FEM Element
 		typename Data::FemType fe(*static_cast<const MeshElementType*>(&e));
@@ -189,7 +199,7 @@ public:
 		Data& data = *data_ptr;
 		for (std::size_t ip(0); ip < Data::N_INTEGRATION_POINTS; ip++) { // ip == number of gauss point
 			MathLib::WeightedPoint2D const& wp = _integration_method.getWeightedPoint(ip);
-			localA += data._shape_matrices[ip].dNdx.transpose() * data._material * data._shape_matrices[ip].dNdx * data._shape_matrices[ip].detJ * wp.getWeight();
+			localA += data._shape_matrices[ip].dNdx.transpose() * data.getMaterial() * data._shape_matrices[ip].dNdx * data._shape_matrices[ip].detJ * wp.getWeight();
 		}
 	}
 
