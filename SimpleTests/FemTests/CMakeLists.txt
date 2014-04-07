@@ -47,3 +47,8 @@ IF(OGS_BUILD_GUI)
 		${VTK_LIBRARIES}
 	)
 ENDIF()
+
+INCLUDE(test/AddTest)
+AddTest(SimpleGroundWaterFlow ${OGS-DATA_PATH}/GroundwaterFlow_Quad4/288Cells case TIME DIFF)
+AddTest(SimpleGroundWaterFlow ${OGS-DATA_PATH}/GroundwaterFlow_Quad4/288Cells case MEMCHECK)
+AddTest(SimpleGroundWaterFlow ${OGS-DATA_PATH}/GroundwaterFlow_Quad4/288Cells case CALLGRIND)
