@@ -128,7 +128,7 @@ struct LocalGWAssemblerData
 
 	typename std::remove_pointer<PROPERTY_TYPE>::type getMaterial()
 	{
-		return _material;
+		return getMaterialProperty(_material);
 	}
 
 	void setMaterial(PROPERTY_TYPE const& material)
@@ -138,6 +138,18 @@ struct LocalGWAssemblerData
 
 	std::array<ShapeMatricesType, N_INTEGRATION_POINTS> _shape_matrices;
 private:
+	typename std::remove_pointer<PROPERTY_TYPE>::type
+	getMaterialProperty(
+		typename std::add_pointer<typename std::remove_pointer<PROPERTY_TYPE>::type>::type /*material*/)
+	{
+		return *_material;
+	}
+
+	typename std::remove_pointer<PROPERTY_TYPE>::type
+	getMaterialProperty(typename std::remove_pointer<PROPERTY_TYPE>::type /*material*/)
+	{
+		return _material;
+	}
 	PROPERTY_TYPE _material;
 };
 
