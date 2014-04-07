@@ -11,6 +11,10 @@
  */
 
 #include <cstdlib>
+#include <functional>
+#include <unordered_map>
+#include <typeinfo>
+#include <typeindex>
 
 #ifdef OGS_USE_EIGEN
 #include <Eigen/Eigen>
@@ -111,8 +115,13 @@ struct EigenFixedSizeShapeMatrices
 	//typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DimMatrixType;
 };
 
+struct LocalAssemblerData
+{
+	virtual ~LocalAssemblerData() = default;
+};
+
 template <typename FemType_, std::size_t _INTEGRATION_ORDER, typename PROPERTY_TYPE>
-struct LocalGWAssemblerData
+struct LocalGWAssemblerData : public LocalAssemblerData
 {
 	typedef typename FemType_::type FemType;
 	typedef typename FemType::NodalMatrixType NodalMatrixType;
@@ -153,6 +162,8 @@ private:
 	PROPERTY_TYPE _material;
 };
 
+std::unordered_map<std::type_index, std::function<LocalAssemblerData*()>> builder;
+
 template <typename Data>
 class ShapeMatricesInitializer
 {
@@ -165,7 +176,9 @@ public:
 	void operator()(const MeshLib::Element& e,
 		Data*& data_ptr)
 	{
-		data_ptr = new Data;
+		std::cerr << std::type_index(typeid(e)).hash_code() << std::endl;
+		data_ptr = builder[std::type_index(typeid(e))]();
+
 		Data& data = *data_ptr;
 		data.setMaterial(_material_values[e.getValue()]);
 		typedef typename Data::FemType::MeshElementType MeshElementType;
@@ -381,6 +394,9 @@ int main(int argc, char *argv[])
 	std::vector <std::vector<std::size_t>> const map_ele_nodes2vec_entries =
 		createDOFMapping(mesh, vec1_composition);
 
+	builder[std::type_index(typeid(MeshLib::Quad))] =
+		[](){ return new LocalGWAssemblerData<NumLib::FeQUAD4<EigenFixedSizeShapeMatrices>, 2, double>; };
+
 	// create data structures for properties
 	typedef LocalGWAssemblerData<
 		NumLib::FeQUAD4<EigenFixedSizeShapeMatrices>,
@@ -395,7 +411,7 @@ int main(int argc, char *argv[])
 	// Shape matrices initializer
 	//
 	typedef LocalGWAssembler<LAData> LA;
-	typedef ShapeMatricesInitializer<LA::Data> SMI;
+	typedef ShapeMatricesInitializer<LocalAssemblerData> SMI;
 	SMI shape_matrices_initializer(material_values);
 
 	typedef AssemblerLib::SimpleAssembler<
