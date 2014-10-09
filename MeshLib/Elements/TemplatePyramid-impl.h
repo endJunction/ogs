@@ -19,7 +19,6 @@
 #include "MeshLib/Node.h"
 
 #include "Tri.h"
-#include "Tet.h"
 #include "Quad.h"
 
 namespace MeshLib {

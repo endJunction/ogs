@@ -19,8 +19,6 @@
 #include "MathLib/MathTools.h"
 #include "GeoLib/AnalyticalGeometry.h"
 
-#include "Tri.h"
-
 namespace MeshLib
 {
 

@@ -19,9 +19,7 @@
 #include "MeshLib/Node.h"
 
 #include "Tri.h"
-#include "Pyramid.h"
 #include "Quad.h"
-
 
 namespace MeshLib {
 
