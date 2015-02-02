@@ -13,6 +13,10 @@
 #include <memory>
 #include <vector>
 
+#ifdef USE_PETSC
+#include <petscmat.h>
+#endif
+
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
 
@@ -104,6 +108,13 @@ public:
     void addToGlobal(GlobalMatrix& A, GlobalVector& rhs,
             AssemblerLib::LocalToGlobalIndexMap::RowColumnIndices const& indices) const
     {
+        // Reset rows of A and rhs in case of ghost nodes.
+        for(std::size_t non_ghost_id : *indices.getNonGhostLocalIds())
+        {
+            _localA->row(non_ghost_id).setZero();
+            (*_localRhs)[non_ghost_id] = 0.;
+        }
+
         A.add(indices, *_localA);
         rhs.add(indices.rows, *_localRhs);
     }
