@@ -112,6 +112,13 @@ public:
     /// | l_m      | comp_id_2   | gi78        |
     /// | ...      |  ...        | ...         |
     /// | l_n      | comp_id_n   | gi89        |
+
+    /// Get the number of global unknowns.
+    std::size_t getNGlobalUnknowns() const
+    {
+        return _num_global_dof;
+    }
+
     template <ComponentOrder ORDER>
     std::vector<std::size_t> getGlobalIndices(const std::vector<Location> &ls) const;
 
@@ -150,6 +157,9 @@ private:
 
 private:
     detail::ComponentGlobalIndexDict _dict;
+
+    /// Number of global unknowns.
+    std::size_t _num_global_dof = 0;
 };
 
 }   // namespace AssemblerLib
