@@ -23,7 +23,7 @@
 //
 // Global vector/matrix types and linear solver.
 //
-#ifdef USE_LIS
+#if defined(USE_LIS)
 
     #include "MathLib/LinAlg/Lis/LisMatrix.h"
     #include "MathLib/LinAlg/Lis/LisVector.h"
@@ -37,7 +37,19 @@ namespace detail
     using LinearSolverType = MathLib::LisLinearSolver;
 }
 
-#else    // USE_LIS
+#elif defined(USE_PETSC)
+    #include "MathLib/LinAlg/PETSc/PETScVector.h"
+    #include "MathLib/LinAlg/PETSc/PETScMatrix.h"
+    #include "MathLib/LinAlg/PETSc/PETScLinearSolver.h"
+namespace detail
+{
+    using GlobalVectorType = MathLib::PETScVector;
+    using GlobalMatrixType = MathLib::PETScMatrix;
+
+    using LinearSolverType = MathLib::PETScLinearSolver;
+}
+
+#else    // Default: GaussAlgorithm
     #include "MathLib/LinAlg/Dense/DenseVector.h"
     #include "MathLib/LinAlg/Dense/GlobalDenseMatrix.h"
     #include "MathLib/LinAlg/Solvers/GaussAlgorithm.h"
@@ -50,8 +62,7 @@ namespace detail
         MathLib::GaussAlgorithm<GlobalMatrixType, GlobalVectorType>;
 }
 
-#endif    // USE_LIS
-
+#endif
 
 //
 // Global vector/matrix builder.
