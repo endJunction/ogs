@@ -142,7 +142,44 @@ private:
     friend std::ostream& operator<<(std::ostream& os, LocalToGlobalIndexMap const& map);
 #endif  // NDEBUG
 
+#ifdef USE_PETSC
+    /// Element wise local indices for the unknowns that are associated with non-ghost nodes.
+    std::vector<std::vector<std::size_t>> _element_non_ghost_local_ids;
+
+    /// Set local indices for the unknowns that are associated with non-ghost nodes for each element.
+    /// \param ghost_element Flag for ghost element.
+    /// \param vec_items     Component info.
+    template <ComponentOrder ORDER>
+    void
+    setLocalNonGhostIndices(const bool ghost_element,
+        std::vector<MeshLib::Location> const& vec_items);
+#endif
+
 };
+
+#ifdef USE_PETSC
+template <ComponentOrder ORDER>
+void LocalToGlobalIndexMap::setLocalNonGhostIndices(const bool ghost_element,
+                                                    const std::vector<MeshLib::Location>& vec_items)
+{
+    if(ghost_element)
+    {
+        std::vector<bool> ele_ghost_flags = _mesh_component_map.getGhostFlags<ORDER>(vec_items);
+        std::vector<std::size_t> ele_local_ids;
+        for(std::size_t i=0; i<ele_ghost_flags.size(); i++)
+        {
+            if(ele_ghost_flags[i])
+                ele_local_ids.push_back(i);
+        }
+        _element_non_ghost_local_ids.push_back(ele_local_ids);
+    }
+    else
+    {
+        std::vector<std::size_t> null_vec;
+        _element_non_ghost_local_ids.push_back(null_vec);
+    }
+}
+#endif
 
 }   // namespace AssemblerLib
 
