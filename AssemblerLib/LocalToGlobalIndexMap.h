@@ -16,6 +16,11 @@
 
 #include <vector>
 
+#ifdef USE_PETSC
+#include <petsc.h>
+#include "MeshLib/NodePartitionedMesh.h"
+#endif
+
 #include "AssemblerLib/MeshComponentMap.h"
 #include "MathLib/LinAlg/RowColumnIndices.h"
 #include "MeshLib/MeshSubsets.h"
@@ -35,28 +40,22 @@ namespace AssemblerLib
 class LocalToGlobalIndexMap
 {
 public:
+#ifdef USE_PETSC
+    using IDX_TYPE = PetscInt;
+#else
     using IDX_TYPE = std::size_t;
+#endif
     typedef MathLib::RowColumnIndices<IDX_TYPE> RowColumnIndices;
     typedef RowColumnIndices::LineIndex LineIndex;
 
 public:
-    /* \todo Extend the constructor for parallel meshes.
-    LocalToGlobalIndexMap(
-        std::vector<LineIndex> const& rows,
-        std::vector<LineIndex> const & columns)
-        : _rows(rows), _columns(columns)
-    {
-        assert(_rows.size() == _columns.size());
-        assert(!_rows.empty());
-    }
-    */
-
     /// Creates a MeshComponentMap internally and stores the global indices for
     /// each mesh element of the given mesh_subsets.
     explicit LocalToGlobalIndexMap(
         std::vector<MeshLib::MeshSubsets*> const& mesh_subsets,
         AssemblerLib::ComponentOrder const order =
-            AssemblerLib::ComponentOrder::BY_COMPONENT);
+            AssemblerLib::ComponentOrder::BY_COMPONENT,
+            const bool is_linear_element = true);
 
     /// Derive a LocalToGlobalIndexMap constrained to a set of mesh subsets and
     /// elements. A new mesh component map will be constructed using the passed
@@ -72,12 +71,26 @@ public:
     /// Returns total number of degrees of freedom.
     std::size_t dofSize() const;
 
+    /// Returns total number of global degrees of freedom for DDC.
+    std::size_t dofSizeGlobal() const
+    {
+        return _mesh_component_map.getNGlobalUnknowns();
+    }
+
     std::size_t size() const;
 
     RowColumnIndices operator[](std::size_t const mesh_item_id) const;
 
     LineIndex rowIndices(std::size_t const mesh_item_id) const;
     LineIndex columnIndices(std::size_t const mesh_item_id) const;
+
+#ifdef USE_PETSC
+    const std::vector<IDX_TYPE>&
+    getLocalNonGhostIndices(std::size_t const mesh_item_id) const
+    {
+        return _element_non_ghost_local_ids[mesh_item_id];
+    }
+#endif
 
 private:
 
@@ -132,12 +145,12 @@ private:
     std::vector<MeshLib::MeshSubsets*> const& _mesh_subsets;
     AssemblerLib::MeshComponentMap _mesh_component_map;
 
-    /// _rows contains for each element a vector of global indices to
-    /// node/element process variables.
+    /// Vector contains for each element a vector of global row/or entry indices
+    /// in the global stiffness matrix or vector
     std::vector<LineIndex> _rows;
 
-    /// For non-parallel implementations the columns are equal to the rows.
-    /// \todo This is to be overriden by any parallel implementation.
+    /// Vector alias to that contains for each element a vector of global column indices
+    /// in the global stiffness matrix
     std::vector<LineIndex> const& _columns = _rows;
 
 #ifndef NDEBUG

@@ -1,4 +1,8 @@
 /**
+ * \file LocalToGlobalIndexMap.cpp
+ * \author Norihiro Watanabe
+ * \author Wenqing Wang
+ * \date   2013-04-16, 2014-11-14
  * \copyright
  * Copyright (c) 2012-2015, OpenGeoSys Community (http://www.opengeosys.org)
  *            Distributed under a Modified BSD License.
@@ -14,12 +18,15 @@
 #include "AssemblerLib/MeshComponentMap.h"
 #include "MeshLib/MeshSubsets.h"
 
+#ifdef USE_PETSC
+#include "MeshLib/NodePartitionedMesh.h"
+#endif
+
 namespace AssemblerLib
 {
-
 LocalToGlobalIndexMap::LocalToGlobalIndexMap(
     std::vector<MeshLib::MeshSubsets*> const& mesh_subsets,
-    AssemblerLib::ComponentOrder const order)
+    AssemblerLib::ComponentOrder const order, const bool is_linear_element)
     : _mesh_subsets(mesh_subsets), _mesh_component_map(_mesh_subsets, order)
 {
     // For all MeshSubsets and each of their MeshSubset's and each element
@@ -79,7 +86,12 @@ LocalToGlobalIndexMap::size() const
 LocalToGlobalIndexMap::RowColumnIndices
 LocalToGlobalIndexMap::operator[](std::size_t const mesh_item_id) const
 {
+#ifdef USE_PETSC
+    return RowColumnIndices(_rows[mesh_item_id], _columns[mesh_item_id],
+            &_element_non_ghost_local_ids[mesh_item_id]);
+#else
     return RowColumnIndices(_rows[mesh_item_id], _columns[mesh_item_id]);
+#endif
 }
 
 LocalToGlobalIndexMap::LineIndex
