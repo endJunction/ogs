@@ -60,6 +60,9 @@ public:
 	/// Return all the nodes connected to this one
 	const std::vector<MeshLib::Node*>& getConnectedNodes() const { return _connected_nodes; }
 
+	/// Return number of the nodes connected to this one
+	std::size_t getNConnectedNodes() const { return _connected_nodes.size(); }
+
 	/// Get an element the node is part of.
 	const Element* getElement(std::size_t idx) const { return _elements[idx]; }
 
