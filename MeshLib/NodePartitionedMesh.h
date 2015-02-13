@@ -118,18 +118,17 @@ class NodePartitionedMesh : public Mesh
             return _n_nghost_elem;
         }
 
-        /// Get the maximum number of connected nodes to node.
+        /// Get the maximum number of connected nodes to any node in the mesh.
         std::size_t getMaximumNConnectedNodesToNode() const
         {
-            std::vector<Node*>::const_iterator it_max_ncn
-                 = std::max_element(this->_nodes.cbegin(), this->_nodes.cend(),
-                                [](Node const*const node_a, Node const*const node_b)
-                                  {
-                                      return (   node_a->getConnectedNodes().size()
-                                               < node_b->getConnectedNodes().size() );
-                                  }
-                                );
-            return (*it_max_ncn)->getConnectedNodes().size() + 1;
+            std::vector<Node*>::const_iterator node_with_max_connections
+                 = std::max_element(_nodes.cbegin(), _nodes.cend(),
+                    [](Node const*const a, Node const*const b)
+                    {
+                        return a->getNConnectedNodes() < b->getNConnectedNodes();
+                    });
+
+            return (*node_with_max_connections)->getNConnectedNodes() + 1;
         }
 
     private:
