@@ -112,6 +112,12 @@ private:
         AssemblerLib::ComponentOrder const order)
     {
         std::size_t const mesh_id = mesh_subset->getMeshID();
+#ifdef USE_PETSC
+        std::size_t const n_non_ghost_elements =
+            static_cast<const MeshLib::NodePartitionedMesh&>(
+                mesh_subset->getMesh()).getNNonGhostElements();
+#endif  // USE_PETSC
+
         // For each element find the global indices for node/element
         // components.
         for (ElementIterator e = first; e != last; ++e)
@@ -134,9 +140,17 @@ private:
             {
                 case AssemblerLib::ComponentOrder::BY_LOCATION:
                     _rows.push_back(_mesh_component_map.getGlobalIndicesByLocation<IDX_TYPE>(vec_items));
+#ifdef USE_PETSC
+                    setLocalNonGhostIndices<AssemblerLib::ComponentOrder::BY_LOCATION>(
+                        (*e)->getID() >= n_non_ghost_elements, vec_items);
+#endif  // USE_PETSC
                     break;
                 case AssemblerLib::ComponentOrder::BY_COMPONENT:
                     _rows.push_back(_mesh_component_map.getGlobalIndicesByComponent<IDX_TYPE>(vec_items));
+#ifdef USE_PETSC
+                    setLocalNonGhostIndices<AssemblerLib::ComponentOrder::BY_COMPONENT>(
+                        (*e)->getID() >= n_non_ghost_elements, vec_items);
+#endif  // USE_PETSC
                     break;
             }
         }
