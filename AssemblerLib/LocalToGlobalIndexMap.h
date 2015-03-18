@@ -117,6 +117,7 @@ private:
         for (ElementIterator e = first; e != last; ++e)
         {
             std::vector<MeshLib::Location> vec_items;
+            /// \todo Need to distinguish those for different interpolation orders.
             std::size_t const nnodes = (*e)->getNNodes();
             vec_items.reserve(nnodes);
 
