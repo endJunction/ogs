@@ -95,8 +95,10 @@ private:
     template <typename ElementIterator>
     void
     findGlobalIndices(ElementIterator first, ElementIterator last,
-        std::size_t const mesh_id, AssemblerLib::ComponentOrder const order)
+        MeshLib::MeshSubset const* const mesh_subset,
+        AssemblerLib::ComponentOrder const order)
     {
+        std::size_t const mesh_id = mesh_subset->getMeshID();
         // For each element find the global indices for node/element
         // components.
         for (ElementIterator e = first; e != last; ++e)

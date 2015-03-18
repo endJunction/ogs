@@ -28,9 +28,7 @@ LocalToGlobalIndexMap::LocalToGlobalIndexMap(
     {
         for (MeshLib::MeshSubset const* const ms : *mss)
         {
-            std::size_t const mesh_id = ms->getMeshID();
-
-            findGlobalIndices(ms->elementsBegin(), ms->elementsEnd(), mesh_id, order);
+            findGlobalIndices(ms->elementsBegin(), ms->elementsEnd(), ms, order);
         }
     }
 }
@@ -48,9 +46,7 @@ LocalToGlobalIndexMap::LocalToGlobalIndexMap(
     {
         for (MeshLib::MeshSubset const* const ms : *mss)
         {
-            std::size_t const mesh_id = ms->getMeshID();
-
-            findGlobalIndices(elements.cbegin(), elements.cend(), mesh_id, order);
+            findGlobalIndices(elements.cbegin(), elements.cend(), ms, order);
         }
     }
 }
