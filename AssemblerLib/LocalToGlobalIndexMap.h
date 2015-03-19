@@ -35,7 +35,8 @@ namespace AssemblerLib
 class LocalToGlobalIndexMap
 {
 public:
-    typedef MathLib::RowColumnIndices<std::size_t> RowColumnIndices;
+    using IDX_TYPE = std::size_t;
+    typedef MathLib::RowColumnIndices<IDX_TYPE> RowColumnIndices;
     typedef RowColumnIndices::LineIndex LineIndex;
 
 public:
@@ -116,10 +117,10 @@ private:
             switch (order)
             {
                 case AssemblerLib::ComponentOrder::BY_LOCATION:
-                    _rows.push_back(_mesh_component_map.getGlobalIndices<AssemblerLib::ComponentOrder::BY_LOCATION>(vec_items));
+                    _rows.push_back(_mesh_component_map.getGlobalIndicesByLocation<IDX_TYPE>(vec_items));
                     break;
                 case AssemblerLib::ComponentOrder::BY_COMPONENT:
-                    _rows.push_back(_mesh_component_map.getGlobalIndices<AssemblerLib::ComponentOrder::BY_COMPONENT>(vec_items));
+                    _rows.push_back(_mesh_component_map.getGlobalIndicesByComponent<IDX_TYPE>(vec_items));
                     break;
             }
         }
