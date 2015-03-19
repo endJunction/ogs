@@ -62,7 +62,8 @@ struct Line
 
     friend std::ostream& operator<<(std::ostream& os, Line const& l)
     {
-        return os << l.location << ", " << l.comp_id << ", " << l.global_index;
+        return os << l.location << ", " << l.comp_id << ", " << l.global_index
+            << ", " << (l.is_ghost ? "ghost" : "");
     }
 };
 
@@ -74,7 +75,7 @@ struct LineByLocationComparator
     }
 };
 
-struct LineByLocationAndComponentComparator
+struct LineByLocationAndComponentAndGhostComparator
 {
     bool operator()(Line const& a, Line const& b) const
     {
@@ -82,9 +83,15 @@ struct LineByLocationAndComponentComparator
             return true;
         if (b.location < a.location)
             return false;
-
         // a.loc == b.loc
-        return a.comp_id < b.comp_id;
+
+        if (a.comp_id < b.comp_id)
+            return true;
+        if (b.comp_id < a.comp_id)
+            return false;
+        // a.comp_id == b.comp_id
+
+        return a.is_ghost < b.is_ghost;
     }
 };
 
@@ -101,7 +108,7 @@ typedef boost::multi_index::multi_index_container<
             <
                 boost::multi_index::tag<ByLocationAndComponent>,
                 boost::multi_index::identity<Line>,
-                LineByLocationAndComponentComparator
+                LineByLocationAndComponentAndGhostComparator
             >,
             boost::multi_index::ordered_non_unique
             <
