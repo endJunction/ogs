@@ -113,6 +113,13 @@ public:
     /// | ...      |  ...        | ...         |
     /// | l_n      | comp_id_n   | gi89        |
 
+    /// Get the flags of the ghost location at location \c l.
+    ///
+    /// | Location | ComponentID | GlobalIndex |  Ghost flag |
+    /// | -------- | ----------- | ----------- |-------------|
+    /// | l        | c           | gi          |is_ghost     |
+    std::vector<bool> getGhostFlags(const Location &l) const;
+
     /// Get the number of global unknowns.
     std::size_t getNGlobalUnknowns() const
     {

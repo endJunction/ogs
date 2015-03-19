@@ -131,6 +131,16 @@ std::vector<std::size_t> MeshComponentMap::getGlobalIndices(const Location &l) c
     return global_indices;
 }
 
+std::vector<bool> MeshComponentMap::getGhostFlags(const Location &l) const
+{
+    auto const &m = _dict.get<ByLocation>();
+    auto const p = m.equal_range(Line(l));
+    std::vector<bool> ghost_flags;
+    for (auto itr=p.first; itr!=p.second; ++itr)
+        ghost_flags.push_back(itr->is_ghost);
+    return ghost_flags;
+}
+
 template <>
 std::vector<std::size_t>
 MeshComponentMap::getGlobalIndices<ComponentOrder::BY_LOCATION>(
