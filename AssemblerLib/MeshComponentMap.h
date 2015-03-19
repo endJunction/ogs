@@ -132,8 +132,9 @@ public:
         return _num_global_dof;
     }
 
+    /// Get the ghost flags of the nodes at location \c l.
     template <ComponentOrder ORDER>
-    std::vector<std::size_t> getGlobalIndices(const std::vector<Location> &ls) const;
+    std::vector<bool> getGhostFlags(const std::vector<Location> &l) const;
 
     /// A value returned if no global index was found for the requested
     /// location/component. The value is implementation dependent.

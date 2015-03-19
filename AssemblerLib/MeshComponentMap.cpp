@@ -201,34 +201,31 @@ std::vector<bool> MeshComponentMap::getGhostFlags(const Location &l) const
 }
 
 template <>
-std::vector<std::size_t>
-MeshComponentMap::getGlobalIndices<ComponentOrder::BY_LOCATION>(
+std::vector<bool>
+MeshComponentMap::getGhostFlags<ComponentOrder::BY_LOCATION>(
     std::vector<Location> const &ls) const
 {
-    // Create vector of global indices sorted by location containing all
-    // locations given in ls parameter.
-
-    std::vector<std::size_t> global_indices;
-    global_indices.reserve(ls.size());
+    std::vector<bool> ghost_flags;
+    ghost_flags.reserve(ls.size());
 
     auto const &m = _dict.get<ByLocation>();
     for (auto l = ls.cbegin(); l != ls.cend(); ++l)
     {
         auto const p = m.equal_range(Line(*l));
         for (auto itr = p.first; itr != p.second; ++itr)
-            global_indices.push_back(itr->global_index);
+            ghost_flags.push_back(itr->is_ghost);
     }
 
-    return global_indices;
+    return ghost_flags;
 }
 
 template <>
-std::vector<std::size_t>
-MeshComponentMap::getGlobalIndices<ComponentOrder::BY_COMPONENT>(
+std::vector<bool>
+MeshComponentMap::getGhostFlags<ComponentOrder::BY_COMPONENT>(
     std::vector<Location> const &ls) const
 {
-    // vector of (Component, global Index) pairs.
-    typedef std::pair<std::size_t, std::size_t> CIPair;
+    // vector of (Component, bool) pairs.
+    typedef std::pair<std::size_t, bool> CIPair;
     std::vector<CIPair> pairs;
     pairs.reserve(ls.size());
 
@@ -238,7 +235,7 @@ MeshComponentMap::getGlobalIndices<ComponentOrder::BY_COMPONENT>(
     {
         auto const p = m.equal_range(Line(*l));
         for (auto itr = p.first; itr != p.second; ++itr)
-            pairs.emplace_back(itr->comp_id, itr->global_index);
+            pairs.emplace_back(itr->comp_id, itr->is_ghost);
     }
 
     auto CIPairLess = [](CIPair const& a, CIPair const& b)
@@ -250,12 +247,13 @@ MeshComponentMap::getGlobalIndices<ComponentOrder::BY_COMPONENT>(
     if (!std::is_sorted(pairs.begin(), pairs.end(), CIPairLess))
         std::stable_sort(pairs.begin(), pairs.end(), CIPairLess);
 
-    std::vector<std::size_t> global_indices;
-    global_indices.reserve(pairs.size());
+    std::vector<bool> ghost_flags;
+    ghost_flags.reserve(ls.size());
+    ghost_flags.reserve(pairs.size());
     for (auto p = pairs.cbegin(); p != pairs.cend(); ++p)
-        global_indices.push_back(p->second);
+        ghost_flags.push_back(p->second);
 
-    return global_indices;
+    return ghost_flags;
 }
 
 }   // namespace AssemblerLib
