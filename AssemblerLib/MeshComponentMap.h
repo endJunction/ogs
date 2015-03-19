@@ -177,4 +177,6 @@ private:
 
 }   // namespace AssemblerLib
 
+#include "MeshComponentMap-impl.h"
+
 #endif  // ASSEMBLERLIB_MESHCOMPONENTMAP_H_
