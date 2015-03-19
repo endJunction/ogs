@@ -112,6 +112,12 @@ public:
     /// | l_m      | comp_id_2   | gi78        |
     /// | ...      |  ...        | ...         |
     /// | l_n      | comp_id_n   | gi89        |
+    template <typename T_INT_TYPE>
+    std::vector<T_INT_TYPE> getGlobalIndicesByLocation(const std::vector<Location> &ls) const;
+
+    /// The same function as getGlobalIndicesByLocation but getting indices by component
+    template <typename T_INT_TYPE>
+    std::vector<T_INT_TYPE> getGlobalIndicesByComponent(const std::vector<Location> &ls) const;
 
     /// Get the flags of the ghost location at location \c l.
     ///
