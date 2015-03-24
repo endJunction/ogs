@@ -26,7 +26,7 @@ namespace AssemblerLib
 {
 LocalToGlobalIndexMap::LocalToGlobalIndexMap(
     std::vector<MeshLib::MeshSubsets*> const& mesh_subsets,
-    AssemblerLib::ComponentOrder const order, const bool is_linear_element)
+    AssemblerLib::ComponentOrder const order)
     : _mesh_subsets(mesh_subsets), _mesh_component_map(_mesh_subsets, order)
 {
     // For all MeshSubsets and each of their MeshSubset's and each element

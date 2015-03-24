@@ -12,50 +12,67 @@
  *
  */
 
+#include "MeshComponentMap.h"
+
 namespace AssemblerLib
 {
 
 using namespace detail;
 
-template <typename T_INT_TYPE>
-std::vector<T_INT_TYPE>
-MeshComponentMap::getGlobalIndicesByLocation(
-    std::vector<Location> const &ls) const
+template<RowDataType ROW_DATA_TYPE, typename T_DATA_TYPE>
+std::vector<T_DATA_TYPE> MeshComponentMap
+::getRowDataByLocation(const std::vector<Location> &l) const
 {
     // Create vector of global indices sorted by location containing all
     // locations given in ls parameter.
+    // or Create vector of ghost node flags.
 
-    std::vector<T_INT_TYPE> global_indices;
-    global_indices.reserve(ls.size());
+    std::vector<T_DATA_TYPE> row_data;
+    row_data.reserve(l.size());
 
     auto const &m = _dict.get<ByLocation>();
-    for (auto l = ls.cbegin(); l != ls.cend(); ++l)
+    for (auto lc = l.cbegin(); lc != l.cend(); ++lc)
     {
-        auto const p = m.equal_range(Line(*l));
-        for (auto itr = p.first; itr != p.second; ++itr)
-            global_indices.push_back(itr->global_index);
+        auto const p = m.equal_range(Line(*lc));
+        if(ROW_DATA_TYPE == RowDataType::ROW_GLOBAL_INDEX)
+        {
+            for (auto itr = p.first; itr != p.second; ++itr)
+                row_data.push_back(itr->global_index);
+        }
+        else if(ROW_DATA_TYPE == RowDataType::ROW_GHOST_FLAG)
+        {
+            for (auto itr = p.first; itr != p.second; ++itr)
+                row_data.push_back(itr->is_ghost);
+        }
     }
 
-    return global_indices;
+    return row_data;
 }
 
-template <typename T_INT_TYPE>
-std::vector<T_INT_TYPE>
-MeshComponentMap::getGlobalIndicesByComponent(
-    std::vector<Location> const &ls) const
+template<RowDataType ROW_DATA_TYPE, typename T_DATA_TYPE>
+std::vector<T_DATA_TYPE> MeshComponentMap
+::getRowDataByComponent(const std::vector<Location> &l) const
 {
     // vector of (Component, global Index) pairs.
     typedef std::pair<std::size_t, std::size_t> CIPair;
     std::vector<CIPair> pairs;
-    pairs.reserve(ls.size());
+    pairs.reserve(l.size());
 
     // Create a sub dictionary containing all lines with location from ls.
     auto const &m = _dict.get<ByLocation>();
-    for (auto l = ls.cbegin(); l != ls.cend(); ++l)
+    for (auto lc = l.cbegin(); lc != l.cend(); ++lc)
     {
-        auto const p = m.equal_range(Line(*l));
-        for (auto itr = p.first; itr != p.second; ++itr)
-            pairs.emplace_back(itr->comp_id, itr->global_index);
+        auto const p = m.equal_range(Line(*lc));
+        if(ROW_DATA_TYPE == RowDataType::ROW_GLOBAL_INDEX)
+        {
+            for (auto itr = p.first; itr != p.second; ++itr)
+                pairs.emplace_back(itr->comp_id, itr->global_index);
+        }
+        else if(ROW_DATA_TYPE == RowDataType::ROW_GHOST_FLAG)
+        {
+            for (auto itr = p.first; itr != p.second; ++itr)
+                pairs.emplace_back(itr->comp_id, itr->is_ghost);
+        }
     }
 
     auto CIPairLess = [](CIPair const& a, CIPair const& b)
@@ -63,16 +80,16 @@ MeshComponentMap::getGlobalIndicesByComponent(
         return a.first < b.first;
     };
 
-    // Create vector of global indices from sub dictionary sorting by component.
+    // Create vector of global indices or ghost node flags from sub dictionary sorting by component.
     if (!std::is_sorted(pairs.begin(), pairs.end(), CIPairLess))
         std::stable_sort(pairs.begin(), pairs.end(), CIPairLess);
 
-    std::vector<T_INT_TYPE> global_indices;
-    global_indices.reserve(pairs.size());
+    std::vector<T_DATA_TYPE> row_data;
+    row_data.reserve(pairs.size());
     for (auto p = pairs.cbegin(); p != pairs.cend(); ++p)
-        global_indices.push_back(p->second);
+        row_data.push_back(p->second);
 
-    return global_indices;
+    return row_data;
 }
 
 }   // namespace AssemblerLib

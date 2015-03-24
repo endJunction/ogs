@@ -34,6 +34,13 @@ enum class ComponentOrder
     BY_LOCATION     ///< Ordering data by spatial location
 };
 
+/// Row data types
+enum class RowDataType
+{
+    ROW_GLOBAL_INDEX,   ///< Global index.
+    ROW_GHOST_FLAG      ///< Ghost node flag.
+};
+
 /// Multidirectional mapping between mesh entities and degrees of freedom.
 class MeshComponentMap
 {
@@ -112,12 +119,13 @@ public:
     /// | l_m      | comp_id_2   | gi78        |
     /// | ...      |  ...        | ...         |
     /// | l_n      | comp_id_n   | gi89        |
-    template <typename T_INT_TYPE>
-    std::vector<T_INT_TYPE> getGlobalIndicesByLocation(const std::vector<Location> &ls) const;
+    /// Get a row data of global indexes or ghost node flags by location.
+    template <RowDataType ROW_DATA_TYPE, typename T_DATA_TYPE>
+    std::vector<T_DATA_TYPE> getRowDataByLocation(const std::vector<Location> &l) const;
 
-    /// The same function as getGlobalIndicesByLocation but getting indices by component
-    template <typename T_INT_TYPE>
-    std::vector<T_INT_TYPE> getGlobalIndicesByComponent(const std::vector<Location> &ls) const;
+    /// Get a row data of global indexes or ghost node flags by component.
+    template <RowDataType ROW_DATA_TYPE, typename T_DATA_TYPE>
+    std::vector<T_DATA_TYPE> getRowDataByComponent(const std::vector<Location> &l) const;
 
     /// Get the flags of the ghost location at location \c l.
     ///
@@ -131,10 +139,6 @@ public:
     {
         return _num_global_dof;
     }
-
-    /// Get the ghost flags of the nodes at location \c l.
-    template <ComponentOrder ORDER>
-    std::vector<bool> getGhostFlags(const std::vector<Location> &l) const;
 
     /// A value returned if no global index was found for the requested
     /// location/component. The value is implementation dependent.
