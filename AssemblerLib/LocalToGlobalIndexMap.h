@@ -54,8 +54,7 @@ public:
     explicit LocalToGlobalIndexMap(
         std::vector<MeshLib::MeshSubsets*> const& mesh_subsets,
         AssemblerLib::ComponentOrder const order =
-            AssemblerLib::ComponentOrder::BY_COMPONENT,
-            const bool is_linear_element = true);
+            AssemblerLib::ComponentOrder::BY_COMPONENT);
 
     /// Derive a LocalToGlobalIndexMap constrained to a set of mesh subsets and
     /// elements. A new mesh component map will be constructed using the passed
@@ -139,14 +138,18 @@ private:
             switch (order)
             {
                 case AssemblerLib::ComponentOrder::BY_LOCATION:
-                    _rows.push_back(_mesh_component_map.getGlobalIndicesByLocation<IDX_TYPE>(vec_items));
+                    _rows.push_back(
+                          _mesh_component_map.getRowDataByLocation<RowDataType::ROW_GLOBAL_INDEX,
+                                                                   IDX_TYPE>(vec_items) );
 #ifdef USE_PETSC
                     setLocalNonGhostIndices<AssemblerLib::ComponentOrder::BY_LOCATION>(
                         (*e)->getID() >= n_non_ghost_elements, vec_items);
 #endif  // USE_PETSC
                     break;
                 case AssemblerLib::ComponentOrder::BY_COMPONENT:
-                    _rows.push_back(_mesh_component_map.getGlobalIndicesByComponent<IDX_TYPE>(vec_items));
+                    _rows.push_back(
+                          _mesh_component_map.getRowDataByComponent<RowDataType::ROW_GLOBAL_INDEX,
+                                                                    IDX_TYPE>(vec_items) );
 #ifdef USE_PETSC
                     setLocalNonGhostIndices<AssemblerLib::ComponentOrder::BY_COMPONENT>(
                         (*e)->getID() >= n_non_ghost_elements, vec_items);
@@ -199,7 +202,11 @@ void LocalToGlobalIndexMap::setLocalNonGhostIndices(const bool ghost_element,
         return;
     }
 
-    std::vector<bool> ele_ghost_flags = _mesh_component_map.getGhostFlags<ORDER>(vec_items);
+    std::vector<bool> ele_ghost_flags;
+    if(ORDER == ComponentOrder::BY_LOCATION)    
+       ele_ghost_flags = _mesh_component_map.getRowDataByLocation<RowDataType::ROW_GHOST_FLAG, bool>(vec_items);
+    else if(ORDER == ComponentOrder::BY_COMPONENT)    
+       ele_ghost_flags = _mesh_component_map.getRowDataByComponent<RowDataType::ROW_GHOST_FLAG, bool>(vec_items);
 
     for(std::size_t i = 0; i < ele_ghost_flags.size(); i++)
     {

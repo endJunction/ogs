@@ -27,7 +27,6 @@ using namespace detail;
 
 std::size_t const MeshComponentMap::nop = std::numeric_limits<std::size_t>::max();
 
-#ifdef USE_PETSC
 MeshComponentMap::MeshComponentMap(
     const std::vector<MeshLib::MeshSubsets*> &components, ComponentOrder order)
 {
@@ -36,28 +35,27 @@ MeshComponentMap::MeshComponentMap(
     std::size_t cell_index = 0;
     std::size_t comp_id = 0;
 
+#ifdef USE_PETSC
     _num_global_dof = 0;
+#endif
+    
     for (auto c = components.cbegin(); c != components.cend(); ++c)
     {
         for (unsigned mesh_subset_index = 0; mesh_subset_index < (*c)->size(); mesh_subset_index++)
         {
             MeshLib::MeshSubset const& mesh_subset = (*c)->getMeshSubset(mesh_subset_index);
             std::size_t const mesh_id = mesh_subset.getMeshID();
+
+            // Nodes
+#ifdef USE_PETSC
             const MeshLib::NodePartitionedMesh &mesh
                    = static_cast<const MeshLib::NodePartitionedMesh&>(mesh_subset.getMesh());
-
             if (order == ComponentOrder::BY_LOCATION)
             {
                 // mesh items are ordered first by node, cell, ....
                 for (std::size_t j=0; j<mesh_subset.getNNodes(); j++)
                     _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Node, j),
                                 comp_id, components.size() * mesh.getGlobalNodeID(j) + comp_id, mesh.isGhostNode(mesh.getNode(j)->getID())));
-
-                // Note: If the cells are really used (e.g. for the mixed FEM), the following global cell index must be reconsidered
-                // according to the employed cell indexing method.
-                for (std::size_t j=0; j<mesh_subset.getNElements(); j++)
-                    _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Cell, j),
-                                 comp_id, cell_index++));
             }
             else
             {
@@ -66,46 +64,28 @@ MeshComponentMap::MeshComponentMap(
                     _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Node, j),
                                 comp_id, global_index_offset + mesh.getGlobalNodeID(j), mesh.isGhostNode(mesh.getNode(j)->getID())));
 
-                // Note: If the cells are really used (e.g. for the mixed FEM), the following global cell index must be reconsidered
-                // according to the employed cell indexing method.
-                for (std::size_t j=0; j<mesh_subset.getNElements(); j++)
-                    _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Cell, j),
-                                 comp_id, cell_index++));
-
-                global_index_offset += mesh.getNGlobalNodes(); // Include base nodes. Should be considered again for a general case.
+                global_index_offset += mesh.getNGlobalNodes();
             }
 
             _num_global_dof += mesh.getNGlobalNodes();
+
+#else // non PETSc or non other DDC approaches
+            for (std::size_t j=0; j<mesh_subset.getNNodes(); j++)
+                _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Node, j), comp_id, global_index_offset++));
+#endif
+
+            // Elements
+            for (std::size_t j=0; j<mesh_subset.getNElements(); j++)
+                _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Cell, j), comp_id, cell_index++));
        }
         comp_id++;
     }
-}
-#else
-MeshComponentMap::MeshComponentMap(
-    const std::vector<MeshLib::MeshSubsets*> &components, ComponentOrder order)
-{
-    // construct dict (and here we number global_index by component type)
-    std::size_t global_index = 0;
-    std::size_t comp_id = 0;
-    for (auto c = components.cbegin(); c != components.cend(); ++c)
-    {
-        for (std::size_t mesh_subset_index = 0; mesh_subset_index < (*c)->size(); mesh_subset_index++)
-        {
-            MeshLib::MeshSubset const& mesh_subset = (*c)->getMeshSubset(mesh_subset_index);
-            std::size_t const mesh_id = mesh_subset.getMeshID();
-            // mesh items are ordered first by node, cell, ....
-            for (std::size_t j=0; j<mesh_subset.getNNodes(); j++)
-                _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Node, j), comp_id, global_index++));
-            for (std::size_t j=0; j<mesh_subset.getNElements(); j++)
-                _dict.insert(Line(Location(mesh_id, MeshLib::MeshItemType::Cell, j), comp_id, global_index++));
-        }
-        comp_id++;
-    }
 
+#ifndef USE_PETSC
     if (order == ComponentOrder::BY_LOCATION)
         renumberByLocation();
+#endif
 }
-#endif // end of USE_PETSC
 
 MeshComponentMap
 MeshComponentMap::getSubset(std::vector<MeshLib::MeshSubsets*> const& components) const
@@ -197,62 +177,6 @@ std::vector<bool> MeshComponentMap::getGhostFlags(const Location &l) const
     std::vector<bool> ghost_flags;
     for (auto itr=p.first; itr!=p.second; ++itr)
         ghost_flags.push_back(itr->is_ghost);
-    return ghost_flags;
-}
-
-template <>
-std::vector<bool>
-MeshComponentMap::getGhostFlags<ComponentOrder::BY_LOCATION>(
-    std::vector<Location> const &ls) const
-{
-    std::vector<bool> ghost_flags;
-    ghost_flags.reserve(ls.size());
-
-    auto const &m = _dict.get<ByLocation>();
-    for (auto l = ls.cbegin(); l != ls.cend(); ++l)
-    {
-        auto const p = m.equal_range(Line(*l));
-        for (auto itr = p.first; itr != p.second; ++itr)
-            ghost_flags.push_back(itr->is_ghost);
-    }
-
-    return ghost_flags;
-}
-
-template <>
-std::vector<bool>
-MeshComponentMap::getGhostFlags<ComponentOrder::BY_COMPONENT>(
-    std::vector<Location> const &ls) const
-{
-    // vector of (Component, bool) pairs.
-    typedef std::pair<std::size_t, bool> CIPair;
-    std::vector<CIPair> pairs;
-    pairs.reserve(ls.size());
-
-    // Create a sub dictionary containing all lines with location from ls.
-    auto const &m = _dict.get<ByLocation>();
-    for (auto l = ls.cbegin(); l != ls.cend(); ++l)
-    {
-        auto const p = m.equal_range(Line(*l));
-        for (auto itr = p.first; itr != p.second; ++itr)
-            pairs.emplace_back(itr->comp_id, itr->is_ghost);
-    }
-
-    auto CIPairLess = [](CIPair const& a, CIPair const& b)
-        {
-            return a.first < b.first;
-        };
-
-    // Create vector of global indices from sub dictionary sorting by component.
-    if (!std::is_sorted(pairs.begin(), pairs.end(), CIPairLess))
-        std::stable_sort(pairs.begin(), pairs.end(), CIPairLess);
-
-    std::vector<bool> ghost_flags;
-    ghost_flags.reserve(ls.size());
-    ghost_flags.reserve(pairs.size());
-    for (auto p = pairs.cbegin(); p != pairs.cend(); ++p)
-        ghost_flags.push_back(p->second);
-
     return ghost_flags;
 }
 
