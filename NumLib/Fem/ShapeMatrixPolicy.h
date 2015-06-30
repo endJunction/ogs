@@ -9,6 +9,22 @@
 
 #pragma once
 
+#include "NumLib/Fem/ShapeFunction/ShapeHex20.h"
+#include "NumLib/Fem/ShapeFunction/ShapeHex8.h"
+#include "NumLib/Fem/ShapeFunction/ShapeLine2.h"
+#include "NumLib/Fem/ShapeFunction/ShapeLine3.h"
+#include "NumLib/Fem/ShapeFunction/ShapePrism15.h"
+#include "NumLib/Fem/ShapeFunction/ShapePrism6.h"
+#include "NumLib/Fem/ShapeFunction/ShapePyra13.h"
+#include "NumLib/Fem/ShapeFunction/ShapePyra5.h"
+#include "NumLib/Fem/ShapeFunction/ShapeQuad4.h"
+#include "NumLib/Fem/ShapeFunction/ShapeQuad8.h"
+#include "NumLib/Fem/ShapeFunction/ShapeQuad9.h"
+#include "NumLib/Fem/ShapeFunction/ShapeTet10.h"
+#include "NumLib/Fem/ShapeFunction/ShapeTet4.h"
+#include "NumLib/Fem/ShapeFunction/ShapeTri3.h"
+#include "NumLib/Fem/ShapeFunction/ShapeTri6.h"
+
 #include "NumLib/Fem/CoordinatesMapping/ShapeMatrices.h"
 
 #include <Eigen/Dense>
@@ -129,5 +145,58 @@ using ShapeMatrixPolicyType = EigenFixedShapeMatrixPolicy<ShapeFunction, GlobalD
 const unsigned OGS_EIGEN_DYNAMIC_SHAPE_MATRICES_FLAG = 0;
 #endif
 
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeHex20  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeHex8   , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeLine2  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeLine3  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapePrism15, 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapePrism6 , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapePyra13 , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapePyra5  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeQuad4  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeQuad8  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeQuad9  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeTet10  , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeTet4   , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeTri3   , 3>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeTri6   , 3>;
+
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeLine2  , 2>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeLine3  , 2>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeQuad4  , 2>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeQuad8  , 2>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeQuad9  , 2>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeTri3   , 2>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeTri6   , 2>;
+
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeLine2  , 1>;
+extern template struct EigenFixedShapeMatrixPolicy<NumLib::ShapeLine3  , 1>;
+
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeHex20  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeHex8   , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeLine2  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeLine3  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapePrism15, 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapePrism6 , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapePyra13 , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapePyra5  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeQuad4  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeQuad8  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeQuad9  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeTet10  , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeTet4   , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeTri3   , 3>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeTri6   , 3>;
+
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeLine2  , 2>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeLine3  , 2>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeQuad4  , 2>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeQuad8  , 2>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeQuad9  , 2>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeTri3   , 2>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeTri6   , 2>;
+
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeLine2  , 1>;
+extern template struct EigenDynamicShapeMatrixPolicy<NumLib::ShapeLine3  , 1>;
 //static_assert(std::is_class<ShapeMatrixPolicyType<>::value,
         //"ShapeMatrixPolicyType was not defined.");
