@@ -227,7 +227,7 @@ vtkImageImport* VtkRaster::loadImageFromTIFF(const std::string &fileName,
         }
 
         XTIFFClose(tiff);
-        ERR("VtkRaster::loadImageFromTIFF() - File not recognised as GeoTIFF-Image.")
+		ERR("VtkRaster::loadImageFromTIFF() - File not recognised as GeoTIFF-Image.");
         return nullptr;
     }
 
