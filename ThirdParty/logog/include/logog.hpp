@@ -5,32 +5,17 @@
 #ifndef __LOGOG_HPP__
 #define __LOGOG_HPP__
 
-/** \def LOGOG_UNICODE
- ** Define this macro to enable Unicode support in logog.  The logog library works either in Unicode mode or not --
- ** attempting to mix the two log types will have unexpected results.
- **/
-// #define LOGOG_UNICODE 1
+#include <cstdio>
 
-#include "const.hpp"
-#include "platform.hpp"
-#include "statics.hpp"
-#include "object.hpp"
-#include "timer.hpp"
-#include "mutex.hpp"
-#include "string.hpp"
-#include "node.hpp"
-#include "topic.hpp"
-#include "formatter.hpp"
-#include "target.hpp"
-// #include "socket.hpp"
-#include "checkpoint.hpp"
-#include "api.hpp"
-#include "message.hpp"
-#include "macro.hpp"
-
-#ifdef LOGOG_UNIT_TESTING
-#include "thread.hpp"
-#include "unittest.hpp"
-#endif
+#define DBUG(...) std::printf( __VA_ARGS__ )
+#define INFO(...) std::printf( __VA_ARGS__ )
+#define WARN3(...) std::printf( __VA_ARGS__ )
+#define WARN2(...) std::printf( __VA_ARGS__ )
+#define WARN1(...) std::printf( __VA_ARGS__ )
+#define WARN(...) std::printf( __VA_ARGS__ )
+#define ERR(...) std::printf( __VA_ARGS__ )
+#define ALERT(...) std::printf( __VA_ARGS__ )
+#define CRITICAL(...) std::printf( __VA_ARGS__ )
+#define EMERGENCY(...) std::printf( __VA_ARGS__ )
 
 #endif // __LOGOG_HPP_

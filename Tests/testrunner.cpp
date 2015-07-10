@@ -17,11 +17,11 @@
 
 #include "gtest/gtest.h"
 
-#include "Applications/ApplicationsLib/LogogSetup.h"
+//#include "Applications/ApplicationsLib/LogogSetup.h"
 #include "Applications/ApplicationsLib/LinearSolverLibrarySetup.h"
 #include "NumLib/DOF/GlobalMatrixProviders.h"
 #include "BaseLib/BuildInfo.h"
-#include "BaseLib/TemplateLogogFormatterSuppressedGCC.h"
+//#include "BaseLib/TemplateLogogFormatterSuppressedGCC.h"
 
 #ifdef OGS_BUILD_GUI
 #include <QCoreApplication>
@@ -52,16 +52,16 @@ int main(int argc, char* argv[])
     // linear_solver_library_setup since they require, e.g., that MPI_Init()
     // has been called before.
 
-    ApplicationsLib::LogogSetup logog_setup;
+    //ApplicationsLib::LogogSetup logog_setup;
 
     ApplicationsLib::LinearSolverLibrarySetup linear_solver_library_setup(
                 argc, argv);
 
-    logog_setup.setFormatter(
-        std::make_unique<BaseLib::TemplateLogogFormatterSuppressedGCC<
-            TOPIC_LEVEL_FLAG | TOPIC_FILE_NAME_FLAG |
-            TOPIC_LINE_NUMBER_FLAG>>());
-    logog_setup.setLevel(logLevel);
+    //logog_setup.setFormatter(
+    //    std::make_unique<BaseLib::TemplateLogogFormatterSuppressedGCC<
+    //        TOPIC_LEVEL_FLAG | TOPIC_FILE_NAME_FLAG |
+    //        TOPIC_LINE_NUMBER_FLAG>>());
+    //logog_setup.setLevel(logLevel);
 
     try
     {
