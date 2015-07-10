@@ -14,6 +14,8 @@
 
 #include "VtkMeshConverter.h"
 
+#include <cstring>
+
 #include "MeshLib/Elements/Elements.h"
 #include "MeshLib/Mesh.h"
 #include "MeshLib/Node.h"
