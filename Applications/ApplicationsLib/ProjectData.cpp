@@ -23,6 +23,8 @@
 
 #include "MathLib/Curve/CreatePiecewiseLinearCurve.h"
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
+#include "BaseLib/CPUTime.h"
+
 #include "MeshLib/Mesh.h"
 
 #include "NumLib/ODESolver/ConvergenceCriterion.h"
@@ -69,11 +71,17 @@ ProjectData::ProjectData(BaseLib::ConfigTree const& project_config,
                          std::string const& project_directory,
                          std::string const& output_directory)
 {
+	BaseLib::CPUTime timer;
+        timer.start();
+
     std::string const geometry_file = BaseLib::copyPathToFileName(
         //! \ogs_file_param{prj__geometry}
         project_config.getConfigParameter<std::string>("geometry"),
         project_directory);
     detail::readGeometry(geometry_file, *_geoObjects);
+	
+	INFO("Time: Read geometry (sec): %g", timer.elapsed());
+        timer.start();
 
     {
         //! \ogs_file_param{prj__mesh}
@@ -97,6 +105,7 @@ ProjectData::ProjectData(BaseLib::ConfigTree const& project_config,
         }
         _mesh_vec.push_back(mesh);
     }
+	INFO("Time: Read mesh (sec): %g", timer.elapsed());
 
     //! \ogs_file_param{prj__curves}
     parseCurves(project_config.getConfigSubtreeOptional("curves"));

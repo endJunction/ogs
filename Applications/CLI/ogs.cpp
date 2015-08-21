@@ -33,6 +33,7 @@
 #include "BaseLib/FileTools.h"
 #include "BaseLib/RunTime.h"
 
+#include "BaseLib/CPUTime.h"
 #include "Applications/ApplicationsLib/LinearSolverLibrarySetup.h"
 #include "Applications/ApplicationsLib/LogogSetup.h"
 #include "Applications/ApplicationsLib/ProjectData.h"
@@ -43,6 +44,9 @@
 
 int main(int argc, char *argv[])
 {
+	BaseLib::CPUTime timer_total;
+	timer_total.start();
+
     // Parse CLI arguments.
     TCLAP::CmdLine cmd(
         "OpenGeoSys-6 software.\n"
@@ -111,6 +115,9 @@ int main(int argc, char *argv[])
     logog_setup.setLevel(log_level_arg.getValue());
 
     INFO("This is OpenGeoSys-6 version %s.",
+	BaseLib::CPUTime timer;
+	timer.start();
+
          BaseLib::BuildInfo::git_describe.c_str());
 
 #ifndef _WIN32  // On windows this command line option is not present.
@@ -153,6 +160,8 @@ int main(int argc, char *argv[])
 
             ProjectData project(*project_config,
                                 BaseLib::extractPath(project_arg.getValue()),
+	INFO("Time: Read project data (sec): %g", timer.elapsed());
+	timer.start();
                                 outdir_arg.getValue());
 
 #ifdef USE_INSITU
@@ -173,6 +182,8 @@ int main(int argc, char *argv[])
             {
                 p.second->initialize();
             }
+	INFO("Time: Initialize processes (sec): %g", timer.elapsed());
+	timer.start();
 
             // Check intermediately that config parsing went fine.
             project_config.checkAndInvalidate();
@@ -184,7 +195,9 @@ int main(int argc, char *argv[])
 
             INFO("Solve processes.");
 
+	INFO("Time: Solve processes (sec): %g", timer.elapsed());
             auto& time_loop = project.getTimeLoop();
+	
             solver_succeeded = time_loop.loop();
 
 #ifdef USE_INSITU
@@ -200,7 +213,6 @@ int main(int argc, char *argv[])
            // possess a ConfigTree is destructed before the final check below is
            // done.
 
-        BaseLib::ConfigTree::assertNoSwallowedErrors();
 
         ogs_status = solver_succeeded ? EXIT_SUCCESS : EXIT_FAILURE;
     } catch (std::exception& e) {
