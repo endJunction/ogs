@@ -35,6 +35,15 @@ class CPUTime
         {
             return (clock() - _start_time)/static_cast<double>(CLOCKS_PER_SEC);
         }
+
+        /// Resets the clock and returns the elapsed time so far.
+        double restart()
+        {
+            double const t = elapsed();
+            start();
+            return t;
+        }
+
     private:
         double _start_time = 0.;
 };
