@@ -24,6 +24,11 @@ namespace BaseLib
 class CPUTime
 {
     public:
+        /// Creates the timer and starts it.
+        CPUTime() : _start_time(clock())
+        {
+        }
+
         /// Start the timer.
         void start()
         {
