@@ -45,7 +45,6 @@
 int main(int argc, char *argv[])
 {
 	BaseLib::CPUTime timer_total;
-	timer_total.start();
 
     // Parse CLI arguments.
     TCLAP::CmdLine cmd(
@@ -116,7 +115,6 @@ int main(int argc, char *argv[])
 
     INFO("This is OpenGeoSys-6 version %s.",
 	BaseLib::CPUTime timer;
-	timer.start();
 
          BaseLib::BuildInfo::git_describe.c_str());
 
@@ -160,8 +158,7 @@ int main(int argc, char *argv[])
 
             ProjectData project(*project_config,
                                 BaseLib::extractPath(project_arg.getValue()),
-	INFO("Time: Read project data (sec): %g", timer.elapsed());
-	timer.start();
+	INFO("Time: Read project data (sec): %g", timer.restart());
                                 outdir_arg.getValue());
 
 #ifdef USE_INSITU
@@ -182,8 +179,7 @@ int main(int argc, char *argv[])
             {
                 p.second->initialize();
             }
-	INFO("Time: Initialize processes (sec): %g", timer.elapsed());
-	timer.start();
+	INFO("Time: Initialize processes (sec): %g", timer.restart());
 
             // Check intermediately that config parsing went fine.
             project_config.checkAndInvalidate();
@@ -195,7 +191,7 @@ int main(int argc, char *argv[])
 
             INFO("Solve processes.");
 
-	INFO("Time: Solve processes (sec): %g", timer.elapsed());
+	INFO("Time: Solve processes (sec): %g", timer.restart());
             auto& time_loop = project.getTimeLoop();
 	
             solver_succeeded = time_loop.loop();
