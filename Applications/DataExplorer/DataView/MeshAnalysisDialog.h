@@ -16,7 +16,7 @@
 #define MESHANALYSISDIALOG_H
 
 #include "ui_MeshAnalysis.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include "MeshQuality/ElementErrorCode.h"
 

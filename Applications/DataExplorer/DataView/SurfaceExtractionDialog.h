@@ -16,7 +16,7 @@
 #define SURFACEEXTRACTIONDIALOG_H
 
 #include "ui_SurfaceExtraction.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include "MathLib/Vector3.h"
 

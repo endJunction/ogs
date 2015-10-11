@@ -14,7 +14,7 @@
 #ifndef ELEMENTTREEVIEW_H
 #define ELEMENTTREEVIEW_H
 
-#include <QTreeView>
+#include <QtWidgets/QTreeView>
 
 class vtkUnstructuredGridAlgorithm;
 

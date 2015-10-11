@@ -15,7 +15,7 @@
 #ifndef VTKALGORITHMPROPERTYLINEEDIT_H
 #define VTKALGORITHMPROPERTYLINEEDIT_H
 
-#include <QLineEdit>
+#include <QtWidgets/QLineEdit>
 #include <QVariant>
 
 class VtkAlgorithmProperties;

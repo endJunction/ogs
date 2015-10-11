@@ -17,7 +17,7 @@
 
 #include "ui_MeshFromRaster.h"
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 namespace MeshLib {
 	enum class MeshElemType;

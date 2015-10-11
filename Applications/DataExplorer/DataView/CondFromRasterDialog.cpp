@@ -15,7 +15,7 @@
 #include "CondFromRasterDialog.h"
 #include "Mesh.h"
 
-#include <QFileDialog>
+#include <QtWidgets/QFileDialog>
 #include <QSettings>
 
 #include "DirectConditionGenerator.h"

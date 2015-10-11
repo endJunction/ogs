@@ -17,7 +17,7 @@
 
 #include <QList>
 #include <QVariant>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 class VtkAlgorithmProperties;
 

@@ -13,7 +13,7 @@
  */
 #include "OGSError.h"
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QString>
 
 OGSError::OGSError()

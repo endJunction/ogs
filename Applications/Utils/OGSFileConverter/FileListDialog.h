@@ -16,8 +16,8 @@
 #define FILELISTDIALOG_H
 
 #include "ui_FileList.h"
-#include <QDialog>
-#include <QFileDialog>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QFileDialog>
 #include <QStringListModel>
 
 enum class FileType {

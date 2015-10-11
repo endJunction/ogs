@@ -16,7 +16,7 @@
 #define COLORPICKERPUSHBUTTON_H
 
 // ** INCLUDES **
-#include <QPushButton>
+#include <QtWidgets/QPushButton>
 
 class QColor;
 class QMouseEvent;

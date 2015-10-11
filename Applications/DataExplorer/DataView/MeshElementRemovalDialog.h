@@ -16,7 +16,7 @@
 #define MESHELEMENTREMOVALDIALOG_H
 
 #include "ui_MeshElementRemoval.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 #include "Applications/ApplicationsLib/ProjectData.h"

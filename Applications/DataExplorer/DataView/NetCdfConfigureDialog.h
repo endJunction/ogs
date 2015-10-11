@@ -6,7 +6,7 @@
 
 #include <netcdfcpp.h>
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 #include "ui_NetCdfConfigure.h"
 
 namespace MeshLib {

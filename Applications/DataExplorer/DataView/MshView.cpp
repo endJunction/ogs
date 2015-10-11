@@ -14,10 +14,10 @@
 
 #include "MshView.h"
 
-#include <QHeaderView>
+#include <QtWidgets/QHeaderView>
 #include <QContextMenuEvent>
-#include <QFileDialog>
-#include <QMenu>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMenu>
 #include <QObject>
 #include <QSettings>
 

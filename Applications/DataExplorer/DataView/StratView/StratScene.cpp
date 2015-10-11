@@ -15,7 +15,7 @@
 #include <limits>
 #include <math.h>
 
-#include <QGraphicsTextItem>
+#include <QtWidgets/QGraphicsTextItem>
 
 #include "DateTools.h"
 #include "QNonScalableGraphicsTextItem.h"

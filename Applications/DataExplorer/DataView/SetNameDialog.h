@@ -17,7 +17,7 @@
 
 #include "GeoType.h"
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 class QDialogButtonBox;
 class QLabel;

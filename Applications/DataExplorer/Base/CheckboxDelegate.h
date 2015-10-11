@@ -15,7 +15,7 @@
 #ifndef CHECKBOXDELEGATE_H
 #define CHECKBOXDELEGATE_H
 
-#include <QItemDelegate>
+#include <QtWidgets/QItemDelegate>
 
 class QWidget;
 class QRect;

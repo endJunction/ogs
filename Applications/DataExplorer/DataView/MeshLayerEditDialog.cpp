@@ -24,16 +24,16 @@
 
 #include "TetGenInterface.h"
 
-#include <QCheckBox>
+#include <QtWidgets/QCheckBox>
 #include <QFileInfo>
-#include <QFileDialog>
-#include <QPushButton>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QPushButton>
 #include <QSettings>
-#include <QLineEdit>
-#include <QGroupBox>
-#include <QRadioButton>
-#include <QGridLayout>
-#include <QVBoxLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QVBoxLayout>
 #include <QTime>
 
 MeshLayerEditDialog::MeshLayerEditDialog(const MeshLib::Mesh* mesh, QDialog* parent)

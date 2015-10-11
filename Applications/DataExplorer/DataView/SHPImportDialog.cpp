@@ -17,12 +17,12 @@
 #include "SHPImportDialog.h"
 #include "SHPInterface.h"
 
-#include <QDialogButtonBox>
+#include <QtWidgets/QDialogButtonBox>
 #include <QFileInfo>
-#include <QLabel>
-#include <QLineEdit>
-#include <QRadioButton>
-#include <QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QVBoxLayout>
 
 SHPImportDialog::SHPImportDialog(std::string filename,
                                  GeoLib::GEOObjects* geo_objects,

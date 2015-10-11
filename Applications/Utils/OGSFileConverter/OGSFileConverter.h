@@ -16,7 +16,7 @@
 #define OGSFILECONVERTER_H
 
 #include "ui_OGSFileConverter.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 class OGSFileConverter : public QDialog, private Ui_OGSFileConverter
 {

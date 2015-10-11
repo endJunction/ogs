@@ -14,8 +14,8 @@
 #ifndef COLORTABLEVIEW_H
 #define COLORTABLEVIEW_H
 
-#include <QItemDelegate>
-#include <QTableView>
+#include <QtWidgets/QItemDelegate>
+#include <QtWidgets/QTableView>
 
 /**
  *	A QTableView to display colour lookup tables.

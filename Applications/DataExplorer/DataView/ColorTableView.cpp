@@ -14,7 +14,7 @@
  */
 
 #include "ColorTableView.h"
-#include <QHeaderView>
+#include <QtWidgets/QHeaderView>
 #include <QPainter>
 
 ColorTableView::ColorTableView( QWidget* parent /*= 0*/ ) : QTableView(parent)

@@ -13,7 +13,7 @@
  */
 
 #include "DiagramView.h"
-#include <QGraphicsTextItem>
+#include <QtWidgets/QGraphicsTextItem>
 #include <math.h>
 
 DiagramView::DiagramView(QWidget* parent) : QGraphicsView(parent)

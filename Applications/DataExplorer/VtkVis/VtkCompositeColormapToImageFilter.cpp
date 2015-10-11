@@ -22,7 +22,7 @@
 #include <vtkSmartPointer.h>
 
 #include <QSettings>
-#include <QFileDialog>
+#include <QtWidgets/QFileDialog>
 
 #include "VtkColorLookupTable.h"
 #include "XmlIO/Qt/XmlLutReader.h"

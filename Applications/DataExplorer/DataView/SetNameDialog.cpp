@@ -14,11 +14,11 @@
 
 #include "SetNameDialog.h"
 
-#include <QDialogButtonBox>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QLineEdit>
-#include <QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QVBoxLayout>
 
 SetNameDialog::SetNameDialog(const std::string &geo_object_type, std::size_t id, const std::string &old_name = "", QDialog* parent)
 :QDialog(parent)

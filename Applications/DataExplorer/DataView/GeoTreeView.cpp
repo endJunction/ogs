@@ -12,8 +12,8 @@
  *
  */
 
-#include <QFileDialog>
-#include <QMenu>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMenu>
 #include <QSettings>
 #include <iostream>
 

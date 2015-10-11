@@ -17,7 +17,7 @@
 
 #include "StationBorehole.h"
 #include "Color.h"
-#include <QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 #include <cmath>
 
 

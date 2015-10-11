@@ -38,9 +38,9 @@
 
 #include <QCursor>
 #include <QDir>
-#include <QFileDialog>
+#include <QtWidgets/QFileDialog>
 #include <QInputDialog>
-#include <QLineEdit>
+#include <QtWidgets/QLineEdit>
 #include <QSettings>
 #include <QString>
 

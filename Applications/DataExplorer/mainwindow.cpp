@@ -85,8 +85,8 @@
 
 // Qt includes
 #include <QDesktopWidget>
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 #include <QObject>
 #include <QSettings>
 #include <QSignalMapper>

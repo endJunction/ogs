@@ -16,8 +16,8 @@
 #define STRATVIEW_H
 
 #include "StratScene.h"
-#include <QGraphicsView>
-#include <QtGui/QWidget>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QWidget>
 
 namespace GeoLib
 {

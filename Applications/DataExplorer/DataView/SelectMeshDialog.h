@@ -15,7 +15,7 @@
 #ifndef SELECTMESHDIALOG_H
 #define SELECTMESHDIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 namespace GeoLib {
 	class GeoObject;

@@ -8,7 +8,7 @@
 #include "VtkGeoImageSource.h"
 #include "VtkRaster.h"
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QSettings>
 
 #include <vtkImageImport.h>

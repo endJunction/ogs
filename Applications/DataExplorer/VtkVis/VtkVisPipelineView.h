@@ -16,7 +16,7 @@
 #define VTKVISPIPELINEVIEW_H
 
 // ** INCLUDES **
-#include <QTreeView>
+#include <QtWidgets/QTreeView>
 
 class QItemSelection;
 class QAbstractItemModel;

@@ -17,7 +17,7 @@
 
 #include "ui_MeshValueEdit.h"
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 namespace MeshLib {
 	class Mesh;

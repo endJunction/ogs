@@ -17,7 +17,7 @@
 
 #include <QCursor>
 #include <QString>
-#include <QToolTip>
+#include <QtWidgets/QToolTip>
 
 #include <iostream>
 

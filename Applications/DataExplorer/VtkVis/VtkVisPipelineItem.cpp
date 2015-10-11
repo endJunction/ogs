@@ -32,7 +32,7 @@
 #include <vtkPointData.h>
 #include <vtkImageActor.h>
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 #ifdef VTKOSGCONVERTER_FOUND
 #include "vtkOsgConverter.h"

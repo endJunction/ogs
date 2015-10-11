@@ -16,7 +16,7 @@
 #define DIAGRAMPREFSDIALOG_H
 
 #include "ui_DiagramPrefs.h"
-#include <QtGui/QMainWindow>
+#include <QtWidgets/QMainWindow>
 
 class DetailWindow;
 class DiagramList;

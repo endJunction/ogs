@@ -19,14 +19,14 @@
 #include "StringTools.h"
 #include "Mesh.h"
 
-#include <QCheckBox>
-#include <QFileDialog>
-#include <QPushButton>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QPushButton>
 #include <QSettings>
-#include <QLineEdit>
-#include <QGroupBox>
-#include <QRadioButton>
-#include <QVBoxLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QVBoxLayout>
 
 MshEditDialog::MshEditDialog(const MeshLib::Mesh* mesh, QDialog* parent)
 	: QDialog(parent), _msh(mesh), _noDataDeleteBox(NULL),

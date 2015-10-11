@@ -19,7 +19,7 @@
 #include "QArrow.h"
 #include "QGraphicsGrid.h"
 #include "QNonScalableGraphicsTextItem.h"
-#include <QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 
 class QDateTime;
 

@@ -17,7 +17,7 @@
 
 #include "MeshEnums.h"
 #include "ui_MeshQualitySelection.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 class VtkMeshSource;
 

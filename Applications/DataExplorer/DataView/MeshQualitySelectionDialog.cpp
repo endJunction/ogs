@@ -15,7 +15,7 @@
 #include "MeshQualitySelectionDialog.h"
 #include "OGSError.h"
 
-#include <QFileDialog>
+#include <QtWidgets/QFileDialog>
 #include <QFileInfo>
 #include <QSettings>
 

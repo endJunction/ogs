@@ -14,7 +14,7 @@
 #ifndef QVALUETOOLTIPSLIDER_H
 #define QVALUETOOLTIPSLIDER_H
 
-#include <QSlider>
+#include <QtWidgets/QSlider>
 
 /**
  * \brief A QSlider which shows its value as a tooltip when moved.

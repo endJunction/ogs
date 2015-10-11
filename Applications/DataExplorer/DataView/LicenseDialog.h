@@ -16,7 +16,7 @@
 #define LICENSEDIALOG_H
 
 #include "ui_License.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 /**
  * \brief A dialog window displaying the OGS license information

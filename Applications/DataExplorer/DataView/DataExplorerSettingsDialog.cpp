@@ -14,7 +14,7 @@
 
 #include "DataExplorerSettingsDialog.h"
 
-#include <QFileDialog>
+#include <QtWidgets/QFileDialog>
 #include <QSettings>
 
 // ThirdParty/logog

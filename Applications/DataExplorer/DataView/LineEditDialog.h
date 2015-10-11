@@ -16,7 +16,7 @@
 #define LINEEDITDIALOG_H
 
 #include "ui_LineEdit.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include "PolylineVec.h"
 

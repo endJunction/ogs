@@ -15,7 +15,7 @@
 #ifndef SHPIMPORTDIALOG_H
 #define SHPIMPORTDIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 namespace FileIO {
 	class SHPInterface;

@@ -16,7 +16,7 @@
 
 #include "Point.h"
 #include "GeoType.h"
-#include <QTreeView>
+#include <QtWidgets/QTreeView>
 
 class MshModel;
 class vtkUnstructuredGridAlgorithm;

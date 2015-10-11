@@ -23,7 +23,7 @@
 #include "OGSError.h"
 
 #include <QList>
-#include <QListWidgetItem>
+#include <QtWidgets/QListWidgetItem>
 
 /// Constructor
 MeshElementRemovalDialog::MeshElementRemovalDialog(const ProjectData &project, QDialog* parent)

@@ -15,8 +15,8 @@
 #define RECENTFILES_H
 
 // ** INCLUDES **
-#include <QAction>
-#include <QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
 #include <QObject>
 
 class QString;

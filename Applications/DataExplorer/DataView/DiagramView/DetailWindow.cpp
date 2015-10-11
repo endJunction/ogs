@@ -16,7 +16,7 @@
 #include "DetailWindow.h"
 #include "DiagramPrefsDialog.h"
 
-#include <QFileDialog>
+#include <QtWidgets/QFileDialog>
 #include <QSettings>
 
 DetailWindow::DetailWindow(QWidget* parent) : QWidget(parent)

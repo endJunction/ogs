@@ -15,7 +15,7 @@
 #ifndef QGRAPHICSGRID_H
 #define QGRAPHICSGRID_H
 
-#include <QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 #include <QPen>
 
 /**

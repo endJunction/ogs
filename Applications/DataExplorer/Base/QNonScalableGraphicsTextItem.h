@@ -15,7 +15,7 @@
 #ifndef QNONSCALABLETEXTITEM_H
 #define QNONSCALABLETEXTITEM_H
 
-#include <QGraphicsTextItem>
+#include <QtWidgets/QGraphicsTextItem>
 
 /**
  * \brief A QGraphicsTextItem that will ignore all geometric transformations.

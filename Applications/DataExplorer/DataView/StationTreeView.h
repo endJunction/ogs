@@ -18,7 +18,7 @@
 #include "Station.h"
 
 #include <QContextMenuEvent>
-#include <QTreeView>
+#include <QtWidgets/QTreeView>
 
 class vtkPolyDataAlgorithm;
 

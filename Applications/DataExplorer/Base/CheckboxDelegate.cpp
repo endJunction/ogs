@@ -14,12 +14,12 @@
 
 // ** INCLUDES **
 #include "CheckboxDelegate.h"
-#include <QApplication>
-#include <QCheckBox>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QEvent>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QStyleOptionButton>
+#include <QtWidgets/QStyleOptionButton>
 
 #include <iostream>
 

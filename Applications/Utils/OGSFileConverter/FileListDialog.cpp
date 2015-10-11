@@ -18,7 +18,7 @@
 #include "StringTools.h"
 #include <QSettings>
 #include <QFileInfo>
-#include <QLineEdit>
+#include <QtWidgets/QLineEdit>
 
 FileListDialog::FileListDialog(FileType input, FileType output, QWidget* parent)
 : QDialog(parent), _output_dir(""), _input_file_type(input), _output_file_type(output)

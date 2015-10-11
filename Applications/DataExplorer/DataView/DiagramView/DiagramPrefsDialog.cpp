@@ -18,9 +18,9 @@
 #include "OGSError.h"
 #include "Station.h"
 
-#include <QCheckBox>
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 DiagramPrefsDialog::DiagramPrefsDialog(const GeoLib::Station* stn,
                                        const QString &listName,

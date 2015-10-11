@@ -16,7 +16,7 @@
 #define GEOTOMESHMAPPINGDIALOG_H
 
 #include "ui_GeoOnMeshMapping.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include "MeshGeoToolsLib/GeoMapper.h"
 

@@ -15,7 +15,7 @@
 #ifndef QARROW_H
 #define QARROW_H
 
-#include <QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 #include <QPen>
 
 const double PI = 3.14159265;

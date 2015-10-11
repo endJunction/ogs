@@ -16,7 +16,7 @@
 #define MESHLAYEREDITDIALOG_H
 
 #include "ui_MeshLayerEdit.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include "MeshGenerators/MeshLayerMapper.h"
 

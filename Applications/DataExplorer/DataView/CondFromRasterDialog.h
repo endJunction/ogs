@@ -16,7 +16,7 @@
 #define CONDFROMRASTERDIALOG_H
 
 #include "ui_CondFromRaster.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 namespace MeshLib {
 	class Mesh;

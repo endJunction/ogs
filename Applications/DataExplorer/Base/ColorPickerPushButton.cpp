@@ -15,7 +15,7 @@
 // ** INCLUDES **
 #include "ColorPickerPushButton.h"
 
-#include <QColorDialog>
+#include <QtWidgets/QColorDialog>
 
 ColorPickerPushButton::ColorPickerPushButton( QWidget* parent /*= 0*/ )
 	: QPushButton(parent)

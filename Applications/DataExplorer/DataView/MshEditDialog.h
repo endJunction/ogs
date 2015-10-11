@@ -16,7 +16,7 @@
 #define MSHEDITDIALOG_H
 
 #include "ui_MshEdit.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include "MshLayerMapper.h"
 

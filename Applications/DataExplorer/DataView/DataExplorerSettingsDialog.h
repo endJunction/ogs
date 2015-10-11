@@ -16,7 +16,7 @@
 #define DATAEXPLORERSETTINGSDIALOG_H
 
 #include "ui_DataExplorerSettings.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 /**
  * \brief A dialog window for managing general Data Explorer settings

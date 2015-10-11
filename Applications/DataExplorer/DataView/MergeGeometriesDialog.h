@@ -16,7 +16,7 @@
 #define MERGEGEOMETRIESDIALOG_H
 
 #include "ui_MergeGeometries.h"
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 class QStringListModel;
 

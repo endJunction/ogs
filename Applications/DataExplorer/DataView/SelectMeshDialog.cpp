@@ -15,10 +15,10 @@
 #include "SelectMeshDialog.h"
 #include "GeoObject.h"
 
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QComboBox>
-#include <QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QVBoxLayout>
 
 SelectMeshDialog::SelectMeshDialog(const GeoLib::GeoObject* geo_object, const std::list<std::string> &msh_names, QDialog* parent) :
 	QDialog(parent), _geo_object(geo_object)

@@ -16,7 +16,7 @@
 #define STRATWINDOW_H
 
 #include "ui_StratWindow.h"
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 namespace GeoLib
 {

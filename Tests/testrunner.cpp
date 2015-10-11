@@ -33,7 +33,7 @@
 #include "BaseLib/LogogCustomCout.h"
 #include "BaseLib/TemplateLogogFormatterSuppressedGCC.h"
 #ifdef OGS_BUILD_GUI
-#include <QApplication>
+#include <QtWidgets/QApplication>
 #endif
 
 /// Implementation of the googletest testrunner

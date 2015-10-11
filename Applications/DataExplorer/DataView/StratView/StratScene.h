@@ -17,7 +17,7 @@
 
 #include "StationBorehole.h"
 #include "Color.h"
-#include <QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 
 class StratBar;
 class QNonScalableGraphicsTextItem;
