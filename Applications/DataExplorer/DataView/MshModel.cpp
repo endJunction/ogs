@@ -72,6 +72,7 @@ void MshModel::addMeshObject(const MeshLib::Mesh* mesh)
 	//	newMesh->vtkSource()->SetName(display_name);
 	_rootItem->appendChild(newMesh);
 
+	beginResetModel();
 	// display elements
 	const std::vector<MeshLib::Element*> &elems = mesh->getElements();
 	const std::size_t nElems (elems.size());
@@ -94,7 +95,7 @@ void MshModel::addMeshObject(const MeshLib::Mesh* mesh)
 		newMesh->appendChild(new TreeItem(elemData, newMesh));
 	}
 
-	reset();
+	endResetModel();
 	emit meshAdded(this, this->index(_rootItem->childCount() - 1, 0, QModelIndex()));
 }
 
@@ -145,8 +146,9 @@ bool MshModel::removeMesh(const std::string &name)
 		if (item->data(0).toString().toStdString().compare(name) == 0)
 		{
 			emit meshRemoved(this, this->index(i, 0, QModelIndex()));
+			beginResetModel();
 			_rootItem->removeChildren(i,1);
-			reset();
+			endResetModel();
 			return _project.removeMesh(name);
 		}
 	}
