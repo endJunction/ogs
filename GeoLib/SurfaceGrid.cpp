@@ -118,7 +118,7 @@ SurfaceGrid::SurfaceGrid(Surface const*const sfc) :
 void SurfaceGrid::sortTrianglesInGridCells(Surface const*const sfc)
 {
     for (std::size_t l(0); l<sfc->getNumberOfTriangles(); l++) {
-        if (! sortTriangleInGridCells((*sfc)[l])) {
+		if (! sortTriangleInGridCells(&(*sfc)[l])) {
             Point const& p0(*((*sfc)[l]->getPoint(0)));
             Point const& p1(*((*sfc)[l]->getPoint(1)));
             Point const& p2(*((*sfc)[l]->getPoint(2)));
