@@ -21,7 +21,6 @@
 // ShapeLib
 #include <shapefil.h>
 
-#include "Applications/ApplicationsLib/LogogSetup.h"
 
 #include "GeoLib/IO/XmlIO/Qt/XmlGmlInterface.h"
 #include "GeoLib/IO/XmlIO/Qt/XmlStnInterface.h"
@@ -132,8 +131,7 @@ void printFieldInformationTable(DBFHandle const& dbf_handle, std::size_t n_field
 
 int main (int argc, char* argv[])
 {
-    ApplicationsLib::LogogSetup logog_setup;
-
+	logog::Cout* logog_cout (new logog::Cout);
     TCLAP::CmdLine cmd("Converts points contained in shape file", ' ', "0.1");
     TCLAP::ValueArg<std::string> shapefile_arg("s",
                                                "shape-file",

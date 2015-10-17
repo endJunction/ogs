@@ -34,7 +34,6 @@
 #include "BaseLib/RunTime.h"
 
 #include "Applications/ApplicationsLib/LinearSolverLibrarySetup.h"
-#include "Applications/ApplicationsLib/LogogSetup.h"
 #include "Applications/ApplicationsLib/ProjectData.h"
 #include "Applications/InSituLib/Adaptor.h"
 #include "ProcessLib/UncoupledProcessesTimeLoop.h"
@@ -107,8 +106,6 @@ int main(int argc, char *argv[])
     if (unbuffered_cout_arg.isSet())
         std::cout.setf(std::ios::unitbuf);
 
-    ApplicationsLib::LogogSetup logog_setup;
-    logog_setup.setLevel(log_level_arg.getValue());
 
     INFO("This is OpenGeoSys-6 version %s.",
          BaseLib::BuildInfo::git_describe.c_str());

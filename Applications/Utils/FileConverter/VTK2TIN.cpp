@@ -13,11 +13,8 @@
 
 #include <tclap/CmdLine.h>
 
-#include "Applications/ApplicationsLib/LogogSetup.h"
-
 // BaseLib
 #include "BaseLib/BuildInfo.h"
-#include "BaseLib/LogogSimpleFormatter.h"
 
 // GeoLib
 #include "GeoLib/GEOObjects.h"
@@ -35,8 +32,6 @@
 
 int main (int argc, char* argv[])
 {
-    ApplicationsLib::LogogSetup logog_setup;
-
     TCLAP::CmdLine cmd("Converts VTK mesh into TIN file.", ' ', BaseLib::BuildInfo::git_describe);
     TCLAP::ValueArg<std::string> mesh_in("i", "mesh-input-file",
                                          "the name of the file containing the input mesh", true,
