@@ -42,35 +42,33 @@ GEOModels::~GEOModels()
 
 void GEOModels::updateGeometry(const std::string &geo_name)
 {
-    GeoLib::PointVec* points (_geo_objects.getPointVecObj(geo_name));
-    GeoLib::PolylineVec* lines (_geo_objects.getPolylineVecObj(geo_name));
-    GeoLib::SurfaceVec* surfaces (_geo_objects.getSurfaceVecObj(geo_name));
+	GeoLib::PointVec* points(_geo_objects.getPointVecObj(geo_name));
+	if (!points)
+		ERR("GEOModels::updateGeometry() - Geometry \"%s\" not found.",
+		    geo_name.c_str());
 
-    if (points)
-    {
-        emit geoDataRemoved(_geoModel, geo_name, GeoLib::GEOTYPE::POINT);
-        this->_geoModel->removeGeoList(geo_name, GeoLib::GEOTYPE::POINT);
-        _geoModel->addPointList(QString::fromStdString(geo_name), *points);
-        emit geoDataAdded(_geoModel, geo_name, GeoLib::GEOTYPE::POINT);
+	emit geoDataRemoved(_geoModel, geo_name, GeoLib::GEOTYPE::POINT);
+	this->_geoModel->removeGeoList(geo_name, GeoLib::GEOTYPE::POINT);
+	_geoModel->addPointList(QString::fromStdString(geo_name), *points);
+	emit geoDataAdded(_geoModel, geo_name, GeoLib::GEOTYPE::POINT);
 
-        if (lines)
-        {
-            emit geoDataRemoved(_geoModel, geo_name, GeoLib::GEOTYPE::POLYLINE);
-            this->_geoModel->removeGeoList(geo_name, GeoLib::GEOTYPE::POLYLINE);
-            _geoModel->addPolylineList(QString::fromStdString(geo_name), *lines);
-            emit geoDataAdded(_geoModel, geo_name, GeoLib::GEOTYPE::POLYLINE);
-        }
+	GeoLib::PolylineVec* lines(_geo_objects.getPolylineVecObj(geo_name));
+	if (lines)
+	{
+		emit geoDataRemoved(_geoModel, geo_name, GeoLib::GEOTYPE::POLYLINE);
+		this->_geoModel->removeGeoList(geo_name, GeoLib::GEOTYPE::POLYLINE);
+		_geoModel->addPolylineList(QString::fromStdString(geo_name), *lines);
+		emit geoDataAdded(_geoModel, geo_name, GeoLib::GEOTYPE::POLYLINE);
+	}
 
-        if (surfaces)
-        {
-            emit geoDataRemoved(_geoModel, geo_name, GeoLib::GEOTYPE::SURFACE);
-            this->_geoModel->removeGeoList(geo_name, GeoLib::GEOTYPE::SURFACE);
-            _geoModel->addSurfaceList(QString::fromStdString(geo_name), *surfaces);
-            emit geoDataAdded(_geoModel, geo_name, GeoLib::GEOTYPE::SURFACE);
-        }
-    }
-    else
-        ERR("GEOModels::updateGeometry() - Geometry \"%s\" not found.", geo_name.c_str());
+	GeoLib::SurfaceVec* surfaces(_geo_objects.getSurfaceVecObj(geo_name));
+	if (surfaces)
+	{
+		emit geoDataRemoved(_geoModel, geo_name, GeoLib::GEOTYPE::SURFACE);
+		this->_geoModel->removeGeoList(geo_name, GeoLib::GEOTYPE::SURFACE);
+		_geoModel->addSurfaceList(QString::fromStdString(geo_name), *surfaces);
+		emit geoDataAdded(_geoModel, geo_name, GeoLib::GEOTYPE::SURFACE);
+	}
 }
 
 void GEOModels::removeGeometry(std::string const& geo_name,
@@ -164,34 +162,41 @@ void GEOModels::connectPolylineSegments(
     bool const closePly,
     bool const triangulatePly)
 {
-    GeoLib::PolylineVec* plyVec = _geo_objects.getPolylineVecObj(geoName);
+	GeoLib::PolylineVec* plyVec = _geo_objects.getPolylineVecObj(geoName);
+	if (!plyVec)
+	{
+		OGSError::box("Corresponding geometry not found.");
+		return;
+	}
 
-    if (plyVec)
-    {
-        const std::vector<GeoLib::Polyline*>* polylines = plyVec->getVector();
-        std::vector<GeoLib::Polyline*> ply_list;
-        for (auto & elem : indexlist)
-            ply_list.push_back( (*polylines)[elem] );
+	const std::vector<GeoLib::Polyline*>* polylines = plyVec->getVector();
+	std::vector<GeoLib::Polyline*> ply_list;
+	for (std::size_t i = 0; i < indexlist.size(); i++)
+		ply_list.push_back((*polylines)[indexlist[i]]);
 
-        // connect polylines
-        GeoLib::Polyline* new_line = GeoLib::Polyline::constructPolylineFromSegments(
-                ply_list,
-                proximity);
+	// connect polylines
+	GeoLib::Polyline* new_line =
+	    GeoLib::Polyline::constructPolylineFromSegments(ply_list, proximity);
 
-        if (new_line)
-        {
-            // insert result in a new vector of polylines (because the GEOObjects::appendPolylines()-method requires a vector)
-            std::vector<GeoLib::Polyline*> connected_ply;
+	if (!new_line)
+	{
+		OGSError::box("Error connecting polyines.");
+		return;
+	}
+
+	// insert result in a new vector of polylines (because the
+	// GEOObjects::appendPolylines()-method requires a vector)
+	std::vector<GeoLib::Polyline*> connected_ply;
 
             connected_ply.push_back(new_line);
             _geo_objects.appendPolylineVec(connected_ply, geoName);
 
-            if (closePly)
-            {
-                new_line->closePolyline();
+	if (closePly)
+	{
+		new_line->closePolyline();
 
-                if (triangulatePly)
-                {
+		if (triangulatePly)
+		{
                     INFO(
                         "Creating a surface by triangulation of the polyline "
                         "...");
@@ -206,17 +211,11 @@ void GEOModels::connectPolylineSegments(
                             "polyline failed.");
                     }
                     plyVec = _geo_objects.getPolylineVecObj(geoName);
-                }
-            }
+		}
+	}
 
-            if (!ply_name.empty())
-                plyVec->setNameOfElementByID(polylines->size(), ply_name);
-        }
-        else
-            OGSError::box("Error connecting polyines.");
-    }
-    else
-        OGSError::box("Corresponding geometry not found.");
+	if (!ply_name.empty())
+		plyVec->setNameOfElementByID(polylines->size(), ply_name);
 }
 
 void GEOModels::addNameForElement(std::string const& geometry_name,
@@ -224,15 +223,24 @@ void GEOModels::addNameForElement(std::string const& geometry_name,
                                   std::size_t const id,
                                   std::string const& new_name)
 {
-    if (object_type == GeoLib::GEOTYPE::POINT)
-        _geo_objects.getPointVecObj(geometry_name)->setNameForElement(id, new_name);
-    else if (object_type == GeoLib::GEOTYPE::POLYLINE)
-        _geo_objects.getPolylineVecObj(geometry_name)->setNameForElement(id, new_name);
-    else if (object_type == GeoLib::GEOTYPE::SURFACE)
-        _geo_objects.getSurfaceVecObj(geometry_name)->setNameForElement(id, new_name);
-    else
-        ERR("GEOModels::addNameForElement() - Unknown GEOTYPE %s.",
-            GeoLib::convertGeoTypeToString(object_type).c_str());
+	switch (object_type)
+	{
+		case GeoLib::GEOTYPE::POINT:
+			_geo_objects.getPointVecObj(geometry_name)
+			    ->setNameForElement(id, new_name);
+			break;
+		case GeoLib::GEOTYPE::POLYLINE:
+			_geo_objects.getPolylineVecObj(geometry_name)
+			    ->setNameForElement(id, new_name);
+			break;
+		case GeoLib::GEOTYPE::SURFACE:
+			_geo_objects.getSurfaceVecObj(geometry_name)
+			    ->setNameForElement(id, new_name);
+			break;
+		default:
+			ERR("GEOModels::addNameForElement() - Unknown GEOTYPE %s.",
+			    GeoLib::convertGeoTypeToString(object_type).c_str());
+	}
 }
 
 void GEOModels::addNameForObjectPoints(const std::string &geometry_name,
