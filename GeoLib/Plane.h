@@ -65,7 +65,7 @@ private:
 /// Function computes the intersection of two planes
 /// @param p0 first plane
 /// @param p1 second plane
-/// @return a line described by the pair of a vector (direction) and a point of
+/// @return a line described by the pair of a vector (direction) and a point on
 /// the line
 std::pair<MathLib::Vector3, MathLib::Point3d>
 computePlanePlaneIntersection(GeoLib::Plane const& p0, GeoLib::Plane const& p1,
