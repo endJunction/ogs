@@ -1,0 +1,9 @@
+# processing results into (size, n, times[i]) rows from serial output:
+awk '/ /{print s, n, t[0], t[1], t[2], t[3]; s=$1; n=$2; b=0}; NF==1{t[b]=$0; b++}' baikal_timings.dat > baikal_timings.dat0
+
+
+# Benchmarking. Run for available number of processors, and a sequence of 2^i
+# for size.
+parallel -j 1 'echo $((2**{1})) {2}; mpirun -np {2} bin/allgather_benchmark $((2**{1})) 10' ::: `seq 28 30` ::: `seq 1 4` | awk '/info:/{print $5; next}//{print $0}'
+
+
