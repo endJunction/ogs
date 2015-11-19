@@ -22,6 +22,8 @@
 namespace ba = boost::accumulators;
 
 #include "BaseLib/BuildInfo.h"
+#include "BaseLib/RunTime.h"
+#include "BaseLib/CPUTime.h"
 
 #include "Applications/ApplicationsLib/LinearSolverLibrarySetup.h"
 #include "Applications/ApplicationsLib/LogogSetup.h"
@@ -63,10 +65,19 @@ void benchmark3(std::size_t const global_vector_size,
 template <typename F, typename... Args>
 std::chrono::duration<double> timeit(F const& f, Args&&... args)
 {
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	BaseLib::CPUTime cpu_time;
+	BaseLib::RunTime run_time;
+
 	MPI_Barrier(MPI_COMM_WORLD);
 	auto start = std::chrono::high_resolution_clock::now();
+	cpu_time.start();
+	run_time.start();
 	f(std::forward<Args>(args)...);
 	auto end = std::chrono::high_resolution_clock::now();
+	INFO("[%d] chrono %ld, cputime %.16lf, runtime %.16lf", rank, (end - start).count(),
+	     cpu_time.elapsed(), run_time.elapsed());
 	return end - start;
 }
 
