@@ -14,7 +14,7 @@
 
 #include "VisPrefsDialog.h"
 #include <QDoubleValidator>
-#include <QtWidgets/QLineEdit>
+#include <QLineEdit>
 #include <QSettings>
 #include <QVariant>
 

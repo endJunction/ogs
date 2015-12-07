@@ -26,7 +26,7 @@
 #include "VtkRaster.h"
 #include "NetCdfConfigureDialog.h"
 
-#include <QtWidgets/QFileDialog>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QSettings>
 

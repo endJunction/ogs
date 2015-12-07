@@ -17,7 +17,7 @@
 
 #include "Point.h"
 #include "ui_VisPrefs.h"
-#include <QtWidgets/QDialog>
+#include <QDialog>
 
 class VtkVisPipeline;
 class VisualizationWidget;

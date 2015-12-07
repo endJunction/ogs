@@ -15,7 +15,7 @@
 #ifndef VTKALGORITHMPROPERTIESCHECKBOX_H
 #define VTKALGORITHMPROPERTIESCHECKBOX_H
 
-#include <QtWidgets/QCheckBox>
+#include <QCheckBox>
 
 class VtkAlgorithmProperties;
 

@@ -18,9 +18,9 @@
 #include "VtkAlgorithmProperties.h"
 
 #include <QDoubleValidator>
-#include <QtWidgets/QHBoxLayout>
+#include <QHBoxLayout>
 #include <QIntValidator>
-#include <QtWidgets/QLineEdit>
+#include <QLineEdit>
 #include <QSize>
 
 VtkAlgorithmPropertyVectorEdit::VtkAlgorithmPropertyVectorEdit( const QList<QString> contents,

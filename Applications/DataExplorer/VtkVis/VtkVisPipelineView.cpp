@@ -30,11 +30,11 @@
 
 #include <QAbstractItemModel>
 #include <QContextMenuEvent>
-#include <QtWidgets/QFileDialog>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QMenu>
+#include <QFileDialog>
+#include <QHeaderView>
+#include <QMenu>
 #include <QSettings>
-#include <QtWidgets/QMessageBox>
+#include <QMessageBox>
 
 //image to mesh conversion
 #include "VtkGeoImageSource.h"
