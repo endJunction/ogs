@@ -116,6 +116,8 @@ include_directories(
 
 	${CMAKE_CURRENT_BINARY_DIR}/../../BaseLib
 	${CMAKE_CURRENT_BINARY_DIR}/../DataView
+
+	${Qt5Widgets_INCLUDE_DIRS}
 )
 
 # Create the library
