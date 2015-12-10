@@ -9,39 +9,31 @@
  *
  */
 
-// stl
 #include <algorithm>
 #include <numeric>
 
-// BaseLib
-#include "tclap/CmdLine.h"
+#include <tclap/CmdLine.h>
+#include <logog/include/logog.hpp>
 
-// ThirdParty/logog
-#include "logog/include/logog.hpp"
+#include "Applications/ApplicationsLib/LogogSetup.h"
 
-// BaseLib
-#include "LogogSimpleFormatter.h"
-#include "quicksort.h"
+#include "BaseLib/quicksort.h"
+#include "BaseLib/FileTools.h"
 
-// FileIO/Legacy
-#include "FileTools.h"
-#include "MeshIO.h"
-#include "readMeshFromFile.h"
-#include "AsciiRasterInterface.h"
+#include "FileIO/readMeshFromFile.h"
+#include "FileIO/writeMeshToFile.h"
+#include "FileIO/AsciiRasterInterface.h"
 
-// GeoLib
-#include "Raster.h"
+#include "GeoLib/Raster.h"
 
-// MathLib
-#include "MathTools.h"
+#include "MathLib/MathTools.h"
 
-// MeshLib
-#include "MeshGenerators/VtkMeshConverter.h"
-#include "MeshGenerators/ConvertRasterToMesh.h"
-#include "Elements/Element.h"
-#include "Mesh.h"
-#include "MeshEditing/Mesh2MeshPropertyInterpolation.h"
-#include "MeshEnums.h"
+#include "MeshLib/MeshGenerators/VtkMeshConverter.h"
+#include "MeshLib/MeshGenerators/ConvertRasterToMesh.h"
+#include "MeshLib/Elements/Element.h"
+#include "MeshLib/Mesh.h"
+#include "MeshLib/MeshEditing/Mesh2MeshPropertyInterpolation.h"
+#include "MeshLib/MeshEnums.h"
 
 // From wikipedia:
 // http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance. The
@@ -72,10 +64,7 @@ auto computeMeanAndVariance(InputIterator first, InputIterator last) ->
 
 int main (int argc, char* argv[])
 {
-	LOGOG_INITIALIZE();
-	logog::Cout* logog_cout (new logog::Cout);
-	BaseLib::LogogSimpleFormatter *custom_format (new BaseLib::LogogSimpleFormatter);
-	logog_cout->SetFormatter(*custom_format);
+	ApplicationsLib::LogogSetup logo_setup;
 
 	TCLAP::CmdLine cmd(
 	        "Generates properties for mesh elements of an input mesh deploying a ASC raster file",
@@ -252,19 +241,12 @@ int main (int argc, char* argv[])
 			(*materialIds)[dest_mesh->getElement(dest_perm[k])->getID()] = k;
 		}
 
-		FileIO::Legacy::MeshIO mesh_writer;
-		mesh_writer.setPrecision(12);
-		mesh_writer.setMesh(dest_mesh);
-		mesh_writer.writeToFile(out_mesh_arg.getValue());
+		FileIO::writeMeshToFile(*dest_mesh, out_mesh_arg.getValue());
 	}
 
 	delete raster;
 	delete src_mesh;
 	delete dest_mesh;
-
-	delete custom_format;
-	delete logog_cout;
-	LOGOG_SHUTDOWN();
 
 	return 0;
 }
