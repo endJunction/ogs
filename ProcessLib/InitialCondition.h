@@ -45,8 +45,8 @@ public:
 	UniformInitialCondition(double const value) : _value(value)
 	{
 	}
-
-	virtual double getValue(MeshLib::Node const&, int const) const override
+	virtual double getValue(MeshLib::Node const&,
+	                        int const /* tuple_size */) const override
 	{
 		return _value;
 	}
@@ -56,6 +56,8 @@ private:
 };
 
 /// Construct a UniformInitialCondition from configuration.
+/// The initial condition will expect a correct tuple size in the configuration,
+/// which should be the same as in the corresponding process variable.
 std::unique_ptr<InitialCondition> createUniformInitialCondition(
     BaseLib::ConfigTree const& config, int const tuple_size);
 
@@ -81,6 +83,8 @@ private:
 };
 
 /// Construct a MeshPropertyInitialCondition from configuration.
+/// The initial condition will expect a correct tuple size in the configuration,
+/// which should be the same as in the corresponding process variable.
 std::unique_ptr<InitialCondition> createMeshPropertyInitialCondition(
     BaseLib::ConfigTree const& config, MeshLib::Mesh const& mesh,
     int const tuple_size);

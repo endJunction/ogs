@@ -55,6 +55,13 @@ std::unique_ptr<InitialCondition> createMeshPropertyInitialCondition(
 		std::abort();
 	}
 
+	if (property->getTupleSize() != tuple_size)
+	{
+		ERR("The required property %s has different tuples size %d, "
+		    "expected %d.",
+		    field_name.c_str(), property->getTupleSize(), tuple_size);
+		std::abort();
+	}
 	return std::unique_ptr<InitialCondition>(
 	    new MeshPropertyInitialCondition(*property));
 }
