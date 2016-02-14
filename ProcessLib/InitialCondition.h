@@ -76,7 +76,8 @@ public:
 	virtual double getValue(MeshLib::Node const& n,
 	                        int const component_id) const override
 	{
-		return _property[n.getID()];
+		return _property[n.getID() * _property.getNumberOfComponents() +
+		                 component_id];
 	}
 
 private:
