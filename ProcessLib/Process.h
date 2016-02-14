@@ -284,7 +284,7 @@ private:
 					auto const global_index =
 					    std::abs(_local_to_global_index_map->getGlobalIndex(
 					        l, component_id));
-					output_data[component_id] = (x_copy)[global_index];
+					output_data[component_id] = x_copy[global_index];
 				}
 			}
 		}
