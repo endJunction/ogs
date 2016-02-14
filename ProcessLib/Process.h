@@ -273,7 +273,7 @@ private:
 		{
 			auto& output_data = pv.getOrCreateMeshProperty();
 
-			int const n_components = pv.getTupleSize();
+			int const n_components = pv.getNComponents();
 			for (std::size_t i = 0; i < n; ++i)
 			{
 				MeshLib::Location const l(_mesh.getID(),
