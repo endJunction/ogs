@@ -159,11 +159,11 @@ private:
 	void setInitialConditions(ProcessVariable const& variable,
 	                          int const component_id)
 	{
-		std::size_t const n = _mesh.getNNodes();
-		for (std::size_t i = 0; i < n; ++i)
+		std::size_t const n_nodes = _mesh.getNNodes();
+		for (std::size_t node_id = 0; node_id < n_nodes; ++node_id)
 		{
 			MeshLib::Location const l(_mesh.getID(),
-			                          MeshLib::MeshItemType::Node, i);
+			                          MeshLib::MeshItemType::Node, node_id);
 			auto global_index = std::abs(
 			    _local_to_global_index_map->getGlobalIndex(l, component_id));
 #ifdef USE_PETSC
@@ -179,7 +179,7 @@ private:
 			    global_index = 0;
 #endif
 			_x->set(global_index,
-			        variable.getInitialConditionValue(*_mesh.getNode(i),
+			        variable.getInitialConditionValue(*_mesh.getNode(node_id),
 			                                          component_id));
 		}
 	}
@@ -268,23 +268,23 @@ private:
 #endif
 		_x->copyValues(x_copy);
 
-		std::size_t const n = _mesh.getNNodes();
+		std::size_t const n_nodes = _mesh.getNNodes();
 		for (ProcessVariable& pv : _process_variables)
 		{
 			auto& output_data = pv.getOrCreateMeshProperty();
 
 			int const n_components = pv.getNComponents();
-			for (std::size_t i = 0; i < n; ++i)
+			for (std::size_t node_id = 0; node_id < n_nodes; ++node_id)
 			{
 				MeshLib::Location const l(_mesh.getID(),
-				                          MeshLib::MeshItemType::Node, i);
+				                          MeshLib::MeshItemType::Node, node_id);
 				for (int component_id = 0; component_id < n_components;
 				     ++component_id)
 				{
 					auto const global_index =
 					    std::abs(_local_to_global_index_map->getGlobalIndex(
 					        l, component_id));
-					output_data[i] = (x_copy)[global_index];
+					output_data[component_id] = (x_copy)[global_index];
 				}
 			}
 		}
