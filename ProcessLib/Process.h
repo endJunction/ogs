@@ -281,13 +281,17 @@ private:
 				for (int component_id = 0; component_id < n_components;
 				     ++component_id)
 				{
-					auto const global_index =
-					    std::abs(_local_to_global_index_map->getGlobalIndex(
-					        l, component_id));
-					output_data[node_id] = x_copy[global_index];
+					auto const index =
+					    _local_to_global_index_map->getLocalIndex(
+					        l, component_id, _x->getRangeBegin(),
+					        _x->getRangeEnd());
+
+					output_data[node_id * n_components + component_id] =
+					    x_copy[index];
 				}
 			}
 		}
+
 		// Write output file
 		DBUG("Writing output to \'%s\'.", file_name.c_str());
 		FileIO::VtuInterface vtu_interface(&_mesh, vtkXMLWriter::Binary, true);
