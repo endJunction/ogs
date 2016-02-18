@@ -285,4 +285,39 @@ std::vector<GlobalIndexType> MeshComponentMap::getGlobalIndicesByComponent(
     return global_indices;
 }
 
+GlobalIndexType MeshComponentMap::getLocalIndex(
+    Location const& l,
+    std::size_t const comp_id,
+    std::size_t const range_begin,
+    std::size_t const range_end) const
+{
+    GlobalIndexType const global_index = getGlobalIndex(l, comp_id);
+#ifndef USE_PETSC
+    return global_index;
+#else
+    if (global_index >= 0)    // non-ghost location.
+        return global_index - range_begin;
+
+    //
+    // For a ghost location look up the global index in ghost indices.
+    //
+    GlobalIndexType index;
+
+    // A special case for a ghost location with global index equal to the size
+    // of the local vector:
+    if (-global_index == _num_global_dof) return 0;
+
+    auto const ghost_index_it = std::find(_ghosts_indices.begin(),
+                                          _ghosts_indices.end(), -global_index);
+    if (ghost_index_it == _ghosts_indices.end())
+    {
+        ERR("index %d not found in ghost_indices", -global_index);
+        std::abort();
+    }
+    return range_end - range_begin +
+           std::distance(_ghosts_indices.begin(), ghost_index_it);
+
+#endif
+}
+
 }   // namespace AssemblerLib
