@@ -17,6 +17,7 @@
 
 #include "AssemblerLib/ComputeSparsityPattern.h"
 #include "AssemblerLib/LocalToGlobalIndexMap.h"
+#include "AssemblerLib/MeshComponentMap.h" // for enum class ComponentOrder
 #include "AssemblerLib/VectorMatrixAssembler.h"
 #include "BaseLib/ConfigTree.h"
 #include "FileIO/VtkIO/VtuInterface.h"
@@ -256,41 +257,72 @@ private:
 		    *_local_to_global_index_map, _mesh));
 	}
 
+	// Only for primary variables.
 	void output(std::string const& file_name)
 	{
 		DBUG("Process output.");
 
-		// Copy result
+		// Copy result -------------------------------------------------------
 #ifdef USE_PETSC
-		std::vector<double> x_copy(_x->getLocalSize() + _x->getGhostSize());
+		const std::size_t num_knowns = _x->getLocalSize() + _x->getGhostSize();
 #else
-		std::vector<double> x_copy(_x->size());
+		const std::size_t num_knowns = _x->size()
 #endif
-		_x->copyValues(x_copy);
 
-		std::size_t const n_nodes = _mesh.getNNodes();
-		for (ProcessVariable& pv : _process_variables)
+		const AssemblerLib::ComponentOrder storage_order
+		                 = _local_to_global_index_map->getStorageOrder();
+
+		if (storage_order == AssemblerLib::ComponentOrder::BY_COMPONENT)
 		{
-			auto& output_data = pv.getOrCreateMeshProperty();
+			// All elements of _process_variables share a long solution vector, 
+			// which can be created by any element of _process_variables
+			auto& output_data = _process_variables[0].get()
+			            .getOrCreateMeshProperty(num_knowns);
+			_x->copyValues(output_data);
+		}
+		else
+		{
+			// All elements of _process_variables share a long solution vector, 
+			// which can be created by any element of _process_variables
+			auto& output_data = _process_variables[0].get()
+			            .getOrCreateMeshProperty(num_knowns);
+			std::size_t const n_nodes = _mesh.getNNodes();
+			int const n_components = _local_to_global_index_map->getNumComponents();
 
-			int const n_components = pv.getNComponents();
-			for (std::size_t node_id = 0; node_id < n_nodes; ++node_id)
-			{
-				MeshLib::Location const l(_mesh.getID(),
-				                          MeshLib::MeshItemType::Node, node_id);
-				for (int component_id = 0; component_id < n_components;
+#ifdef USE_PETSC
+			std::vector<GlobalIndexType> global_id_rank;
+			global_id_rank.reserve(num_knowns);
+			for (int component_id = 0; component_id < n_components;
 				     ++component_id)
+			{
+				for (std::size_t node_id = 0; node_id < n_nodes; ++node_id)
 				{
-					auto const index =
-					    _local_to_global_index_map->getLocalIndex(
-					        l, component_id, _x->getRangeBegin(),
-					        _x->getRangeEnd());
-
-					output_data[node_id * n_components + component_id] =
-					    x_copy[index];
+					MeshLib::Location const l(_mesh.getID(),
+					               MeshLib::MeshItemType::Node, node_id);
+					auto global_index = std::abs(
+						  _local_to_global_index_map->getGlobalIndex(l, component_id));
+					if ( global_index == _x->size() )
+						global_index = 0;
+					global_id_rank.push_back(global_index);
 				}
 			}
+			_x->get(global_id_rank, output_data);
+#else
+			std::vector<double> x_copy(num_knowns);
+			_x->copyValues(x_copy);
+			for (int component_id = 0; component_id < n_components;
+				     ++component_id)
+			{
+				for (std::size_t node_id = 0; node_id < n_nodes; ++node_id)
+				{
+					output_data[node_id * n_components + component_id] =
+					    x_copy[component_id * n_nodes + node_id];
+				}
+			}
+#endif
 		}
+
+		// What left here are that for econdary variables
 
 		// Write output file
 		DBUG("Writing output to \'%s\'.", file_name.c_str());

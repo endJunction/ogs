@@ -89,7 +89,7 @@ public:
     /// Copy vector values.
     void copyValues(std::vector<double>& u)
     {
-        assert(u.size() == _vec.size());
+        assert(static_cast<IndexType>(u.size()) == _vec.size());
         copy_n(_vec.data(), _vec.size(), u.begin());
     }
 

@@ -54,7 +54,8 @@ LocalToGlobalIndexMap::findGlobalIndices(
 LocalToGlobalIndexMap::LocalToGlobalIndexMap(
     std::vector<MeshLib::MeshSubsets*> const& mesh_subsets,
     AssemblerLib::ComponentOrder const order)
-    : _mesh_subsets(mesh_subsets), _mesh_component_map(_mesh_subsets, order)
+    : _storage_order(order), _mesh_subsets(mesh_subsets),
+      _mesh_component_map(_mesh_subsets, order)
 {
     // For all MeshSubsets and each of their MeshSubset's and each element
     // of that MeshSubset save a line of global indices.
@@ -78,7 +79,8 @@ LocalToGlobalIndexMap::LocalToGlobalIndexMap(
     std::vector<std::size_t> const& original_indices,
     std::vector<MeshLib::Element*> const& elements,
     AssemblerLib::MeshComponentMap&& mesh_component_map)
-    : _mesh_subsets(std::move(mesh_subsets)),
+    : _storage_order(ComponentOrder::BY_COMPONENT),
+      _mesh_subsets(std::move(mesh_subsets)),
       _mesh_component_map(std::move(mesh_component_map))
 {
     assert(original_indices.size() == _mesh_subsets.size());

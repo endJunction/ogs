@@ -114,7 +114,8 @@ MeshLib::Mesh const& ProcessVariable::getMesh() const
 	return _mesh;
 }
 
-MeshLib::PropertyVector<double>& ProcessVariable::getOrCreateMeshProperty()
+MeshLib::PropertyVector<double>& ProcessVariable
+        ::getOrCreateMeshProperty(const std::size_t size)
 {
 	boost::optional<MeshLib::PropertyVector<double>&> result;
 	if (_mesh.getProperties().hasPropertyVector(_name))
@@ -122,14 +123,14 @@ MeshLib::PropertyVector<double>& ProcessVariable::getOrCreateMeshProperty()
 		result =
 		    _mesh.getProperties().template getPropertyVector<double>(_name);
 		assert(result);
-		assert(result->size() == _mesh.getNNodes() * _n_components);
+		assert(result->size() == size);
 	}
 	else
 	{
 		result = _mesh.getProperties().template createNewPropertyVector<double>(
 		    _name, MeshLib::MeshItemType::Node);
 		assert(result);
-		result->resize(_mesh.getNNodes() * _n_components);
+		result->resize(size);
 	}
 	return *result;
 }

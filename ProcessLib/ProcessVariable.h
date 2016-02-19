@@ -99,7 +99,7 @@ public:
 	// Get or create a property vector for results.
 	// The returned mesh property size is number of mesh nodes times number of
 	// components.
-	MeshLib::PropertyVector<double>& getOrCreateMeshProperty();
+	MeshLib::PropertyVector<double>& getOrCreateMeshProperty(const std::size_t size);
 
 private:
 	std::string const _name;

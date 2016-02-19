@@ -155,7 +155,7 @@ void PETScVector::getGlobalVector(PetscScalar u[])
 
 void PETScVector::copyValues(std::vector<double>& u)
 {
-    assert(u.size() == getLocalSize() + getGhostSize());
+    assert(static_cast<PetscInt>(u.size()) == getLocalSize() + getGhostSize());
 
     double* loc_x = getLocalVector();
     std::copy_n(loc_x, getLocalSize() + getGhostSize(), u.begin());

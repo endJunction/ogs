@@ -84,6 +84,9 @@ public:
 
     std::size_t size() const;
 
+    AssemblerLib::ComponentOrder getStorageOrder()
+                                   const {return _storage_order;}
+
     std::size_t getNumComponents() const { return _mesh_subsets.size(); }
 
     RowColumnIndices operator()(std::size_t const mesh_item_id, const unsigned component_id) const;
@@ -108,16 +111,6 @@ public:
         return _mesh_component_map.getGhostIndices();
     }
 
-    /// Computes the index in a local (for DDC) vector for a given location and
-    /// component; forwarded from MeshComponentMap.
-    GlobalIndexType getLocalIndex(MeshLib::Location const& l, std::size_t const comp_id,
-                                  std::size_t const range_begin,
-                                  std::size_t const range_end) const
-    {
-        return _mesh_component_map.getLocalIndex(l, comp_id, range_begin,
-                                                 range_end);
-    }
-
 private:
     /// Private constructor used by internally created local-to-global index
     /// maps. The mesh_component_map is passed as argument instead of being
@@ -137,6 +130,10 @@ private:
         const unsigned component_id, const unsigned comp_id_write);
 
 private:
+    /// Indicator for the method that used to store entries below to individual
+    /// unknowns (components) into the global matrix and vector. 
+    AssemblerLib::ComponentOrder _storage_order;
+
     std::vector<MeshLib::MeshSubsets*> const _mesh_subsets;
     AssemblerLib::MeshComponentMap _mesh_component_map;
 
