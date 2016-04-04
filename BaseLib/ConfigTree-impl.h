@@ -81,6 +81,17 @@ boost::optional<std::vector<T>> ConfigTree::getConfParamOptionalImpl(
         T value;
         while (ss >> value)
             result.push_back(value);
+        if (!ss.eof())  // The stream is not read until the end, must be an
+                        // error. result contains number of read values.
+        {
+            error("Value for key <" + param + "> `" +
+                  shortString(_tree->data()) +
+                  "' not convertible to a vector of the desired type."
+                  " Could not convert token no. " +
+                  std::to_string(result.size() + 1) + ".");
+            return boost::none;
+        }
+
         return boost::make_optional(result);
     }
 
