@@ -76,16 +76,16 @@ boost::optional<std::vector<T>> ConfigTree::getConfParamOptionalImpl(
 {
     if (auto p = getConfSubtreeOptional(param))
     {
-        std::stringstream ss{p->getValue<std::string>()};
+        std::istringstream sstr{p->getValue<std::string>()};
         std::vector<T> result;
         T value;
-        while (ss >> value)
+        while (sstr >> value)
             result.push_back(value);
-        if (!ss.eof())  // The stream is not read until the end, must be an
+        if (!sstr.eof())  // The stream is not read until the end, must be an
                         // error. result contains number of read values.
         {
             error("Value for key <" + param + "> `" +
-                  shortString(_tree->data()) +
+                  shortString(sstr.str()) +
                   "' not convertible to a vector of the desired type."
                   " Could not convert token no. " +
                   std::to_string(result.size() + 1) + ".");
