@@ -10,6 +10,7 @@ set(REQUIRED_SUBMODULES
     ThirdParty/vtkdiff
     ThirdParty/tclap
     ThirdParty/tetgen
+    ThirdParty/Celero
     ${OGS_ADDITIONAL_SUBMODULES_TO_CHECKOUT}
 )
 if(OGS_BUILD_GUI)

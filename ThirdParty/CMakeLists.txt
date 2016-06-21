@@ -57,3 +57,8 @@ endif()
 if(OGS_BUILD_METIS)
     include(${PROJECT_SOURCE_DIR}/scripts/cmake/MetisSetup.cmake)
 endif()
+
+# Celero microbenchmarking library
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Celero/CMakeLists.txt)
+    add_subdirectory(Celero)
+endif()

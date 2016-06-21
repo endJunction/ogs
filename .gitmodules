@@ -25,3 +25,6 @@
 [submodule "ThirdParty/cmake-modules"]
 	path = ThirdParty/cmake-modules
 	url = https://github.com/bilke/cmake-modules.git
+[submodule "ThirdParty/Celero"]
+	path = ThirdParty/Celero
+	url = https://github.com/DigitalInBlue/Celero.git

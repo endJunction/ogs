@@ -259,6 +259,7 @@ include_directories( SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/gtest/include
 include_directories( SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/autocheck/include )
 include_directories( SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/tclap/include )
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vtkGUISupportQt)
+include_directories( SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/Celero/include )
 
 add_subdirectory( Applications )
 add_subdirectory( BaseLib )
