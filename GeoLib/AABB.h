@@ -58,12 +58,25 @@ public:
     template <typename PNT_TYPE>
     AABB(std::vector<PNT_TYPE*> const& pnts, std::vector<std::size_t> const& ids)
     {
-        assert(! ids.empty());
-        init(pnts[ids[0]]);
-        for (std::size_t i=1; i<ids.size(); ++i) {
-            updateWithoutEnlarge(*(pnts[ids[i]]));
+        if (ids.empty())
+        {
+            for (auto* p_ptr : pnts)
+                updateWithoutEnlarge(*p_ptr);
+        }
+        else
+        {
+            init(pnts[ids[0]]);
+            for (std::size_t i = 1; i < ids.size(); ++i)
+            {
+                updateWithoutEnlarge(*(pnts[ids[i]]));
+            }
         }
         enlarge();
+    }
+
+    template <typename PNT_TYPE>
+    AABB(std::vector<PNT_TYPE*> const& pnts)
+    {
     }
 
     AABB(AABB const&) = default;

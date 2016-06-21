@@ -1,3 +1,15 @@
+add_executable(t
+    t.cpp
+    ${SOURCES}
+    ${HEADERS}
+)
+
+add_dependencies(t celero)
+target_link_libraries(t
+    GeoLib
+    celero
+)
+
 # Create the executable
 add_executable(MeshRead
     MeshRead.cpp

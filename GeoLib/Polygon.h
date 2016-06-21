@@ -112,7 +112,6 @@ public:
     const std::list<Polygon*>& getListOfSimplePolygons ();
 
     friend bool operator==(Polygon const& lhs, Polygon const& rhs);
-private:
     /**
      * Computes all intersections of the straight line segment and the polyline boundary
      * @param segment the line segment that will be processed
@@ -121,6 +120,7 @@ private:
     std::vector<GeoLib::Point> getAllIntersectionPoints(
         GeoLib::LineSegment const& segment) const;
 
+private:
     /**
      * from book: Computational Geometry and Computer Graphics in C++, page 119
      * get the type of edge with respect to the given point (2d method!)
