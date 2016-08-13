@@ -100,11 +100,12 @@ public:
                                  sm.detJ * wp.getWeight();
 
             // Darcy velocity only computed for output.
-            auto const darcy_velocity = -(k * sm.dNdx *
-                Eigen::Map<const NodalVectorType>(local_x.data(), ShapeFunction::NPOINTS)
-                ).eval();
+            NodalVectorType const darcy_velocity =
+                -k * sm.dNdx * Eigen::Map<const NodalVectorType>(
+                                   local_x.data(), ShapeFunction::NPOINTS);
 
-            for (unsigned d=0; d<GlobalDim; ++d) {
+            for (unsigned d = 0; d < GlobalDim; ++d)
+            {
                 _darcy_velocities[d][ip] = darcy_velocity[d];
             }
         }
