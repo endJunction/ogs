@@ -58,6 +58,7 @@ class LocalAssemblerData
 
     using NodalMatrixType = typename LocalAssemblerTraits::LocalMatrix;
     using NodalVectorType = typename LocalAssemblerTraits::LocalVector;
+    using GlobalDimVectorType = typename ShapeMatricesType::GlobalDimVectorType;
 
 public:
     /// The hydraulic_conductivity factor is directly integrated into the local
@@ -100,7 +101,7 @@ public:
                                  sm.detJ * wp.getWeight();
 
             // Darcy velocity only computed for output.
-            NodalVectorType const darcy_velocity =
+            GlobalDimVectorType const darcy_velocity =
                 -k * sm.dNdx * Eigen::Map<const NodalVectorType>(
                                    local_x.data(), ShapeFunction::NPOINTS);
 
