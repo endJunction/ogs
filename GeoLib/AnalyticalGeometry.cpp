@@ -468,13 +468,22 @@ std::vector<MathLib::Point3d> lineSegmentIntersect2d(
     auto isCollinearPointOntoLineSegment = [](MathLib::Point3d const& a,
                                               MathLib::Point3d const& b,
                                               MathLib::Point3d const& c) {
-        if (b[0] - a[0] == 0)
-            OGS_FATAL(
-                "isCollinearPointOntoLineSegment is about to divide by "
-                "zero: a[0] = %g, b[0] = %g, and b[0] - a[0] = %g",
-                a[0], b[0], b[0] - a[0]);
-        double const t = (c[0] - a[0]) / (b[0] - a[0]);
-        return 0.0 <= t && t <= 1.0;
+        if (b[0] - a[0] != 0)
+        {
+            double const t = (c[0] - a[0]) / (b[0] - a[0]);
+            return 0.0 <= t && t <= 1.0;
+        }
+        else if (b[1] - a[1] != 0)
+        {
+            double const t = (c[1] - a[1]) / (b[1] - a[1]);
+            return 0.0 <= t && t <= 1.0;
+        }
+        else if (b[2] - a[2] != 0)
+        {
+            double const t = (c[2] - a[2]) / (b[2] - a[2]);
+            return 0.0 <= t && t <= 1.0;
+        }
+        return false;
     };
 
     if (orient_abc == 0.0) {
