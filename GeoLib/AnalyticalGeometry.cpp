@@ -465,6 +465,8 @@ std::vector<MathLib::Point3d> lineSegmentIntersect2d(
         return std::vector<MathLib::Point3d>();
     }
 
+    // precondition: points a, b, c are collinear
+    // the function checks if the point c is onto the line segment (a,b)
     auto isCollinearPointOntoLineSegment = [](MathLib::Point3d const& a,
                                               MathLib::Point3d const& b,
                                               MathLib::Point3d const& c) {
