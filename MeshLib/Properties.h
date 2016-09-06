@@ -87,13 +87,8 @@ public:
 
     /// Method to get a vector of property values.
     template <typename T>
-    boost::optional<PropertyVector<T> const&>
-    getPropertyVector(std::string const& name) const;
-
-    /// Method to get a vector of property values.
-    template <typename T>
-    boost::optional<PropertyVector<T>&>
-    getPropertyVector(std::string const& name);
+    boost::optional<PropertyVector<T>&> getPropertyVector(
+        std::string const& name) const;
 
     void removePropertyVector(std::string const& name);
 

@@ -615,7 +615,8 @@ void TetGenInterface::write2dElements(std::ofstream &out,
     out << nTotalTriangles << " 1\n";
 
     const std::vector<MeshLib::Element*> &elements = mesh.getElements();
-    boost::optional< MeshLib::PropertyVector<int> const&> materialIds (mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
+    boost::optional<MeshLib::PropertyVector<int>&> const materialIds(
+        mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
     const std::size_t nElements (elements.size());
     unsigned element_count(0);
     for (std::size_t i=0; i<nElements; ++i)
@@ -638,7 +639,8 @@ void TetGenInterface::write3dElements(std::ofstream &out,
     const std::streamoff before_elems_pos (out.tellp());
     const unsigned n_spaces (static_cast<unsigned>(std::floor(log(nElements*8))) + 1);
     out << std::string(n_spaces, ' ') << " 1\n";
-    boost::optional< MeshLib::PropertyVector<int> const&> materialIds = mesh.getProperties().getPropertyVector<int>("MaterialIDs");
+    boost::optional<MeshLib::PropertyVector<int>&> const materialIds =
+        mesh.getProperties().getPropertyVector<int>("MaterialIDs");
     unsigned element_count(0);
     for (std::size_t i=0; i<nElements; ++i)
     {

@@ -34,7 +34,8 @@ ElementStatus::ElementStatus(Mesh const* const mesh,
                              std::vector<int> const& vec_inactive_matIDs)
     : ElementStatus(mesh, !vec_inactive_matIDs.empty())
 {
-    auto materialIds = mesh->getProperties().getPropertyVector<int>("MaterialIDs");
+    auto const materialIds =
+        mesh->getProperties().getPropertyVector<int>("MaterialIDs");
     if (materialIds) {
         for (auto material_id : vec_inactive_matIDs) {
             for (auto e : _mesh->getElements()) {
