@@ -621,7 +621,8 @@ void TetGenInterface::write2dElements(std::ofstream &out,
     unsigned element_count(0);
     for (std::size_t i=0; i<nElements; ++i)
     {
-        std::string matId = (materialIds) ? std::to_string((*materialIds)[i]) : "";
+        std::string const matId =
+            (materialIds) ? std::to_string((*materialIds)[i]) : "";
         this->writeElementToFacets(out, *elements[i], element_count, matId);
     }
 }
