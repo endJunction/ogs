@@ -80,33 +80,13 @@ Properties::createNewPropertyVector(std::string const& name,
 }
 
 template <typename T>
-boost::optional<PropertyVector<T> const&>
-Properties::getPropertyVector(std::string const& name) const
+boost::optional<PropertyVector<T>&> Properties::getPropertyVector(
+    std::string const& name) const
 {
     std::map<std::string, PropertyVectorBase*>::const_iterator it(
         _properties.find(name)
     );
-    if (it == _properties.end()) {
-        ERR("A property with the specified name \"%s\" is not available.",
-            name.c_str());
-        return boost::optional<PropertyVector<T> const&>();
-    }
-
-    PropertyVector<T> const* t=dynamic_cast<PropertyVector<T>const*>(it->second);
-    if (!t) {
-        return boost::optional<PropertyVector<T> const&>();
-    }
-    return *t;
-}
-
-template <typename T>
-boost::optional<PropertyVector<T>&>
-Properties::getPropertyVector(std::string const& name)
-{
-    std::map<std::string, PropertyVectorBase*>::iterator it(
-        _properties.find(name)
-    );
-    if (it == _properties.end()) {
+    if (it == _properties.cend()) {
         ERR("A property with the specified name \"%s\" is not available.",
             name.c_str());
         return boost::optional<PropertyVector<T>&>();
