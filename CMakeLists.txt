@@ -282,6 +282,7 @@ if( OGS_BUILD_TESTS AND NOT IS_SUBPROJECT )
     if(OGS_USE_MPI)
         add_subdirectory( SimpleTests/MeshTests/MPI )
     else()
+        add_subdirectory( SimpleTests/MaterialLib )
         add_subdirectory( SimpleTests/MeshTests )
     endif()
 endif() # OGS_BUILD_TESTS
