@@ -38,6 +38,8 @@ void doProcessOutput(std::string const& file_name,
                      std::vector<std::reference_wrapper<ProcessVariable>> const&
                          process_variables,
                      SecondaryVariableCollection secondary_variables,
+                     std::function<std::size_t(MeshLib::PropertyVector<char>&)>
+                         ip_writer,
                      ProcessOutput const& process_output);
 
 } // ProcessLib

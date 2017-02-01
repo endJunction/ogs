@@ -12,6 +12,56 @@
 #include "MeshLib/IO/VtkIO/VtuInterface.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 
+<<<<<<< HEAD
+=======
+namespace
+{
+std::size_t countMeshItems(MeshLib::Mesh const& mesh,
+                           MeshLib::MeshItemType type)
+{
+    switch (type)
+    {
+        case MeshLib::MeshItemType::Cell:
+            return mesh.getNumberOfElements();
+        case MeshLib::MeshItemType::Node:
+            return mesh.getNumberOfNodes();
+        case MeshLib::MeshItemType::IntegrationPoint:
+            return 0;
+        default:
+            break;  // avoid compiler warning
+    }
+    return 0;
+};
+
+template <typename T>
+MeshLib::PropertyVector<T>* getOrCreateMeshProperty(
+    MeshLib::Mesh& mesh, std::string const& property_name,
+    MeshLib::MeshItemType type)
+{
+    // Get or create a property vector for results.
+    MeshLib::PropertyVector<T>* result = nullptr;
+
+    auto const N = countMeshItems(mesh, type);
+
+    if (mesh.getProperties().existsPropertyVector<double>(property_name))
+    {
+        result = mesh.getProperties().template getPropertyVector<T>(
+            property_name);
+    }
+    else
+    {
+        result = mesh.getProperties().template createNewPropertyVector<T>(
+            property_name, type);
+        result->resize(N);
+    }
+    assert(type == MeshLib::MeshItemType::IntegrationPoint ||
+           result && result->size() == N);
+
+    return result;
+};
+}
+
+>>>>>>> [PL] Add IntegrationPoint case for countMeshItems.
 namespace ProcessLib
 {
 
@@ -48,8 +98,6 @@ void doProcessOutput(std::string const& file_name,
                      std::vector<std::reference_wrapper<ProcessVariable>> const&
                          process_variables,
                      SecondaryVariableCollection secondary_variables,
-                     std::function<std::size_t(MeshLib::PropertyVector<char>&)>
-                         ip_writer,
                      ProcessOutput const& process_output)
 {
     DBUG("Process output.");

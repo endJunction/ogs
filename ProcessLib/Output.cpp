@@ -123,7 +123,8 @@ void Output::doOutputAlways(Process const& process,
     doProcessOutput(output_file_name, _output_file_compression, x,
                     process.getMesh(), process.getDOFTable(),
                     process.getProcessVariables(),
-                    process.getSecondaryVariables(), process_output);
+                    process.getSecondaryVariables(),
+                    process.integration_point_writer, process_output);
     spd.pvd_file.addVTUFile(output_file_name, t);
 
     INFO("[time] Output of timestep %d took %g s.", timestep,
@@ -186,7 +187,8 @@ void Output::doOutputNonlinearIteration(Process const& process,
     doProcessOutput(output_file_name, _output_file_compression, x,
                     process.getMesh(), process.getDOFTable(),
                     process.getProcessVariables(),
-                    process.getSecondaryVariables(), process_output);
+                    process.getSecondaryVariables(),
+                    process.integration_point_writer, process_output);
 
     INFO("[time] Output took %g s.", time_output.elapsed());
 }
