@@ -30,6 +30,7 @@ add_library(ProcessLib ${SOURCES})
 target_link_libraries(ProcessLib
     PUBLIC BaseLib GeoLib MaterialLib MathLib MeshLib NumLib logog
     PRIVATE MeshGeoToolsLib
+    ${PROTOBUF_LIBRARIES}
 )
 
 ADD_VTK_DEPENDENCY(ProcessLib)
