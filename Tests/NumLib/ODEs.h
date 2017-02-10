@@ -27,6 +27,8 @@ class ODE1 final : public NumLib::ODESystem<
                        NumLib::NonlinearSolverTag::Newton>
 {
 public:
+    void preAssemble(const double t, GlobalVector const& x) override {}
+
     void assemble(const double /*t*/, GlobalVector const& /*x*/,
                   GlobalMatrix& M, GlobalMatrix& K, GlobalVector& b,
                   ProcessLib::StaggeredCouplingTerm const& /*coupling_term*/
@@ -107,6 +109,8 @@ class ODE2 final : public NumLib::ODESystem<
                        NumLib::NonlinearSolverTag::Newton>
 {
 public:
+    void preAssemble(const double t, GlobalVector const& x) override {}
+
     void assemble(const double /*t*/, GlobalVector const& x, GlobalMatrix& M,
                   GlobalMatrix& K, GlobalVector& b,
                   ProcessLib::StaggeredCouplingTerm const& /*coupling_term*/
@@ -195,6 +199,8 @@ class ODE3 final : public NumLib::ODESystem<
                        NumLib::NonlinearSolverTag::Newton>
 {
 public:
+    void preAssemble(const double t, GlobalVector const& x) override {}
+
     void assemble(const double /*t*/, GlobalVector const& x_curr, GlobalMatrix& M,
                   GlobalMatrix& K, GlobalVector& b,
                   ProcessLib::StaggeredCouplingTerm const& /*coupling_term*/
