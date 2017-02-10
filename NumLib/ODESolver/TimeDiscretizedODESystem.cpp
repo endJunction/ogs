@@ -85,6 +85,7 @@ void TimeDiscretizedODESystem<ODESystemTag::FirstOrderImplicitQuasilinear,
     _b->setZero();
     _Jac->setZero();
 
+    _ode.preAssemble(t, x_curr);
     _ode.assembleWithJacobian(t, x_curr, xdot, dxdot_dx, dx_dx, *_M, *_K, *_b,
                               *_Jac, coupling_term);
 
@@ -188,6 +189,7 @@ void TimeDiscretizedODESystem<ODESystemTag::FirstOrderImplicitQuasilinear,
     _K->setZero();
     _b->setZero();
 
+    _ode.preAssemble(t, x_curr);
     _ode.assemble(t, x_curr, *_M, *_K, *_b, coupling_term);
 
     LinAlg::finalizeAssembly(*_M);
