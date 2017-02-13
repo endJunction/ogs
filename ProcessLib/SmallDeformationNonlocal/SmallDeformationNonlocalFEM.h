@@ -133,8 +133,15 @@ struct IntegrationPointData final
         _sigma_prev = _sigma;
         _material_state_variables->pushBackState();
     }
-};
 
+    std::vector<std::tuple<
+        // element's local assembler
+        SmallDeformationNonlocalLocalAssemblerInterface const* const,
+        int,    // integration point id,
+        double  // distance to current integration point
+        >>
+        non_local_assemblers;
+};
 
 /// Used by for extrapolation of the integration point values. It is ordered
 /// (and stored) by integration points.
@@ -244,11 +251,17 @@ public:
                     la->getIntegrationPointCoordinates(xyz, 0.34);
                 for (auto const& n : neighbor_ip_coords)
                 {
+                    // output
                     std::cout << "\t[" << std::get<0>(n) << ", "
                               << std::get<1>(n) << ", (";
                     for (int i = 0; i < std::get<2>(n).size(); ++i)
                         std::cout << std::get<2>(n)[i] << ", ";
                     std::cout << "), " << std::get<3>(n) << "]\n";
+
+                    // save into current ip
+                    std::cout << _ip_data[ip].non_local_assemblers.size();
+                    _ip_data[ip].non_local_assemblers.push_back(std::make_tuple(
+                        la.get(), std::get<1>(n), std::get<3>(n)));
                 }
             }
         }
