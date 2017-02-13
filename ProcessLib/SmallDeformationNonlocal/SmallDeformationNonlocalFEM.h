@@ -256,6 +256,8 @@ public:
     {
         auto const& N = _secondary_data.N[ip];
 
+        // Copy is unfortunately necessary because the nodes' coordinates are
+        // not linearly stored in memory.
         auto* nodes = _element.getNodes();
         using CoordinatesMatrix =
             typename ShapeMatricesType::GlobalDimNodalMatrixType;
