@@ -137,8 +137,9 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
             SmallDeformationNonlocalLocalAssemblerInterface>> const&
             local_assemblers) = 0;
 
-    virtual Eigen::Vector3d getIntegrationPointCoordinates(
-        int const integration_point) const = 0;
+    virtual std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
+    getIntegrationPointCoordinates(Eigen::Vector3d const& coords,
+                                   double const radius) const = 0;
 };
 
 template <typename ShapeFunction, typename IntegrationMethod,
@@ -226,29 +227,34 @@ public:
         std::cout << "\nXXX";
         std::cout << "nonlocal in element " << _element.getID() << "\n";
 
-        // For all neighbors of element
-        for (std::size_t i = 0; i < _element.getNumberOfNeighbors(); ++i)
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            if (_element.getNeighbor(i) == nullptr)
-                continue;
-
-            auto const& neighbor_id = _element.getNeighbor(i)->getID();
-
-            std::cout << _element.getNeighbor(i)->getID() << "\t";
-
-            auto const& la = *local_assemblers[neighbor_id];
-            std::cout << &la << "\n";
-
-            la.getIntegrationPointCoordinates(0);
+            std::cout << "\n\tip = " << ip << "\n";
+            // For all neighbors of element
+            for (auto const& la : local_assemblers)
+            {
+                auto const xyz = getIPCoords(ip);
+                //std::cout << "Current ip coords : " << xyz << "\n";
+                auto const neighbor_ip_coords =
+                    la->getIntegrationPointCoordinates(xyz, 0.34);
+                for (auto const& n : neighbor_ip_coords)
+                {
+                    std::cout << "\t[" << std::get<0>(n) << ", "
+                              << std::get<1>(n) << ", (";
+                    for (int i = 0; i < std::get<2>(n).size(); ++i)
+                        std::cout << std::get<2>(n)[i] << ", ";
+                    std::cout << "), " << std::get<3>(n) << "]\n";
+                }
+            }
         }
     }
 
-    Eigen::Vector3d getIntegrationPointCoordinates(
-        int const integration_point) const override
+    Eigen::Vector3d getIPCoords(int ip) const
     {
-        std::cout << _element.getID() << ", " << integration_point;
-
-        auto const& N = _secondary_data.N[integration_point];
+        auto const& N = _secondary_data.N[ip];
 
         auto* nodes = _element.getNodes();
         using CoordinatesMatrix =
@@ -263,8 +269,34 @@ public:
         }
 
         Eigen::VectorXd xyz = node_coordinates * N.transpose();
-        std::cout << " xyz = " << xyz << "\n";
+        //std::cout << " xyz = " << xyz << "\n";
         return xyz;
+    }
+
+    // element, ip, coords, distance
+    std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
+    getIntegrationPointCoordinates(Eigen::Vector3d const& coords,
+                                   double const radius) const override
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        std::vector<std::tuple<int, int, Eigen::Vector3d, double>> result;
+        result.reserve(n_integration_points);
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            std::cout << _element.getID() << ", " << ip << "\n";
+
+            auto const xyz = getIPCoords(ip);
+            double const distance2 = (xyz - coords).squaredNorm();
+            if (distance2 < radius * radius)
+                result.emplace_back(
+                    _element.getID(), ip, xyz, std::sqrt(distance2));
+        }
+        std::cout << "for element " << _element.getID() << " got "
+                  << result.size() << " point in radius\n";
+        return result;
     }
 
     void assemble(double const /*t*/, std::vector<double> const& /*local_x*/,
