@@ -136,6 +136,9 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
         std::vector<std::unique_ptr<
             SmallDeformationNonlocalLocalAssemblerInterface>> const&
             local_assemblers) = 0;
+
+    virtual Eigen::Vector3d getIntegrationPointCoordinates(
+        int const integration_point) const = 0;
 };
 
 template <typename ShapeFunction, typename IntegrationMethod,
@@ -232,13 +235,36 @@ public:
             auto const& neighbor_id = _element.getNeighbor(i)->getID();
 
             std::cout << _element.getNeighbor(i)->getID() << "\t";
-            std::cout << local_assemblers[neighbor_id].get() << "\n";
+
+            auto const& la = *local_assemblers[neighbor_id];
+            std::cout << &la << "\n";
+
+            la.getIntegrationPointCoordinates(0);
         }
     }
 
-    char getIntegrationPointCoordinates(int const i) const
+    Eigen::Vector3d getIntegrationPointCoordinates(
+        int const integration_point) const override
     {
-        return ip
+        std::cout << _element.getID() << ", " << integration_point;
+
+        auto const& N = _secondary_data.N[integration_point];
+
+        auto* nodes = _element.getNodes();
+        using CoordinatesMatrix =
+            typename ShapeMatricesType::GlobalDimNodalMatrixType;
+        CoordinatesMatrix node_coordinates(3, N.size());
+        for (int dim = 0; dim < 3; ++dim)
+        {
+            for (int i = 0; i < N.size(); ++i)
+            {
+                node_coordinates(dim, i) = (*nodes[i])[dim];
+            }
+        }
+
+        Eigen::VectorXd xyz = node_coordinates * N.transpose();
+        std::cout << " xyz = " << xyz << "\n";
+        return xyz;
     }
 
     void assemble(double const /*t*/, std::vector<double> const& /*local_x*/,
