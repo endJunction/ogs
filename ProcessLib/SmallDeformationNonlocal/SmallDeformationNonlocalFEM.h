@@ -250,8 +250,17 @@ public:
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
+        //
+        // For every integration point in this element collect the neighbouring
+        // integration points falling in given radius (internal length) and
+        // compute the alpha_kl weight.
+        //
         for (unsigned k = 0; k < n_integration_points; k++)
         {
+            //
+            // Collect the integration points.
+            //
+
             //std::cout << "\n\tip = " << k << "\n";
             // For all neighbors of element
             for (auto const& la : local_assemblers)
@@ -276,10 +285,11 @@ public:
                                     std::numeric_limits<double>::quiet_NaN()));
                 }
             }
-        }
 
-        for (unsigned k = 0; k < n_integration_points; k++)
-        {
+            //
+            // Calculate alpha_kl =
+            //       alpha_0(|x_k - x_l|) / int_{m \in ip} alpha_0(|x_k - x_m|)
+            //
             for (auto& tuple : _ip_data[k].non_local_assemblers)
             {
                 auto const& la_l =
