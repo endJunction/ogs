@@ -244,8 +244,8 @@ public:
                       SmallDeformationNonlocalLocalAssemblerInterface>> const&
                       local_assemblers) override
     {
-        std::cout << "\nXXX";
-        std::cout << "nonlocal in element " << _element.getID() << "\n";
+        //std::cout << "\nXXX";
+        //std::cout << "nonlocal in element " << _element.getID() << "\n";
 
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -291,9 +291,9 @@ public:
                 int const l = std::get<1>(tuple);
                 double const distance2_l = std::get<2>(tuple);
 
-                std::cout << "Compute a_kl for k = " << k << " and l = ("
-                          << l_ele << ", " << l
-                          << "); distance^2_l = " << distance2_l << "\n";
+                //std::cout << "Compute a_kl for k = " << k << " and l = ("
+                //          << l_ele << ", " << l
+                //          << "); distance^2_l = " << distance2_l << "\n";
 
                 double a_k_sum_m = 0;
                 for (auto const& tuple_m : _ip_data[k].non_local_assemblers)
@@ -316,18 +316,18 @@ public:
 
                     a_k_sum_m += w_m * detJ_m * integralMeasure_m *
                                  alpha_0(distance2_m, 0.34);
-                    std::cout
-                        << "\tCompute sum_a_km for k = " << k << " and m = ("
-                        << m_ele << ", " << m
-                        << "); distance^2_m = " << distance2_m
-                        << "alpha_0(d^2_m, 0.34) = " << alpha_0(distance2_m, 0.34)
-                        << "; sum_alpha_km = " << a_k_sum_m << "\n";
+                    //std::cout
+                    //    << "\tCompute sum_a_km for k = " << k << " and m = ("
+                    //    << m_ele << ", " << m
+                    //    << "); distance^2_m = " << distance2_m
+                    //    << "alpha_0(d^2_m, 0.34) = " << alpha_0(distance2_m, 0.34)
+                    //    << "; sum_alpha_km = " << a_k_sum_m << "\n";
                 }
                 double const a_kl = alpha_0(distance2_l, 0.34) / a_k_sum_m;
 
-                std::cout << "alpha_0(d^2_l, 0.34) = " << alpha_0(distance2_l, 0.34)
-                          << "\n";
-                std::cout << "alpha_kl = " << a_kl << "done\n";
+                //std::cout << "alpha_0(d^2_l, 0.34) = " << alpha_0(distance2_l, 0.34)
+                //          << "\n";
+                //std::cout << "alpha_kl = " << a_kl << "done\n";
                 std::get<3>(tuple) = a_kl;
             }
         }
