@@ -456,7 +456,7 @@ public:
                     test_alpha +=
                         a_kl * detJ * wp.getWeight() * integralMeasure;
                 }
-                assert(std::abs(test_alpha - 1) < 2.5e-15);
+                assert(std::abs(test_alpha - 1) < 2.7e-15);
             }
         }
     }
