@@ -340,19 +340,15 @@ public:
 
         // Copy is unfortunately necessary because the nodes' coordinates are
         // not linearly stored in memory.
+        Eigen::Vector3d xyz;
         auto* nodes = _element.getNodes();
-        using CoordinatesMatrix =
-            typename ShapeMatricesType::GlobalDimNodalMatrixType;
-        CoordinatesMatrix node_coordinates(3, N.size());
-        for (int dim = 0; dim < 3; ++dim)
+        for (int i = 0; i < N.size(); ++i)
         {
-            for (int i = 0; i < N.size(); ++i)
-            {
-                node_coordinates(dim, i) = (*nodes[i])[dim];
-            }
+            Eigen::Map<Eigen::Vector3d const> node_coordinates{
+                nodes[i]->getCoords(), 3};
+            xyz += node_coordinates * N[i];
         }
 
-        Eigen::VectorXd xyz = node_coordinates * N.transpose();
         //std::cout << " xyz = " << xyz << "\n";
         return xyz;
     }
