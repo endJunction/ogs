@@ -139,7 +139,7 @@ struct IntegrationPointData final
         // element's local assembler
         SmallDeformationNonlocalLocalAssemblerInterface const* const,
         int,     // integration point id,
-        double,  // distance to current integration point
+        double,  // squared distance to current integration point
         double   // alpha_kl
         >>
         non_local_assemblers;
@@ -230,16 +230,13 @@ public:
         }
     }
 
-    double alpha_0(double const distance, double const internal_length) const
+    double alpha_0(double const distance2, double const internal_length) const
     {
-        return (distance > internal_length)
+        double const internal_length2 = internal_length * internal_length;
+        return (distance2 > internal_length2)
                    ? 0
-                   : (1 -
-                      distance * distance /
-                          (internal_length * internal_length)) *
-                         (1 -
-                          distance * distance /
-                              (internal_length * internal_length));
+                   : (1 - distance2 / (internal_length2)) *
+                         (1 - distance2 / (internal_length2));
     }
 
     void nonlocal(std::size_t const mesh_item_id,
@@ -292,11 +289,11 @@ public:
 
                 int const l_ele = la_l._element.getID();
                 int const l = std::get<1>(tuple);
-                double const distance_l = std::get<2>(tuple);
+                double const distance2_l = std::get<2>(tuple);
 
                 std::cout << "Compute a_kl for k = " << k << " and l = ("
                           << l_ele << ", " << l
-                          << "); distance_l = " << distance_l << "\n";
+                          << "); distance^2_l = " << distance2_l << "\n";
 
                 double a_k_sum_m = 0;
                 for (auto const& tuple_m : _ip_data[k].non_local_assemblers)
@@ -308,7 +305,7 @@ public:
 
                     int const m_ele = la_m._element.getID();
                     int const m = std::get<1>(tuple_m);
-                    double const distance_m = std::get<2>(tuple_m);
+                    double const distance2_m = std::get<2>(tuple_m);
 
                     auto const& w_m =
                         la_m._integration_method.getWeightedPoint(m)
@@ -318,17 +315,17 @@ public:
                         la_m._ip_data[m]._integralMeasure;
 
                     a_k_sum_m += w_m * detJ_m * integralMeasure_m *
-                                 alpha_0(distance_m, 0.34);
+                                 alpha_0(distance2_m, 0.34);
                     std::cout
                         << "\tCompute sum_a_km for k = " << k << " and m = ("
                         << m_ele << ", " << m
-                        << "); distance_m = " << distance_m
-                        << "alpha_0(d_m, 0.34) = " << alpha_0(distance_m, 0.34)
+                        << "); distance^2_m = " << distance2_m
+                        << "alpha_0(d^2_m, 0.34) = " << alpha_0(distance2_m, 0.34)
                         << "; sum_alpha_km = " << a_k_sum_m << "\n";
                 }
-                double const a_kl = alpha_0(distance_l, 0.34) / a_k_sum_m;
+                double const a_kl = alpha_0(distance2_l, 0.34) / a_k_sum_m;
 
-                std::cout << "alpha_0(d_l, 0.34) = " << alpha_0(distance_l, 0.34)
+                std::cout << "alpha_0(d^2_l, 0.34) = " << alpha_0(distance2_l, 0.34)
                           << "\n";
                 std::cout << "alpha_kl = " << a_kl << "done\n";
                 std::get<3>(tuple) = a_kl;
@@ -360,7 +357,7 @@ public:
         return xyz;
     }
 
-    // element, ip, coords, distance
+    // element, ip, coords, distance^2
     std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
     getIntegrationPointCoordinates(Eigen::Vector3d const& coords,
                                    double const internal_length) const override
@@ -378,8 +375,7 @@ public:
             auto const xyz = getIPCoords(ip);
             double const distance2 = (xyz - coords).squaredNorm();
             if (distance2 < internal_length * internal_length)
-                result.emplace_back(_element.getID(), ip, xyz,
-                                    std::sqrt(distance2));
+                result.emplace_back(_element.getID(), ip, xyz, distance2);
         }
         //std::cout << "for element " << _element.getID() << " got "
         //          << result.size() << " point in internal_length\n";
@@ -460,7 +456,7 @@ public:
                     test_alpha +=
                         a_kl * detJ * wp.getWeight() * integralMeasure;
                 }
-                std::cout << "AAAA " << test_alpha << "\n";
+                assert(std::abs(test_alpha - 1) < 2.5e-15);
             }
         }
     }
