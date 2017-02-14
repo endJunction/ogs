@@ -256,7 +256,7 @@ public:
             // For all neighbors of element
             for (auto const& la : local_assemblers)
             {
-                auto const xyz = getIPCoords(k);
+                auto const xyz = getSingleIntegrationPointCoordinates(k);
                 // std::cout << "Current ip_k coords : " << xyz << "\n";
                 auto const neighbor_ip_coords =
                     la->getIntegrationPointCoordinates(xyz, 0.34);
@@ -334,9 +334,10 @@ public:
 
     }
 
-    Eigen::Vector3d getIPCoords(int ip) const
+    Eigen::Vector3d getSingleIntegrationPointCoordinates(
+        int integration_point) const
     {
-        auto const& N = _secondary_data.N[ip];
+        auto const& N = _secondary_data.N[integration_point];
 
         // Copy is unfortunately necessary because the nodes' coordinates are
         // not linearly stored in memory.
@@ -368,7 +369,7 @@ public:
         {
             //std::cout << _element.getID() << ", " << ip << "\n";
 
-            auto const xyz = getIPCoords(ip);
+            auto const xyz = getSingleIntegrationPointCoordinates(ip);
             double const distance2 = (xyz - coords).squaredNorm();
             if (distance2 < internal_length * internal_length)
                 result.emplace_back(_element.getID(), ip, xyz, distance2);
