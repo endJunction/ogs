@@ -292,13 +292,13 @@ public:
             //
             for (auto& tuple : _ip_data[k].non_local_assemblers)
             {
-                auto const& la_l =
-                    *static_cast<SmallDeformationNonlocalLocalAssembler<
-                        ShapeFunction, IntegrationMethod,
-                        DisplacementDim> const* const>(std::get<0>(tuple));
+                //auto const& la_l =
+                //    *static_cast<SmallDeformationNonlocalLocalAssembler<
+                //        ShapeFunction, IntegrationMethod,
+                //        DisplacementDim> const* const>(std::get<0>(tuple));
 
-                int const l_ele = la_l._element.getID();
-                int const l = std::get<1>(tuple);
+                //int const l_ele = la_l._element.getID();
+                //int const l = std::get<1>(tuple);
                 double const distance2_l = std::get<2>(tuple);
 
                 //std::cout << "Compute a_kl for k = " << k << " and l = ("
@@ -313,7 +313,7 @@ public:
                             ShapeFunction, IntegrationMethod,
                             DisplacementDim> const* const>(std::get<0>(tuple_m));
 
-                    int const m_ele = la_m._element.getID();
+                    //int const m_ele = la_m._element.getID();
                     int const m = std::get<1>(tuple_m);
                     double const distance2_m = std::get<2>(tuple_m);
 
@@ -399,6 +399,46 @@ public:
             "implemented.");
     }
 
+    void preAssemble(double const t,
+                     std::vector<double> const& local_x) override
+    {
+        //auto const local_matrix_size = local_x.size();
+
+        //auto local_Jac = MathLib::createZeroedMatrix<StiffnessMatrixType>(
+        //    local_Jac_data, local_matrix_size, local_matrix_size);
+
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        SpatialPosition x_position;
+        x_position.setElementID(_element.getID());
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            x_position.setIntegrationPoint(ip);
+
+            auto const& B = _ip_data[ip]._b_matrices;
+            auto const& eps_prev = _ip_data[ip]._eps_prev;
+            auto const& sigma_prev = _ip_data[ip]._sigma_prev;
+
+            auto& eps = _ip_data[ip]._eps;
+            auto& sigma = _ip_data[ip]._sigma;
+            auto& C = _ip_data[ip]._C;
+            auto& material_state_variables =
+                *_ip_data[ip]._material_state_variables;
+
+            eps.noalias() =
+                B *
+                Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
+                    local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
+
+            if (!_ip_data[ip]._solid_material.computeConstitutiveRelation(
+                    t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
+                    sigma, C, material_state_variables))
+                OGS_FATAL("Computation of local constitutive relation failed.");
+        }
+    }
+
     void assembleWithJacobian(double const t,
                               std::vector<double> const& local_x,
                               std::vector<double> const& /*local_xdot*/,
@@ -430,30 +470,38 @@ public:
             auto const& integralMeasure = _ip_data[ip]._integralMeasure;
 
             auto const& B = _ip_data[ip]._b_matrices;
-            auto const& eps_prev = _ip_data[ip]._eps_prev;
-            auto const& sigma_prev = _ip_data[ip]._sigma_prev;
+            //auto const& eps_prev = _ip_data[ip]._eps_prev;
+            //auto const& sigma_prev = _ip_data[ip]._sigma_prev;
 
             auto& eps = _ip_data[ip]._eps;
             auto& sigma = _ip_data[ip]._sigma;
             auto& C = _ip_data[ip]._C;
-            auto& material_state_variables =
-                *_ip_data[ip]._material_state_variables;
+            //auto& material_state_variables =
+            //    *_ip_data[ip]._material_state_variables;
 
             eps.noalias() =
                 B *
                 Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
                     local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
 
-            if (!_ip_data[ip]._solid_material.computeConstitutiveRelation(
+            /*
+            if (!_ip_data[ip]._solid_material.updateNonlocalDamage(
                     t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
                     sigma, C, material_state_variables))
-                OGS_FATAL("Computation of local constitutive relation failed.");
+                OGS_FATAL("Computation of non-local damage update failed.");
+            */
 
-            local_b.noalias() -=
-                B.transpose() * sigma * detJ * wp.getWeight() * integralMeasure;
-            local_Jac.noalias() +=
-                B.transpose() * C * B * detJ * wp.getWeight() * integralMeasure;
+            {  // Integrate one-function.
+                double test_alpha = 0;
 
+                for (auto const& tuple : _ip_data[ip].non_local_assemblers)
+                {
+                    double const a_kl = std::get<3>(tuple);
+                    test_alpha +=
+                        a_kl * detJ * wp.getWeight() * integralMeasure;
+                }
+                assert(std::abs(test_alpha - 1) < 2.7e-15);
+            }
             {
                 double test_alpha = 0;
 
@@ -465,6 +513,12 @@ public:
                 }
                 assert(std::abs(test_alpha - 1) < 2.7e-15);
             }
+
+            local_b.noalias() -=
+                B.transpose() * sigma * detJ * wp.getWeight() * integralMeasure;
+            local_Jac.noalias() +=
+                B.transpose() * C * B * detJ * wp.getWeight() * integralMeasure;
+
         }
     }
 

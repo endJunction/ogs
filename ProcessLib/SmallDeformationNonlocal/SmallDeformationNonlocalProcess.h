@@ -172,6 +172,18 @@ private:
             coupling_term);
     }
 
+    void preAssembleConcreteProcess(const double t,
+                                    GlobalVector const& x) override
+    {
+        DBUG("preAssemble SmallDeformationNonlocalProcess.");
+
+        // Call global assembler for each local assembly item.
+        GlobalExecutor::executeMemberDereferenced(
+            _global_assembler,
+            &VectorMatrixAssembler::preAssemble,
+            _local_assemblers, *_local_to_global_index_map, t, x);
+    }
+
     void assembleWithJacobianConcreteProcess(
         const double t, GlobalVector const& x, GlobalVector const& xdot,
         const double dxdot_dx, const double dx_dx, GlobalMatrix& M,
