@@ -9,6 +9,8 @@ APPEND_SOURCE_FILES(SOURCES GroundwaterFlow)
 APPEND_SOURCE_FILES(SOURCES HeatConduction)
 APPEND_SOURCE_FILES(SOURCES HT)
 APPEND_SOURCE_FILES(SOURCES HydroMechanics)
+if(Protobuf_FOUND)
+endif() # Protobuf_FOUND
 APPEND_SOURCE_FILES(SOURCES LIE/BoundaryCondition)
 APPEND_SOURCE_FILES(SOURCES LIE/Common)
 APPEND_SOURCE_FILES(SOURCES LIE/HydroMechanics)
@@ -19,9 +21,11 @@ APPEND_SOURCE_FILES(SOURCES LiquidFlow)
 APPEND_SOURCE_FILES(SOURCES Parameter)
 APPEND_SOURCE_FILES(SOURCES RichardsFlow)
 
+if(Protobuf_FOUND)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS SmallDeformation/integration_point.proto)
 list(APPEND SOURCES ${PROTO_SRCS} ${PROTO_HDRS})
+endif() # Protobuf_FOUND
 
 APPEND_SOURCE_FILES(SOURCES SmallDeformation)
 APPEND_SOURCE_FILES(SOURCES SmallDeformationNonlocal)
@@ -35,8 +39,11 @@ add_library(ProcessLib ${SOURCES})
 target_link_libraries(ProcessLib
     PUBLIC BaseLib GeoLib MaterialLib MathLib MeshLib NumLib logog
     PRIVATE MeshGeoToolsLib
-    ${PROTOBUF_LIBRARIES}
 )
+
+if(Protobuf_FOUND)
+    target_link_libraries(ProcessLib ${PROTOBUF_LIBRARIES})
+endif() # Protobuf_FOUND
 
 ADD_VTK_DEPENDENCY(ProcessLib)
 
