@@ -395,9 +395,19 @@ public:
 
                 for (auto const& tuple : _ip_data[ip].non_local_assemblers)
                 {
+                    // Get damage from the local assembler and its corresponding
+                    // integration point l.
+                    int const& l = std::get<1>(tuple);
+                    double const d =
+                        static_cast<SmallDeformationNonlocalLocalAssembler<
+                            ShapeFunction, IntegrationMethod,
+                            DisplacementDim> const* const>(std::get<0>(tuple))
+                            ->_ip_data[l]
+                            .getDamage();
                     double const a_kl = std::get<3>(tuple);
+
                     test_alpha +=
-                        a_kl * detJ * wp.getWeight() * integralMeasure;
+                        a_kl * d * detJ * wp.getWeight() * integralMeasure;
                 }
                 assert(std::abs(test_alpha - 1) < 2.7e-15);
             }
