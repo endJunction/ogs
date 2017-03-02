@@ -17,16 +17,15 @@
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/Lubby2.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
-#include "NumLib/Extrapolation/ExtrapolatableElement.h"
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
 #include "ProcessLib/Deformation/BMatrixPolicy.h"
 #include "ProcessLib/Deformation/LinearBMatrix.h"
-#include "ProcessLib/LocalAssemblerInterface.h"
 #include "ProcessLib/LocalAssemblerTraits.h"
 #include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
 
+#include "LocalAssemblerInterface.h"
 #include "SmallDeformationNonlocalProcessData.h"
 
 namespace ProcessLib
@@ -34,57 +33,6 @@ namespace ProcessLib
 namespace SmallDeformationNonlocal
 {
 
-
-struct SmallDeformationNonlocalLocalAssemblerInterface
-    : public ProcessLib::LocalAssemblerInterface,
-      public NumLib::ExtrapolatableElement
-{
-    virtual std::vector<double> const& getIntPtSigmaXX(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtSigmaYY(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtSigmaZZ(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtSigmaXY(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtSigmaXZ(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtSigmaYZ(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtEpsilonXX(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtEpsilonYY(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtEpsilonZZ(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtEpsilonXY(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtEpsilonXZ(
-        std::vector<double>& cache) const = 0;
-
-    virtual std::vector<double> const& getIntPtEpsilonYZ(
-        std::vector<double>& cache) const = 0;
-
-    virtual void nonlocal(
-        std::size_t const mesh_item_id,
-        std::vector<std::unique_ptr<
-            SmallDeformationNonlocalLocalAssemblerInterface>> const&
-            local_assemblers) = 0;
-
-    virtual std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
-    getIntegrationPointCoordinates(Eigen::Vector3d const& coords,
-                                   double const internal_length) const = 0;
-};
 
 template <typename BMatricesType, int DisplacementDim>
 struct IntegrationPointData final
