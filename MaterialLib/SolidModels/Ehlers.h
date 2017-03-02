@@ -161,6 +161,11 @@ public:
             lambda = 0;
         }
 
+        double getDamage() const override
+        {
+            return damage;
+        }
+
         using KelvinVector = ProcessLib::KelvinVectorType<DisplacementDim>;
 
         KelvinVector eps_p_D;  ///< deviatoric plastic strain
