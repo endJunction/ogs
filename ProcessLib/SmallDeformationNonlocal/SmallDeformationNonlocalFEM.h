@@ -129,7 +129,7 @@ public:
                          (1 - distance2 / (internal_length2));
     }
 
-    void nonlocal(std::size_t const mesh_item_id,
+    void nonlocal(std::size_t const /*mesh_item_id*/,
                   std::vector<std::unique_ptr<
                       SmallDeformationNonlocalLocalAssemblerInterface>> const&
                       local_assemblers) override
@@ -329,7 +329,7 @@ public:
         }
     }
 
-    void assembleWithJacobian(double const t,
+    void assembleWithJacobian(double const /*t*/,
                               std::vector<double> const& local_x,
                               std::vector<double> const& /*local_xdot*/,
                               const double /*dxdot_dx*/, const double /*dx_dx*/,
