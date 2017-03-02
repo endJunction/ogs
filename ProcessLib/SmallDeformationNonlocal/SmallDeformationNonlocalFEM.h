@@ -238,9 +238,7 @@ public:
     {
         auto const& N = _secondary_data.N[integration_point];
 
-        // Copy is unfortunately necessary because the nodes' coordinates are
-        // not linearly stored in memory.
-        Eigen::Vector3d xyz;
+        Eigen::Vector3d xyz;    // Resulting coordinates
         auto* nodes = _element.getNodes();
         for (int i = 0; i < N.size(); ++i)
         {
@@ -253,7 +251,9 @@ public:
         return xyz;
     }
 
-    // element, ip, coords, distance^2
+    /// \returns for each of the current element's integration points the
+    /// element's id, the integration point number, its coordinates, and the
+    /// squared distance from the current integration point.
     std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
     getIntegrationPointCoordinates(Eigen::Vector3d const& coords,
                                    double const internal_length) const override
