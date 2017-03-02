@@ -63,6 +63,11 @@ struct IntegrationPointData final
         _material_state_variables->pushBackState();
     }
 
+    double getDamage() const
+    {
+        return _material_state_variables->getDamage();
+    }
+
     std::vector<std::tuple<
         // element's local assembler
         SmallDeformationNonlocalLocalAssemblerInterface const* const,
