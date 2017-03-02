@@ -60,9 +60,10 @@ public:
     using NodalDisplacementVectorType =
         typename BMatricesType::NodalForceVectorType;
 
-    SmallDeformationNonlocalLocalAssembler(SmallDeformationNonlocalLocalAssembler const&) =
-        delete;
-    SmallDeformationNonlocalLocalAssembler(SmallDeformationNonlocalLocalAssembler&&) = delete;
+    SmallDeformationNonlocalLocalAssembler(
+        SmallDeformationNonlocalLocalAssembler const&) = delete;
+    SmallDeformationNonlocalLocalAssembler(
+        SmallDeformationNonlocalLocalAssembler&&) = delete;
 
     SmallDeformationNonlocalLocalAssembler(
         MeshLib::Element const& e,
@@ -170,7 +171,7 @@ public:
                     //std::cout << _ip_data[k].non_local_assemblers.size();
                     _ip_data[k].non_local_assemblers.push_back(std::make_tuple(
                         la.get(), std::get<1>(n), std::get<3>(n),
-                                    std::numeric_limits<double>::quiet_NaN()));
+                        std::numeric_limits<double>::quiet_NaN()));
                 }
             }
 
@@ -416,7 +417,6 @@ public:
                 B.transpose() * sigma * detJ * wp.getWeight() * integralMeasure;
             local_Jac.noalias() +=
                 B.transpose() * C * B * detJ * wp.getWeight() * integralMeasure;
-
         }
     }
 
@@ -525,10 +525,11 @@ private:
         cache.clear();
         cache.reserve(_ip_data.size());
 
-        for (auto const& ip_data : _ip_data) {
+        for (auto const& ip_data : _ip_data)
+        {
             if (component < 3)  // xx, yy, zz components
                 cache.push_back(ip_data._sigma[component]);
-            else    // mixed xy, yz, xz components
+            else  // mixed xy, yz, xz components
                 cache.push_back(ip_data._sigma[component] / std::sqrt(2));
         }
 
@@ -541,13 +542,13 @@ private:
         cache.clear();
         cache.reserve(_ip_data.size());
 
-        for (auto const& ip_data : _ip_data) {
+        for (auto const& ip_data : _ip_data)
+        {
             cache.push_back(ip_data._eps[component]);
         }
 
         return cache;
     }
-
 
     SmallDeformationNonlocalProcessData<DisplacementDim>& _process_data;
 
@@ -564,8 +565,8 @@ private:
 template <typename ShapeFunction, typename IntegrationMethod,
           unsigned GlobalDim, int DisplacementDim>
 class LocalAssemblerData final
-    : public SmallDeformationNonlocalLocalAssembler<ShapeFunction, IntegrationMethod,
-                                            DisplacementDim>
+    : public SmallDeformationNonlocalLocalAssembler<
+          ShapeFunction, IntegrationMethod, DisplacementDim>
 {
 public:
     LocalAssemblerData(LocalAssemblerData const&) = delete;
@@ -577,8 +578,8 @@ public:
         bool is_axially_symmetric,
         unsigned const integration_order,
         SmallDeformationNonlocalProcessData<DisplacementDim>& process_data)
-        : SmallDeformationNonlocalLocalAssembler<ShapeFunction, IntegrationMethod,
-                                         DisplacementDim>(
+        : SmallDeformationNonlocalLocalAssembler<
+              ShapeFunction, IntegrationMethod, DisplacementDim>(
               e, local_matrix_size, is_axially_symmetric, integration_order,
               process_data)
     {
