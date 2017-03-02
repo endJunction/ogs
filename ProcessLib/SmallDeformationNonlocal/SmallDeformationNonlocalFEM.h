@@ -392,7 +392,7 @@ public:
                 assert(std::abs(test_alpha - 1) < 2.7e-15);
             }
             {
-                double test_alpha = 0;
+                double nonlocal_damage = 0;
 
                 for (auto const& tuple : _ip_data[ip].non_local_assemblers)
                 {
@@ -405,12 +405,14 @@ public:
                             DisplacementDim> const* const>(std::get<0>(tuple))
                             ->_ip_data[l]
                             .getDamage();
+                    std::cerr << d << "\n";
                     double const a_kl = std::get<3>(tuple);
 
-                    test_alpha +=
+                    nonlocal_damage +=
                         a_kl * d * detJ * wp.getWeight() * integralMeasure;
                 }
-                assert(std::abs(test_alpha - 1) < 2.7e-15);
+                std::cerr << "XX " << nonlocal_damage << "\n\n";
+                assert(std::abs(nonlocal_damage - 1) < 2.7e-15);
             }
 
             local_b.noalias() -=
