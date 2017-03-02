@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "LocalAssemblerInterface.h"
+
 namespace ProcessLib
 {
 namespace SmallDeformationNonlocal
