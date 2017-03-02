@@ -25,16 +25,14 @@
 #include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
 
+#include "IntegrationPointData.h"
 #include "LocalAssemblerInterface.h"
 #include "SmallDeformationNonlocalProcessData.h"
-#include "IntegrationPointData.h"
 
 namespace ProcessLib
 {
 namespace SmallDeformationNonlocal
 {
-
-
 /// Used by for extrapolation of the integration point values. It is ordered
 /// (and stored) by integration points.
 template <typename ShapeMatrixType>
