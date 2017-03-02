@@ -35,8 +35,8 @@ class LocalAssemblerInterface
 public:
     virtual ~LocalAssemblerInterface() = default;
 
-    virtual void preAssemble(double const t,
-                             std::vector<double> const& local_x){};
+    virtual void preAssemble(double const /*t*/,
+                             std::vector<double> const& /*local_x*/){};
 
     virtual void assemble(
         double const t, std::vector<double> const& local_x,
