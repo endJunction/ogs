@@ -40,7 +40,7 @@ struct MechanicsBase
     {
         virtual ~MaterialStateVariables() = default;
         virtual void pushBackState() = 0;
-        virtual double getDamage() const { return 0; }
+        virtual double getLocalVariable() const { return 0; }
     };
 
     /// Polymorphic creator for MaterialStateVariables objects specific for a
