@@ -70,6 +70,8 @@ public:
 
     MathLib::MatrixSpecifications getMatrixSpecifications() const final;
 
+    void preAssemble(const double t, GlobalVector const& x) override final;
+
     void assemble(const double t, GlobalVector const& x, GlobalMatrix& M,
                   GlobalMatrix& K, GlobalVector& b,
                   StaggeredCouplingTerm const& coupling_term) final;
