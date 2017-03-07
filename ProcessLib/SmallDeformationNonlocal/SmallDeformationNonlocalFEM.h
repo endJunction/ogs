@@ -415,10 +415,10 @@ public:
                 }
                 std::cerr << "XX " << nonlocal_kappa_d << "\n\n";
 
-                double const damage =
+                _ip_data[ip]._damage =
                     _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
 
-                sigma = sigma * (1 - damage);
+                sigma = sigma * (1 - _ip_data[ip]._damage);
             }
 
             local_b.noalias() -=
@@ -448,6 +448,20 @@ public:
 
         // assumes N is stored contiguously in memory
         return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
+    }
+
+    std::vector<double> const& getIntPtDamage(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            cache.push_back(ip_data._damage);
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtSigmaXX(

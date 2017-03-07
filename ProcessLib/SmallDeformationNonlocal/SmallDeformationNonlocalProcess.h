@@ -79,6 +79,12 @@ private:
                 NumLib::ComponentOrder::BY_LOCATION));
 
         Base::_secondary_variables.addSecondaryVariable(
+            "damage", 1,
+            makeExtrapolator(
+                getExtrapolator(), _local_assemblers,
+                &SmallDeformationNonlocalLocalAssemblerInterface::getIntPtDamage));
+
+        Base::_secondary_variables.addSecondaryVariable(
             "sigma_xx", 1,
             makeExtrapolator(
                 getExtrapolator(), _local_assemblers,

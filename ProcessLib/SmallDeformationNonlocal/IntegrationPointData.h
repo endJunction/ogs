@@ -48,6 +48,7 @@ struct IntegrationPointData final
     typename BMatricesType::BMatrixType _b_matrices;
     typename BMatricesType::KelvinVectorType _sigma, _sigma_prev;
     typename BMatricesType::KelvinVectorType _eps, _eps_prev;
+    double _damage = 0;
 
     MaterialLib::Solids::MechanicsBase<DisplacementDim>& _solid_material;
     std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
