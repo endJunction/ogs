@@ -199,6 +199,7 @@ public:
             return os;
         }
 #endif  // NDEBUG
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     };
 
     std::unique_ptr<
