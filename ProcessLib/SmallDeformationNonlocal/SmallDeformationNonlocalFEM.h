@@ -407,16 +407,17 @@ public:
                             DisplacementDim> const* const>(std::get<0>(tuple))
                             ->_ip_data[l]
                             .getLocalVariable();
-                    std::cerr << kappa_d << "\n";
+                    //std::cerr << kappa_d << "\n";
                     double const a_kl = std::get<3>(tuple);
 
                     nonlocal_kappa_d += a_kl * kappa_d * detJ * wp.getWeight() *
                                         integralMeasure;
                 }
-                std::cerr << "XX " << nonlocal_kappa_d << "\n\n";
+                //std::cerr << "XX " << nonlocal_kappa_d << "\n";
 
                 _ip_data[ip]._damage =
                     _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
+                //std::cerr << "DD " << damage << "\n\n";
 
                 sigma = sigma * (1 - _ip_data[ip]._damage);
             }
