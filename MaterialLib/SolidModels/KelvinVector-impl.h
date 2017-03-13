@@ -15,8 +15,7 @@ template <int KelvinVectorSize>
 double Invariants<KelvinVectorSize>::equivalentStress(
     Eigen::Matrix<double, KelvinVectorSize, 1> const& deviatoric_v)
 {
-    assert(std::abs(trace(deviatoric_v)) <
-           std::numeric_limits<double>::epsilon() * 100);
+    assert(std::abs(trace(deviatoric_v)) < 1e-12);
     return std::sqrt(3 * J2(deviatoric_v));
 }
 
@@ -24,8 +23,7 @@ template <int KelvinVectorSize>
 double Invariants<KelvinVectorSize>::J2(
     Eigen::Matrix<double, KelvinVectorSize, 1> const& deviatoric_v)
 {
-    assert(std::abs(trace(deviatoric_v)) <
-           std::numeric_limits<double>::epsilon() * 100);
+    assert(std::abs(trace(deviatoric_v)) < 1e-12);
     return 0.5 * deviatoric_v.transpose() * deviatoric_v;
 }
 
@@ -35,8 +33,7 @@ template <int KelvinVectorSize>
 double Invariants<KelvinVectorSize>::J3(
     Eigen::Matrix<double, KelvinVectorSize, 1> const& deviatoric_v)
 {
-    assert(std::abs(trace(deviatoric_v)) <
-           std::numeric_limits<double>::epsilon() * 100);
+    assert(std::abs(trace(deviatoric_v)) < 1e-12);
     return determinant(deviatoric_v);
 }
 
