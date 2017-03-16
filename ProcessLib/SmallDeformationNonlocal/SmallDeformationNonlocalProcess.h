@@ -11,6 +11,7 @@
 
 #include <cassert>
 
+#include "NumLib/DOF/DOFTableUtil.h"
 #include "ProcessLib/Process.h"
 #include "ProcessLib/SmallDeformationCommon/Common.h"
 #include "ProcessLib/SmallDeformationNonlocal/CreateLocalAssemblers.h"
@@ -45,6 +46,8 @@ public:
                   std::move(named_function_caller)),
           _process_data(std::move(process_data))
     {
+        _nodal_forces = MeshLib::getOrCreateMeshProperty<double>(
+            mesh, "NodalForces", MeshLib::MeshItemType::Node, DisplacementDim);
     }
 
     //! \name ODESystem interface
@@ -77,6 +80,7 @@ private:
                 std::move(all_mesh_subsets_single_component),
                 // by location order is needed for output
                 NumLib::ComponentOrder::BY_LOCATION));
+        _nodal_forces->resize(DisplacementDim * mesh.getNumberOfNodes());
 
         Base::_secondary_variables.addSecondaryVariable(
             "damage", 1,
@@ -222,9 +226,23 @@ private:
     {
         DBUG("PostTimestep SmallDeformationNonlocalProcess.");
 
-        GlobalExecutor::executeMemberOnDereferenced(
-            &SmallDeformationNonlocalLocalAssemblerInterface::postTimestep,
-            _local_assemblers, *_local_to_global_index_map, x);
+        GlobalExecutor::executeDereferenced(
+            [this](const std::size_t mesh_item_id,
+                   LocalAssemblerInterface& local_assembler,
+                   const NumLib::LocalToGlobalIndexMap& dof_table,
+                   std::vector<double>& node_values) {
+                auto const indices =
+                    NumLib::getIndices(mesh_item_id, dof_table);
+                std::vector<double> local_data;
+
+                local_assembler.getNodalValues(local_data);
+
+                assert(local_data.size() == indices.size());
+                for (std::size_t i = 0; i < indices.size(); ++i)
+                    for (int dim = 0; dim < DisplacementDim; ++dim)
+                        node_values[indices[i]] += local_data[i];
+            },
+            _local_assemblers, *_local_to_global_index_map, *_nodal_forces);
     }
 
 private:
@@ -234,6 +252,8 @@ private:
 
     std::unique_ptr<NumLib::LocalToGlobalIndexMap>
         _local_to_global_index_map_single_component;
+
+    MeshLib::PropertyVector<double>* _nodal_forces = nullptr;
 };
 
 }  // namespace SmallDeformationNonlocal
