@@ -24,6 +24,9 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
       public NumLib::ExtrapolatableElement
 {
+    virtual std::vector<double> const& getNodalValues(
+        std::vector<double>& nodal_values) const = 0;
+
     virtual std::vector<double> const& getIntPtDamage(
         std::vector<double>& cache) const = 0;
 

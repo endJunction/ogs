@@ -451,6 +451,36 @@ public:
         return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
     }
 
+    std::vector<double> const& getNodalForce(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.resize(ShapeFunction::NPOINTS * DisplacementDim);
+        auto local_b = MathLib::createZeroedVector<NodalDisplacementVectorType>(
+            cache, ShapeFunction::NPOINTS * DisplacementDim);
+
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        SpatialPosition x_position;
+        x_position.setElementID(_element.getID());
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            x_position.setIntegrationPoint(ip);
+            auto const& wp = _integration_method.getWeightedPoint(ip);
+            auto const& detJ = _ip_data[ip]._detJ;
+            auto const& integralMeasure = _ip_data[ip]._integralMeasure;
+
+            auto const& B = _ip_data[ip]._b_matrices;
+            auto& sigma = _ip_data[ip]._sigma;
+
+            local_b.noalias() +=
+                B.transpose() * sigma * detJ * wp.getWeight() * integralMeasure;
+        }
+
+        return cache;
+    }
     std::vector<double> const& getIntPtDamage(
         std::vector<double>& cache) const override
     {
