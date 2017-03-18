@@ -391,7 +391,10 @@ public:
                     test_alpha +=
                         a_kl * detJ * wp.getWeight() * integralMeasure;
                 }
-                assert(std::abs(test_alpha - 1) < 2.7e-15);
+                if (std::abs(test_alpha - 1) >= 2.7e-15)
+                    OGS_FATAL(
+                        "One-function integration failed. v: %f, diff: %f",
+                        test_alpha, test_alpha - 1);
             }
             {
                 double nonlocal_kappa_d = 0;
