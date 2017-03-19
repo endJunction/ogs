@@ -134,8 +134,7 @@ public:
                       SmallDeformationNonlocalLocalAssemblerInterface>> const&
                       local_assemblers) override
     {
-        //std::cout << "\nXXX";
-        //std::cout << "nonlocal in element " << _element.getID() << "\n";
+        std::cout << "\nXXX nonlocal in element " << _element.getID() << "\n";
 
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -150,29 +149,32 @@ public:
             //
             // Collect the integration points.
             //
+            std::cout << "\n\tip = " << k << "\n";
 
-            //std::cout << "\n\tip = " << k << "\n";
+            auto const xyz = getSingleIntegrationPointCoordinates(k);
+            std::cout << "\tCurrent ip_k coords : " << xyz << "\n";
+
             // For all neighbors of element
             for (auto const& la : local_assemblers)
             {
-                auto const xyz = getSingleIntegrationPointCoordinates(k);
-                // std::cout << "Current ip_k coords : " << xyz << "\n";
                 auto const neighbor_ip_coords =
-                    la->getIntegrationPointCoordinates(xyz, 0.025);
+                    la->getIntegrationPointCoordinates(xyz, 0.01);
                 for (auto const& n : neighbor_ip_coords)
                 {
                     // output
-                    //std::cout << "\t[" << std::get<0>(n) << ", "
-                    //          << std::get<1>(n) << ", (";
-                    //for (int i = 0; i < std::get<2>(n).size(); ++i)
-                    //    std::cout << std::get<2>(n)[i] << ", ";
-                    //std::cout << "), " << std::get<3>(n) << "]\n";
+                    std::cout << "\t[" << std::get<0>(n) << ", "
+                              << std::get<1>(n) << ", (";
+                    for (int i = 0; i < std::get<2>(n).size(); ++i)
+                        std::cout << std::get<2>(n)[i] << ", ";
+                    std::cout << "), " << std::get<3>(n) << "]\n";
 
                     // save into current ip_k
-                    //std::cout << _ip_data[k].non_local_assemblers.size();
                     _ip_data[k].non_local_assemblers.push_back(std::make_tuple(
                         la.get(), std::get<1>(n), std::get<3>(n),
                         std::numeric_limits<double>::quiet_NaN()));
+                    std::cout << "\tadd "
+                              << _ip_data[k].non_local_assemblers.size()
+                              << " points.\n";
                 }
             }
 
@@ -182,18 +184,18 @@ public:
             //
             for (auto& tuple : _ip_data[k].non_local_assemblers)
             {
-                //auto const& la_l =
-                //    *static_cast<SmallDeformationNonlocalLocalAssembler<
-                //        ShapeFunction, IntegrationMethod,
-                //        DisplacementDim> const* const>(std::get<0>(tuple));
+                auto const& la_l =
+                    *static_cast<SmallDeformationNonlocalLocalAssembler<
+                        ShapeFunction, IntegrationMethod,
+                        DisplacementDim> const* const>(std::get<0>(tuple));
 
-                //int const l_ele = la_l._element.getID();
-                //int const l = std::get<1>(tuple);
                 double const distance2_l = std::get<2>(tuple);
 
-                //std::cout << "Compute a_kl for k = " << k << " and l = ("
-                //          << l_ele << ", " << l
-                //          << "); distance^2_l = " << distance2_l << "\n";
+                int const l_ele = la_l._element.getID();
+                int const l = std::get<1>(tuple);
+                std::cout << "Compute a_kl for k = " << k << " and l = ("
+                          << l_ele << ", " << l
+                          << "); distance^2_l = " << distance2_l << "\n";
 
                 double a_k_sum_m = 0;
                 for (auto const& tuple_m : _ip_data[k].non_local_assemblers)
@@ -203,7 +205,6 @@ public:
                             ShapeFunction, IntegrationMethod,
                             DisplacementDim> const* const>(std::get<0>(tuple_m));
 
-                    //int const m_ele = la_m._element.getID();
                     int const m = std::get<1>(tuple_m);
                     double const distance2_m = std::get<2>(tuple_m);
 
@@ -215,19 +216,21 @@ public:
                         la_m._ip_data[m]._integralMeasure;
 
                     a_k_sum_m += w_m * detJ_m * integralMeasure_m *
-                                 alpha_0(distance2_m, 0.025);
-                    //std::cout
-                    //    << "\tCompute sum_a_km for k = " << k << " and m = ("
-                    //    << m_ele << ", " << m
-                    //    << "); distance^2_m = " << distance2_m
-                    //    << "alpha_0(d^2_m, 0.025) = " << alpha_0(distance2_m, 0.025)
-                    //    << "; sum_alpha_km = " << a_k_sum_m << "\n";
-                }
-                double const a_kl = alpha_0(distance2_l, 0.025) / a_k_sum_m;
+                                 alpha_0(distance2_m, 0.01);
 
-                //std::cout << "alpha_0(d^2_l, 0.025) = " << alpha_0(distance2_l, 0.025)
-                //          << "\n";
-                //std::cout << "alpha_kl = " << a_kl << "done\n";
+                    int const m_ele = la_m._element.getID();
+                    std::cout
+                        << "\tCompute sum_a_km for k = " << k << " and m = ("
+                        << m_ele << ", " << m
+                        << "); distance^2_m = " << distance2_m
+                        << "alpha_0(d^2_m, 0.01) = " << alpha_0(distance2_m, 0.01)
+                        << "; sum_alpha_km = " << a_k_sum_m << "\n";
+                }
+                double const a_kl = alpha_0(distance2_l, 0.01) / a_k_sum_m;
+
+                std::cout << "alpha_0(d^2_l, 0.01) = " << alpha_0(distance2_l, 0.01)
+                          << "\n";
+                std::cout << "alpha_kl = " << a_kl << "done\n";
                 std::get<3>(tuple) = a_kl;
             }
         }
@@ -248,7 +251,8 @@ public:
             xyz += node_coordinates * N[i];
         }
 
-        //std::cout << " xyz = " << xyz << "\n";
+        std::cout << "\t\t singleIPcoords: xyz = " << xyz[0] << " " << xyz[1]
+                  << " " << xyz[2] << "\n";
         return xyz;
     }
 
@@ -267,15 +271,15 @@ public:
 
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            //std::cout << _element.getID() << ", " << ip << "\n";
+            std::cout << _element.getID() << ", " << ip << "\n";
 
             auto const xyz = getSingleIntegrationPointCoordinates(ip);
             double const distance2 = (xyz - coords).squaredNorm();
             if (distance2 < internal_length * internal_length)
                 result.emplace_back(_element.getID(), ip, xyz, distance2);
         }
-        //std::cout << "for element " << _element.getID() << " got "
-        //          << result.size() << " point in internal_length\n";
+        std::cout << "\tfor element " << _element.getID() << " got "
+                  << result.size() << " point in internal_length\n";
         return result;
     }
 
