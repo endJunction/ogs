@@ -423,11 +423,16 @@ public:
                     OGS_FATAL(
                         "One-function integration failed. v: %f, diff: %f",
                         test_alpha, test_alpha - 1);
-                //std::cerr << "XX " << nonlocal_kappa_d << "\n";
+                if (nonlocal_kappa_d < 0.)
+                {
+                    std::cerr << "set kappa_d zero " << nonlocal_kappa_d << "\n";
+                    nonlocal_kappa_d = 0;
+                }
 
                 _ip_data[ip]._damage =
                     _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
-                //std::cerr << "DD " << damage << "\n\n";
+                if (_ip_data[ip]._damage < 0. || _ip_data[ip]._damage > 1.)
+                    std::cerr << "DD " << _ip_data[ip]._damage << "\n\n";
 
                 sigma = sigma * (1 - _ip_data[ip]._damage);
             }
