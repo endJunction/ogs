@@ -455,6 +455,7 @@ void SolidEhlers<DisplacementDim>::calculateLocalKappaD(
         double const h_d = _damage_properties->h_d(t, x)[0];
         double const eps_p_eff_dot = _state.eps_p_eff - _state.eps_p_eff_prev;
         double const r_s = eps_p_eff_dot / eps_p_V_dot;
+        assert(eps_p_V_dot >= 0.);
 
         // Brittleness decrease with confinement for the nonlinear flow rule.
         // ATTENTION: For linear flow rule -> constant brittleness.
@@ -469,6 +470,7 @@ void SolidEhlers<DisplacementDim>::calculateLocalKappaD(
         }
         _state.kappa_d += eps_p_eff_dot / x_s;
     }
+    assert(_state.kappa_d > 0.);
 }
 
 template <int DisplacementDim>
