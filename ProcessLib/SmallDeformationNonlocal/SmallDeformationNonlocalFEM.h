@@ -386,21 +386,8 @@ public:
                 OGS_FATAL("Computation of non-local damage update failed.");
             */
 
-            {  // Integrate one-function.
-                double test_alpha = 0;
-
-                for (auto const& tuple : _ip_data[ip].non_local_assemblers)
-                {
-                    double const a_kl = std::get<3>(tuple);
-                    test_alpha +=
-                        a_kl * detJ * wp.getWeight() * integralMeasure;
-                }
-                if (std::abs(test_alpha - 1) >= 2.7e-15)
-                    OGS_FATAL(
-                        "One-function integration failed. v: %f, diff: %f",
-                        test_alpha, test_alpha - 1);
-            }
             {
+                double test_alpha = 0;  // Integration of one-function.
                 double nonlocal_kappa_d = 0;
 
                 for (auto const& tuple : _ip_data[ip].non_local_assemblers)
@@ -417,9 +404,22 @@ public:
                     //std::cerr << kappa_d << "\n";
                     double const a_kl = std::get<3>(tuple);
 
-                    nonlocal_kappa_d += a_kl * kappa_d * detJ * wp.getWeight() *
-                                        integralMeasure;
+                    int const m = std::get<1>(tuple);
+                    auto const& w_m =
+                        l._integration_method.getWeightedPoint(m)
+                            .getWeight();
+                    auto const& detJ_m = l._ip_data[m]._detJ;
+                    auto const& integralMeasure_m =
+                        l._ip_data[m]._integralMeasure;
+
+                    test_alpha += a_kl * detJ_m * w_m * integralMeasure_m;
+                    nonlocal_kappa_d +=
+                        a_kl * kappa_d * detJ_m * w_m * integralMeasure_m;
                 }
+                if (std::abs(test_alpha - 1) >= 1e-14)
+                    OGS_FATAL(
+                        "One-function integration failed. v: %f, diff: %f",
+                        test_alpha, test_alpha - 1);
                 //std::cerr << "XX " << nonlocal_kappa_d << "\n";
 
                 _ip_data[ip]._damage =
