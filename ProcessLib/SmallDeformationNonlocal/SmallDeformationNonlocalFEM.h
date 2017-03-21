@@ -424,9 +424,19 @@ public:
                     OGS_FATAL(
                         "One-function integration failed. v: %f, diff: %f",
                         test_alpha, test_alpha - 1);
+
+                double const _gamma_nonlocal = 1.0;
+                // === Overnonlocal formulation ===
+                // Update nonlocal damage with local damage (scaled with 1 -
+                // \gamma_nonlocal) for the current integration point and the
+                // nonlocal integral part.
+                nonlocal_kappa_d =
+                    (1. - _gamma_nonlocal) * _ip_data[ip].getLocalVariable() +
+                    _gamma_nonlocal * nonlocal_kappa_d;
+
                 if (nonlocal_kappa_d < 0.)
                 {
-                    std::cerr << "set kappa_d zero " << nonlocal_kappa_d << "\n";
+                    ERR("set kappa_d zero %g", nonlocal_kappa_d);
                     nonlocal_kappa_d = 0;
                 }
 
