@@ -23,13 +23,18 @@ struct SmallDeformationNonlocalProcessData
 {
     SmallDeformationNonlocalProcessData(
         std::unique_ptr<MaterialLib::Solids::MechanicsBase<DisplacementDim>>&&
-            material)
-        : material{std::move(material)}
+            material,
+        double const internal_length_)
+        : material{std::move(material)}, internal_length(internal_length_)
     {
     }
 
-    SmallDeformationNonlocalProcessData(SmallDeformationNonlocalProcessData&& other)
-        : material{std::move(other.material)}, dt{other.dt}, t{other.t}
+    SmallDeformationNonlocalProcessData(
+        SmallDeformationNonlocalProcessData&& other)
+        : material{std::move(other.material)},
+          dt{other.dt},
+          t{other.t},
+          internal_length{other.internal_length}
     {
     }
 
@@ -46,6 +51,7 @@ struct SmallDeformationNonlocalProcessData
         material;
     double dt = 0;
     double t = 0;
+    double const internal_length;
 };
 
 }  // namespace SmallDeformationNonlocal

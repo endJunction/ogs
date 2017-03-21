@@ -120,9 +120,10 @@ public:
         }
     }
 
-    double alpha_0(double const distance2, double const internal_length) const
+    double alpha_0(double const distance2) const
     {
-        double const internal_length2 = internal_length * internal_length;
+        double const internal_length2 =
+            _process_data.internal_length * _process_data.internal_length;
         return (distance2 > internal_length2)
                    ? 0
                    : (1 - distance2 / (internal_length2)) *
@@ -158,7 +159,7 @@ public:
             for (auto const& la : local_assemblers)
             {
                 auto const neighbor_ip_coords =
-                    la->getIntegrationPointCoordinates(xyz, 0.025);
+                    la->getIntegrationPointCoordinates(xyz);
                 for (auto const& n : neighbor_ip_coords)
                 {
                     // output
@@ -216,19 +217,19 @@ public:
                         la_m._ip_data[m]._integralMeasure;
 
                     a_k_sum_m += w_m * detJ_m * integralMeasure_m *
-                                 alpha_0(distance2_m, 0.025);
+                                 alpha_0(distance2_m);
 
                     //int const m_ele = la_m._element.getID();
                     //std::cout
                     //    << "\tCompute sum_a_km for k = " << k << " and m = ("
                     //    << m_ele << ", " << m
                     //    << "); distance^2_m = " << distance2_m
-                    //    << "alpha_0(d^2_m, 0.025) = " << alpha_0(distance2_m, 0.025)
+                    //    << "alpha_0(d^2_m) = " << alpha_0(distance2_m)
                     //    << "; sum_alpha_km = " << a_k_sum_m << "\n";
                 }
-                double const a_kl = alpha_0(distance2_l, 0.025) / a_k_sum_m;
+                double const a_kl = alpha_0(distance2_l) / a_k_sum_m;
 
-                //std::cout << "alpha_0(d^2_l, 0.025) = " << alpha_0(distance2_l, 0.025)
+                //std::cout << "alpha_0(d^2_l) = " << alpha_0(distance2_l)
                 //          << "\n";
                 //std::cout << "alpha_kl = " << a_kl << "done\n";
                 std::get<3>(tuple) = a_kl;
@@ -260,8 +261,7 @@ public:
     /// element's id, the integration point number, its coordinates, and the
     /// squared distance from the current integration point.
     std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
-    getIntegrationPointCoordinates(Eigen::Vector3d const& coords,
-                                   double const internal_length) const override
+    getIntegrationPointCoordinates(Eigen::Vector3d const& coords) const override
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -275,7 +275,8 @@ public:
 
             auto const xyz = getSingleIntegrationPointCoordinates(ip);
             double const distance2 = (xyz - coords).squaredNorm();
-            if (distance2 < internal_length * internal_length)
+            if (distance2 <
+                _process_data.internal_length * _process_data.internal_length)
                 result.emplace_back(_element.getID(), ip, xyz, distance2);
         }
         //std::cout << "\tfor element " << _element.getID() << " got "

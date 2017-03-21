@@ -102,8 +102,12 @@ createSmallDeformationNonlocalProcess(
             type.c_str());
     }
 
+    double const internal_length =
+        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__internal_length}
+        config.getConfigParameter<double>("internal_length");
+
     SmallDeformationNonlocalProcessData<DisplacementDim> process_data{
-        std::move(material)};
+        std::move(material), internal_length};
 
     SecondaryVariableCollection secondary_variables;
 

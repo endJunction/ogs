@@ -73,8 +73,7 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
             local_assemblers) = 0;
 
     virtual std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
-    getIntegrationPointCoordinates(Eigen::Vector3d const& coords,
-                                   double const internal_length) const = 0;
+    getIntegrationPointCoordinates(Eigen::Vector3d const& coords) const = 0;
 };
 
 }  // namespace SmallDeformationNonlocal
