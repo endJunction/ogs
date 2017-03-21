@@ -468,7 +468,7 @@ void SolidEhlers<DisplacementDim>::calculateLocalKappaD(
         {
             x_s = 1 - 3 * h_d + 4 * h_d * std::sqrt(r_s);
         }
-        _state.kappa_d += eps_p_eff_dot / x_s;
+        _state.kappa_d += eps_p_V_dot / x_s;
     }
     assert(_state.kappa_d > 0.);
 }
