@@ -14,6 +14,7 @@
 
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/Lubby2.h"
+#include "MaterialLib/SolidModels/Ehlers.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"
@@ -46,6 +47,14 @@ struct IntegrationPointData final
           material_state_variables(
               solid_material.createMaterialStateVariables())
     {
+        if (auto const msv =
+                dynamic_cast<typename MaterialLib::Solids::Ehlers::SolidEhlers<
+                    DisplacementDim>::MaterialStateVariables*>(
+                    material_state_variables.get()))
+        {
+            eps_p_V = &msv->eps_p_V;
+            eps_p_D_xx = &(msv->eps_p_D[0]);
+        }
     }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -83,6 +92,14 @@ struct IntegrationPointData final
         sigma_prev = sigma;
         material_state_variables->pushBackState();
     }
+
+    std::tuple<double, double> getLocalVariable() const
+    {
+        return {-1, -1};
+    }
+
+    double const* eps_p_V;
+    double const* eps_p_D_xx;
 };
 
 /// Used by for extrapolation of the integration point values. It is ordered
@@ -99,6 +116,11 @@ struct SmallDeformationLocalAssemblerInterface
       public NumLib::ExtrapolatableElement,
       public ProcessLib::IntegrationPointSerialization
 {
+    virtual std::vector<double> const& getIntPtEpsPV(
+        std::vector<double>& cache) const = 0;
+    virtual std::vector<double> const& getIntPtEpsPDXX(
+        std::vector<double>& cache) const = 0;
+
     virtual std::vector<double> const& getIntPtSigmaXX(
         std::vector<double>& cache) const = 0;
 
@@ -395,6 +417,33 @@ public:
 
         // assumes N is stored contiguously in memory
         return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
+    }
+
+    std::vector<double> const& getIntPtEpsPV(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            cache.push_back(*ip_data.eps_p_V);
+        }
+
+        return cache;
+    }
+    std::vector<double> const& getIntPtEpsPDXX(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            cache.push_back(*ip_data.eps_p_D_xx);
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtSigmaXX(

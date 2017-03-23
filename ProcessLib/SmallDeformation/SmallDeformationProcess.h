@@ -82,6 +82,17 @@ private:
         _nodal_forces->resize(DisplacementDim * mesh.getNumberOfNodes());
 
         Base::_secondary_variables.addSecondaryVariable(
+            "eps_p_V", 1,
+            makeExtrapolator(
+                getExtrapolator(), _local_assemblers,
+                &SmallDeformationLocalAssemblerInterface::getIntPtEpsPV));
+        Base::_secondary_variables.addSecondaryVariable(
+            "eps_p_D_xx", 1,
+            makeExtrapolator(
+                getExtrapolator(), _local_assemblers,
+                &SmallDeformationLocalAssemblerInterface::getIntPtEpsPDXX));
+
+        Base::_secondary_variables.addSecondaryVariable(
             "sigma_xx", 1,
             makeExtrapolator(
                 getExtrapolator(), _local_assemblers,
