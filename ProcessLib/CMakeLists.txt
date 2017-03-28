@@ -23,7 +23,7 @@ APPEND_SOURCE_FILES(SOURCES RichardsFlow)
 
 if(Protobuf_FOUND)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS SmallDeformation/integration_point.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS SmallDeformationCommon/integration_point.proto)
 list(APPEND SOURCES ${PROTO_SRCS} ${PROTO_HDRS})
 endif() # Protobuf_FOUND
 
