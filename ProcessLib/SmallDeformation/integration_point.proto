@@ -1,25 +1,52 @@
 syntax = "proto3";
 
-package SmallDeformationFEM;
-
-enum Dimension {
-    UNDEFINED = 0;
-    ONE = 1;
-    TWO = 2;
-    THREE = 3;
-}
+package OGS;
 
 // Kelvin vector for 1D, 2D, or 3D problems allowing a size check of the stored
 // 'value' array.
 message KelvinVector {
-    Dimension dimension = 1;
+    int32 dimension = 1;
     repeated double value = 2;
 }
 
-// Storing arrays of data (sigma, eps, damage, etc.) for all integration points.
 message ElementData {
-    uint64 id = 1;  // For sanity checks.
+    uint64 element_id = 1;  // Element id
     uint32 n_integration_points = 2;    // Length of the following arrays.
-    repeated KelvinVector sigma = 3;
-    repeated KelvinVector eps = 4;
+
+    oneof ipdata {
+        SmallDeformation small_deformation = 10;
+    }
+}
+
+message LinearElastic {}
+message Ehlers {
+    KelvinVector eps_p_D = 1;  // deviatoric plastic strain
+    double eps_p_V = 2;    // volumetric strain
+    double eps_p_eff = 3;  // effective plastic strain
+
+    // Damage model extension
+    double kappa_d = 10;    // damage driving variable
+    double damage = 11;     // isotropic damage variable
+}
+message Lubby2 {
+    /// Deviatoric strain in the viscous kelvin element
+    KelvinVector eps_K = 1;
+    /// Deviatoric strain in the viscous maxwell element
+    KelvinVector eps_M_t = 2;
+}
+
+message MaterialState {
+    oneof type {
+        LinearElastic linear_elastic = 1;
+        Ehlers ehlers = 2;
+        Lubby2 lubby2 = 3;
+    }
+}
+
+// Integration point data (for all integration points) common to mechanics
+// process
+message SmallDeformation {
+    repeated KelvinVector sigma = 1;
+    repeated KelvinVector eps = 2;
+    repeated MaterialState material_state = 3;
 }
