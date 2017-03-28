@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
+#include "ProcessLib/IntegrationPointSerialization.h"
 #include "ProcessLib/LocalAssemblerInterface.h"
 
 namespace ProcessLib
@@ -22,7 +23,8 @@ namespace SmallDeformationNonlocal
 
 struct SmallDeformationNonlocalLocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
-      public NumLib::ExtrapolatableElement
+      public NumLib::ExtrapolatableElement,
+      public ProcessLib::IntegrationPointSerialization
 {
     virtual std::vector<double> const& getNodalValues(
         std::vector<double>& nodal_values) const = 0;

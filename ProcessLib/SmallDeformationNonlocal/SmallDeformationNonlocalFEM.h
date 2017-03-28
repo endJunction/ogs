@@ -26,9 +26,15 @@
 #include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
 
+#include "ProcessLib/SmallDeformationCommon/integration_point_data.h"
+
 #include "IntegrationPointData.h"
 #include "LocalAssemblerInterface.h"
 #include "SmallDeformationNonlocalProcessData.h"
+
+#ifdef PROTOBUF_FOUND
+#include "integration_point.pb.h"
+#endif  // PROTOBUF_FOUND
 
 namespace ProcessLib
 {
@@ -43,11 +49,12 @@ struct SecondaryData
 };
 
 template <typename ShapeFunction, typename IntegrationMethod,
-          int DisplacementDim>
+          int DisplacementDim_>
 class SmallDeformationNonlocalLocalAssembler
     : public SmallDeformationNonlocalLocalAssemblerInterface
 {
 public:
+    static int const DisplacementDim = DisplacementDim_;
     using ShapeMatricesType =
         ShapeMatrixPolicyType<ShapeFunction, DisplacementDim>;
     using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
@@ -467,6 +474,24 @@ public:
             _ip_data[ip].pushBackState();
         }
     }
+
+    friend void readSmallDeformationIntegrationPointData<
+        SmallDeformationNonlocalLocalAssembler>(
+        std::vector<char> const& data,
+        SmallDeformationNonlocalLocalAssembler& local_assembler);
+    void readIntegrationPointData(std::vector<char> const& data) override
+    {
+        readSmallDeformationIntegrationPointData(data, *this);
+    }
+
+    friend std::size_t writeSmallDeformationIntegrationPointData<
+        SmallDeformationNonlocalLocalAssembler>(
+        std::vector<char>& data,
+        SmallDeformationNonlocalLocalAssembler const& local_assembler);
+    std::size_t writeIntegrationPointData(std::vector<char>& data) override
+    {
+        return writeSmallDeformationIntegrationPointData(data, *this);
+    };
 
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
         const unsigned integration_point) const override

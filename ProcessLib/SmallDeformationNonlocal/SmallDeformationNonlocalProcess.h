@@ -164,9 +164,36 @@ private:
                                      getIntPtEpsilonXZ));
         }
 
+#ifdef PROTOBUF_FOUND
+        Base::integration_point_writer = [this](
+            MeshLib::PropertyVector<char>& output,
+            MeshLib::PropertyVector<std::size_t>& offsets) {
+            return writeIntegrationPointData(output, offsets);
+        };
+#endif  // PROTOBUF_FOUND
+
         GlobalExecutor::executeMemberOnDereferenced(
             &SmallDeformationNonlocalLocalAssemblerInterface::nonlocal,
             _local_assemblers, _local_assemblers);
+    }
+
+    std::size_t writeIntegrationPointData(MeshLib::PropertyVector<char>& output,
+            MeshLib::PropertyVector<std::size_t>& offsets)
+    {
+        output.clear();
+        offsets.clear();
+        std::vector<char> local_data;
+        std::size_t offset = 0;
+        for (auto& la : _local_assemblers)
+        {
+            offsets.push_back(offset);
+            std::size_t const local_offset =
+                la->writeIntegrationPointData(local_data);
+            std::copy_n(std::begin(local_data), local_offset,
+                        std::back_inserter(output));
+            offset += local_offset;
+        }
+        return offset;
     }
 
     void assembleConcreteProcess(
