@@ -678,8 +678,19 @@ bool SolidEhlers<DisplacementDim>::computeConstitutiveRelation(
                     increment.template segment<KelvinVectorSize>(
                         KelvinVectorSize * 1);
                 _state.eps_p_V += increment(KelvinVectorSize * 2);
+                if (_state.eps_p_V < _state.eps_p_V_prev)
+                    OGS_FATAL("Ehlers. eps_p_V < eps_p_V_prev: %g < %g",
+                              _state.eps_p_V, _state.eps_p_V_prev);
                 _state.eps_p_eff += increment(KelvinVectorSize * 2 + 1);
+                if (_state.eps_p_eff < _state.eps_p_eff_prev)
+                    OGS_FATAL("Ehlers. eps_p_eff < eps_p_eff_prev: %g < %g",
+                              _state.eps_p_eff, _state.eps_p_eff_prev);
                 _state.lambda += increment(KelvinVectorSize * 2 + 2);
+                if (_state.lambda < 0)
+                    OGS_FATAL(
+                        "Ehlers: Got negative plastic multiplier; Lambda = %g "
+                        "< 0",
+                        _state.lambda);
 
                 _mp.calculateIsotropicHardening(t, x, _state.eps_p_eff);
             };
