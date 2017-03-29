@@ -91,6 +91,7 @@ struct OnePlusGamma_pTheta final
     OnePlusGamma_pTheta(double const gamma_p, double const theta,
                         double const m_p)
         : value{1 + gamma_p * theta},
+          // value(1+gamma_p*theta)/(1-gamma_p)
           pow_m_p{std::pow(value, m_p)},
           pow_m_p1{pow_m_p / value}
     {
@@ -148,6 +149,7 @@ double yieldFunction(
                alpha / 2. * I_1_squared +
                boost::math::pow<2>(delta) * boost::math::pow<2>(I_1_squared)) +
            beta * s.I_1 + epsilon * I_1_squared - mp.k;
+    //std::pow((1 +gamma * s.J_3 / boost::math::pow<3>(std::sqrt(s.J_2)))/(1-gamma),m)
 }
 
 template <int DisplacementDim>
@@ -436,6 +438,7 @@ void calculatePlasticJacobian(
 template <int DisplacementDim>
 void SolidEhlers<DisplacementDim>::calculateLocalKappaD(
     double const t, ProcessLib::SpatialPosition const& x,
+    KelvinVector const& sigma,
     typename MechanicsBase<DisplacementDim>::MaterialStateVariables&
         material_state_variables)
 {
@@ -453,20 +456,53 @@ void SolidEhlers<DisplacementDim>::calculateLocalKappaD(
     if (eps_p_V_dot > 0)
     {
         double const h_d = _damage_properties->h_d(t, x)[0];
-        double const eps_p_eff_dot = _state.eps_p_eff - _state.eps_p_eff_prev;
-        double const r_s = eps_p_eff_dot / eps_p_V_dot;
         assert(eps_p_V_dot >= 0.);
+
+        Eigen::Matrix<double,DisplacementDim,DisplacementDim> stress_mat
+                        = Eigen::Matrix<double,DisplacementDim,DisplacementDim>::Zero();
+        double const G = _mp.G(t, x)[0];
+
+        for (int i=0;i<DisplacementDim;++i)
+            for (int j=0;j<DisplacementDim;++j){
+                 if (i==j){
+                 stress_mat(i,j)=G*sigma(i);
+                 }else{
+                 stress_mat(i,j)=G*sigma(i+j+2);
+                 };
+           };
+
+         Eigen::EigenSolver<decltype(stress_mat)> eigen_solver(stress_mat);
+                auto const& principal_stress=eigen_solver.eigenvalues();
+                // building kappa_d (damage driving variable)
+         double prod_stress = 0.;
+         for (int i = 0; i < DisplacementDim; ++i)
+         {
+          Eigen::Matrix<double, DisplacementDim, 1> eig_val;
+          eig_val(i, 0) = real(principal_stress(i, 0));
+          prod_stress = prod_stress + eig_val(i, 0)*eig_val(i, 0);
+          }
 
         // Brittleness decrease with confinement for the nonlinear flow rule.
         // ATTENTION: For linear flow rule -> constant brittleness.
-        double x_s = 0;
+        double const beta = _mp.beta(t, x)[0];
+        double const kappa = _mp.kappa(t, x)[0];
+
+        double f_t=std::sqrt(3.0)*kappa/(1+std::sqrt(3.0)*beta);
+
+        double x_s=0;
+        double r_s = std::sqrt(prod_stress)/f_t;
+
         if (r_s < 1)
         {
-            x_s = 1 + h_d * r_s * r_s;
+            x_s=1;
+        }
+        else if (r_s>=1 && r_s<=2)
+        {
+            x_s = 1 + h_d * (r_s-1) * (r_s-1);
         }
         else
         {
-            x_s = 1 - 3 * h_d + 4 * h_d * std::sqrt(r_s);
+            x_s = 1 - 3 * h_d + 4 * h_d * std::sqrt(r_s-1);
         }
         _state.kappa_d += eps_p_V_dot / x_s;
     }
@@ -679,7 +715,7 @@ bool SolidEhlers<DisplacementDim>::computeConstitutiveRelation(
 
         if (_damage_properties)
         {
-            calculateLocalKappaD(t, x, _state);
+            calculateLocalKappaD(t, x, sigma, _state);
 
             if (_compute_local_damage)  // The non-local damage update is called
                                        // from the FEM.

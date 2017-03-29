@@ -251,6 +251,7 @@ public:
 private:
     void calculateLocalKappaD(
         double const t, ProcessLib::SpatialPosition const& x,
+        KelvinVector const& sigma,
         typename MechanicsBase<DisplacementDim>::MaterialStateVariables&
             material_state_variables);
 
