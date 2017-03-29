@@ -32,10 +32,6 @@
 #include "LocalAssemblerInterface.h"
 #include "SmallDeformationNonlocalProcessData.h"
 
-#ifdef PROTOBUF_FOUND
-#include "integration_point.pb.h"
-#endif  // PROTOBUF_FOUND
-
 namespace ProcessLib
 {
 namespace SmallDeformationNonlocal
