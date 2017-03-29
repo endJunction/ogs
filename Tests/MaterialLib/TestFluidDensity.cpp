@@ -97,6 +97,52 @@ TEST(Material, checkLinearTemperatureDependentDensity)
                 rho->getdValue(vars, Fluid::PropertyVariableType::T), 1.e-10);
 }
 
+TEST(Material, checkWaterDensityMagri)
+{
+    const char xml[] =
+        "<density>"
+        "   <type>WaterDensityMagri</type>"
+        "</density>";
+
+    const auto rho = createTestFluidDensityModel(xml);
+
+    ArrayType vars;
+    /*
+    for (double p = 0; p < 100e6; p += 1e6)
+    {
+        for (double T = 273.15; T < 273.15 + 350.; T += 1)
+        {
+            vars[static_cast<std::size_t>(Fluid::PropertyVariableType::T)] = T;
+            vars[static_cast<std::size_t>(Fluid::PropertyVariableType::p)] = p;
+            std::cerr << p << " " << T << " " << rho->getValue(vars) << " "
+                      << rho->getdValue(vars, Fluid::PropertyVariableType::T)
+                      << "\n";
+        }
+    }
+    */
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::T)] = 0.001;
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::p)] = 100;
+    EXPECT_NEAR(998.8396, rho->getValue(vars),
+                1.e-10);
+
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::T)] = 4;
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::p)] = 100;
+    EXPECT_NEAR(1000., rho->getValue(vars),
+                1.e-10);
+
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::T)] = 100;
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::p)] = 100;
+    EXPECT_NEAR(958.65, rho->getValue(vars),
+                1.e-10);
+
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::T)] = 135;
+    vars[static_cast<std::size_t>(Fluid::PropertyVariableType::p)] = 313;
+    EXPECT_NEAR(931, rho->getValue(vars),
+                1.e-10);
+    //ASSERT_NEAR(-1000.0 * 4.3e-4,
+    //            rho->getdValue(vars, Fluid::PropertyVariableType::T), 1.e-10);
+}
+
 TEST(Material, checkLiquidDensity)
 {
     const char xml[] =

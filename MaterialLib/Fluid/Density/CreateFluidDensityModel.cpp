@@ -19,6 +19,7 @@
 #include "LinearConcentrationDependentDensity.h"
 #include "LinearTemperatureDependentDensity.h"
 #include "LiquidDensity.h"
+#include "WaterDensityMagri.h"
 #include "WaterDensityIAPWSIF97Region1.h"
 
 #include "MaterialLib/Fluid/ConstantFluidProperty.h"
@@ -92,6 +93,20 @@ static std::unique_ptr<FluidProperty> createLinearConcentrationDependentDensity(
         fluid_density_difference_ratio);
 }
 
+/**
+ *     \param config  ConfigTree object which contains the input data
+ *                    `<type>WaterDensityMagri</type>`
+ *                     and it has a tag of `<density>`
+ */
+static std::unique_ptr<FluidProperty> createWaterDensityMagri(
+    BaseLib::ConfigTree const& config)
+{
+    //! \ogs_file_param{material__fluid__density__type}
+    config.checkConfigParameter("type", "WaterDensityMagri");
+
+    return std::unique_ptr<FluidProperty>(new WaterDensityMagri());
+}
+
 std::unique_ptr<FluidProperty> createFluidDensityModel(
     BaseLib::ConfigTree const& config)
 {
@@ -124,12 +139,14 @@ std::unique_ptr<FluidProperty> createFluidDensityModel(
     {
         return std::make_unique<WaterDensityIAPWSIF97Region1>();
     }
+    if (type == "WaterDensityMagri")
+        return createWaterDensityMagri(config);
 
     OGS_FATAL(
         "The density type %s is unavailable.\n"
         "The available types are: \n\tConstant, \n\tLiquidDensity, "
         "\n\tTemperatureDependent, \n\tIdealGasLaw."
-        "\n\tWaterDensityIAPWSIF97Region1\n",
+        "\n\tWaterDensityIAPWSIF97Region1, \n\tWaterDensityMagri\n",
         type.data());
 }
 
