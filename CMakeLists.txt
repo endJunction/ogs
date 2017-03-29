@@ -241,6 +241,8 @@ include_directories( SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/autocheck/inc
 include_directories( SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/tclap/include )
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vtkGUISupportQt)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 add_subdirectory( Applications )
 add_subdirectory( BaseLib )
 # TODO This is a hack but we have to make sure that Boost is built first
@@ -254,6 +256,7 @@ add_subdirectory( MeshLib )
 add_subdirectory( MeshGeoToolsLib )
 add_subdirectory( NumLib )
 add_subdirectory( ProcessLib )
+add_subdirectory( SerializationLib )
 if( OGS_BUILD_TESTS AND NOT IS_SUBPROJECT )
     add_subdirectory( Tests )
 

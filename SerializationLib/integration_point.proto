@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "common.proto";
+import "material.proto";
+
+package OGS;
+
+message ElementData {
+    uint64 element_id = 1;  // Element id
+    uint32 n_integration_points = 2;    // Length of the following arrays.
+
+    oneof ipdata {
+        SmallDeformation small_deformation = 10;
+    }
+}
+
+// Integration point data (for all integration points) common to mechanics
+// process
+message SmallDeformation {
+    repeated KelvinVector sigma = 1;
+    repeated KelvinVector eps = 2;
+    repeated MaterialState material_state = 3;
+}

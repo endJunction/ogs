@@ -12,7 +12,7 @@
 #pragma once
 
 #ifdef PROTOBUF_FOUND
-#include "integration_point.pb.h"
+#include "SerializationLib/integration_point.pb.h"
 #endif  // PROTOBUF_FOUND
 
 namespace ProcessLib

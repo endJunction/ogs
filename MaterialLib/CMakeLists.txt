@@ -24,7 +24,7 @@ target_link_libraries(MaterialLib
     PUBLIC BaseLib NumLib logog # ProcessLib
     PRIVATE MathLib MeshLib
 )
-
 if(OGS_USE_PCH)
     cotire(MaterialLib)
 endif()
+

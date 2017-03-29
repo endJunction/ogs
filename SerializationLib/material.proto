@@ -1,24 +1,10 @@
 syntax = "proto3";
+import "common.proto";
 
 package OGS;
 
-// Kelvin vector for 1D, 2D, or 3D problems allowing a size check of the stored
-// 'value' array.
-message KelvinVector {
-    int32 dimension = 1;
-    repeated double value = 2;
-}
-
-message ElementData {
-    uint64 element_id = 1;  // Element id
-    uint32 n_integration_points = 2;    // Length of the following arrays.
-
-    oneof ipdata {
-        SmallDeformation small_deformation = 10;
-    }
-}
-
 message LinearElastic {}
+
 message Ehlers {
     KelvinVector eps_p_D = 1;  // deviatoric plastic strain
     double eps_p_V = 2;    // volumetric strain
@@ -28,6 +14,7 @@ message Ehlers {
     double kappa_d = 10;    // damage driving variable
     double damage = 11;     // isotropic damage variable
 }
+
 message Lubby2 {
     /// Deviatoric strain in the viscous kelvin element
     KelvinVector eps_K = 1;
@@ -41,12 +28,4 @@ message MaterialState {
         Ehlers ehlers = 2;
         Lubby2 lubby2 = 3;
     }
-}
-
-// Integration point data (for all integration points) common to mechanics
-// process
-message SmallDeformation {
-    repeated KelvinVector sigma = 1;
-    repeated KelvinVector eps = 2;
-    repeated MaterialState material_state = 3;
 }

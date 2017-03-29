@@ -9,8 +9,6 @@ APPEND_SOURCE_FILES(SOURCES GroundwaterFlow)
 APPEND_SOURCE_FILES(SOURCES HeatConduction)
 APPEND_SOURCE_FILES(SOURCES HT)
 APPEND_SOURCE_FILES(SOURCES HydroMechanics)
-if(Protobuf_FOUND)
-endif() # Protobuf_FOUND
 APPEND_SOURCE_FILES(SOURCES LIE/BoundaryCondition)
 APPEND_SOURCE_FILES(SOURCES LIE/Common)
 APPEND_SOURCE_FILES(SOURCES LIE/HydroMechanics)
@@ -39,11 +37,8 @@ add_library(ProcessLib ${SOURCES})
 target_link_libraries(ProcessLib
     PUBLIC BaseLib GeoLib MaterialLib MathLib MeshLib NumLib logog
     PRIVATE MeshGeoToolsLib
+    SerializationLib
 )
-
-if(Protobuf_FOUND)
-    target_link_libraries(ProcessLib ${PROTOBUF_LIBRARIES})
-endif() # Protobuf_FOUND
 
 ADD_VTK_DEPENDENCY(ProcessLib)
 
