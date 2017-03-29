@@ -25,6 +25,14 @@ struct IntegrationPointData final
           _material_state_variables(
               _solid_material.createMaterialStateVariables())
     {
+        if (auto const msv =
+                dynamic_cast<typename MaterialLib::Solids::Ehlers::SolidEhlers<
+                    DisplacementDim>::MaterialStateVariables*>(
+                    _material_state_variables.get()))
+        {
+            _eps_p_V = &msv->eps_p_V;
+            _eps_p_D_xx = &(msv->eps_p_D[0]);
+        }
     }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -58,6 +66,9 @@ struct IntegrationPointData final
     typename BMatricesType::KelvinMatrixType _C;
     double _detJ;
     double _integralMeasure;
+
+    double const* _eps_p_V;
+    double const* _eps_p_D_xx;
 
     void pushBackState()
     {

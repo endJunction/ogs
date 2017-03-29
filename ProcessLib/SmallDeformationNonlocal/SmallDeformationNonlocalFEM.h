@@ -532,6 +532,33 @@ public:
         return nodal_values;
     }
 
+    std::vector<double> const& getIntPtEpsPV(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            cache.push_back(*ip_data._eps_p_V);
+        }
+
+        return cache;
+    }
+    std::vector<double> const& getIntPtEpsPDXX(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            cache.push_back(*ip_data._eps_p_D_xx);
+        }
+
+        return cache;
+    }
+
     std::vector<double> const& getIntPtDamage(
         std::vector<double>& cache) const override
     {
