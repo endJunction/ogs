@@ -248,6 +248,35 @@ public:
         double const kappa_d,
         typename MechanicsBase<DisplacementDim>::MaterialStateVariables&
             material_state_variables);
+
+#ifdef PROTOBUF_FOUND
+    OGS::MaterialState writeMaterialState(
+        typename MechanicsBase<DisplacementDim>::MaterialStateVariables const&
+            material_state_variables) const override
+    {
+        assert(dynamic_cast<MaterialStateVariables const*>(
+                   &material_state_variables) != nullptr);
+        MaterialStateVariables const& state =
+            static_cast<MaterialStateVariables const&>(
+                material_state_variables);
+
+        OGS::MaterialState material_state;
+        auto ehlers_material_state = material_state.mutable_ehlers();
+
+        auto eps_p_D = ehlers_material_state->mutable_eps_p_d();
+        eps_p_D->set_dimension(DisplacementDim);
+        for (int i = 0; i < state.eps_p_D.size(); ++i)
+            eps_p_D->add_value(state.eps_p_D[i]);
+
+        ehlers_material_state->set_eps_p_v(state.eps_p_V);
+        ehlers_material_state->set_eps_p_eff(state.eps_p_eff);
+        ehlers_material_state->set_kappa_d(state.kappa_d);
+        ehlers_material_state->set_damage(state.damage);
+
+        return material_state;
+    };
+#endif  // PROTOBUF_FOUND
+
 private:
     void calculateLocalKappaD(
         double const t, ProcessLib::SpatialPosition const& x,
