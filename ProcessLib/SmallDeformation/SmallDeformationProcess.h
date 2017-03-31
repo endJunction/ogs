@@ -11,6 +11,7 @@
 
 #include <cassert>
 
+#include "NumLib/DOF/DOFTableUtil.h"
 #include "ProcessLib/Process.h"
 #include "ProcessLib/SmallDeformation/CreateLocalAssemblers.h"
 #include "ProcessLib/SmallDeformationCommon/Common.h"
@@ -287,6 +288,24 @@ private:
 
         ProcessLib::SmallDeformation::writeNodalForces(
             *_nodal_forces, _local_assemblers, *_local_to_global_index_map);
+
+        GlobalExecutor::executeDereferenced(
+            [this](const std::size_t mesh_item_id,
+                   LocalAssemblerInterface& local_assembler,
+                   const NumLib::LocalToGlobalIndexMap& dof_table,
+                   std::vector<double>& node_values) {
+                auto const indices =
+                    NumLib::getIndices(mesh_item_id, dof_table);
+                std::vector<double> local_data;
+
+                local_assembler.getNodalValues(local_data);
+
+                assert(local_data.size() == indices.size());
+                for (std::size_t i = 0; i < indices.size(); ++i)
+                    for (int dim = 0; dim < DisplacementDim; ++dim)
+                        node_values[indices[i]] += local_data[i];
+            },
+            _local_assemblers, *_local_to_global_index_map, *_nodal_forces);
     }
 
 private:
