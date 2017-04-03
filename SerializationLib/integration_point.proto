@@ -11,18 +11,23 @@ message ElementData {
 
     oneof ipdata {
         SmallDeformation small_deformation = 10;
+        SmallDeformationNonlocal small_deformation_nonlocal = 11;
     }
 }
 
 // Integration point data (for all integration points) common to mechanics
 // process
-message SmallDeformation {
+message SmallDeformationCommon {
     repeated KelvinVector sigma = 1;
     repeated KelvinVector eps = 2;
     repeated MaterialState material_state = 3;
 }
 
+message SmallDeformation {
+    SmallDeformationCommon common = 1;
+}
+
 message SmallDeformationNonlocal {
-    SmallDeformation small_deformation = 1;
+    SmallDeformationCommon common = 1;
     repeated double nonlocal_damage = 2;
 }

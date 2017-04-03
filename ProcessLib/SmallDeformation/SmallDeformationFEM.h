@@ -335,6 +335,10 @@ public:
     writeSmallDeformationIntegrationPointData<SmallDeformationLocalAssembler>(
         std::vector<char>& data,
         SmallDeformationLocalAssembler const& local_assembler);
+    friend OGS::SmallDeformationCommon
+    getSmallDeformationCommonIntegrationPointData<
+        SmallDeformationLocalAssembler>(
+        SmallDeformationLocalAssembler const& local_assembler);
     std::size_t writeIntegrationPointData(std::vector<char>& data) override
     {
         return writeSmallDeformationIntegrationPointData(data, *this);

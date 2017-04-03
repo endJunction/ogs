@@ -12,6 +12,8 @@
 #pragma once
 
 #ifdef PROTOBUF_FOUND
+#include "ProcessLib/SmallDeformation/SmallDeformationFEM.h"
+#include "ProcessLib/SmallDeformationNonlocal/SmallDeformationNonlocalFEM.h"
 #include "SerializationLib/integration_point.pb.h"
 #endif  // PROTOBUF_FOUND
 
@@ -26,6 +28,7 @@ void readSmallDeformationIntegrationPointData(
     if (!element_data.ParseFromArray(data.data(), data.size()))
         OGS_FATAL("Parsing ElementData protobuf failed.");
 
+    /*
     // check element number
     if (local_assembler._element.getID() != element_data.element_id())
         OGS_FATAL("Reading input failed somewhat. Mesh item id does not match");
@@ -71,6 +74,7 @@ void readSmallDeformationIntegrationPointData(
         for (int i = 0; i < local_assembler._ip_data[ip].eps.size(); ++i)
             local_assembler._ip_data[ip].eps[i] = eps.value(i);
     }
+    */
 #else   // PROTOBUF_FOUND
     (void)data;  // Unused argument
 #endif  // PROTOBUF_FOUND
@@ -80,18 +84,27 @@ template <typename LocalAssembler>
 std::size_t writeSmallDeformationIntegrationPointData(
     std::vector<char>& data, LocalAssembler const& local_assembler)
 {
+    // Unused arguments
+    (void)data;
+    (void)local_assembler;
+
+    return 0;    // Dummy value needed for compilation. Code is not executed
+                 // because the integration_point_writer is not created in
+                 // absence of protobuffer.
+}
+
 #ifdef PROTOBUF_FOUND
+template <typename LocalAssembler>
+OGS::SmallDeformationCommon getSmallDeformationCommonIntegrationPointData(
+    LocalAssembler const& local_assembler)
+{
+    OGS::SmallDeformationCommon small_deformation;
     unsigned const n_integration_points =
         local_assembler._integration_method.getNumberOfPoints();
 
-    OGS::ElementData element_data;
-    element_data.set_element_id(local_assembler._element.getID());
-    element_data.set_n_integration_points(n_integration_points);
-
-    auto small_deformation_data = element_data.mutable_small_deformation();
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
-        auto sigma = small_deformation_data->add_sigma();
+        auto sigma = small_deformation.add_sigma();
         sigma->set_dimension(LocalAssembler::DisplacementDim);
         for (int i = 0; i < local_assembler._ip_data[ip].sigma.size(); ++i)
             sigma->add_value(local_assembler._ip_data[ip].sigma[i]);
@@ -99,7 +112,7 @@ std::size_t writeSmallDeformationIntegrationPointData(
 
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
-        auto eps = small_deformation_data->add_eps();
+        auto eps = small_deformation.add_eps();
         eps->set_dimension(LocalAssembler::DisplacementDim);
         for (int i = 0; i < local_assembler._ip_data[ip].eps.size(); ++i)
             eps->add_value(local_assembler._ip_data[ip].eps[i]);
@@ -108,21 +121,77 @@ std::size_t writeSmallDeformationIntegrationPointData(
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
         auto const& ip_data = local_assembler._ip_data[ip];
-        auto material_state = small_deformation_data->add_material_state();
+        auto material_state = small_deformation.add_material_state();
         material_state->CopyFrom(ip_data.solid_material.writeMaterialState(
             *ip_data.material_state_variables));
+    }
+
+    return small_deformation;
+}
+
+template <>
+std::size_t writeSmallDeformationIntegrationPointData<
+    ProcessLib::SmallDeformation::SmallDeformationLocalAssembler>(
+    std::vector<char>& data,
+    ProcessLib::SmallDeformation::SmallDeformationLocalAssembler const&
+        local_assembler)
+{
+    unsigned const n_integration_points =
+        local_assembler._integration_method.getNumberOfPoints();
+
+    OGS::ElementData element_data;
+    element_data.set_element_id(local_assembler._element.getID());
+    element_data.set_n_integration_points(n_integration_points);
+
+    auto small_deformation_data = element_data.mutable_small_deformation();
+    auto common = small_deformation_data->mutable_common();
+    common->CopyFrom(
+        getSmallDeformationCommonIntegrationPointData(local_assembler));
+
+    data.resize(element_data.ByteSize());
+    element_data.SerializeToArray(data.data(), element_data.ByteSize());
+
+    return element_data.ByteSize();
+};
+
+template <>
+std::size_t writeSmallDeformationIntegrationPointData<
+    ProcessLib::SmallDeformationNonlocal::
+        SmallDeformationNonlocalLocalAssembler>(
+    std::vector<char>& data,
+    ProcessLib::SmallDeformationNonlocal::
+        SmallDeformationNonlocalLocalAssembler const& local_assembler)
+{
+    unsigned const n_integration_points =
+        local_assembler._integration_method.getNumberOfPoints();
+
+    OGS::ElementData element_data;
+    element_data.set_element_id(local_assembler._element.getID());
+    element_data.set_n_integration_points(n_integration_points);
+
+    auto small_deformation_data =
+        element_data.mutable_small_deformation_nonlocal();
+    auto common = small_deformation_data->mutable_common();
+    common->CopyFrom(
+        getSmallDeformationCommonIntegrationPointData(local_assembler));
+
+    {  // SmallDeformationNonlocal specific output.
+        unsigned const n_integration_points =
+            local_assembler._integration_method.getNumberOfPoints();
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            auto nonlocal_damage =
+                small_deformation_nonlocal.add_nonlocal_damage(
+                    local_assembler._ip_data[ip]._nonlocal_kappa_d);
+        }
     }
 
     data.resize(element_data.ByteSize());
     element_data.SerializeToArray(data.data(), element_data.ByteSize());
 
     return element_data.ByteSize();
-#else   // PROTOBUF_FOUND
-    (void)data;  // Unused argument
-    return 0;    // Dummy value needed for compilation. Code is not executed
-                 // because the integration_point_writer is not created in
-                 // absence of protobuffer.
-#endif  // PROTOBUF_FOUND
 };
+#endif  // PROTOBUF_FOUND
 
 }  // namespace ProcessLib

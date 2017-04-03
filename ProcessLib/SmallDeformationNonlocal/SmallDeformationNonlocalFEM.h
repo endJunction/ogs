@@ -485,6 +485,10 @@ public:
         SmallDeformationNonlocalLocalAssembler>(
         std::vector<char>& data,
         SmallDeformationNonlocalLocalAssembler const& local_assembler);
+    friend OGS::SmallDeformationCommon
+    getSmallDeformationCommonIntegrationPointData<
+        SmallDeformationNonlocalLocalAssembler>(
+        SmallDeformationNonlocalLocalAssembler const& local_assembler);
     std::size_t writeIntegrationPointData(std::vector<char>& data) override
     {
         return writeSmallDeformationIntegrationPointData(data, *this);
