@@ -443,6 +443,7 @@ public:
                     nonlocal_kappa_d = 0;
                 }
 
+                _ip_data[ip]._nonlocal_kappa_d = nonlocal_kappa_d;
                 _ip_data[ip]._damage =
                     _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
                 if (_ip_data[ip]._damage < 0. || _ip_data[ip]._damage > 1.)
