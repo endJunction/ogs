@@ -264,6 +264,7 @@ private:
     {
         DBUG("PostTimestep SmallDeformationNonlocalProcess.");
 
+        std::fill(std::begin(*_nodal_forces), std::end(*_nodal_forces), 0);
         GlobalExecutor::executeDereferenced(
             [this](const std::size_t mesh_item_id,
                    LocalAssemblerInterface& local_assembler,
@@ -277,8 +278,7 @@ private:
 
                 assert(local_data.size() == indices.size());
                 for (std::size_t i = 0; i < indices.size(); ++i)
-                    for (int dim = 0; dim < DisplacementDim; ++dim)
-                        node_values[indices[i]] += local_data[i];
+                    node_values[indices[i]] += local_data[i];
             },
             _local_assemblers, *_local_to_global_index_map, *_nodal_forces);
     }
