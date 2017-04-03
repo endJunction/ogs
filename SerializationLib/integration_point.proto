@@ -21,3 +21,8 @@ message SmallDeformation {
     repeated KelvinVector eps = 2;
     repeated MaterialState material_state = 3;
 }
+
+message SmallDeformationNonlocal {
+    SmallDeformation small_deformation = 1;
+    repeated double nonlocal_damage = 2;
+}
