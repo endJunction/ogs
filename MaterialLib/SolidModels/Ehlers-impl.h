@@ -511,7 +511,8 @@ void SolidEhlers<DisplacementDim>::calculateLocalKappaD(
 
 template <int DisplacementDim>
 double SolidEhlers<DisplacementDim>::updateDamage(
-    double const t, ProcessLib::SpatialPosition const& x, double const kappa_d,
+    double const t, ProcessLib::SpatialPosition const& x,
+    double const kappa_damage,
     typename MechanicsBase<DisplacementDim>::MaterialStateVariables&
         material_state_variables)
 {
@@ -524,7 +525,7 @@ double SolidEhlers<DisplacementDim>::updateDamage(
     double const beta_d = _damage_properties->beta_d(t, x)[0];
 
     // Update internal damage variable.
-    _state.damage = (1 - beta_d) * (1 - std::exp(-kappa_d / alpha_d));
+    _state.damage = (1 - beta_d) * (1 - std::exp(-kappa_damage / alpha_d));
 
     return _state.damage;
 }

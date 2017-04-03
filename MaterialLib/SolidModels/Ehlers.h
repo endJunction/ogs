@@ -241,11 +241,11 @@ public:
         typename MechanicsBase<DisplacementDim>::MaterialStateVariables&
             material_state_variables) override;
 
-    /// Updates the internal damage based on the given kappa_d value.
+    /// Updates the internal damage based on the given kappa_damage value.
     /// \returns the new updated damage value.
     double updateDamage(
         double const t, ProcessLib::SpatialPosition const& x,
-        double const kappa_d,
+        double const kappa_damage,
         typename MechanicsBase<DisplacementDim>::MaterialStateVariables&
             material_state_variables);
 
