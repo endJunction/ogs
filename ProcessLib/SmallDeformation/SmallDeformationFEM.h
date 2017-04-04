@@ -327,17 +327,28 @@ public:
         readSmallDeformationIntegrationPointData(data, *this);
     }
 
-    friend std::size_t
-    writeSmallDeformationIntegrationPointData<SmallDeformationLocalAssembler>(
-        std::vector<char>& data,
-        SmallDeformationLocalAssembler const& local_assembler);
     friend OGS::SmallDeformationCommon
     getSmallDeformationCommonIntegrationPointData<
         SmallDeformationLocalAssembler>(
         SmallDeformationLocalAssembler const& local_assembler);
     std::size_t writeIntegrationPointData(std::vector<char>& data) override
     {
-        return writeSmallDeformationIntegrationPointData(data, *this);
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        OGS::ElementData element_data;
+        element_data.set_element_id(_element.getID());
+        element_data.set_n_integration_points(n_integration_points);
+
+        auto small_deformation_data = element_data.mutable_small_deformation();
+        auto common = small_deformation_data->mutable_common();
+        common->CopyFrom(
+            getSmallDeformationCommonIntegrationPointData(*this));
+
+        data.resize(element_data.ByteSize());
+        element_data.SerializeToArray(data.data(), element_data.ByteSize());
+
+        return element_data.ByteSize();
     };
 
     std::vector<double> const& getNodalValues(

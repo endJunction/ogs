@@ -481,17 +481,40 @@ public:
         readSmallDeformationIntegrationPointData(data, *this);
     }
 
-    friend std::size_t writeSmallDeformationIntegrationPointData<
-        SmallDeformationNonlocalLocalAssembler>(
-        std::vector<char>& data,
-        SmallDeformationNonlocalLocalAssembler const& local_assembler);
     friend OGS::SmallDeformationCommon
     getSmallDeformationCommonIntegrationPointData<
         SmallDeformationNonlocalLocalAssembler>(
         SmallDeformationNonlocalLocalAssembler const& local_assembler);
     std::size_t writeIntegrationPointData(std::vector<char>& data) override
     {
-        return writeSmallDeformationIntegrationPointData(data, *this);
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        OGS::ElementData element_data;
+        element_data.set_element_id(_element.getID());
+        element_data.set_n_integration_points(n_integration_points);
+
+        auto small_deformation_nonlocal =
+            element_data.mutable_small_deformation_nonlocal();
+        auto common = small_deformation_nonlocal->mutable_common();
+        common->CopyFrom(
+            getSmallDeformationCommonIntegrationPointData(*this));
+
+        {  // SmallDeformationNonlocal specific output.
+            unsigned const n_integration_points =
+                _integration_method.getNumberOfPoints();
+
+            for (unsigned ip = 0; ip < n_integration_points; ip++)
+            {
+                small_deformation_nonlocal->add_nonlocal_damage(
+                    _ip_data[ip]._nonlocal_kappa_d);
+            }
+        }
+
+        data.resize(element_data.ByteSize());
+        element_data.SerializeToArray(data.data(), element_data.ByteSize());
+
+        return element_data.ByteSize();
     };
 
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
