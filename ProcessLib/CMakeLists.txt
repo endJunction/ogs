@@ -25,6 +25,7 @@ protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS SmallDeformationCommon/integration_p
 list(APPEND SOURCES ${PROTO_SRCS} ${PROTO_HDRS})
 endif() # Protobuf_FOUND
 
+APPEND_SOURCE_FILES(SOURCES SmallDeformationCommon)
 APPEND_SOURCE_FILES(SOURCES SmallDeformation)
 APPEND_SOURCE_FILES(SOURCES SmallDeformationNonlocal)
 APPEND_SOURCE_FILES(SOURCES TES)
