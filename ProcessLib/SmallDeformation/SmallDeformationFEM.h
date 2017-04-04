@@ -12,9 +12,9 @@
 #include <memory>
 #include <vector>
 
+#include "MaterialLib/SolidModels/Ehlers.h"
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/Lubby2.h"
-#include "MaterialLib/SolidModels/Ehlers.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"
@@ -90,11 +90,7 @@ struct IntegrationPointData final
         material_state_variables->pushBackState();
     }
 
-    std::tuple<double, double> getLocalVariable() const
-    {
-        return {-1, -1};
-    }
-
+    std::tuple<double, double> getLocalVariable() const { return {-1, -1}; }
     double const* eps_p_V;
     double const* eps_p_D_xx;
 };
