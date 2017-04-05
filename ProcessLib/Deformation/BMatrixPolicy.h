@@ -91,5 +91,13 @@ public:
         MatrixType<_kelvin_vector_size, _kelvin_vector_size>;
 
     using BMatrixType = MatrixType<_kelvin_vector_size, _number_of_dof>;
+
+    // For the 2D case the 33-component is needed (and the four entries
+    // of the non-symmetric matrix); In 3d there are nine entries.
+    using GradientMatrixType = MatrixType<DisplacementDim * DisplacementDim +
+                                              (DisplacementDim == 2 ? 1 : 0),
+                                          _number_of_dof>;
+    using GradientVectorType = VectorType<DisplacementDim * DisplacementDim +
+                                          (DisplacementDim == 2 ? 1 : 0)>;
 };
 }  // namespace ProcessLib
