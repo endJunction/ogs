@@ -24,6 +24,9 @@ struct SmallDeformationLocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
       public NumLib::ExtrapolatableElement
 {
+    virtual std::vector<double> const& getIntPtFreeEnergyDensity(
+        std::vector<double>& cache) const = 0;
+
     virtual std::vector<double> const& getIntPtSigma(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
