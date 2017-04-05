@@ -104,6 +104,14 @@ struct MechanicsBase
                     KelvinVector const& sigma_prev,
                     MaterialStateVariables const& material_state_variables) = 0;
 
+    virtual double computeFreeEnergyDensity(
+        KelvinVector const& eps,
+        KelvinVector const& sigma,
+        MaterialStateVariables const& material_state_variables) const
+    {
+        return -42;
+    }
+
     virtual ~MechanicsBase() = default;
 };
 
