@@ -27,6 +27,7 @@ std::unique_ptr<ParameterBase> createGroupBasedParameter(
     std::string const group_id_property_name = config.getConfigParameter<std::string>("group_id_property");
     DBUG("Using group_id_property %s", group_id_property_name.c_str());
 
+    // TODO Extend to int64 and unsigned.
     auto const& group_id_property =
         mesh.getProperties().getPropertyVector<int>(group_id_property_name);
 
