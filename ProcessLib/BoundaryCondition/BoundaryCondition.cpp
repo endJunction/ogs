@@ -14,6 +14,7 @@
 #include "MeshGeoToolsLib/CreateSearchLength.h"
 #include "MeshGeoToolsLib/MeshNodeSearcher.h"
 #include "MeshGeoToolsLib/SearchLength.h"
+#include "HydrostaticBoundaryCondition.h"
 #include "NeumannBoundaryCondition.h"
 #include "NonuniformDirichletBoundaryCondition.h"
 #include "NonuniformNeumannBoundaryCondition.h"
@@ -36,6 +37,13 @@ BoundaryConditionBuilder::createBoundaryCondition(
     if (type == "Dirichlet")
     {
         return createDirichletBoundaryCondition(
+                    config, dof_table, mesh, variable_id,
+                    integration_order, shapefunction_order, parameters,
+                    mesh_node_searcher, boundary_element_searcher);
+    }
+    else if (type == "Hydrostatic")
+    {
+        return createHydrostaticBoundaryCondition(
                     config, dof_table, mesh, variable_id,
                     integration_order, shapefunction_order, parameters);
     }
@@ -127,6 +135,55 @@ BoundaryConditionBuilder::createDirichletBoundaryCondition(
     return ProcessLib::createDirichletBoundaryCondition(
         config.config, std::move(ids), dof_table, mesh.getID(), variable_id,
         *config.component_id, parameters);
+}
+
+std::unique_ptr<BoundaryCondition>
+BoundaryConditionBuilder::createHydrostaticBoundaryCondition(
+        const BoundaryConditionConfig& config,
+        const NumLib::LocalToGlobalIndexMap& dof_table, const MeshLib::Mesh& mesh,
+        const int variable_id, const unsigned /*integration_order*/,
+        const unsigned /*shapefunction_order*/,
+        const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters,
+        MeshGeoToolsLib::MeshNodeSearcher& mesh_node_searcher,
+        MeshGeoToolsLib::BoundaryElementsSearcher& /*boundary_element_searcher*/)
+{
+    // Find nodes' ids on the given mesh on which this boundary condition
+    // is defined.
+    std::vector<std::size_t> ids =
+        mesh_node_searcher.getMeshNodeIDs(config.geometry);
+    // Filter out ids, which are not part of mesh subsets corresponding to
+    // the variable_id and component_id.
+
+    // Sorted ids of all mesh_subsets.
+    std::vector<std::size_t> sorted_nodes_ids;
+
+    auto const& mesh_subsets =
+        dof_table.getMeshSubsets(variable_id, config.component_id);
+    for (auto const& mesh_subset : mesh_subsets)
+    {
+        auto const& nodes = mesh_subset->getNodes();
+        sorted_nodes_ids.reserve(sorted_nodes_ids.size() + nodes.size());
+        std::transform(std::begin(nodes), std::end(nodes),
+                       std::back_inserter(sorted_nodes_ids),
+                       [](MeshLib::Node* const n) { return n->getID(); });
+    }
+    std::sort(std::begin(sorted_nodes_ids), std::end(sorted_nodes_ids));
+
+    auto ids_new_end_iterator = std::end(ids);
+    ids_new_end_iterator = std::remove_if(
+        std::begin(ids), ids_new_end_iterator,
+        [&sorted_nodes_ids](std::size_t const node_id) {
+            return !std::binary_search(std::begin(sorted_nodes_ids),
+                                       std::end(sorted_nodes_ids), node_id);
+        });
+    ids.erase(ids_new_end_iterator, std::end(ids));
+
+    DBUG("Found %d nodes for Hydrostatic BCs for the variable %d and component %d",
+         ids.size(), variable_id, config.component_id);
+
+    return ProcessLib::createHydrostaticBoundaryCondition(
+        config.config, std::move(ids), dof_table, mesh.getID(), variable_id,
+        config.component_id, parameters, mesh);
 }
 
 std::unique_ptr<BoundaryCondition>
