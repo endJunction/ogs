@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include <cmath>
 #include <array>
+#include <boost/math/special_functions/pow.hpp>
+#include <cmath>
 
 #include "MathLib/Integration/GaussLegendre.h"
 #include "MathLib/TemplateWeightedPoint.h"
@@ -45,7 +46,8 @@ public:
     /// Change the integration order.
     void setIntegrationOrder(unsigned order)
     {
-        this->_n_sampl_pt = static_cast<unsigned>(std::pow(order, N_DIM));
+        this->_n_sampl_pt =
+            static_cast<unsigned>(boost::math::pow<N_DIM>(order));
         this->_order = order;
     }
 

@@ -10,6 +10,7 @@
  *
  */
 
+#include <boost/math/special_functions/pow.hpp>
 #include <cassert>
 
 namespace NumLib
@@ -28,7 +29,7 @@ template <>
 inline std::array<unsigned, 2>
 IntegrationGaussRegular<2>::getPositionIndices(unsigned order, unsigned igp)
 {
-    assert(igp < order*order);
+    assert(igp < boost::math::pow<2>(order));
     std::array<unsigned, 2> result;
     result[0] = igp / order;
     result[1] = igp % order;
@@ -39,7 +40,7 @@ template <>
 inline std::array<unsigned, 3>
 IntegrationGaussRegular<3>::getPositionIndices(unsigned order, unsigned igp)
 {
-    assert(igp < order*order*order);
+    assert(igp < boost::math::pow<3>(order));
     unsigned const gp_r = igp / (order * order);
     unsigned const gp_s = igp % (order * order);
     std::array<unsigned, 3> result;
@@ -54,7 +55,7 @@ inline MathLib::TemplateWeightedPoint<double, double, N_DIM>
 IntegrationGaussRegular<N_DIM>::getWeightedPoint(unsigned order,
                                                  unsigned igp)
 {
-    assert(igp < std::pow(order, N_DIM));
+    assert(igp < boost::math::pow<N_DIM>(order));
     std::array<unsigned, N_DIM> const pos = getPositionIndices(order, igp);
 
     switch (order)
