@@ -43,34 +43,49 @@ class PyramidRule5 : public CellRule
 {
 public:
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = 5u;
+    static constexpr unsigned n_base_nodes = 5u;
 
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 5u;
+    static constexpr unsigned n_all_nodes = 5u;
 
     /// Constant: The geometric type of the element
-    static const MeshElemType mesh_elem_type = MeshElemType::PYRAMID;
+    static constexpr MeshElemType mesh_elem_type = MeshElemType::PYRAMID;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::PYRAMID5;
+    static constexpr CellType cell_type = CellType::PYRAMID5;
 
     /// Constant: The number of faces
-    static const unsigned n_faces = 5;
+    static constexpr unsigned n_faces = 5;
 
     /// Constant: The number of edges
-    static const unsigned n_edges = 8;
+    static constexpr unsigned n_edges = 8;
 
     /// Constant: The number of neighbors
-    static const unsigned n_neighbors = 5;
+    static constexpr unsigned n_neighbors = 5;
 
     /// Constant: Local node index table for faces
-    static const unsigned face_nodes[5][4];
+    static constexpr unsigned face_nodes[5][4] = {
+        {0, 1, 4, 99},  // Face 0
+        {1, 2, 4, 99},  // Face 1
+        {2, 3, 4, 99},  // Face 2
+        {3, 0, 4, 99},  // Face 3
+        {0, 3, 2, 1}    // Face 4
+    };
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[8][2];
+    static constexpr unsigned edge_nodes[8][2] = {
+        {0, 1},  // Edge 0
+        {1, 2},  // Edge 1
+        {2, 3},  // Edge 2
+        {0, 3},  // Edge 3
+        {0, 4},  // Edge 4
+        {1, 4},  // Edge 5
+        {2, 4},  // Edge 6
+        {3, 4}   // Edge 7
+    };
 
     /// Constant: Table for the number of nodes for each face
-    static const unsigned n_face_nodes[5];
+    static constexpr unsigned n_face_nodes[5] = {3, 3, 3, 3, 4};
 
     /// Returns the i-th edge of the element.
     using EdgeReturn = MeshLib::LinearEdgeReturn;

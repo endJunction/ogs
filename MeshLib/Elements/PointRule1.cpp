@@ -14,10 +14,7 @@
 
 namespace MeshLib {
 
-const unsigned PointRule1::edge_nodes[1][1] =
-{
-    {0}
-};
+constexpr unsigned PointRule1::edge_nodes[1][1];
 
 double PointRule1::computeVolume(Node const* const* /*_nodes*/)
 {

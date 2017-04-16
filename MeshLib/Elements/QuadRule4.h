@@ -37,25 +37,30 @@ class QuadRule4 : public FaceRule
 {
 public:
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = 4u;
+    static constexpr unsigned n_base_nodes = 4u;
 
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 4u;
+    static constexpr unsigned n_all_nodes = 4u;
 
     /// Constant: The geometric type of the element
-    static const MeshElemType mesh_elem_type = MeshElemType::QUAD;
+    static constexpr MeshElemType mesh_elem_type = MeshElemType::QUAD;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::QUAD4;
+    static constexpr CellType cell_type = CellType::QUAD4;
 
     /// Constant: The number of edges
-    static const unsigned n_edges = 4;
+    static constexpr unsigned n_edges = 4;
 
     /// Constant: The number of neighbors
-    static const unsigned n_neighbors = 4;
+    static constexpr unsigned n_neighbors = 4;
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[4][2];
+    static constexpr unsigned edge_nodes[4][2] = {
+        {0, 1},  // Edge 0
+        {1, 2},  // Edge 1
+        {2, 3},  // Edge 2
+        {0, 3}   // Edge 3
+    };
 
     /// Returns the i-th edge of the element.
     using EdgeReturn = MeshLib::LinearEdgeReturn;

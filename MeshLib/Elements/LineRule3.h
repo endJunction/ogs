@@ -25,10 +25,10 @@ class LineRule3 : public LineRule2
 {
 public:
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 3u;
+    static constexpr unsigned n_all_nodes = 3u;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::LINE3;
+    static constexpr CellType cell_type = CellType::LINE3;
 
     /// Edge rule
     using EdgeReturn = MeshLib::QuadraticEdgeReturn;

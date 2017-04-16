@@ -38,25 +38,29 @@ class TriRule3 : public FaceRule
 {
 public:
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = 3u;
+    static constexpr unsigned n_base_nodes = 3u;
 
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 3u;
+    static constexpr unsigned n_all_nodes = 3u;
 
     /// Constant: The geometric type of the element
-    static const MeshElemType mesh_elem_type = MeshElemType::TRIANGLE;
+    static constexpr MeshElemType mesh_elem_type = MeshElemType::TRIANGLE;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::TRI3;
+    static constexpr CellType cell_type = CellType::TRI3;
 
     /// Constant: The number of edges
-    static const unsigned n_edges = 3;
+    static constexpr unsigned n_edges = 3;
 
     /// Constant: The number of neighbors
-    static const unsigned n_neighbors = 3;
+    static constexpr unsigned n_neighbors = 3;
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[3][2];
+    static constexpr unsigned edge_nodes[3][2] = {
+        {0, 1},  // Edge 0
+        {1, 2},  // Edge 1
+        {2, 0},  // Edge 2
+    };
 
     /// Returns the i-th edge of the element.
     using EdgeReturn = MeshLib::LinearEdgeReturn;

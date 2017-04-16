@@ -35,10 +35,10 @@ class QuadRule9 : public QuadRule8
 {
 public:
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 9u;
+    static constexpr unsigned n_all_nodes = 9u;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::QUAD9;
+    static constexpr CellType cell_type = CellType::QUAD9;
 }; /* class */
 
 } /* namespace */

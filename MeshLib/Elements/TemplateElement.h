@@ -32,13 +32,13 @@ class TemplateElement : public Element
 {
 public:
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = ELEMENT_RULE::n_all_nodes;
+    static constexpr unsigned n_all_nodes = ELEMENT_RULE::n_all_nodes;
 
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = ELEMENT_RULE::n_base_nodes;
+    static constexpr unsigned n_base_nodes = ELEMENT_RULE::n_base_nodes;
 
     /// Constant: The dimension of this element
-    static const unsigned dimension = ELEMENT_RULE::dimension;
+    static constexpr unsigned dimension = ELEMENT_RULE::dimension;
 
     /**
      * Constructor with an array of mesh nodes.

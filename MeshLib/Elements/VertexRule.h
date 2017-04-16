@@ -18,13 +18,13 @@ class VertexRule
 {
 public:
     /// Constant: Dimension of this mesh element
-    static const unsigned dimension = 0u;
+    static constexpr unsigned dimension = 0u;
 
     /// Constant: The number of faces
-    static const unsigned n_faces = 0;
+    static constexpr unsigned n_faces = 0;
 
     /// Constant: The number of edges
-    static const unsigned n_edges = 0;
+    static constexpr unsigned n_edges = 0;
 
     /// Returns the i-th face of the element.
     static const Element* getFace(const Element* /*e*/, unsigned /*i*/)

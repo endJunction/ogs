@@ -27,22 +27,22 @@ class LineRule2 : public EdgeRule
 {
 public:
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = 2u;
+    static constexpr unsigned n_base_nodes = 2u;
 
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 2u;
+    static constexpr unsigned n_all_nodes = 2u;
 
     /// Constant: The geometric type of the element
-    static const MeshElemType mesh_elem_type = MeshElemType::LINE;
+    static constexpr MeshElemType mesh_elem_type = MeshElemType::LINE;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::LINE2;
+    static constexpr CellType cell_type = CellType::LINE2;
 
     /// Constant: The number of neighbors
-    static const unsigned n_neighbors = 2;
+    static constexpr unsigned n_neighbors = 2;
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[1][2];
+    static constexpr unsigned edge_nodes[1][2] = {{0, 1}};  // Edge 0
 
     /// Edge rule
     using EdgeReturn = MeshLib::LinearEdgeReturn;

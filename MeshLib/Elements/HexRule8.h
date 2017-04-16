@@ -46,31 +46,51 @@ class HexRule8 : public CellRule
 {
 public:
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = 8u;
+    static constexpr unsigned n_base_nodes = 8u;
 
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 8u;
+    static constexpr unsigned n_all_nodes = 8u;
 
     /// Constant: The geometric type of the element
-    static const MeshElemType mesh_elem_type = MeshElemType::HEXAHEDRON;
+    static constexpr MeshElemType mesh_elem_type = MeshElemType::HEXAHEDRON;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::HEX8;
+    static constexpr CellType cell_type = CellType::HEX8;
 
     /// Constant: The number of faces
-    static const unsigned n_faces = 6;
+    static constexpr unsigned n_faces = 6;
 
     /// Constant: The number of edges
-    static const unsigned n_edges = 12;
+    static constexpr unsigned n_edges = 12;
 
     /// Constant: The number of neighbors
-    static const unsigned n_neighbors = 6;
+    static constexpr unsigned n_neighbors = 6;
 
     /// Constant: Local node index table for faces
-    static const unsigned face_nodes[6][4];
+    static constexpr unsigned face_nodes[6][4] = {
+        {0, 3, 2, 1},  // Face 0
+        {0, 1, 5, 4},  // Face 1
+        {1, 2, 6, 5},  // Face 2
+        {2, 3, 7, 6},  // Face 3
+        {3, 0, 4, 7},  // Face 4
+        {4, 5, 6, 7}   // Face 5
+    };
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[12][2];
+    static constexpr unsigned edge_nodes[12][2] = {
+        {0, 1},  // Edge 0
+        {1, 2},  // Edge 1
+        {2, 3},  // Edge 2
+        {0, 3},  // Edge 3
+        {4, 5},  // Edge 4
+        {5, 6},  // Edge 5
+        {6, 7},  // Edge 6
+        {4, 7},  // Edge 7
+        {0, 4},  // Edge 8
+        {1, 5},  // Edge 9
+        {2, 6},  // Edge 10
+        {3, 7}   // Edge 11
+    };
 
     /// Returns the i-th edge of the element.
     using EdgeReturn = MeshLib::LinearEdgeReturn;

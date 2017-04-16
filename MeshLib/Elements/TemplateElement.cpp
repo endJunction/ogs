@@ -22,13 +22,13 @@
 /// \todo Windows compiler does not accept this definition and issues a linking
 /// error.
 template <class ELEMENT_RULE>
-const unsigned MeshLib::TemplateElement<ELEMENT_RULE>::n_all_nodes;
+constexpr unsigned MeshLib::TemplateElement<ELEMENT_RULE>::n_all_nodes;
 
 template <class ELEMENT_RULE>
-const unsigned MeshLib::TemplateElement<ELEMENT_RULE>::n_base_nodes;
+constexpr unsigned MeshLib::TemplateElement<ELEMENT_RULE>::n_base_nodes;
 
 template <class ELEMENT_RULE>
-const unsigned MeshLib::TemplateElement<ELEMENT_RULE>::dimension;
+constexpr unsigned MeshLib::TemplateElement<ELEMENT_RULE>::dimension;
 #endif // WIN32
 
 template class MeshLib::TemplateElement<MeshLib::HexRule20>;

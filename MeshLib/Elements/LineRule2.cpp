@@ -15,10 +15,7 @@
 
 namespace MeshLib {
 
-const unsigned LineRule2::edge_nodes[1][2] =
-{
-    {0, 1} // Edge 0
-};
+constexpr unsigned LineRule2::edge_nodes[1][2];
 
 double LineRule2::computeVolume(Node const* const* _nodes)
 {

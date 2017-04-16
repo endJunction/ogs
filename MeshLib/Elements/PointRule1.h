@@ -22,22 +22,22 @@ class PointRule1 : public VertexRule
 {
 public:
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = 1u;
+    static constexpr unsigned n_base_nodes = 1u;
 
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 1u;
+    static constexpr unsigned n_all_nodes = 1u;
 
     /// Constant: The geometric type of the element
-    static const MeshElemType mesh_elem_type = MeshElemType::POINT;
+    static constexpr MeshElemType mesh_elem_type = MeshElemType::POINT;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::POINT1;
+    static constexpr CellType cell_type = CellType::POINT1;
 
     /// Constant: The number of neighbors
-    static const unsigned n_neighbors = 2;
+    static constexpr unsigned n_neighbors = 2;
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[1][1];
+    static constexpr unsigned edge_nodes[1][1] = {{0}};
 
     /// Edge rule
     using EdgeReturn = MeshLib::NoEdgeReturn;

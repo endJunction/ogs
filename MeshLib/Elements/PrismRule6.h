@@ -44,34 +44,50 @@ class PrismRule6 : public CellRule
 {
 public:
     /// Constant: The number of base nodes for this element
-    static const unsigned n_base_nodes = 6u;
+    static constexpr unsigned n_base_nodes = 6u;
 
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 6u;
+    static constexpr unsigned n_all_nodes = 6u;
 
     /// Constant: The geometric type of the element
-    static const MeshElemType mesh_elem_type = MeshElemType::PRISM;
+    static constexpr MeshElemType mesh_elem_type = MeshElemType::PRISM;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::PRISM6;
+    static constexpr CellType cell_type = CellType::PRISM6;
 
     /// Constant: The number of faces
-    static const unsigned n_faces = 5;
+    static constexpr unsigned n_faces = 5;
 
     /// Constant: The number of edges
-    static const unsigned n_edges = 9;
+    static constexpr unsigned n_edges = 9;
 
     /// Constant: The number of neighbors
-    static const unsigned n_neighbors = 5;
+    static constexpr unsigned n_neighbors = 5;
 
     /// Constant: Local node index table for faces
-    static const unsigned face_nodes[5][4];
+    static constexpr unsigned face_nodes[5][4] = {
+        {0, 2, 1, 99},  // Face 0
+        {0, 1, 4, 3},   // Face 1
+        {1, 2, 5, 4},   // Face 2
+        {2, 0, 3, 5},   // Face 3
+        {3, 4, 5, 99}   // Face 4
+    };
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[9][2];
+    static constexpr unsigned edge_nodes[9][2] = {
+        {0, 1},  // Edge 0
+        {1, 2},  // Edge 1
+        {0, 2},  // Edge 2
+        {0, 3},  // Edge 3
+        {1, 4},  // Edge 4
+        {2, 5},  // Edge 5
+        {3, 4},  // Edge 6
+        {4, 5},  // Edge 7
+        {3, 5}   // Edge 8
+    };
 
     /// Constant: Table for the number of nodes for each face
-    static const unsigned n_face_nodes[5];
+    static constexpr unsigned n_face_nodes[5] = {3, 4, 4, 4, 3};
 
     /// Returns the i-th edge of the element.
     using EdgeReturn = MeshLib::LinearEdgeReturn;

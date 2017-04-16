@@ -19,13 +19,13 @@ class FaceRule
 {
 public:
     /// Constant: Dimension of this mesh element
-    static const unsigned dimension = 2u;
+    static constexpr unsigned dimension = 2u;
 
     /// Returns the face i of the element.
     static const Element* getFace(const Element* e, unsigned i) { return e->getEdge(i); }
 
     /// Constant: The number of faces
-    static const unsigned n_faces = 0;
+    static constexpr unsigned n_faces = 0;
 
     /**
      * Checks if the node order of an element is correct by testing surface normals.

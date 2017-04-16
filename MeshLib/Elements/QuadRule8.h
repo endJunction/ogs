@@ -36,13 +36,18 @@ class QuadRule8 : public QuadRule4
 {
 public:
     /// Constant: The number of all nodes for this element
-    static const unsigned n_all_nodes = 8u;
+    static constexpr unsigned n_all_nodes = 8u;
 
     /// Constant: The FEM type of the element
-    static const CellType cell_type = CellType::QUAD8;
+    static constexpr CellType cell_type = CellType::QUAD8;
 
     /// Constant: Local node index table for edge
-    static const unsigned edge_nodes[4][3];
+    static constexpr unsigned edge_nodes[4][3] = {
+        {0, 1, 4},  // Edge 0
+        {1, 2, 5},  // Edge 1
+        {2, 3, 6},  // Edge 2
+        {0, 3, 7}   // Edge 3
+    };
 
     /// Returns the i-th edge of the element.
     using EdgeReturn = MeshLib::QuadraticEdgeReturn;

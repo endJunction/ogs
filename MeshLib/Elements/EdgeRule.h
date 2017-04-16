@@ -18,13 +18,13 @@ class EdgeRule
 {
 public:
     /// Constant: Dimension of this mesh element
-    static const unsigned dimension = 1u;
+    static constexpr unsigned dimension = 1u;
 
     /// Constant: The number of faces
-    static const unsigned n_faces = 0;
+    static constexpr unsigned n_faces = 0;
 
     /// Constant: The number of edges
-    static const unsigned n_edges = 1;
+    static constexpr unsigned n_edges = 1;
 
     /// Returns the i-th face of the element.
     static const Element* getFace(const Element* /*e*/, unsigned /*i*/) { return nullptr; }

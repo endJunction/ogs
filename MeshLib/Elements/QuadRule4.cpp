@@ -17,13 +17,7 @@
 
 namespace MeshLib {
 
-const unsigned QuadRule4::edge_nodes[4][2] =
-{
-        {0, 1}, // Edge 0
-        {1, 2}, // Edge 1
-        {2, 3}, // Edge 2
-        {0, 3}  // Edge 3
-};
+constexpr unsigned QuadRule4::edge_nodes[4][2];
 
 double QuadRule4::computeVolume(Node const* const* _nodes)
 {
