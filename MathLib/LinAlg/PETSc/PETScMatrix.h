@@ -22,8 +22,6 @@
 
 #include "MathLib/LinAlg/RowColumnIndices.h"
 
-typedef Mat PETSc_Mat;
-
 namespace MathLib
 {
 /*!
