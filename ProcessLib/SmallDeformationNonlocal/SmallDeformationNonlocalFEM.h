@@ -509,7 +509,7 @@ public:
     {
         readSmallDeformationIntegrationPointData(data, *this);
     }
-
+#ifdef PROTOBUF_FOUND
     friend OGS::SmallDeformationCommon
     getSmallDeformationCommonIntegrationPointData<
         SmallDeformationNonlocalLocalAssembler>(
@@ -544,6 +544,12 @@ public:
 
         return element_data.ByteSize();
     };
+#else
+    std::size_t writeIntegrationPointData(std::vector<char>& data) override
+    {
+        return 0;
+    }
+#endif
 
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
         const unsigned integration_point) const override

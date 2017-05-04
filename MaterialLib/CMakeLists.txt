@@ -21,16 +21,22 @@ append_source_files(SOURCES PorousMedium/UnsaturatedProperty/CapillaryPressure)
 append_source_files(SOURCES PorousMedium/UnsaturatedProperty/RelativePermeability)
 append_source_files(SOURCES TwoPhaseModels)
 
-add_library(MaterialLib ${SOURCES})
+add_library(MaterialLib ${SOURCES} )
 
 include(GenerateExportHeader)
 generate_export_header(MaterialLib)
 target_include_directories(MaterialLib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(MaterialLib
-    PUBLIC BaseLib NumLib SerializationLib logog # ProcessLib
+    PUBLIC BaseLib NumLib logog # ProcessLib
     PRIVATE MathLib MeshLib
 )
+
+if(Protobuf_FOUND)
+target_link_libraries(MaterialLib
+    PUBLIC SerializationLib
+)
+endif()
 
 if(OGS_USE_PCH)
     cotire(MaterialLib)
