@@ -142,6 +142,7 @@ struct MechanicsBase
         return -42;
     }
 
+#ifdef PROTOBUF_FOUND
     virtual OGS::MaterialState writeMaterialState(
         MaterialStateVariables const& material_state_variables) const
     {
@@ -149,6 +150,7 @@ struct MechanicsBase
                      // because the integration_point_writer is not created in
                      // absence of protobuffer.
     }
+#endif
 
     virtual ~MechanicsBase() = default;
 };
