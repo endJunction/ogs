@@ -18,7 +18,6 @@ APPEND_SOURCE_FILES(SOURCES LIE/SmallDeformation/LocalAssembler)
 APPEND_SOURCE_FILES(SOURCES LiquidFlow)
 APPEND_SOURCE_FILES(SOURCES Parameter)
 APPEND_SOURCE_FILES(SOURCES RichardsFlow)
-APPEND_SOURCE_FILES(SOURCES SmallDeformationCommon)
 APPEND_SOURCE_FILES(SOURCES SmallDeformation)
 APPEND_SOURCE_FILES(SOURCES SmallDeformationNonlocal)
 APPEND_SOURCE_FILES(SOURCES TES)
@@ -30,7 +29,7 @@ APPEND_SOURCE_FILES(SOURCES Utils)
 add_library(ProcessLib ${SOURCES})
 
 target_link_libraries(ProcessLib
-    PUBLIC BaseLib GeoLib MaterialLib MathLib MeshLib NumLib SerializationLib logog
+    PUBLIC BaseLib GeoLib MaterialLib MathLib MeshLib NumLib logog
     PRIVATE MeshGeoToolsLib
 )
 
@@ -48,6 +47,11 @@ endif()
 
 if(OGS_USE_PCH)
     cotire(ProcessLib)
+endif()
+
+if(Protobuf_FOUND)
+target_link_libraries(ProcessLib
+    PUBLIC SerializationLib)
 endif()
 
 ### Tests ###
