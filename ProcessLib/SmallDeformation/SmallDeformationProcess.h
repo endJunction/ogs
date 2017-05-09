@@ -49,6 +49,10 @@ private:
         MeshLib::Mesh const& mesh,
         unsigned const integration_order) override;
 
+    std::size_t writeIntegrationPointData(
+        MeshLib::PropertyVector<char>& output,
+        MeshLib::PropertyVector<std::size_t>& offsets);
+
     void assembleConcreteProcess(
         const double t, GlobalVector const& x, GlobalMatrix& M, GlobalMatrix& K,
         GlobalVector& b) override;
@@ -57,6 +61,10 @@ private:
         const double t, GlobalVector const& x, GlobalVector const& xdot,
         const double dxdot_dx, const double dx_dx, GlobalMatrix& M,
         GlobalMatrix& K, GlobalVector& b, GlobalMatrix& Jac) override;
+
+
+    void setInitialConditionsConcreteProcess(double const t,
+                                             GlobalVector const& x) override;
 
     void preTimestepConcreteProcess(
         GlobalVector const& x, double const t, double const dt,
