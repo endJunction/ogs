@@ -79,6 +79,17 @@ void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
                              getIntPtFreeEnergyDensity));
 
     Base::_secondary_variables.addSecondaryVariable(
+        "eps_p_V", 1,
+        makeExtrapolator(
+            getExtrapolator(), _local_assemblers,
+            &SmallDeformationLocalAssemblerInterface::getIntPtEpsPV));
+    Base::_secondary_variables.addSecondaryVariable(
+        "eps_p_D_xx", 1,
+        makeExtrapolator(
+            getExtrapolator(), _local_assemblers,
+            &SmallDeformationLocalAssemblerInterface::getIntPtEpsPDXX));
+
+    Base::_secondary_variables.addSecondaryVariable(
         "sigma_xx", 1,
         makeExtrapolator(
             getExtrapolator(), _local_assemblers,
@@ -154,6 +165,35 @@ void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
                 getExtrapolator(), _local_assemblers,
                 &SmallDeformationLocalAssemblerInterface::getIntPtEpsilonXZ));
     }
+
+#ifdef PROTOBUF_FOUND
+        Base::integration_point_writer = [this](
+            MeshLib::PropertyVector<char>& output,
+            MeshLib::PropertyVector<std::size_t>& offsets) {
+            return writeIntegrationPointData(output, offsets);
+        };
+#endif  // PROTOBUF_FOUND
+}
+
+template <int DisplacementDim>
+std::size_t SmallDeformationProcess<DisplacementDim>::writeIntegrationPointData(
+    MeshLib::PropertyVector<char>& output,
+    MeshLib::PropertyVector<std::size_t>& offsets)
+{
+    output.clear();
+    offsets.clear();
+    std::vector<char> local_data;
+    std::size_t offset = 0;
+    for (auto& la : _local_assemblers)
+    {
+        offsets.push_back(offset);
+        std::size_t const local_offset =
+            la->writeIntegrationPointData(local_data);
+        std::copy_n(std::begin(local_data), local_offset,
+                    std::back_inserter(output));
+        offset += local_offset;
+    }
+    return offset;
 }
 
 template <int DisplacementDim>
@@ -188,6 +228,48 @@ void SmallDeformationProcess<DisplacementDim>::
     b.copyValues(*_nodal_forces);
     std::transform(_nodal_forces->begin(), _nodal_forces->end(),
                    _nodal_forces->begin(), [](double val) { return -val; });
+}
+
+template <int DisplacementDim>
+void SmallDeformationProcess<DisplacementDim>::
+    setInitialConditionsConcreteProcess(double const t,
+                                        GlobalVector const& x) override
+{
+    DBUG("SetInitialConditions SmallDeformationProcess.");
+
+    if (!_mesh.getProperties().hasPropertyVector("integration_point_data"))
+        return;
+    if (!_mesh.getProperties().hasPropertyVector("integration_point_offsets"))
+        OGS_FATAL(
+            "integration_point_data field exists in the input but there is "
+            "no integration_point_offsets cell data.");
+
+    auto const& data = *_mesh.getProperties().template getPropertyVector<char>(
+        "integration_point_data");
+    assert(data.getMeshItemType() == MeshLib::MeshItemType::IntegrationPoint);
+
+    auto const& offsets =
+        *_mesh.getProperties().template getPropertyVector<std::size_t>(
+            "integration_point_offsets");
+    assert(offsets.getMeshItemType() == MeshLib::MeshItemType::Cell);
+
+    std::vector<char> local_data;
+    assert(_local_assemblers.size() == offsets.size());
+    // Starting counting from one; the last cell is handled after the loop.
+    std::size_t i = 0;
+    for (; i < _local_assemblers.size() - 1; ++i)
+    {
+        std::size_t const size = offsets[i + 1] - offsets[i];
+        local_data.resize(size);
+        std::memcpy(local_data.data(), &data[offsets[i]], size);
+        _local_assemblers[i]->readIntegrationPointData(local_data);
+    }
+    {  // last cell
+        std::size_t const size = data.size() - offsets[i];
+        local_data.resize(size);
+        std::memcpy(local_data.data(), &data[offsets[i]], size);
+        _local_assemblers[i]->readIntegrationPointData(local_data);
+    }
 }
 
 template <int DisplacementDim>

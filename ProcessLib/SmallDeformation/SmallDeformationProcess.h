@@ -48,6 +48,10 @@ private:
         MeshLib::Mesh const& mesh,
         unsigned const integration_order) override;
 
+    std::size_t writeIntegrationPointData(
+        MeshLib::PropertyVector<char>& output,
+        MeshLib::PropertyVector<std::size_t>& offsets);
+
     void assembleConcreteProcess(
         const double t, GlobalVector const& x, GlobalMatrix& M, GlobalMatrix& K,
         GlobalVector& b, StaggeredCouplingTerm const& coupling_term) override;
@@ -58,6 +62,9 @@ private:
         GlobalMatrix& K, GlobalVector& b, GlobalMatrix& Jac,
         StaggeredCouplingTerm const& coupling_term) override;
 
+
+    void setInitialConditionsConcreteProcess(double const t,
+                                             GlobalVector const& x) override;
     void preTimestepConcreteProcess(GlobalVector const& x, double const t,
                                     double const dt) override;
 
