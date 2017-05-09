@@ -29,7 +29,7 @@ APPEND_SOURCE_FILES(SOURCES Utils)
 add_library(ProcessLib ${SOURCES})
 
 target_link_libraries(ProcessLib
-    PUBLIC BaseLib GeoLib MaterialLib MathLib MeshLib NumLib logog
+    PUBLIC BaseLib GeoLib MaterialLib MathLib MeshLib NumLib SerializationLib logog
     PRIVATE MeshGeoToolsLib
 )
 
