@@ -95,9 +95,10 @@ public:
             _ip_data.emplace_back(*_process_data.material);
             auto& ip_data = _ip_data[ip];
             auto const& sm = shape_matrices[ip];
-            ip_data._detJ = sm.detJ;
-            ip_data._integralMeasure = sm.integralMeasure;
-            ip_data._b_matrices.resize(
+            _ip_data[ip].integration_weight =
+                _integration_method.getWeightedPoint(ip).getWeight() *
+                sm.integralMeasure * sm.detJ;
+            ip_data.b_matrices.resize(
                 KelvinVectorDimensions<DisplacementDim>::value,
                 ShapeFunction::NPOINTS * DisplacementDim);
 
@@ -106,17 +107,17 @@ public:
                                                                          sm.N);
             LinearBMatrix::computeBMatrix<DisplacementDim,
                                           ShapeFunction::NPOINTS>(
-                sm.dNdx, ip_data._b_matrices, is_axially_symmetric, sm.N,
+                sm.dNdx, ip_data.b_matrices, is_axially_symmetric, sm.N,
                 x_coord);
 
-            ip_data._sigma.resize(
+            ip_data.sigma.resize(
                 KelvinVectorDimensions<DisplacementDim>::value);
-            ip_data._sigma_prev.resize(
+            ip_data.sigma_prev.resize(
                 KelvinVectorDimensions<DisplacementDim>::value);
-            ip_data._eps.resize(KelvinVectorDimensions<DisplacementDim>::value);
-            ip_data._eps_prev.resize(
+            ip_data.eps.resize(KelvinVectorDimensions<DisplacementDim>::value);
+            ip_data.eps_prev.resize(
                 KelvinVectorDimensions<DisplacementDim>::value);
-            ip_data._C.resize(KelvinVectorDimensions<DisplacementDim>::value,
+            ip_data.C.resize(KelvinVectorDimensions<DisplacementDim>::value,
                               KelvinVectorDimensions<DisplacementDim>::value);
 
             _secondary_data.N[ip] = shape_matrices[ip].N;
@@ -213,14 +214,9 @@ public:
                     double const distance2_m = std::get<2>(tuple_m);
 
                     auto const& w_m =
-                        la_m._integration_method.getWeightedPoint(m)
-                            .getWeight();
-                    auto const& detJ_m = la_m._ip_data[m]._detJ;
-                    auto const& integralMeasure_m =
-                        la_m._ip_data[m]._integralMeasure;
+                        la_m._ip_data[m].integration_weight;
 
-                    a_k_sum_m += w_m * detJ_m * integralMeasure_m *
-                                 alpha_0(distance2_m);
+                    a_k_sum_m += w_m * alpha_0(distance2_m);
 
                     //int const m_ele = la_m._element.getID();
                     //std::cout
@@ -315,15 +311,15 @@ public:
         {
             x_position.setIntegrationPoint(ip);
 
-            auto const& B = _ip_data[ip]._b_matrices;
-            auto const& eps_prev = _ip_data[ip]._eps_prev;
-            auto const& sigma_prev = _ip_data[ip]._sigma_prev;
+            auto const& B = _ip_data[ip].b_matrices;
+            auto const& eps_prev = _ip_data[ip].eps_prev;
+            auto const& sigma_prev = _ip_data[ip].sigma_prev;
 
-            auto& eps = _ip_data[ip]._eps;
-            auto& sigma = _ip_data[ip]._sigma;
-            auto& C = _ip_data[ip]._C;
+            auto& eps = _ip_data[ip].eps;
+            auto& sigma = _ip_data[ip].sigma;
+            auto& C = _ip_data[ip].C;
             auto& material_state_variables =
-                *_ip_data[ip]._material_state_variables;
+                *_ip_data[ip].material_state_variables;
 
             eps.noalias() =
                 B *
@@ -331,7 +327,7 @@ public:
                     local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
 
             // sigma is for plastic part only.
-            if (!_ip_data[ip]._solid_material.computeConstitutiveRelation(
+            if (!_ip_data[ip].solid_material.computeConstitutiveRelation(
                     t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
                     sigma, C, material_state_variables))
                 OGS_FATAL("Computation of local constitutive relation failed.");
@@ -364,19 +360,17 @@ public:
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
-            auto const& wp = _integration_method.getWeightedPoint(ip);
-            auto const& detJ = _ip_data[ip]._detJ;
-            auto const& integralMeasure = _ip_data[ip]._integralMeasure;
+            auto const& w = _ip_data[ip].integration_weight;
 
-            auto const& B = _ip_data[ip]._b_matrices;
-            //auto const& eps_prev = _ip_data[ip]._eps_prev;
-            //auto const& sigma_prev = _ip_data[ip]._sigma_prev;
+            auto const& B = _ip_data[ip].b_matrices;
+            //auto const& eps_prev = _ip_data[ip].eps_prev;
+            //auto const& sigma_prev = _ip_data[ip].sigma_prev;
 
-            auto& eps = _ip_data[ip]._eps;
-            auto& sigma = _ip_data[ip]._sigma;
-            auto& C = _ip_data[ip]._C;
+            auto& eps = _ip_data[ip].eps;
+            auto& sigma = _ip_data[ip].sigma;
+            auto& C = _ip_data[ip].C;
             //auto& material_state_variables =
-            //    *_ip_data[ip]._material_state_variables;
+            //    *_ip_data[ip].material_state_variables;
 
             eps.noalias() =
                 B *
@@ -384,7 +378,7 @@ public:
                     local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
 
             /*
-            if (!_ip_data[ip]._solid_material.updateNonlocalDamage(
+            if (!_ip_data[ip].solid_material.updateNonlocalDamage(
                     t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
                     sigma, C, material_state_variables))
                 OGS_FATAL("Computation of non-local damage update failed.");
@@ -412,16 +406,10 @@ public:
                     //std::cerr << kappa_d << "\n";
                     double const a_kl = std::get<3>(tuple);
 
-                    auto const& w_l =
-                        la_l._integration_method.getWeightedPoint(l)
-                            .getWeight();
-                    auto const& detJ_l = la_l._ip_data[l]._detJ;
-                    auto const& integralMeasure_l =
-                        la_l._ip_data[l]._integralMeasure;
+                    auto const& w_l = la_l._ip_data[l].integration_weight;
 
-                    test_alpha += a_kl * detJ_l * w_l * integralMeasure_l;
-                    nonlocal_kappa_d +=
-                        a_kl * kappa_d * detJ_l * w_l * integralMeasure_l;
+                    test_alpha += a_kl * w_l;
+                    nonlocal_kappa_d += a_kl * kappa_d * w_l;
                 }
                 if (std::abs(test_alpha - 1) >= 1e-14)
                     OGS_FATAL(
@@ -443,19 +431,17 @@ public:
                     nonlocal_kappa_d = 0;
                 }
 
-                _ip_data[ip]._nonlocal_kappa_d = nonlocal_kappa_d;
-                _ip_data[ip]._damage =
+                _ip_data[ip].nonlocal_kappa_d = nonlocal_kappa_d;
+                _ip_data[ip].damage =
                     _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
-                if (_ip_data[ip]._damage < 0. || _ip_data[ip]._damage > 1.)
-                    std::cerr << "DD " << _ip_data[ip]._damage << "\n\n";
+                if (_ip_data[ip].damage < 0. || _ip_data[ip].damage > 1.)
+                    std::cerr << "DD " << _ip_data[ip].damage << "\n\n";
 
-                sigma = sigma * (1 - _ip_data[ip]._damage);
+                sigma = sigma * (1 - _ip_data[ip].damage);
             }
 
-            local_b.noalias() -=
-                B.transpose() * sigma * detJ * wp.getWeight() * integralMeasure;
-            local_Jac.noalias() +=
-                B.transpose() * C * B * detJ * wp.getWeight() * integralMeasure;
+            local_b.noalias() -= B.transpose() * sigma * w;
+            local_Jac.noalias() += B.transpose() * C * B * w;
         }
     }
 
@@ -507,7 +493,7 @@ public:
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
                 small_deformation_nonlocal->add_nonlocal_damage(
-                    _ip_data[ip]._nonlocal_kappa_d);
+                    _ip_data[ip].nonlocal_kappa_d);
             }
         }
 
@@ -542,15 +528,12 @@ public:
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
-            auto const& wp = _integration_method.getWeightedPoint(ip);
-            auto const& detJ = _ip_data[ip]._detJ;
-            auto const& integralMeasure = _ip_data[ip]._integralMeasure;
+            auto const& w = _ip_data[ip].integration_weight;
 
-            auto const& B = _ip_data[ip]._b_matrices;
-            auto& sigma = _ip_data[ip]._sigma;
+            auto const& B = _ip_data[ip].b_matrices;
+            auto& sigma = _ip_data[ip].sigma;
 
-            local_b.noalias() +=
-                B.transpose() * sigma * detJ * wp.getWeight() * integralMeasure;
+            local_b.noalias() += B.transpose() * sigma * w;
         }
 
         return nodal_values;
@@ -564,7 +547,7 @@ public:
 
         for (auto const& ip_data : _ip_data)
         {
-            cache.push_back(*ip_data._eps_p_V);
+            cache.push_back(*ip_data.eps_p_V);
         }
 
         return cache;
@@ -577,7 +560,7 @@ public:
 
         for (auto const& ip_data : _ip_data)
         {
-            cache.push_back(*ip_data._eps_p_D_xx);
+            cache.push_back(*ip_data.eps_p_D_xx);
         }
 
         return cache;
@@ -591,7 +574,7 @@ public:
 
         for (auto const& ip_data : _ip_data)
         {
-            cache.push_back(ip_data._damage);
+            cache.push_back(ip_data.damage);
         }
 
         return cache;
@@ -683,9 +666,9 @@ private:
         for (auto const& ip_data : _ip_data)
         {
             if (component < 3)  // xx, yy, zz components
-                cache.push_back(ip_data._sigma[component]);
+                cache.push_back(ip_data.sigma[component]);
             else  // mixed xy, yz, xz components
-                cache.push_back(ip_data._sigma[component] / std::sqrt(2));
+                cache.push_back(ip_data.sigma[component] / std::sqrt(2));
         }
 
         return cache;
@@ -699,7 +682,7 @@ private:
 
         for (auto const& ip_data : _ip_data)
         {
-            cache.push_back(ip_data._eps[component]);
+            cache.push_back(ip_data.eps[component]);
         }
 
         return cache;
