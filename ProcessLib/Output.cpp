@@ -193,8 +193,8 @@ void Output::doOutputAlways(Process const& process,
     doProcessOutput(output_file_path, make_output, _output_file_compression,
                     _output_file_data_mode, t, x, process.getMesh(),
                     process.getDOFTable(), process.getProcessVariables(),
-                    process.getSecondaryVariables(), process_output);
-
+                    process.getSecondaryVariables(),
+                    process.integration_point_writer, process_output);
     if (make_output)
     {
         spd_ptr->pvd_file.addVTUFile(output_file_name, t);
@@ -277,7 +277,8 @@ void Output::doOutputNonlinearIteration(Process const& process,
     doProcessOutput(output_file_path, make_output, _output_file_compression,
                     _output_file_data_mode, t, x, process.getMesh(),
                     process.getDOFTable(), process.getProcessVariables(),
-                    process.getSecondaryVariables(), process_output);
+                    process.getSecondaryVariables(),
+                    process.integration_point_writer, process_output);
 
     if (make_output)
     {

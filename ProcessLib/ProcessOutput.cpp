@@ -38,20 +38,28 @@ ProcessOutput::ProcessOutput(BaseLib::ConfigTree const& output_config)
     {
         output_residuals = *out_resid;
     }
+
+    output_integration_point_data =
+        //! \ogs_file_param{prj__time_loop__processes__process__output__integration_point_data}
+        output_config.getConfigParameter("integration_point_data", false);
 }
 
-void doProcessOutput(std::string const& file_name,
-                     bool const make_output,
-                     bool const compress_output,
-                     int const data_mode,
-                     const double t,
-                     GlobalVector const& x,
-                     MeshLib::Mesh& mesh,
-                     NumLib::LocalToGlobalIndexMap const& dof_table,
-                     std::vector<std::reference_wrapper<ProcessVariable>> const&
-                         process_variables,
-                     SecondaryVariableCollection secondary_variables,
-                     ProcessOutput const& process_output)
+void doProcessOutput(
+    std::string const& file_name,
+    bool const make_output,
+    bool const compress_output,
+    int const data_mode,
+    const double t,
+    GlobalVector const& x,
+    MeshLib::Mesh& mesh,
+    NumLib::LocalToGlobalIndexMap const& dof_table,
+    std::vector<std::reference_wrapper<ProcessVariable>> const&
+        process_variables,
+    SecondaryVariableCollection secondary_variables,
+    std::function<std::size_t(MeshLib::PropertyVector<char>&,
+                              MeshLib::PropertyVector<std::size_t>&)>
+        integration_point_writer,
+    ProcessOutput const& process_output)
 {
     DBUG("Process output.");
 
@@ -68,6 +76,7 @@ void doProcessOutput(std::string const& file_name,
 
     auto const& output_variables = process_output.output_variables;
     std::set<std::string> already_output;
+    already_output.insert("integration_point");
 
     int global_component_offset = 0;
     int global_component_offset_next = 0;
@@ -229,6 +238,18 @@ void doProcessOutput(std::string const& file_name,
     if (!make_output)
     {
         return;
+    }
+
+    // Integration point data
+    if (process_output.output_integration_point_data &&
+        integration_point_writer)
+    {
+        auto result = MeshLib::getOrCreateMeshProperty<char>(
+            mesh, "integration_point_data",
+            MeshLib::MeshItemType::IntegrationPoint, 0 /* ignore tuple size */);
+        auto offsets = MeshLib::getOrCreateMeshProperty<std::size_t>(
+            mesh, "integration_point_offsets", MeshLib::MeshItemType::Cell, 1);
+        integration_point_writer(*result, *offsets);
     }
 
     // Write output file
