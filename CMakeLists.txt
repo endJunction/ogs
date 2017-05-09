@@ -100,6 +100,7 @@ set(ProcessesList
     RichardsComponentTransport
     RichardsFlow
     SmallDeformation
+    SmallDeformationNonlocal
     TES
     ThermalTwoPhaseFlowWithPP
     ThermoMechanics

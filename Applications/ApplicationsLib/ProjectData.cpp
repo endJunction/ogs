@@ -68,6 +68,9 @@
 #ifdef OGS_BUILD_PROCESS_SMALLDEFORMATION
 #include "ProcessLib/SmallDeformation/CreateSmallDeformationProcess.h"
 #endif
+#ifdef OGS_BUILD_PROCESS_SMALLDEFORMATIONNONLOCAL
+#include "ProcessLib/SmallDeformationNonlocal/CreateSmallDeformationNonlocalProcess.h"
+#endif
 #ifdef OGS_BUILD_PROCESS_TES
 #include "ProcessLib/TES/CreateTESProcess.h"
 #endif
@@ -513,6 +516,34 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                 default:
                     OGS_FATAL(
                         "SMALL_DEFORMATION process does not support "
+                        "given dimension");
+            }
+        }
+        else
+#endif
+#ifdef OGS_BUILD_PROCESS_SMALLDEFORMATIONNONLOCAL
+            if (type == "SMALL_DEFORMATION_NONLOCAL")
+        {
+            //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION_NONLOCAL__dimension}
+            switch (process_config.getConfigParameter<int>("dimension"))
+            {
+                case 2:
+                    process = ProcessLib::SmallDeformationNonlocal::
+                        createSmallDeformationNonlocalProcess<2>(
+                            *_mesh_vec[0], std::move(jacobian_assembler),
+                            _process_variables, _parameters, integration_order,
+                            process_config);
+                    break;
+                case 3:
+                    process = ProcessLib::SmallDeformationNonlocal::
+                        createSmallDeformationNonlocalProcess<3>(
+                            *_mesh_vec[0], std::move(jacobian_assembler),
+                            _process_variables, _parameters, integration_order,
+                            process_config);
+                    break;
+                default:
+                    OGS_FATAL(
+                        "SMALL_DEFORMATION_NONLOCAL process does not support "
                         "given dimension");
             }
         }
