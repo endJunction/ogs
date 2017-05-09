@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 
+#include "MaterialLib/SolidModels/Ehlers.h"
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/Lubby2.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
@@ -24,6 +25,9 @@
 #include "ProcessLib/LocalAssemblerTraits.h"
 #include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
+
+#include "ProcessLib/IntegrationPointSerialization.h"
+#include "ProcessLib/SmallDeformationCommon/integration_point_data.h"
 
 #include "SmallDeformationProcessData.h"
 
@@ -40,6 +44,13 @@ struct IntegrationPointData final
           material_state_variables(
               solid_material.createMaterialStateVariables())
     {
+        if (auto const msv = dynamic_cast<typename MaterialLib::Solids::Ehlers::
+                                              StateVariables<DisplacementDim>*>(
+                material_state_variables.get()))
+        {
+            eps_p_V = &msv->eps_p.V;
+            eps_p_D_xx = &(msv->eps_p.D[0]);
+        }
     }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -75,6 +86,10 @@ struct IntegrationPointData final
         sigma_prev = sigma;
         material_state_variables->pushBackState();
     }
+
+    std::tuple<double, double> getLocalVariable() const { return {-1, -1}; }
+    double const* eps_p_V;
+    double const* eps_p_D_xx;
 };
 
 /// Used by for extrapolation of the integration point values. It is ordered
@@ -88,8 +103,14 @@ struct SecondaryData
 struct SmallDeformationLocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
       public ProcessLib::SmallDeformation::NodalForceCalculationInterface,
-      public NumLib::ExtrapolatableElement
+      public NumLib::ExtrapolatableElement,
+      public ProcessLib::IntegrationPointSerialization
 {
+    virtual std::vector<double> const& getIntPtEpsPV(
+        std::vector<double>& cache) const = 0;
+    virtual std::vector<double> const& getIntPtEpsPDXX(
+        std::vector<double>& cache) const = 0;
+
     virtual std::vector<double> const& getIntPtSigmaXX(
         std::vector<double>& cache) const = 0;
 
@@ -125,14 +146,18 @@ struct SmallDeformationLocalAssemblerInterface
 
     virtual std::vector<double> const& getIntPtEpsilonYZ(
         std::vector<double>& cache) const = 0;
+
+    virtual std::vector<double> const& getNodalValues(
+        std::vector<double>& nodal_values) const = 0;
 };
 
 template <typename ShapeFunction, typename IntegrationMethod,
-          int DisplacementDim>
+          int DisplacementDim_>
 class SmallDeformationLocalAssembler
     : public SmallDeformationLocalAssemblerInterface
 {
 public:
+    static int const DisplacementDim = DisplacementDim_;
     using ShapeMatricesType =
         ShapeMatrixPolicyType<ShapeFunction, DisplacementDim>;
     using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
@@ -291,6 +316,66 @@ public:
                                          _ip_data, _element.getID());
     }
 
+    friend void
+    readSmallDeformationIntegrationPointData<SmallDeformationLocalAssembler>(
+        std::vector<char> const& data,
+        SmallDeformationLocalAssembler& local_assembler);
+    void readIntegrationPointData(std::vector<char> const& data) override
+    {
+        readSmallDeformationIntegrationPointData(data, *this);
+    }
+
+    friend OGS::SmallDeformationCommon
+    getSmallDeformationCommonIntegrationPointData<
+        SmallDeformationLocalAssembler>(
+        SmallDeformationLocalAssembler const& local_assembler);
+    std::size_t writeIntegrationPointData(std::vector<char>& data) override
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        OGS::ElementData element_data;
+        element_data.set_element_id(_element.getID());
+        element_data.set_n_integration_points(n_integration_points);
+
+        auto small_deformation_data = element_data.mutable_small_deformation();
+        auto common = small_deformation_data->mutable_common();
+        common->CopyFrom(
+            getSmallDeformationCommonIntegrationPointData(*this));
+
+        data.resize(element_data.ByteSize());
+        element_data.SerializeToArray(data.data(), element_data.ByteSize());
+
+        return element_data.ByteSize();
+    };
+
+    std::vector<double> const& getNodalValues(
+        std::vector<double>& nodal_values) const override
+    {
+        nodal_values.clear();
+        auto local_b = MathLib::createZeroedVector<NodalDisplacementVectorType>(
+            nodal_values, ShapeFunction::NPOINTS * DisplacementDim);
+
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        SpatialPosition x_position;
+        x_position.setElementID(_element.getID());
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            x_position.setIntegrationPoint(ip);
+            auto const& w = _ip_data[ip].integration_weight;
+
+            auto const& B = _ip_data[ip].b_matrices;
+            auto& sigma = _ip_data[ip].sigma;
+
+            local_b.noalias() += B.transpose() * sigma * w;
+        }
+
+        return nodal_values;
+    }
+
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
         const unsigned integration_point) const override
     {
@@ -298,6 +383,33 @@ public:
 
         // assumes N is stored contiguously in memory
         return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
+    }
+
+    std::vector<double> const& getIntPtEpsPV(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            cache.push_back(*ip_data.eps_p_V);
+        }
+
+        return cache;
+    }
+    std::vector<double> const& getIntPtEpsPDXX(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            cache.push_back(*ip_data.eps_p_D_xx);
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtSigmaXX(

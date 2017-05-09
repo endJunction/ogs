@@ -11,6 +11,7 @@
 
 #include <cassert>
 
+#include "NumLib/DOF/DOFTableUtil.h"
 #include "ProcessLib/Process.h"
 #include "ProcessLib/SmallDeformation/CreateLocalAssemblers.h"
 #include "ProcessLib/SmallDeformationCommon/Common.h"
@@ -80,6 +81,17 @@ private:
                 // by location order is needed for output
                 NumLib::ComponentOrder::BY_LOCATION);
         _nodal_forces->resize(DisplacementDim * mesh.getNumberOfNodes());
+
+        Base::_secondary_variables.addSecondaryVariable(
+            "eps_p_V", 1,
+            makeExtrapolator(
+                getExtrapolator(), _local_assemblers,
+                &SmallDeformationLocalAssemblerInterface::getIntPtEpsPV));
+        Base::_secondary_variables.addSecondaryVariable(
+            "eps_p_D_xx", 1,
+            makeExtrapolator(
+                getExtrapolator(), _local_assemblers,
+                &SmallDeformationLocalAssemblerInterface::getIntPtEpsPDXX));
 
         Base::_secondary_variables.addSecondaryVariable(
             "sigma_xx", 1,
@@ -156,6 +168,33 @@ private:
                                  &SmallDeformationLocalAssemblerInterface::
                                      getIntPtEpsilonXZ));
         }
+
+#ifdef PROTOBUF_FOUND
+        Base::integration_point_writer = [this](
+            MeshLib::PropertyVector<char>& output,
+            MeshLib::PropertyVector<std::size_t>& offsets) {
+            return writeIntegrationPointData(output, offsets);
+        };
+#endif  // PROTOBUF_FOUND
+    }
+
+    std::size_t writeIntegrationPointData(MeshLib::PropertyVector<char>& output,
+            MeshLib::PropertyVector<std::size_t>& offsets)
+    {
+        output.clear();
+        offsets.clear();
+        std::vector<char> local_data;
+        std::size_t offset = 0;
+        for (auto& la : _local_assemblers)
+        {
+            offsets.push_back(offset);
+            std::size_t const local_offset =
+                la->writeIntegrationPointData(local_data);
+            std::copy_n(std::begin(local_data), local_offset,
+                        std::back_inserter(output));
+            offset += local_offset;
+        }
+        return offset;
     }
 
     void assembleConcreteProcess(const double t, GlobalVector const& x,
@@ -188,6 +227,48 @@ private:
             dxdot_dx, dx_dx, M, K, b, Jac, coupling_term);
     }
 
+    void setInitialConditionsConcreteProcess(double const t,
+                                             GlobalVector const& x) override
+    {
+        DBUG("SetInitialConditions SmallDeformationProcess.");
+
+        if (!_mesh.getProperties().hasPropertyVector("integration_point_data"))
+            return;
+        if (!_mesh.getProperties().hasPropertyVector("integration_point_offsets"))
+            OGS_FATAL(
+                "integration_point_data field exists in the input but there is "
+                "no integration_point_offsets cell data.");
+
+        auto const& data =
+            *_mesh.getProperties().template getPropertyVector<char>(
+                "integration_point_data");
+        assert(data.getMeshItemType() ==
+               MeshLib::MeshItemType::IntegrationPoint);
+
+        auto const& offsets =
+            *_mesh.getProperties().template getPropertyVector<std::size_t>(
+                "integration_point_offsets");
+        assert(offsets.getMeshItemType() == MeshLib::MeshItemType::Cell);
+
+        std::vector<char> local_data;
+        assert(_local_assemblers.size() == offsets.size());
+        // Starting counting from one; the last cell is handled after the loop.
+        std::size_t i = 0;
+        for (; i < _local_assemblers.size() - 1; ++i)
+        {
+            std::size_t const size = offsets[i + 1] - offsets[i];
+            local_data.resize(size);
+            std::memcpy(local_data.data(), &data[offsets[i]], size);
+            _local_assemblers[i]->readIntegrationPointData(local_data);
+        }
+        {   // last cell
+            std::size_t const size = data.size() - offsets[i];
+            local_data.resize(size);
+            std::memcpy(local_data.data(), &data[offsets[i]], size);
+            _local_assemblers[i]->readIntegrationPointData(local_data);
+        }
+    }
+
     void preTimestepConcreteProcess(GlobalVector const& x, double const t,
                                     double const dt) override
     {
@@ -207,6 +288,24 @@ private:
 
         ProcessLib::SmallDeformation::writeNodalForces(
             *_nodal_forces, _local_assemblers, *_local_to_global_index_map);
+
+        std::fill(std::begin(*_nodal_forces), std::end(*_nodal_forces), 0);
+        GlobalExecutor::executeDereferenced(
+            [this](const std::size_t mesh_item_id,
+                   LocalAssemblerInterface& local_assembler,
+                   const NumLib::LocalToGlobalIndexMap& dof_table,
+                   std::vector<double>& node_values) {
+                auto const indices =
+                    NumLib::getIndices(mesh_item_id, dof_table);
+                std::vector<double> local_data;
+
+                local_assembler.getNodalValues(local_data);
+
+                assert(local_data.size() == indices.size());
+                for (std::size_t i = 0; i < indices.size(); ++i)
+                    node_values[indices[i]] += local_data[i];
+            },
+            _local_assemblers, *_local_to_global_index_map, *_nodal_forces);
     }
 
 private:
