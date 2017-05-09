@@ -144,6 +144,10 @@ private:
     {
     }
 
+    virtual void setInitialConditionsConcreteProcess(const double /*t*/,
+                                                     GlobalVector const& /*x*/)
+    {
+    }
     virtual void assembleConcreteProcess(const double t, GlobalVector const& x,
                                          GlobalMatrix& M, GlobalMatrix& K,
                                          GlobalVector& b,
