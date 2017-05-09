@@ -105,6 +105,14 @@ std::size_t writeSmallDeformationIntegrationPointData(
             eps->add_value(local_assembler._ip_data[ip].eps[i]);
     }
 
+    for (unsigned ip = 0; ip < n_integration_points; ip++)
+    {
+        auto const& ip_data = local_assembler._ip_data[ip];
+        auto material_state = small_deformation_data->add_material_state();
+        material_state->CopyFrom(ip_data.solid_material.writeMaterialState(
+            *ip_data.material_state_variables));
+    }
+
     data.resize(element_data.ByteSize());
     element_data.SerializeToArray(data.data(), element_data.ByteSize());
 
