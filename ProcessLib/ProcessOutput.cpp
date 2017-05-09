@@ -192,11 +192,11 @@ void doProcessOutput(
     if (process_output.output_integration_point_data &&
         integration_point_writer)
     {
-        auto result = getOrCreateMeshProperty<char>(
+        auto result = MeshLib::getOrCreateMeshProperty<char>(
             mesh, "integration_point_data",
-            MeshLib::MeshItemType::IntegrationPoint);
-        auto offsets = getOrCreateMeshProperty<std::size_t>(
-            mesh, "integration_point_offsets", MeshLib::MeshItemType::Cell);
+            MeshLib::MeshItemType::IntegrationPoint, 0 /* ignore tuple size */);
+        auto offsets = MeshLib::getOrCreateMeshProperty<std::size_t>(
+            mesh, "integration_point_offsets", MeshLib::MeshItemType::Cell, 1);
         integration_point_writer(*result, *offsets);
     }
 
