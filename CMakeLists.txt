@@ -273,6 +273,7 @@ if(OGS_BUILD_CLI OR OGS_BUILD_UTILS OR OGS_BUILD_TESTS)
     add_subdirectory( MaterialLib )
     add_subdirectory( ProcessLib )
 endif()
+add_subdirectory( SerializationLib )
 if( OGS_BUILD_TESTS AND NOT IS_SUBPROJECT )
     add_subdirectory( Tests )
 

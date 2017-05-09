@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package OGS;
+
+// Kelvin vector for 1D, 2D, or 3D problems allowing a size check of the stored
+// 'value' array.
+message KelvinVector {
+    int32 dimension = 1;
+    repeated double value = 2;
+}
