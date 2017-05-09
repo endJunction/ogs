@@ -147,6 +147,8 @@ void Process::setInitialConditions(const unsigned pcs_id, double const t,
             }
         }
     }
+
+    setInitialConditionsConcreteProcess(t, x);
 }
 
 MathLib::MatrixSpecifications Process::getMatrixSpecifications() const
