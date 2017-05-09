@@ -18,13 +18,6 @@ APPEND_SOURCE_FILES(SOURCES LIE/SmallDeformation/LocalAssembler)
 APPEND_SOURCE_FILES(SOURCES LiquidFlow)
 APPEND_SOURCE_FILES(SOURCES Parameter)
 APPEND_SOURCE_FILES(SOURCES RichardsFlow)
-
-if(Protobuf_FOUND)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS SmallDeformationCommon/integration_point.proto)
-list(APPEND SOURCES ${PROTO_SRCS} ${PROTO_HDRS})
-endif() # Protobuf_FOUND
-
 APPEND_SOURCE_FILES(SOURCES SmallDeformationCommon)
 APPEND_SOURCE_FILES(SOURCES SmallDeformation)
 APPEND_SOURCE_FILES(SOURCES SmallDeformationNonlocal)
