@@ -154,6 +154,8 @@ struct StateVariables
         damage_prev = damage;
     }
 
+    double getLocalVariable() const override { return damage.kappa_d(); }
+
     using KelvinVector = ProcessLib::KelvinVectorType<DisplacementDim>;
 
     PlasticStrain<KelvinVector> eps_p;  ///< plastic part of the state.
