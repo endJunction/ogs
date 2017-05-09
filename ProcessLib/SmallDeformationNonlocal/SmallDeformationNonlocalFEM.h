@@ -16,6 +16,7 @@
 
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/Lubby2.h"
+#include "MaterialLib/SolidModels/Ehlers.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
@@ -321,6 +322,7 @@ public:
                 Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
                     local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
 
+            // sigma is for plastic part only.
             if (!_ip_data[ip]._solid_material.computeConstitutiveRelation(
                     t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
                     sigma, C, material_state_variables))
@@ -328,7 +330,7 @@ public:
         }
     }
 
-    void assembleWithJacobian(double const /*t*/,
+    void assembleWithJacobian(double const t,
                               std::vector<double> const& local_x,
                               std::vector<double> const& /*local_xdot*/,
                               const double /*dxdot_dx*/, const double /*dx_dx*/,
@@ -392,27 +394,31 @@ public:
                 assert(std::abs(test_alpha - 1) < 2.7e-15);
             }
             {
-                double nonlocal_damage = 0;
+                double nonlocal_kappa_d = 0;
 
                 for (auto const& tuple : _ip_data[ip].non_local_assemblers)
                 {
                     // Get damage from the local assembler and its corresponding
                     // integration point l.
                     int const& l = std::get<1>(tuple);
-                    double const d =
+                    double const kappa_d =
                         static_cast<SmallDeformationNonlocalLocalAssembler<
                             ShapeFunction, IntegrationMethod,
                             DisplacementDim> const* const>(std::get<0>(tuple))
                             ->_ip_data[l]
-                            .getDamage();
-                    std::cerr << d << "\n";
+                            .getLocalVariable();
+                    std::cerr << kappa_d << "\n";
                     double const a_kl = std::get<3>(tuple);
 
-                    nonlocal_damage +=
-                        a_kl * d * detJ * wp.getWeight() * integralMeasure;
+                    nonlocal_kappa_d += a_kl * kappa_d * detJ * wp.getWeight() *
+                                        integralMeasure;
                 }
-                std::cerr << "XX " << nonlocal_damage << "\n\n";
-                assert(std::abs(nonlocal_damage - 1) < 2.7e-15);
+                std::cerr << "XX " << nonlocal_kappa_d << "\n\n";
+
+                double const damage =
+                    _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
+
+                sigma = sigma * (1 - damage);
             }
 
             local_b.noalias() -=
