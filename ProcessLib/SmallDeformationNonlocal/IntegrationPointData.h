@@ -65,9 +65,18 @@ struct IntegrationPointData final
         _material_state_variables->pushBackState();
     }
 
-    double getDamage() const
+    double getLocalVariable() const
     {
-        return _material_state_variables->getDamage();
+        return _material_state_variables->getLocalVariable();
+    }
+
+    double updateDamage(double const t, SpatialPosition const& x_position,
+                      double const kappa_d)
+    {
+        return static_cast<
+                   MaterialLib::Solids::Ehlers::SolidEhlers<DisplacementDim>&>(
+                   _solid_material)
+            .updateDamage(t, x_position, kappa_d, *_material_state_variables);
     }
 
     std::vector<std::tuple<
