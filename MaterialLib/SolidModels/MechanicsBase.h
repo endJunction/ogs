@@ -22,6 +22,10 @@ namespace ProcessLib
 class SpatialPosition;
 }
 
+#ifdef PROTOBUF_FOUND
+#include "SerializationLib/material.pb.h"
+#endif  // PROTOBUF_FOUND
+
 namespace MeshLib
 {
 class Element;
@@ -136,6 +140,14 @@ struct MechanicsBase
         MaterialStateVariables const& material_state_variables) const
     {
         return -42;
+    }
+
+    virtual OGS::MaterialState writeMaterialState(
+        MaterialStateVariables const& material_state_variables) const
+    {
+        return {};   // Dummy value needed for compilation. Code is not executed
+                     // because the integration_point_writer is not created in
+                     // absence of protobuffer.
     }
 
     virtual ~MechanicsBase() = default;
