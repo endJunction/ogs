@@ -21,17 +21,17 @@ struct IntegrationPointData final
 {
     explicit IntegrationPointData(
         MaterialLib::Solids::MechanicsBase<DisplacementDim>& solid_material)
-        : _solid_material(solid_material),
-          _material_state_variables(
-              _solid_material.createMaterialStateVariables())
+        : solid_material(solid_material),
+          material_state_variables(
+              solid_material.createMaterialStateVariables())
     {
         if (auto const msv =
                 dynamic_cast<typename MaterialLib::Solids::Ehlers::SolidEhlers<
                     DisplacementDim>::MaterialStateVariables*>(
-                    _material_state_variables.get()))
+                    material_state_variables.get()))
         {
-            _eps_p_V = &msv->eps_p_V;
-            _eps_p_D_xx = &(msv->eps_p_D[0]);
+            eps_p_V = &msv->eps_p_V;
+            eps_p_D_xx = &(msv->eps_p_D[0]);
         }
     }
 
@@ -39,48 +39,46 @@ struct IntegrationPointData final
     // The default generated move-ctor is correctly generated for other
     // compilers.
     explicit IntegrationPointData(IntegrationPointData&& other)
-        : _b_matrices(std::move(other._b_matrices)),
-          _sigma(std::move(other._sigma)),
-          _sigma_prev(std::move(other._sigma_prev)),
-          _eps(std::move(other._eps)),
-          _eps_prev(std::move(other._eps_prev)),
-          _solid_material(other._solid_material),
-          _material_state_variables(std::move(other._material_state_variables)),
-          _C(std::move(other._C)),
-          _detJ(std::move(other._detJ)),
-          _integralMeasure(other._integralMeasure)
+        : b_matrices(std::move(other.b_matrices)),
+          sigma(std::move(other.sigma)),
+          sigma_prev(std::move(other.sigma_prev)),
+          eps(std::move(other.eps)),
+          eps_prev(std::move(other.eps_prev)),
+          solid_material(other.solid_material),
+          material_state_variables(std::move(other.material_state_variables)),
+          C(std::move(other.C)),
+          integration_weight(std::move(other.integration_weight)),
     {
     }
 #endif  // _MSC_VER
 
-    typename BMatricesType::BMatrixType _b_matrices;
-    typename BMatricesType::KelvinVectorType _sigma, _sigma_prev;
-    typename BMatricesType::KelvinVectorType _eps, _eps_prev;
-    double _damage = 0;
-    double _nonlocal_kappa_d = 0;
+    typename BMatricesType::BMatrixType b_matrices;
+    typename BMatricesType::KelvinVectorType sigma, sigma_prev;
+    typename BMatricesType::KelvinVectorType eps, eps_prev;
+    double damage = 0;
+    double nonlocal_kappa_d = 0;
 
-    MaterialLib::Solids::MechanicsBase<DisplacementDim>& _solid_material;
+    MaterialLib::Solids::MechanicsBase<DisplacementDim>& solid_material;
     std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
         DisplacementDim>::MaterialStateVariables>
-        _material_state_variables;
+        material_state_variables;
 
-    typename BMatricesType::KelvinMatrixType _C;
-    double _detJ;
-    double _integralMeasure;
+    typename BMatricesType::KelvinMatrixType C;
+    double integration_weight;
 
-    double const* _eps_p_V;
-    double const* _eps_p_D_xx;
+    double const* eps_p_V;
+    double const* eps_p_D_xx;
 
     void pushBackState()
     {
-        _eps_prev = _eps;
-        _sigma_prev = _sigma;
-        _material_state_variables->pushBackState();
+        eps_prev = eps;
+        sigma_prev = sigma;
+        material_state_variables->pushBackState();
     }
 
     double getLocalVariable() const
     {
-        return _material_state_variables->getLocalVariable();
+        return material_state_variables->getLocalVariable();
     }
 
     double updateDamage(double const t, SpatialPosition const& x_position,
@@ -88,8 +86,8 @@ struct IntegrationPointData final
     {
         return static_cast<
                    MaterialLib::Solids::Ehlers::SolidEhlers<DisplacementDim>&>(
-                   _solid_material)
-            .updateDamage(t, x_position, kappa_d, *_material_state_variables);
+                   solid_material)
+            .updateDamage(t, x_position, kappa_d, *material_state_variables);
     }
 
     std::vector<std::tuple<
