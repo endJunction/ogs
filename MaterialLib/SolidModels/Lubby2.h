@@ -195,6 +195,34 @@ public:
         typename MechanicsBase<DisplacementDim>::MaterialStateVariables const&
             material_state_variables) override;
 
+#ifdef PROTOBUF_FOUND_X
+    std::vector<char> writeMaterialState() const override
+    {
+        OGS::Lubby2 material_data;
+
+        //auto eps_p_D = material_data.mutable_eps_p_d();
+        /*
+            sigma->set_dimension(LocalAssembler::DisplacementDim);
+            for (int i = 0; i < local_assembler._ip_data[ip]._sigma.size(); ++i)
+                sigma->add_value(local_assembler._ip_data[ip]._sigma[i]);
+        }
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            auto eps = small_deformation_data->add_eps();
+            eps->set_dimension(LocalAssembler::DisplacementDim);
+            for (int i = 0; i < local_assembler._ip_data[ip]._eps.size(); ++i)
+                eps->add_value(local_assembler._ip_data[ip]._eps[i]);
+        }
+        */
+
+        std::vector<char> data(material_data.ByteSize());
+        material_data.SerializeToArray(data.data(), material_data.ByteSize());
+
+        return data;
+    };
+#endif  // PROTOBUF_FOUND
+
 private:
     /// Calculates the 18x1 residual vector.
     void calculateResidualBurgers(

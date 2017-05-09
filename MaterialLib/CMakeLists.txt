@@ -27,7 +27,7 @@ generate_export_header(MaterialLib)
 target_include_directories(MaterialLib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(MaterialLib
-    PUBLIC BaseLib NumLib logog # ProcessLib
+    PUBLIC BaseLib NumLib SerializationLib logog # ProcessLib
     PRIVATE MathLib MeshLib
 )
 
