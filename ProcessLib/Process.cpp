@@ -123,6 +123,8 @@ void Process::setInitialConditions(double const t, GlobalVector& x)
             }
         }
     }
+
+    setInitialConditionsConcreteProcess(t, x);
 }
 
 MathLib::MatrixSpecifications Process::getMatrixSpecifications() const
