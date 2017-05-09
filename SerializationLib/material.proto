@@ -1,0 +1,31 @@
+syntax = "proto3";
+import "common.proto";
+
+package OGS;
+
+message LinearElastic {}
+
+message Ehlers {
+    KelvinVector eps_p_D = 1;  // deviatoric plastic strain
+    double eps_p_V = 2;    // volumetric strain
+    double eps_p_eff = 3;  // effective plastic strain
+
+    // Damage model extension
+    double kappa_d = 10;    // damage driving variable
+    double damage = 11;     // isotropic damage variable
+}
+
+message Lubby2 {
+    /// Deviatoric strain in the viscous kelvin element
+    KelvinVector eps_K = 1;
+    /// Deviatoric strain in the viscous maxwell element
+    KelvinVector eps_M_t = 2;
+}
+
+message MaterialState {
+    oneof type {
+        LinearElastic linear_elastic = 1;
+        Ehlers ehlers = 2;
+        Lubby2 lubby2 = 3;
+    }
+}
