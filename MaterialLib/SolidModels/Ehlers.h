@@ -216,10 +216,12 @@ public:
     explicit SolidEhlers(
         NumLib::NewtonRaphsonSolverParameters nonlinear_solver_parameters,
         MaterialPropertiesParameters material_properties,
-        std::unique_ptr<DamagePropertiesParameters>&& damage_properties)
+        std::unique_ptr<DamagePropertiesParameters>&& damage_properties,
+        bool const compute_local_damage)
         : _nonlinear_solver_parameters(std::move(nonlinear_solver_parameters)),
           _mp(std::move(material_properties)),
-          _damage_properties(std::move(damage_properties))
+          _damage_properties(std::move(damage_properties)),
+          _compute_local_damage(compute_local_damage)
     {
     }
 
@@ -269,6 +271,7 @@ private:
 
     MaterialPropertiesParameters _mp;
     std::unique_ptr<DamagePropertiesParameters> _damage_properties;
+    bool const _compute_local_damage;
 };
 
 }  // namespace Ehlers
