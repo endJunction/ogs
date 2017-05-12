@@ -730,7 +730,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
     }
 
     KelvinVector sigma_final = mp.G * sigma;
-    if (_damage_properties)
+    if (_damage_properties && _compute_local_damage)
         sigma_final *= 1 - state.damage.value();
 
     return {std::make_tuple(
