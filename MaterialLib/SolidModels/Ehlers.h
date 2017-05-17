@@ -325,6 +325,12 @@ public:
 
     std::vector<typename MechanicsBase<DisplacementDim>::InternalVariable>
     getInternalVariables() const override;
+	
+    DamageProperties evaluatedDamageProperties(
+        double const t, ProcessLib::SpatialPosition const& x) const
+    {
+        return DamageProperties(t, x, *_damage_properties);
+    }
 
 #ifdef PROTOBUF_FOUND
     OGS::MaterialState writeMaterialState(
