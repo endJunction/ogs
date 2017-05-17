@@ -326,6 +326,12 @@ public:
     std::vector<typename MechanicsBase<DisplacementDim>::InternalVariable>
     getInternalVariables() const override;
 	
+    MaterialProperties evaluatedMaterialProperties(
+        double const t, ProcessLib::SpatialPosition const& x) const
+    {
+        return MaterialProperties(t, x, _mp);
+    }
+
     DamageProperties evaluatedDamageProperties(
         double const t, ProcessLib::SpatialPosition const& x) const
     {
