@@ -320,6 +320,12 @@ public:
         typename MechanicsBase<DisplacementDim>::MaterialStateVariables const&
             material_state_variables) override;
 
+    DamageProperties evaluatedDamageProperties(
+        double const t, ProcessLib::SpatialPosition const& x) const
+    {
+        return DamageProperties(t, x, *_damage_properties);
+    }
+
 #ifdef PROTOBUF_FOUND
     OGS::MaterialState writeMaterialState(
         typename MechanicsBase<DisplacementDim>::MaterialStateVariables const&
