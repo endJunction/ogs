@@ -392,10 +392,9 @@ typename SolidEhlers<DisplacementDim>::JacobianMatrix calculatePlasticJacobian(
     return jacobian;
 }
 
-/// Computes the damage internal material variable explicitly based on the
-/// results obtained from the local stress return algorithm.
+/// \Returns a new kappa_d.
 template <int DisplacementDim>
-Damage calculateDamage(
+double calculateDamageKappaD(
     double const eps_p_V_diff,
     double const eps_p_eff_diff,
     typename SolidEhlers<DisplacementDim>::KelvinVector sigma,
@@ -407,57 +406,72 @@ Damage calculateDamage(
     // strain rate is positive (dilatancy).
 
     // Compute damage current step
-    if (eps_p_V_diff > 0)
+    if (eps_p_V_diff <= 0)
+        return kappa_d;
+
+    Eigen::Matrix<double, DisplacementDim, DisplacementDim> stress_mat =
+        Eigen::Matrix<double, DisplacementDim, DisplacementDim>::Zero();
+
+    for (int i = 0; i < DisplacementDim; ++i)
     {
-        Eigen::Matrix<double, DisplacementDim, DisplacementDim> stress_mat =
-            Eigen::Matrix<double, DisplacementDim, DisplacementDim>::Zero();
-
-        for (int i = 0; i < DisplacementDim; ++i)
-            for (int j = 0; j < DisplacementDim; ++j)
+        for (int j = 0; j < DisplacementDim; ++j)
+        {
+            if (i == j)
             {
-                if (i == j)
-                {
-                    stress_mat(i, j) = mp.G * sigma(i);
-                }
-                else
-                {
-                    stress_mat(i, j) = mp.G * sigma(i + j + 2);
-                };
-            };
-
-        Eigen::EigenSolver<decltype(stress_mat)> eigen_solver(stress_mat);
-        auto const& principal_stress = eigen_solver.eigenvalues();
-        // building kappa_d (damage driving variable)
-        double prod_stress = 0.;
-        for (int i = 0; i < DisplacementDim; ++i)
-        {
-            Eigen::Matrix<double, DisplacementDim, 1> eig_val;
-            eig_val(i, 0) = real(principal_stress(i, 0));
-            prod_stress = prod_stress + eig_val(i, 0) * eig_val(i, 0);
+                stress_mat(i, j) = mp.G * sigma(i);
+            }
+            else
+            {
+                stress_mat(i, j) = mp.G * sigma(i + j + 2);
+            }
         }
-
-        // Brittleness decrease with confinement for the nonlinear flow rule.
-        // ATTENTION: For linear flow rule -> constant brittleness.
-        double const f_t =
-            std::sqrt(3.0) * mp.kappa / (1 + std::sqrt(3.0) * mp.beta);
-        double const r_s = std::sqrt(prod_stress) / f_t;
-
-        double x_s = 0;
-        if (r_s < 1)
-        {
-            x_s = 1;
-        }
-        else if (r_s >= 1 && r_s <= 2)
-        {
-            x_s = 1 + dp.h_d * (r_s - 1) * (r_s - 1);
-        }
-        else
-        {
-            x_s = 1 - 3 * dp.h_d + 4 * dp.h_d * std::sqrt(r_s - 1);
-        }
-        kappa_d += eps_p_V_diff / x_s;
     }
 
+    Eigen::EigenSolver<decltype(stress_mat)> eigen_solver(stress_mat);
+    auto const& principal_stress = eigen_solver.eigenvalues();
+    // building kappa_d (damage driving variable)
+    double prod_stress = 0.;
+    for (int i = 0; i < DisplacementDim; ++i)
+    {
+        double const real_eigen_value = real(principal_stress(i, 0));
+        prod_stress = prod_stress + boost::math::pow<2>(real_eigen_value);
+    }
+
+    // Brittleness decrease with confinement for the nonlinear flow rule.
+    // ATTENTION: For linear flow rule -> constant brittleness.
+    double const f_t =
+        std::sqrt(3.0) * mp.kappa / (1 + std::sqrt(3.0) * mp.beta);
+    double const r_s = std::sqrt(prod_stress) / f_t;
+
+    double x_s = 0;
+    if (r_s < 1)
+    {
+        x_s = 1;
+    }
+    else if (r_s >= 1 && r_s <= 2)
+    {
+        x_s = 1 + dp.h_d * (r_s - 1) * (r_s - 1);
+    }
+    else
+    {
+        x_s = 1 - 3 * dp.h_d + 4 * dp.h_d * std::sqrt(r_s - 1);
+    }
+    kappa_d += eps_p_V_diff / x_s;
+
+    return kappa_d;
+}
+
+/// Computes the damage internal material variable explicitly based on the
+/// results obtained from the local stress return algorithm.
+template <int DisplacementDim>
+Damage calculateDamage(
+    double const eps_p_V_diff,
+    double const eps_p_eff_diff,
+    typename SolidEhlers<DisplacementDim>::KelvinVector sigma,
+    double const kappa_d,
+    DamageProperties const& dp,
+    MaterialProperties const& mp)
+{
     return {kappa_d, (1 - dp.beta_d) * (1 - std::exp(-kappa_d / dp.alpha_d))};
 }
 
@@ -680,10 +694,15 @@ SolidEhlers<DisplacementDim>::integrateStress(
         if (_damage_properties)
         {
             DamageProperties damage_properties(t, x, *_damage_properties);
-            state.damage = calculateDamage<DisplacementDim>(
+            double const kappa_d = calculateDamageKappaD<DisplacementDim>(
                 state.eps_p.V - state.eps_p_prev.V,
                 state.eps_p.eff - state.eps_p_prev.eff, sigma,
                 state.damage.kappa_d(), damage_properties, mp);
+
+            state.damage = calculateDamage<DisplacementDim>(
+                state.eps_p.V - state.eps_p_prev.V,
+                state.eps_p.eff - state.eps_p_prev.eff, sigma, kappa_d,
+                damage_properties, mp);
         }
 
 
