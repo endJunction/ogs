@@ -389,6 +389,23 @@ public:
         return cache;
     }
 
+    std::vector<double> const& getIntPtDamage(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            auto const& state =
+                static_cast<MaterialLib::Solids::Ehlers::StateVariables<
+                    DisplacementDim> const&>(*ip_data.material_state_variables);
+            cache.push_back(state.damage.value());
+        }
+
+        return cache;
+    }
+
     std::vector<double> const& getIntPtSigmaXX(
         std::vector<double>& cache) const override
     {
