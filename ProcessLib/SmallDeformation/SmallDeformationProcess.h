@@ -94,6 +94,12 @@ private:
                 &SmallDeformationLocalAssemblerInterface::getIntPtEpsPDXX));
 
         Base::_secondary_variables.addSecondaryVariable(
+            "damage", 1,
+            makeExtrapolator(
+                getExtrapolator(), _local_assemblers,
+                &SmallDeformationLocalAssemblerInterface::getIntPtDamage));
+
+        Base::_secondary_variables.addSecondaryVariable(
             "sigma_xx", 1,
             makeExtrapolator(
                 getExtrapolator(), _local_assemblers,

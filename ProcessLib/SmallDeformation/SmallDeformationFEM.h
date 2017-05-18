@@ -111,6 +111,9 @@ struct SmallDeformationLocalAssemblerInterface
     virtual std::vector<double> const& getIntPtEpsPDXX(
         std::vector<double>& cache) const = 0;
 
+    virtual std::vector<double> const& getIntPtDamage(
+        std::vector<double>& cache) const = 0;
+
     virtual std::vector<double> const& getIntPtSigmaXX(
         std::vector<double>& cache) const = 0;
 
@@ -415,6 +418,23 @@ public:
         for (auto const& ip_data : _ip_data)
         {
             cache.push_back(*ip_data.eps_p_D_xx);
+        }
+
+        return cache;
+    }
+
+    std::vector<double> const& getIntPtDamage(
+        std::vector<double>& cache) const override
+    {
+        cache.clear();
+        cache.reserve(_ip_data.size());
+
+        for (auto const& ip_data : _ip_data)
+        {
+            auto const& state =
+                static_cast<MaterialLib::Solids::Ehlers::StateVariables<
+                    DisplacementDim> const&>(*ip_data.material_state_variables);
+            cache.push_back(state.damage.value());
         }
 
         return cache;
