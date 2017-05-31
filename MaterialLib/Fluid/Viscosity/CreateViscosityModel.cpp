@@ -17,6 +17,7 @@
 
 #include "MaterialLib/Fluid/ConstantFluidProperty.h"
 #include "LinearPressureDependentViscosity.h"
+#include "NonLinearTemperatureDependentViscosity.h"
 #include "TemperatureDependentViscosity.h"
 #include "VogelsLiquidDynamicViscosity.h"
 #include "WaterViscosityIAPWS.h"
@@ -87,6 +88,8 @@ std::unique_ptr<FluidProperty> createViscosityModel(
     }
     if (type == "LinearPressure")
         return createLinearPressureDependentViscosity(config);
+    if (type == "NonLinearTemperatureDependent")
+        return std::make_unique<NonLinearTemperatureDependentViscosity>();
     if (type == "TemperatureDependent")
         return createTemperatureDependentViscosity(config);
     if (type == "Vogels")
