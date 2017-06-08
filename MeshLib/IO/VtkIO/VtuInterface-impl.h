@@ -78,6 +78,7 @@ bool VtuInterface::writeVTU(std::string const& file_name,
     (void)rank;
 #endif
 
+
     return (vtuWriter->Write() > 0);
 }
 
