@@ -87,6 +87,8 @@ public:
 
         _ip_data.reserve(n_integration_points);
         _secondary_data.N.resize(n_integration_points);
+        // TODO (naumov) This is compile-time size. Use eigen matrix.
+        _material_forces.resize(DisplacementDim * ShapeFunction::NPOINTS);
 
         auto const shape_matrices =
             initShapeMatrices<ShapeFunction, ShapeMatricesType,
@@ -344,6 +346,8 @@ public:
 
             std::tie(sigma, state, C) = std::move(*solution);
         }
+
+        getMaterialForces(local_x, _material_forces);
     }
 
     void assembleWithJacobian(double const t,
@@ -766,6 +770,8 @@ private:
         Eigen::aligned_allocator<IntegrationPointData<
             BMatricesType, ShapeMatricesType, DisplacementDim>>>
         _ip_data;
+
+    std::vector<double> _material_forces;
 
     IntegrationMethod _integration_method;
     MeshLib::Element const& _element;
