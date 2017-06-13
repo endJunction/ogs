@@ -9,6 +9,7 @@ message ElementData {
     uint64 element_id = 1;  // Element id
     uint32 n_integration_points = 2;    // Length of the following arrays.
 
+    repeated double integration_point_coordinates = 3;
     oneof ipdata {
         SmallDeformation small_deformation = 10;
         SmallDeformationNonlocal small_deformation_nonlocal = 11;
@@ -30,4 +31,5 @@ message SmallDeformation {
 message SmallDeformationNonlocal {
     SmallDeformationCommon common = 1;
     repeated double nonlocal_damage = 2;
+    repeated double nonlocal_length = 3;
 }
