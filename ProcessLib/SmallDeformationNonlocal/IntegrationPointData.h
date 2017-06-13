@@ -113,6 +113,8 @@ struct IntegrationPointData final
         double   // alpha_kl
         >>
         non_local_assemblers;
+
+    double nonlocal_internal_length;
 };
 
 }  // namespace SmallDeformationNonlocal
