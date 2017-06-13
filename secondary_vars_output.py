@@ -13,7 +13,9 @@ import material_pb2
 def readElementData(ip_data, offsets):
 
     if offsets.GetNumberOfComponents() != 1:
-        print('Error: integration point offsets array has wrong number of components.')
+        print(
+            'Error: integration point offsets array has wrong number of components.'
+        )
         print('Expected one component.')
         sys.exit(2)
     if offsets.GetDataType() != VTK_UNSIGNED_LONG:
@@ -22,7 +24,9 @@ def readElementData(ip_data, offsets):
         sys.exit(2)
 
     if ip_data.GetNumberOfComponents() != 1:
-        print('Error: integration point data array has wrong number of components.')
+        print(
+            'Error: integration point data array has wrong number of components.'
+        )
         print('Expected one component.')
         sys.exit(2)
     if ip_data.GetDataType() != VTK_CHAR:
@@ -32,27 +36,28 @@ def readElementData(ip_data, offsets):
 
     ip_data_array = vtk_to_numpy(ip_data)
 
-    element_data = []       # Resulting array
+    element_data = []  # Resulting array
 
     # Process all but the last one.
     for i in range(offsets.GetNumberOfTuples() - 1):
         start = int(offsets.GetTuple1(i))
-        end = int(offsets.GetTuple1(i+1))
+        end = int(offsets.GetTuple1(i + 1))
         ed = ip.ElementData()
         ed.ParseFromString(ip_data_array[start:end].tobytes())
         element_data.append(ed)
     # Process the last element
-    start = int(offsets.GetTuple1(i+1))
+    start = int(offsets.GetTuple1(offsets.GetNumberOfTuples() - 1))
     end = ip_data.GetNumberOfTuples()
     if start >= end:
         print('Error: integration point offsets and integration point data \
-               array sizes do not match.')
-        sys.exit(2);
+               array sizes do not match.\nstart', start, ', end', end)
+        sys.exit(2)
     ed = ip.ElementData()
     ed.ParseFromString(ip_data_array[start:end].tobytes())
     element_data.append(ed)
 
     return element_data
+
 
 def readMesh(filename):
     r = vtkXMLUnstructuredGridReader()
@@ -60,12 +65,14 @@ def readMesh(filename):
     r.Update()
     return r.GetOutput()
 
+
 def writeMesh(mesh, filename):
     w = vtkXMLUnstructuredGridWriter()
     w.SetFileName(filename)
     w.SetInputData(mesh)
     w.SetDataModeToAscii()
     w.Update()
+
 
 def getIntegrationPointArrays(mesh):
     offsets = mesh.GetCellData().GetArray('integration_point_offsets')
@@ -78,72 +85,59 @@ def getIntegrationPointArrays(mesh):
         sys.exit(2)
     return [offsets, ip_data]
 
-def averageOverIntegrationPointsSigma(element_data):
-    if element_data.n_integration_points == 0:
-        print("Error: Got 0 integration points.")
-        sys.exit(2)
 
-    sd = element_data.small_deformation
-    result = np.array([0.0, 0.0, 0.0, 0.0])
-    for i in range(element_data.n_integration_points):
-        result += sd.sigma[i].value
-    return result / element_data.n_integration_points
+def averageOverIntegrationPointsSigma(sd_common, n_ip):
+    assert len(sd_common.sigma) == n_ip
+    result = np.zeros(len(sd_common.sigma[0].value))
+    for i in range(n_ip):
+        result += sd_common.sigma[i].value
+    return result / n_ip
 
-def averageOverIntegrationPointsEpsPD(element_data):
-    if element_data.n_integration_points == 0:
-        print("Error: Got 0 integration points.")
-        sys.exit(2)
 
-    sd = element_data.small_deformation
-    result = np.array([0.0, 0.0, 0.0, 0.0])
-    for i in range(element_data.n_integration_points):
-        result += sd.material_state[i].ehlers.eps_p_D.value
+def averageOverIntegrationPointsEpsPD(sd_common, n_ip):
+    assert len(sd_common.sigma) == n_ip
+    result = np.zeros(len(sd_common.sigma[0].value))
+    for i in range(n_ip):
+        result += sd_common.material_state[i].ehlers.eps_p_D.value
 
-    return result / element_data.n_integration_points
+    return result / n_ip
 
-def averageOverIntegrationPointsEpsPV(element_data):
-    if element_data.n_integration_points == 0:
-        print("Error: Got 0 integration points.")
-        sys.exit(2)
 
-    sd = element_data.small_deformation
-    result = 0;
-    for i in range(element_data.n_integration_points):
-        result += sd.material_state[i].ehlers.eps_p_V
-    return result / element_data.n_integration_points
+def averageOverIntegrationPointsEpsPV(sd_common, n_ip):
+    result = 0
+    for i in range(n_ip):
+        result += sd_common.material_state[i].ehlers.eps_p_V
+    return result / n_ip
 
-def averageOverIntegrationPointsEpsPEff(element_data):
-    if element_data.n_integration_points == 0:
-        print("Error: Got 0 integration points.")
-        sys.exit(2)
 
-    sd = element_data.small_deformation
-    result = 0;
-    for i in range(element_data.n_integration_points):
-        result += sd.material_state[i].ehlers.eps_p_eff
-    return result / element_data.n_integration_points
+def averageOverIntegrationPointsEpsPEff(sd_common, n_ip):
+    result = 0
+    for i in range(n_ip):
+        result += sd_common.material_state[i].ehlers.eps_p_eff
+    return result / n_ip
 
-def averageOverIntegrationPointsKappaD(element_data):
-    if element_data.n_integration_points == 0:
-        print("Error: Got 0 integration points.")
-        sys.exit(2)
 
-    sd = element_data.small_deformation
-    result = 0;
-    for i in range(element_data.n_integration_points):
-        result += sd.material_state[i].ehlers.kappa_d
-    return result / element_data.n_integration_points
+def averageOverIntegrationPointsKappaD(sd_common, n_ip):
+    result = 0
+    for i in range(n_ip):
+        result += sd_common.material_state[i].ehlers.kappa_d
+    return result / n_ip
 
-def averageOverIntegrationPointsDamage(element_data):
-    if element_data.n_integration_points == 0:
-        print("Error: Got 0 integration points.")
-        sys.exit(2)
 
-    sd = element_data.small_deformation
-    result = 0;
-    for i in range(element_data.n_integration_points):
-        result += sd.material_state[i].ehlers.damage
-    return result / element_data.n_integration_points
+def averageOverIntegrationPointsDamage(sd_common, n_ip):
+    result = 0
+    for i in range(n_ip):
+        result += sd_common.material_state[i].ehlers.damage
+    return result / n_ip
+
+
+def averageOverIntegrationPointsNonlocalDamage(sdn):
+    return np.average(sdn.nonlocal_damage)
+
+
+def averageOverIntegrationPointsNonlocalLength(sdn):
+    return np.average(sdn.nonlocal_length)
+
 
 def processIntegrationPointData(filename):
     m = readMesh(filename)
@@ -152,46 +146,85 @@ def processIntegrationPointData(filename):
 
     element_data = readElementData(ip_data, offsets)
 
-    np_sigma = np.empty([m.GetNumberOfCells(), 4])
-    np_eps_p_D = np.empty([m.GetNumberOfCells(), 4])
+    assert m.GetNumberOfCells() > 0
+    mesh_dimension = m.GetCell(0).GetCellDimension()
+    kelvin_vector_size = [0, 0, 4, 6][mesh_dimension]
+    assert kelvin_vector_size > 0
+
+    np_sigma = np.empty([m.GetNumberOfCells(), kelvin_vector_size])
+    np_eps_p_D = np.empty([m.GetNumberOfCells(), kelvin_vector_size])
     np_eps_p_V = np.empty([m.GetNumberOfCells(), 1])
     np_eps_p_eff = np.empty([m.GetNumberOfCells(), 1])
     np_kappa_d = np.empty([m.GetNumberOfCells(), 1])
     np_damage = np.empty([m.GetNumberOfCells(), 1])
 
-    for ed in element_data:
-        np_sigma[ed.element_id] = averageOverIntegrationPointsSigma(ed)
-        np_eps_p_D[ed.element_id] = averageOverIntegrationPointsEpsPD(ed)
-        np_eps_p_V[ed.element_id] = averageOverIntegrationPointsEpsPV(ed)
-        np_eps_p_eff[ed.element_id] = averageOverIntegrationPointsEpsPEff(ed)
-        np_kappa_d[ed.element_id] = averageOverIntegrationPointsKappaD(ed)
-        np_damage[ed.element_id] = averageOverIntegrationPointsDamage(ed)
+    # only used if SDN is present
+    has_sdn = False
+    np_nonlocal_damage = np.empty([m.GetNumberOfCells(), 1])
+    np_nonlocal_length = np.empty([m.GetNumberOfCells(), 1])
 
-    sigma = numpy_to_vtk(np_sigma);
+    for ed in element_data:
+        n_ip = ed.n_integration_points
+        if not n_ip > 0:
+            print("Error: Got", n_ip,
+                  "integration points, but positive number expected")
+            sys.exit(2)
+
+        ipdata = getattr(ed, ed.WhichOneof('ipdata'))  # one of SD or SDN
+        c = ipdata.common
+
+        np_sigma[ed.element_id] = averageOverIntegrationPointsSigma(c, n_ip)
+        np_eps_p_D[ed.element_id] = averageOverIntegrationPointsEpsPD(c, n_ip)
+        np_eps_p_V[ed.element_id] = averageOverIntegrationPointsEpsPV(c, n_ip)
+        np_eps_p_eff[ed.element_id] = averageOverIntegrationPointsEpsPEff(
+            c, n_ip)
+        np_kappa_d[ed.element_id] = averageOverIntegrationPointsKappaD(c, n_ip)
+        np_damage[ed.element_id] = averageOverIntegrationPointsDamage(c, n_ip)
+
+        if ipdata.DESCRIPTOR.full_name == 'OGS.SmallDeformationNonlocal':
+            has_sdn = True
+            np_nonlocal_damage[
+                ed.element_id] = averageOverIntegrationPointsNonlocalDamage(
+                    ipdata)
+            np_nonlocal_length[
+                ed.element_id] = averageOverIntegrationPointsNonlocalLength(
+                    ipdata)
+
+    sigma = numpy_to_vtk(np_sigma)
     sigma.SetName("sigma")
     m.GetCellData().AddArray(sigma)
 
-    eps_p_D = numpy_to_vtk(np_eps_p_D);
+    eps_p_D = numpy_to_vtk(np_eps_p_D)
     eps_p_D.SetName("eps_p_D")
     m.GetCellData().AddArray(eps_p_D)
 
-    eps_p_V = numpy_to_vtk(np_eps_p_V);
+    eps_p_V = numpy_to_vtk(np_eps_p_V)
     eps_p_V.SetName("eps_p_V")
     m.GetCellData().AddArray(eps_p_V)
 
-    eps_p_eff = numpy_to_vtk(np_eps_p_eff);
+    eps_p_eff = numpy_to_vtk(np_eps_p_eff)
     eps_p_eff.SetName("eps_p_eff")
     m.GetCellData().AddArray(eps_p_eff)
 
-    kappa_d = numpy_to_vtk(np_kappa_d);
+    kappa_d = numpy_to_vtk(np_kappa_d)
     kappa_d.SetName("kappa_d")
     m.GetCellData().AddArray(kappa_d)
 
-    damage = numpy_to_vtk(np_damage);
+    damage = numpy_to_vtk(np_damage)
     damage.SetName("damage")
     m.GetCellData().AddArray(damage)
 
+    if has_sdn:
+        nonlocal_damage = numpy_to_vtk(np_nonlocal_damage)
+        nonlocal_damage.SetName("nonlocal_damage")
+        m.GetCellData().AddArray(nonlocal_damage)
+
+        nonlocal_length = numpy_to_vtk(np_nonlocal_length)
+        nonlocal_length.SetName("nonlocal_length")
+        m.GetCellData().AddArray(nonlocal_length)
+
     writeMesh(m, filename)
+
 
 def main():
     if len(sys.argv) != 2:
@@ -199,6 +232,7 @@ def main():
         sys.exit(1)
 
     processIntegrationPointData(sys.argv[1])
+
 
 if __name__ == '__main__':
     main()
@@ -214,6 +248,7 @@ def garbage():
     ed = ip.ElementData()
     ed.ParseFromString('aeouaoeuaoeu')
 
+
 def generateIntegrationPoints(mesh):
     qp_dict_gen = vtkQuadratureSchemeDictionaryGenerator()
     qp_dict_gen.SetInputData(m)
@@ -222,7 +257,8 @@ def generateIntegrationPoints(mesh):
 
     qp_gen = vtkQuadraturePointsGenerator()
     qp_gen.SetInputConnection(qp_dict_gen.GetOutputPort())
-    qp_gen.SetInputArrayToProcess(0, 0, 0, vtkDataObject.FIELD_ASSOCIATION_CELLS, "QuadratureOffset");
+    qp_gen.SetInputArrayToProcess(
+        0, 0, 0, vtkDataObject.FIELD_ASSOCIATION_CELLS, "QuadratureOffset")
     qp_gen.Update()
     qp_gen.GetOutput()
 
@@ -230,4 +266,3 @@ def generateIntegrationPoints(mesh):
     w.SetFileName("/tmp/x.vtp")
     w.SetInputConnection(qp_gen.GetOutputPort())
     w.Update()
-
