@@ -20,6 +20,7 @@
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
+#include "NumLib/Function/Interpolation.h"
 #include "ProcessLib/Deformation/BMatrixPolicy.h"
 #include "ProcessLib/Deformation/LinearBMatrix.h"
 #include "ProcessLib/LocalAssemblerTraits.h"
@@ -55,6 +56,7 @@ public:
         ShapeMatrixPolicyType<ShapeFunction, DisplacementDim>;
     using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
     using NodalVectorType = typename ShapeMatricesType::NodalVectorType;
+    using GlobalDimVectorType = typename ShapeMatricesType::GlobalDimVectorType;
     using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
     using BMatricesType = BMatrixPolicyType<ShapeFunction, DisplacementDim>;
 
@@ -236,6 +238,7 @@ public:
 
     // TODO (naumov) is this the same as the
     // interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(_element, N) ???
+    // NO, it is indeed only X-coordinate
     Eigen::Vector3d getSingleIntegrationPointCoordinates(
         int integration_point) const
     {
@@ -314,6 +317,11 @@ public:
             auto const& N = _ip_data[ip].N;
             auto const& dNdx = _ip_data[ip].dNdx;
 
+            auto& x = _ip_data[ip].coordinates;
+            // Take only the first DisplacementDim values, because the function
+            // alway returns 3D vector.
+            x = getSingleIntegrationPointCoordinates(ip).head(DisplacementDim);
+
             auto const x_coord =
                 interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
                     _element, N);
@@ -350,8 +358,17 @@ public:
         }
 
         // Compute material forces, needed in the non-local assembly, storing
-        // them locally.
+        // them locally and interpolating them to integration points.
         getMaterialForces(local_x, _material_forces);
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            x_position.setIntegrationPoint(ip);
+
+            auto const& N = _ip_data[ip].N;
+            auto& g = _ip_data[ip].material_force;
+            NumLib::shapeFunctionInterpolate(_material_forces, N, g[0], g[1],
+                                             g[2]);
+        }
     }
 
     void assembleWithJacobian(double const t,
@@ -386,12 +403,9 @@ public:
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             auto const& N = _ip_data[ip].N;
+            auto const& x = _ip_data[ip].coordinates;
             auto& l = _ip_data[ip].nonlocal_internal_length;
             l = 0;
-
-            auto const x_ip_coord =
-                interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
-                    _element, N);
 
             for (auto const& tuple : _ip_data[ip].non_local_assemblers)
             {
@@ -406,9 +420,12 @@ public:
                 double const elements_volume = la_l._element.getContent();
 
                 auto const& w_l = la_l._ip_data[ip_l].integration_weight;
-                l += 1 * w_l / elements_volume;
+                auto const& g_l = la_l._ip_data[ip_l].material_force;
+                auto const& x_l = la_l._ip_data[ip].coordinates;
+                GlobalDimVectorType d_l = x - x_l;
+                l +=  g_l.dot(d_l) * w_l / elements_volume;
             }
-            INFO("local_length(%d) %g", ip, l)
+            //INFO("local_length(%d) %g", ip, l)
         }
 
         // Non-local integration.
@@ -579,6 +596,8 @@ public:
             {
                 small_deformation_nonlocal->add_nonlocal_damage(
                     _ip_data[ip].nonlocal_kappa_d);
+                small_deformation_nonlocal->add_nonlocal_length(
+                    _ip_data[ip].nonlocal_internal_length);
             }
         }
 
