@@ -306,7 +306,7 @@ public:
         using Invariants =
             MaterialLib::SolidModels::Invariants<KelvinVectorSize>;
         auto const& identity2 = Invariants::identity2;
-        return (eps - eps_p.D - eps_p.V * identity2).dot(sigma) / 2;
+        return (eps - eps_p.D - eps_p.V / 3 * identity2).dot(sigma) / 2;
     }
 
     boost::optional<
