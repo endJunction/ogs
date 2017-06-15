@@ -58,6 +58,22 @@ public:
              EigenOption::getSolverName(opt.solver_type).c_str());
         if (!A.isCompressed()) A.makeCompressed();
 
+        /// << OUTPUT
+        std::ofstream A_output("/tmp/A.eigen_direct");
+        A_output.precision(16);
+        A_output << A;
+        A_output.close();
+
+        std::ofstream x_output("/tmp/x.eigen_direct");
+        x_output.precision(16);
+        x_output << x;
+        x_output.close();
+
+        std::ofstream b_output("/tmp/b.eigen_direct");
+        b_output.precision(16);
+        b_output << b;
+        b_output.close();
+
         _solver.compute(A);
         if(_solver.info()!=Eigen::Success) {
             ERR("Failed during Eigen linear solver initialization");
@@ -92,6 +108,22 @@ public:
 
         if (!A.isCompressed())
             A.makeCompressed();
+
+        /// << OUTPUT
+        std::ofstream A_output("/tmp/A.eigen_iter");
+        A_output.precision(16);
+        A_output << A;
+        A_output.close();
+
+        std::ofstream x_output("/tmp/x.eigen_iter");
+        x_output.precision(16);
+        x_output << x;
+        x_output.close();
+
+        std::ofstream b_output("/tmp/b.eigen_iter");
+        b_output.precision(16);
+        b_output << b;
+        b_output.close();
 
         _solver.compute(A);
         if(_solver.info()!=Eigen::Success) {
