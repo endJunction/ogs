@@ -426,6 +426,7 @@ public:
     }
 
     double getCurrentTime() const override { return _t; }
+    /// \todo FIXME _delta_t is zero when not initialized properly.
     double getNewXWeight() const override { return 1.0 / _delta_t; }
     void getWeightedOldX(GlobalVector& y) const override
     {
