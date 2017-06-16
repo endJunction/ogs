@@ -59,20 +59,25 @@ public:
         if (!A.isCompressed()) A.makeCompressed();
 
         /// << OUTPUT
-        std::ofstream A_output("/tmp/A.eigen_direct");
+        std::ofstream A_output("/tmp/A.eigen_direct." +
+                               std::to_string(global_output_counter));
         A_output.precision(16);
         A_output << A;
         A_output.close();
 
-        std::ofstream x_output("/tmp/x.eigen_direct");
+        std::ofstream x_output("/tmp/x.eigen_direct." +
+                               std::to_string(global_output_counter));
         x_output.precision(16);
         x_output << x;
         x_output.close();
 
-        std::ofstream b_output("/tmp/b.eigen_direct");
+        std::ofstream b_output("/tmp/b.eigen_direct." +
+                               std::to_string(global_output_counter));
         b_output.precision(16);
         b_output << b;
         b_output.close();
+
+        global_output_counter++;
 
         _solver.compute(A);
         if(_solver.info()!=Eigen::Success) {
@@ -110,20 +115,25 @@ public:
             A.makeCompressed();
 
         /// << OUTPUT
-        std::ofstream A_output("/tmp/A.eigen_iter");
+        std::ofstream A_output("/tmp/A.eigen_iter." +
+                               std::to_string(global_output_counter));
         A_output.precision(16);
         A_output << A;
         A_output.close();
 
-        std::ofstream x_output("/tmp/x.eigen_iter");
+        std::ofstream x_output("/tmp/x.eigen_iter." +
+                               std::to_string(global_output_counter));
         x_output.precision(16);
         x_output << x;
         x_output.close();
 
-        std::ofstream b_output("/tmp/b.eigen_iter");
+        std::ofstream b_output("/tmp/b.eigen_iter." +
+                               std::to_string(global_output_counter));
         b_output.precision(16);
         b_output << b;
         b_output.close();
+
+        global_output_counter++;
 
         _solver.compute(A);
         if(_solver.info()!=Eigen::Success) {

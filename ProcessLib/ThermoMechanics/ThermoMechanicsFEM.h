@@ -292,11 +292,11 @@ public:
             //
             auto const lambda =
                 _process_data.thermal_conductivity(t, x_position)[0];
-            KTT.noalias() += dNdx.transpose() * lambda * dNdx * w;
+            KTT.noalias() += (dNdx.transpose() * lambda * dNdx * w).eval();
 
             auto const c =
                 _process_data.specific_heat_capacity(t, x_position)[0];
-            DTT.noalias() += N.transpose() * rho_s * c * N * w;
+            DTT.noalias() += (N.transpose() * rho_s * c * N * w).eval();
         }
         // temperature equation, temperature part
         local_Jac
@@ -310,8 +310,59 @@ public:
                 displacement_index, temperature_index)
             .noalias() -= KuT;
 
+        std::cerr.precision(17);
+
+        typename ShapeMatricesType::template VectorType<
+            temperature_size> ktttx;
+        ktttx.setZero(temperature_size);
+        for (int j = 0; j < temperature_size; ++j)
+        {
+            for (int i = 0; i < temperature_size; i++)
+            {
+                ktttx[i] += KTT(i, j) * T(j);
+            }
+        }
+
+        typename ShapeMatricesType::template VectorType<
+            temperature_size> kttt;
+        kttt.setZero(temperature_size);
+        for (int i = 0; i < temperature_size; ++i)
+        {
+            for (int j = 0; j < temperature_size; j++)
+            {
+                kttt[i] += KTT(i, j) * T(j);
+            }
+        }
+
+        std::cerr << "KTT:\n" << KTT << "\n";
+        std::cerr << "T:\n" << T << "\n";
+        typename ShapeMatricesType::template VectorType<temperature_size> const
+            KTTT = (KTT * T).eval();
+        typename ShapeMatricesType::template RowVectorType<temperature_size> const
+            TKTTT = (T.transpose() * KTT.transpose()).eval();
+        std::cerr << "T * KTT:\n" << TKTTT << "\n";
+        std::cerr << "KTT * T:\n" << KTTT << "\n";
+        std::cerr << "ktt * T:\n" << kttt << "\n";
+        std::cerr << "ktt * Txx:\n" << kttt << "\n";
+        //std::cerr << "DTT: " << DTT << "\n";
+        //auto const DTTT_dot = (DTT * T_dot).eval();
+        //std::cerr << "DTT * T_dot: " << DTTT_dot << "\n";
+
+        //auto const a = (-(KTTT + DTTT_dot)).eval();
+        //auto const b = (-(KTT * T + DTT * T_dot)).eval();
+        //auto const diff = (a - b).eval();
+        //if (diff.norm() > 0)
+        //{
+        //    std::cerr << "a = " << a << " b = " << b << "; diff = " << diff
+        //              << "; norm(diff) = " << diff.norm() << "\n";
+        //}
+
         local_rhs.template block<temperature_size, 1>(temperature_index, 0)
             .noalias() -= KTT * T + DTT * T_dot;
+        std::cerr << "rhs_T: "
+                  << local_rhs.template block<temperature_size, 1>(
+                         temperature_index, 0)
+                  << "\n";
     }
 
     void preTimestepConcrete(std::vector<double> const& /*local_x*/,

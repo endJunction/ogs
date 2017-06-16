@@ -9,6 +9,7 @@
 
 #pragma once
 
+static int global_output_counter = 0;
 #include <vector>
 #ifndef NDEBUG
 #include <fstream>

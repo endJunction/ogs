@@ -43,20 +43,25 @@ bool EigenLisLinearSolver::solve(EigenMatrix &A_, EigenVector& b_,
         A.makeCompressed();
 
     /// << OUTPUT
-    std::ofstream A_output("/tmp/A.lis");
+    std::ofstream A_output("/tmp/A.lis." +
+                           std::to_string(global_output_counter));
     A_output.precision(16);
     A_output << A;
     A_output.close();
 
-    std::ofstream x_output("/tmp/x.lis");
+    std::ofstream x_output("/tmp/x.lis." +
+                           std::to_string(global_output_counter));
     x_output.precision(16);
     x_output << x;
     x_output.close();
 
-    std::ofstream b_output("/tmp/b.lis");
+    std::ofstream b_output("/tmp/b.lis." +
+                           std::to_string(global_output_counter));
     b_output.precision(16);
     b_output << b;
     b_output.close();
+
+    global_output_counter++;
 
     int nnz = A.nonZeros();
     int* ptr = A.outerIndexPtr();
