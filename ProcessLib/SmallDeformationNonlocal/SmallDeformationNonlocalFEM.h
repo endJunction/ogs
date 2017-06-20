@@ -402,10 +402,17 @@ public:
         // scaling(x_ip, \xi) := |<g(\xi), dir>|
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            auto const& N = _ip_data[ip].N;
             auto const& x = _ip_data[ip].coordinates;
             auto& l = _ip_data[ip].nonlocal_internal_length;
             l = 0;
+            double const integration_volume =
+                0.5 *  // Only half of the space cos(theta)>= 0 contributes to
+                       // the nonlocal_internal_length.
+                (DisplacementDim == 3
+                     ? 4.0 / 3.0 * 3.1415926793 *
+                           boost::math::pow<3>(_process_data.internal_length)
+                     : 3.1415926793 *
+                           boost::math::pow<2>(_process_data.internal_length));
 
             for (auto const& tuple : _ip_data[ip].non_local_assemblers)
             {
@@ -417,15 +424,29 @@ public:
                         ShapeFunction, IntegrationMethod,
                         DisplacementDim> const* const>(std::get<0>(tuple));
                 int const& ip_l = std::get<1>(tuple);
-                double const elements_volume = la_l._element.getContent();
 
                 auto const& w_l = la_l._ip_data[ip_l].integration_weight;
                 auto const& g_l = la_l._ip_data[ip_l].material_force;
-                auto const& x_l = la_l._ip_data[ip].coordinates;
+                auto const& x_l = la_l._ip_data[ip_l].coordinates;
+                if (x == x_l)
+                    continue;   // skip the point itself.
+
+                if (g_l.squaredNorm() == 0.0)
+                    continue;   // skip not contributing points
+
                 GlobalDimVectorType d_l = x - x_l;
-                l +=  g_l.dot(d_l) * w_l / elements_volume;
+                auto const cos_theta = -g_l.dot(d_l);  // up to normalization
+                if (cos_theta <= 0.0)
+                    continue;  // skip points with material forces pointing in
+                               // away from current point
+
+                //l += cos_theta * w_l / integration_volume;
+                l +=  cos_theta / g_l.norm() / d_l.norm() * w_l /integration_volume;
+                //l += cos_theta / g_l.norm() / d_l.norm() * w_l /
+                //     integration_volume * std::exp(-d_l.norm()) *
+                //     (1 - std::exp(-g_l.norm()));
             }
-            //INFO("local_length(%d) %g", ip, l)
+            //INFO("local_length(%d:%d) %g", _element.getID(), ip, l)
         }
 
         // Non-local integration.
