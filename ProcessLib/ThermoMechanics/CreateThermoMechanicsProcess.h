@@ -57,5 +57,20 @@ extern template std::unique_ptr<Process> createThermoMechanicsProcess<3>(
     unsigned const integration_order,
     BaseLib::ConfigTree const& config);
 
+extern template std::unique_ptr<Process> createThermoMechanicsProcess<2>(
+    MeshLib::Mesh& mesh,
+    std::unique_ptr<ProcessLib::AbstractJacobianAssembler>&& jacobian_assembler,
+    std::vector<ProcessVariable> const& variables,
+    std::vector<std::unique_ptr<ParameterBase>> const& parameters,
+    unsigned const integration_order,
+    BaseLib::ConfigTree const& config);
+
+extern template std::unique_ptr<Process> createThermoMechanicsProcess<3>(
+    MeshLib::Mesh& mesh,
+    std::unique_ptr<ProcessLib::AbstractJacobianAssembler>&& jacobian_assembler,
+    std::vector<ProcessVariable> const& variables,
+    std::vector<std::unique_ptr<ParameterBase>> const& parameters,
+    unsigned const integration_order,
+    BaseLib::ConfigTree const& config);
 }  // namespace ThermoMechanics
 }  // namespace ProcessLib
