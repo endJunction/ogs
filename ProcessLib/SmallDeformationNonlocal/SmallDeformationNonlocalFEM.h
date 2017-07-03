@@ -511,7 +511,7 @@ public:
                     auto const& w_l = la_l._ip_data[l].integration_weight;
 
                     test_alpha += a_kl * w_l;
-                    nonlocal_kappa_d += a_kl * kappa_d * w_l;
+                    nonlocal_kappa_d += a_kl * kappa_d * w_l * (1 - d); // d being the local damage.
                 }
                 if (std::abs(test_alpha - 1) >= 1e-14)
                     OGS_FATAL(
