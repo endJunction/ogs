@@ -461,20 +461,6 @@ double calculateDamageKappaD(
     return kappa_d;
 }
 
-/// Computes the damage internal material variable explicitly based on the
-/// results obtained from the local stress return algorithm.
-template <int DisplacementDim>
-Damage calculateDamage(
-    double const eps_p_V_diff,
-    double const eps_p_eff_diff,
-    typename SolidEhlers<DisplacementDim>::KelvinVector sigma,
-    double const kappa_d,
-    DamageProperties const& dp,
-    MaterialProperties const& mp)
-{
-    return {kappa_d, (1 - dp.beta_d) * (1 - std::exp(-kappa_d / dp.alpha_d))};
-}
-
 /// Calculates the derivative of the residuals with respect to total
 /// strain. Implementation fully implicit only.
 template <int DisplacementDim>

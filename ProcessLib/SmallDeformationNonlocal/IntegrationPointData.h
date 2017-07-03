@@ -10,6 +10,7 @@
 #pragma once
 
 #include "LocalAssemblerInterface.h"
+#include "MaterialLib/SolidModels/Ehlers.h"
 
 namespace ProcessLib
 {

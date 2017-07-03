@@ -239,7 +239,7 @@ void SmallDeformationProcess<DisplacementDim>::
 template <int DisplacementDim>
 void SmallDeformationProcess<DisplacementDim>::
     setInitialConditionsConcreteProcess(double const t,
-                                        GlobalVector const& x) override
+                                        GlobalVector const& x)
 {
     DBUG("SetInitialConditions SmallDeformationProcess.");
 
@@ -294,7 +294,7 @@ void SmallDeformationProcess<DisplacementDim>::preTimestepConcreteProcess(
 
 template <int DisplacementDim>
 void SmallDeformationProcess<DisplacementDim>::postTimestepConcreteProcess(
-    GlobalVector const& x) override
+    GlobalVector const& x)
 {
     DBUG("PostTimestep SmallDeformationProcess.");
 

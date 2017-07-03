@@ -13,6 +13,8 @@
 
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
 #include "ProcessLib/LocalAssemblerInterface.h"
+#include "ProcessLib/SmallDeformationCommon/Common.h"
+#include "ProcessLib/IntegrationPointSerialization.h"
 
 namespace ProcessLib
 {
@@ -20,7 +22,9 @@ namespace SmallDeformation
 {
 struct SmallDeformationLocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
-      public NumLib::ExtrapolatableElement
+      public NumLib::ExtrapolatableElement,
+      public NodalForceCalculationInterface,
+      public IntegrationPointSerialization
 {
     virtual std::vector<double> const& getIntPtEpsPV(
         std::vector<double>& cache) const = 0;

@@ -274,9 +274,6 @@ private:
     {
         DBUG("PostTimestep SmallDeformationNonlocalProcess.");
 
-        ProcessLib::SmallDeformation::writeNodalForces(
-            *_nodal_forces, _local_assemblers, *_local_to_global_index_map);
-
         ProcessLib::SmallDeformation::writeMaterialForces(
             *_material_forces, _local_assemblers, *_local_to_global_index_map,
             x);

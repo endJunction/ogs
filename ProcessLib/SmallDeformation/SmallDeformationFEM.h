@@ -88,12 +88,12 @@ struct SecondaryData
 };
 
 template <typename ShapeFunction, typename IntegrationMethod,
-          int DisplacementDim>
+          int DisplacementDim_>
 class SmallDeformationLocalAssembler
     : public SmallDeformationLocalAssemblerInterface
 {
 public:
-    static int const DisplacementDim = DisplacementDim_;
+    static constexpr int DisplacementDim = DisplacementDim_;
     using ShapeMatricesType =
         ShapeMatrixPolicyType<ShapeFunction, DisplacementDim>;
     using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
@@ -298,46 +298,9 @@ public:
 #else
     std::size_t writeIntegrationPointData(std::vector<char>& data) override
     {
-	return 0;
-
+        return 0;
     }
 #endif
-
-    std::vector<double> const& getNodalValues(
-        std::vector<double>& nodal_values) const override
-    {
-        nodal_values.clear();
-        auto local_b = MathLib::createZeroedVector<NodalDisplacementVectorType>(
-            nodal_values, ShapeFunction::NPOINTS * DisplacementDim);
-
-        unsigned const n_integration_points =
-            _integration_method.getNumberOfPoints();
-
-        SpatialPosition x_position;
-        x_position.setElementID(_element.getID());
-
-        for (unsigned ip = 0; ip < n_integration_points; ip++)
-        {
-            x_position.setIntegrationPoint(ip);
-            auto const& w = _ip_data[ip].integration_weight;
-
-            auto const& N = _ip_data[ip].N;
-            auto const& dNdx = _ip_data[ip].dNdx;
-
-            auto const x_coord =
-                interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
-                    _element, N);
-            auto const B = LinearBMatrix::computeBMatrix<
-                DisplacementDim, ShapeFunction::NPOINTS,
-                typename BMatricesType::BMatrixType>(dNdx, N, x_coord,
-                                                     _is_axially_symmetric);
-            auto& sigma = _ip_data[ip].sigma;
-
-            local_b.noalias() += B.transpose() * sigma * w;
-        }
-
-        return nodal_values;
-    }
 
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
         const unsigned integration_point) const override

@@ -13,6 +13,8 @@
 #include <limits>
 #include <memory>
 #include <vector>
+#include <boost/math/special_functions/pow.hpp>
+
 
 #include "MaterialLib/SolidModels/Ehlers.h"
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
@@ -499,19 +501,15 @@ public:
                     // Get damage from the local assembler and its corresponding
                     // integration point l.
                     int const& l = std::get<1>(tuple);
-                    double const kappa_d =
-                        static_cast<SmallDeformationNonlocalLocalAssembler<
-                            ShapeFunction, IntegrationMethod,
-                            DisplacementDim> const* const>(std::get<0>(tuple))
-                            ->_ip_data[l]
-                            .getLocalVariable();
+                    double const kappa_d = la_l._ip_data[l].getLocalVariable();
+                    double const d_l = la_l._ip_data[l].damage;
                     // std::cerr << kappa_d << "\n";
                     double const a_kl = std::get<3>(tuple);
 
                     auto const& w_l = la_l._ip_data[l].integration_weight;
 
                     test_alpha += a_kl * w_l;
-                    nonlocal_kappa_d += a_kl * kappa_d * w_l * (1 - d); // d being the local damage.
+                    nonlocal_kappa_d += a_kl * kappa_d * w_l * (1 - d_l);
                 }
                 if (std::abs(test_alpha - 1) >= 1e-14)
                     OGS_FATAL(
@@ -558,16 +556,6 @@ public:
         {
             _ip_data[ip].pushBackState();
         }
-    }
-
-    std::vector<double> const& getNodalForces(
-        std::vector<double>& nodal_values) const override
-    {
-        return ProcessLib::SmallDeformation::getNodalForces<
-            DisplacementDim, ShapeFunction, ShapeMatricesType,
-            NodalDisplacementVectorType, typename BMatricesType::BMatrixType>(
-            nodal_values, _integration_method, _ip_data, _element,
-            _is_axially_symmetric);
     }
 
     std::vector<double> const& getMaterialForces(
