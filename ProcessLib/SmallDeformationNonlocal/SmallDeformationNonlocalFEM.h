@@ -78,7 +78,7 @@ public:
     SmallDeformationNonlocalLocalAssembler(
         MeshLib::Element const& e,
         std::size_t const /*local_matrix_size*/,
-        bool is_axially_symmetric,
+        bool const is_axially_symmetric,
         unsigned const integration_order,
         SmallDeformationNonlocalProcessData<DisplacementDim>& process_data)
         : _process_data(process_data),
