@@ -33,24 +33,8 @@ struct IntegrationPointData final
             eps_p_V = &msv->eps_p.V;
             eps_p_D_xx = &(msv->eps_p.D[0]);
         }
-    }
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-    // The default generated move-ctor is correctly generated for other
-    // compilers.
-    explicit IntegrationPointData(IntegrationPointData&& other)
-        : b_matrices(std::move(other.b_matrices)),
-          sigma(std::move(other.sigma)),
-          sigma_prev(std::move(other.sigma_prev)),
-          eps(std::move(other.eps)),
-          eps_prev(std::move(other.eps_prev)),
-          solid_material(other.solid_material),
-          material_state_variables(std::move(other.material_state_variables)),
-          C(std::move(other.C)),
-          integration_weight(std::move(other.integration_weight)),
-    {
     }
-#endif  // _MSC_VER
 
     typename BMatricesType::BMatrixType b_matrices;
     typename BMatricesType::KelvinVectorType sigma, sigma_prev;
