@@ -111,13 +111,17 @@ public:
             ip_data.N = sm.N;
             ip_data.dNdx = sm.dNdx;
 
-            ip_data.sigma.resize(
+            // Initialize current time step values
+            ip_data.sigma.setZero(
                 KelvinVectorDimensions<DisplacementDim>::value);
+            ip_data.eps.setZero(KelvinVectorDimensions<DisplacementDim>::value);
+
+            // Previous time step values are not initialized and are set later.
             ip_data.sigma_prev.resize(
                 KelvinVectorDimensions<DisplacementDim>::value);
-            ip_data.eps.resize(KelvinVectorDimensions<DisplacementDim>::value);
             ip_data.eps_prev.resize(
                 KelvinVectorDimensions<DisplacementDim>::value);
+
             ip_data.C.resize(KelvinVectorDimensions<DisplacementDim>::value,
                              KelvinVectorDimensions<DisplacementDim>::value);
 
@@ -246,7 +250,7 @@ public:
     {
         auto const& N = _secondary_data.N[integration_point];
 
-        Eigen::Vector3d xyz;  // Resulting coordinates
+        Eigen::Vector3d xyz = Eigen::Vector3d::Zero();  // Resulting coordinates
         auto* nodes = _element.getNodes();
         for (int i = 0; i < N.size(); ++i)
         {
@@ -294,8 +298,7 @@ public:
     {
         OGS_FATAL(
             "SmallDeformationNonlocalLocalAssembler: assembly without jacobian "
-            "is not "
-            "implemented.");
+            "is not implemented.");
     }
 
     void preAssemble(double const t,
@@ -345,7 +348,6 @@ public:
                     local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
 
             // sigma is for plastic part only.
-            std::unique_ptr<KelvinMatrixType<DisplacementDim>> new_C;
             std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
                 DisplacementDim>::MaterialStateVariables>
                 new_state;
@@ -368,8 +370,12 @@ public:
 
             auto const& N = _ip_data[ip].N;
             auto& g = _ip_data[ip].material_force;
-            NumLib::shapeFunctionInterpolate(_material_forces, N, g[0], g[1],
-                                             g[2]);
+            if (DisplacementDim == 2)
+                NumLib::shapeFunctionInterpolate(_material_forces, N, g[0],
+                                                 g[1]);
+            if (DisplacementDim == 3)
+                NumLib::shapeFunctionInterpolate(_material_forces, N, g[0],
+                                                 g[1], g[2]);
         }
     }
 
@@ -396,6 +402,7 @@ public:
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
 
+        /*
         // Compute the non-local internal length depending on the material
         // forces and directions dir := x_ip - \xi:
         // length(x_ip) := 1/Vol \int_{Vol} <g(\xi), dir> / scaling * beta  d\xi,
@@ -450,13 +457,13 @@ public:
             }
             //INFO("local_length(%d:%d) %g", _element.getID(), ip, l)
         }
+        */
 
         // Non-local integration.
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
             auto const& w = _ip_data[ip].integration_weight;
-
             auto const& N = _ip_data[ip].N;
             auto const& dNdx = _ip_data[ip].dNdx;
 

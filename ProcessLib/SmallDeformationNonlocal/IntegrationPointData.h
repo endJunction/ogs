@@ -34,6 +34,7 @@ struct IntegrationPointData final
             eps_p_D_xx = &(msv->eps_p.D[0]);
         }
 
+        material_force.setZero(DisplacementDim);
     }
 
     typename BMatricesType::BMatrixType b_matrices;
