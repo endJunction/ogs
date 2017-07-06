@@ -273,7 +273,9 @@ PropertyVector<T>* getOrCreateMeshProperty(Mesh& mesh,
         auto result =
             mesh.getProperties().template getPropertyVector<T>(property_name);
         assert(result);
-        assert(result->size() == numberOfMeshItems() * number_of_components);
+        assert(result->size() == numberOfMeshItems() * number_of_components ||
+               // For the integration points the size might be arbitrary.
+               item_type == MeshLib::MeshItemType::IntegrationPoint);
         return result;
     }
 
