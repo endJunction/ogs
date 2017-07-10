@@ -32,6 +32,8 @@ struct IntegrationPointData final
             eps_p_V = &msv->eps_p.V;
             eps_p_D_xx = &(msv->eps_p.D[0]);
         }
+
+        material_force.setZero(DisplacementDim);
     }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
