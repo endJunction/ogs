@@ -366,8 +366,12 @@ public:
 
             auto const& N = _ip_data[ip].N;
             auto& g = _ip_data[ip].material_force;
-            NumLib::shapeFunctionInterpolate(_material_forces, N, g[0], g[1],
-                                             g[2]);
+            if (DisplacementDim == 2)
+                NumLib::shapeFunctionInterpolate(_material_forces, N, g[0],
+                                                 g[1]);
+            if (DisplacementDim == 3)
+                NumLib::shapeFunctionInterpolate(_material_forces, N, g[0],
+                                                 g[1], g[2]);
         }
     }
 
