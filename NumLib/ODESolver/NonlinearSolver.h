@@ -103,9 +103,11 @@ public:
      */
     explicit NonlinearSolver(
         GlobalLinearSolver& linear_solver,
-        const unsigned maxiter)
+        const unsigned maxiter,
+            double const damping)
         : _linear_solver(linear_solver),
-          _maxiter(maxiter)
+          _maxiter(maxiter),
+          _damping(damping)
     {
     }
 
@@ -134,8 +136,7 @@ private:
     ConvergenceCriterion* _convergence_criterion = nullptr;
     const unsigned _maxiter;  //!< maximum number of iterations
 
-    double const _alpha =
-        1;  //!< Damping factor. \todo Add constructor parameter.
+    double const _damping;
 
     std::size_t _res_id = 0u;            //!< ID of the residual vector.
     std::size_t _J_id = 0u;              //!< ID of the Jacobian matrix.
