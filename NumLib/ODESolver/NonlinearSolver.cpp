@@ -232,7 +232,7 @@ bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
             auto& x_new =
                 NumLib::GlobalVectorProvider::provider.getVector(
                     x, _x_new_id);
-            LinAlg::axpy(x_new, -_alpha, minus_delta_x);
+            LinAlg::axpy(x_new, -_damping, minus_delta_x);
 
             if (postIterationCallback)
                 postIterationCallback(iteration, x_new);
@@ -312,6 +312,8 @@ createNonlinearSolver(GlobalLinearSolver& linear_solver,
     auto const type = config.getConfigParameter<std::string>("type");
     //! \ogs_file_param{prj__nonlinear_solvers__nonlinear_solver__max_iter}
     auto const max_iter = config.getConfigParameter<unsigned>("max_iter");
+    //! \ogs_file_param{prj__nonlinear_solvers__nonlinear_solver__damping}
+    auto const damping= config.getConfigParameter<double>("damping");
 
     if (type == "Picard") {
         auto const tag = NonlinearSolverTag::Picard;
@@ -324,7 +326,7 @@ createNonlinearSolver(GlobalLinearSolver& linear_solver,
         auto const tag = NonlinearSolverTag::Newton;
         using ConcreteNLS = NonlinearSolver<tag>;
         return std::make_pair(
-            std::make_unique<ConcreteNLS>(linear_solver, max_iter), tag);
+            std::make_unique<ConcreteNLS>(linear_solver, max_iter, damping), tag);
     }
     OGS_FATAL("Unsupported nonlinear solver type");
 }
