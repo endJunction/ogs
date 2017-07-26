@@ -458,7 +458,7 @@ double calculateDamageKappaD(
     {
         x_s = 1 - 3 * dp.h_d + 4 * dp.h_d * std::sqrt(r_s - 1);
     }
-    kappa_d += eps_p_V_diff / x_s;
+    kappa_d = eps_p_eff_diff / x_s;
 
     return kappa_d;
 }
