@@ -670,6 +670,48 @@ SolidEhlers<DisplacementDim>::integrateStress(
                         mp.G * solution.template segment<KelvinVectorSize>(0)};
                 };
 
+            auto const update_jacobian = [&](JacobianMatrix& jacobian) {
+                jacobian = calculatePlasticJacobian<DisplacementDim>(
+                    dt, s, solution[KelvinVectorSize * 2 + 2], mp);
+                //std::cout << "analytical J:\n" << jacobian << "\n";
+
+                
+                {   // Central differences
+                    ResidualVectorType solution_org = solution;
+
+                    double const pert = 1e-8;
+
+                    JacobianMatrix jacobian_num = JacobianMatrix::Zero();
+
+                    for (int i = 0; i < solution.size(); ++i)
+                    {
+                        solution = solution_org;  // Reset to original
+                        ResidualVectorType num_increment =
+                            ResidualVectorType::Zero();
+                        num_increment[i] += pert;
+
+                        update_solution(num_increment);  // and perturbate+
+
+                        ResidualVectorType residual_plus;
+                        update_residual(residual_plus);
+
+                        solution = solution_org;  // Reset to original
+                        num_increment = ResidualVectorType::Zero();
+                        num_increment[i] -= pert;
+
+                        update_solution(num_increment);  // and perturbate-
+
+                        ResidualVectorType residual_minus;
+                        update_residual(residual_minus);
+                        jacobian_num.col(i) =
+                            (residual_plus - residual_minus) / (2. * pert);
+                    }
+                    //std::cout << "numerical  J:\n" << jacobian_num << "\n";
+                    solution = solution_org;  // Reset to original
+
+                    //std::cout << "difference  J:\n" << jacobian_num - jacobian << "\n";
+                }
+            };
             auto newton_solver = NumLib::NewtonRaphson<
                 decltype(linear_solver), JacobianMatrix,
                 decltype(update_jacobian), ResidualVectorType,
