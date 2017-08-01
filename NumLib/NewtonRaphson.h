@@ -68,14 +68,17 @@ public:
 
             increment.noalias() =
                 _linear_solver.compute(jacobian).solve(-residual);
-            // DBUG("Local linear solver accuracy |J dx - r| = %g",
-            //      (jacobian * increment + residual).norm());
+            DBUG("Local linear solver accuracy |J dx - r| = %g",
+                 (jacobian * increment + residual).norm());
 
             _solution_update(increment);
 
-            // DBUG("Local Newton: Iteration #%d |dx| = %g, |r| = %g",
-            //      iteration, increment.norm(), residual.norm());
+            DBUG("Local Newton: Iteration #%d |dx| = %g, |r| = %g",
+                 iteration, increment.norm(), residual.norm());
         } while (iteration++ < _maximum_iterations);
+
+        DBUG("XX Local Newton: Iteration #%d |dx| = %g, |r| = %g",
+            iteration, increment.norm(), residual.norm());
 
         if (iteration > _maximum_iterations)
         {

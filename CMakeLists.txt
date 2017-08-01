@@ -2,6 +2,8 @@
 ### OGS-6 Project ###
 #####################
 
+add_definitions(-DEIGEN_DONT_VECTORIZE)
+
 # Specify minimum CMake version
 cmake_minimum_required(VERSION 3.1)
 
