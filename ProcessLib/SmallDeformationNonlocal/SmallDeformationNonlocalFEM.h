@@ -310,8 +310,16 @@ public:
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
 
+        //std::cout << "\nXXX nonlocal in element " << _element.getID() <<
+        //"\n";
+
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
+            //std::cout << "\n\tip = " << ip << "\n";
+
+            auto const xyz = getSingleIntegrationPointCoordinates(ip);
+            //std::cout << "\tCurrent ip_k coords : " << xyz << "\n";
+
             x_position.setIntegrationPoint(ip);
 
             auto const& N = _ip_data[ip].N;
@@ -496,7 +504,7 @@ public:
                     test_alpha += a_kl * w_l;
                     nonlocal_kappa_d += a_kl * kappa_d * w_l;
                 }
-                if (std::abs(test_alpha - 1) >= 1e-14)
+                if (std::abs(test_alpha - 1) >= 1e-6)
                     OGS_FATAL(
                         "One-function integration failed. v: %f, diff: %f",
                         test_alpha, test_alpha - 1);
