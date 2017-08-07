@@ -585,7 +585,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
     {
         // Compute sigma_eff from damage total stress sigma, which is given by
         // sigma_eff=sigma_prev / (1-damage)
-        sigma_eff_prev = sigma_prev / (1 - state.damage_prev.value());
+        sigma_eff_prev = sigma_prev / ((1 - state.damage_prev.value())*(1 - state.damage_prev.value()));
     }
     KelvinVector sigma = predict_sigma<DisplacementDim>(
         mp.G, mp.K, sigma_eff_prev, eps, eps_prev, eps_V);
@@ -598,8 +598,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
     if ((sigma.squaredNorm() == 0 ||
          yieldFunction(mp, s, calculateIsotropicHardening(
                                   mp.kappa, mp.hardening_coefficient,
-                                  state.eps_p.eff)) < 0) ||
-        (_damage_properties && state.damage_prev.value() > 0.99))
+                                  state.eps_p.eff)) < 0))
     {
         tangentStiffness.setZero();
         tangentStiffness.template topLeftCorner<3, 3>().setConstant(
@@ -769,8 +768,9 @@ SolidEhlers<DisplacementDim>::integrateStress(
 
     KelvinVector sigma_final = mp.G * sigma;
     if (_damage_properties && _compute_local_damage)
-        sigma_final *= 1 - state.damage.value();
-
+    {
+        sigma_final *= (1 - state.damage.value())*(1 - state.damage.value());
+    }
     return {std::make_tuple(
         sigma_final,
         std::unique_ptr<
