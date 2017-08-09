@@ -408,8 +408,8 @@ double calculateDamageKappaD(
     // strain rate is positive (dilatancy).
 
     // Compute damage current step
-    if (eps_p_V_diff <= 0)
-        return kappa_d;
+    //if (eps_p_V_diff <= 0)
+    //    return kappa_d;
 
     Eigen::Matrix<double, DisplacementDim, DisplacementDim> stress_mat =
         Eigen::Matrix<double, DisplacementDim, DisplacementDim>::Zero();
@@ -458,7 +458,7 @@ double calculateDamageKappaD(
     {
         x_s = 1 - 3 * dp.h_d + 4 * dp.h_d * std::sqrt(r_s - 1);
     }
-    kappa_d = eps_p_eff_diff / x_s;
+    kappa_d = kappa_d + eps_p_eff_diff / x_s;
 
     return kappa_d;
 }
@@ -585,7 +585,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
     {
         // Compute sigma_eff from damage total stress sigma, which is given by
         // sigma_eff=sigma_prev / (1-damage)
-        sigma_eff_prev = sigma_prev / ((1 - state.damage_prev.value())*(1 - state.damage_prev.value()));
+        sigma_eff_prev = sigma_prev / (1 - state.damage_prev.value());
     }
     KelvinVector sigma = predict_sigma<DisplacementDim>(
         mp.G, mp.K, sigma_eff_prev, eps, eps_prev, eps_V);
@@ -766,10 +766,17 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 .template block<KelvinVectorSize, KelvinVectorSize>(0, 0);
     }
 
+    if (_damage_properties && state.damage.value()>0.0)
+    {
+        tangentStiffness.template topLeftCorner<3, 3>().setConstant(
+            mp.K - 2. / 3 * mp.G);
+        tangentStiffness.noalias() += 2 * mp.G * KelvinMatrix::Identity();
+    }
+
     KelvinVector sigma_final = mp.G * sigma;
     if (_damage_properties && _compute_local_damage)
     {
-        sigma_final *= (1 - state.damage.value())*(1 - state.damage.value());
+        sigma_final *= 1 - state.damage.value();
     }
     return {std::make_tuple(
         sigma_final,
