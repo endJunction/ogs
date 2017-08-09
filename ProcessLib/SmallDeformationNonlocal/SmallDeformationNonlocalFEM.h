@@ -18,6 +18,7 @@
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/Lubby2.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
+#include "MeshLib/findElementsWithinRadius.h"
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
 #include "NumLib/Function/Interpolation.h"
@@ -143,6 +144,9 @@ public:
         // std::cout << "\nXXX nonlocal in element " << _element.getID() <<
         // "\n";
 
+        auto const search_element_ids = MeshLib::findElementsWithinRadius(
+            _element, _process_data.internal_length);
+
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
@@ -162,8 +166,9 @@ public:
             // std::cout << "\tCurrent ip_k coords : " << xyz << "\n";
 
             // For all neighbors of element
-            for (auto const& la : local_assemblers)
+            for (auto const search_element_id : search_element_ids)
             {
+                auto const& la = local_assemblers[search_element_id];
                 auto const neighbor_ip_coords =
                     la->getIntegrationPointCoordinates(xyz);
                 for (auto const& n : neighbor_ip_coords)
