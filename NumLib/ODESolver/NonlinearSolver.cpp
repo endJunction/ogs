@@ -312,8 +312,6 @@ createNonlinearSolver(GlobalLinearSolver& linear_solver,
     auto const type = config.getConfigParameter<std::string>("type");
     //! \ogs_file_param{prj__nonlinear_solvers__nonlinear_solver__max_iter}
     auto const max_iter = config.getConfigParameter<unsigned>("max_iter");
-    //! \ogs_file_param{prj__nonlinear_solvers__nonlinear_solver__damping}
-    auto const damping= config.getConfigParameter<double>("damping");
 
     if (type == "Picard") {
         auto const tag = NonlinearSolverTag::Picard;
@@ -323,6 +321,8 @@ createNonlinearSolver(GlobalLinearSolver& linear_solver,
     }
     if (type == "Newton")
     {
+        //! \ogs_file_param{prj__nonlinear_solvers__nonlinear_solver__damping}
+        auto const damping= config.getConfigParameter<double>("damping", 1.0);
         auto const tag = NonlinearSolverTag::Newton;
         using ConcreteNLS = NonlinearSolver<tag>;
         return std::make_pair(
