@@ -245,7 +245,7 @@ public:
     {
         auto const& N = _secondary_data.N[integration_point];
 
-        Eigen::Vector3d xyz;  // Resulting coordinates
+        Eigen::Vector3d xyz = Eigen::Vector3d::Zero();  // Resulting coordinates
         auto* nodes = _element.getNodes();
         for (int i = 0; i < N.size(); ++i)
         {
