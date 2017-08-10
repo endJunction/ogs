@@ -183,6 +183,9 @@ public:
                     //          << " points.\n";
                 }
             }
+            if (_ip_data[k].non_local_assemblers.size() == 0) {
+                OGS_FATAL("no neighbours found!");
+            }
 
             //
             // Calculate alpha_kl =
