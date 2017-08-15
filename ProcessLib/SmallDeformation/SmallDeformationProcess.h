@@ -64,8 +64,10 @@ private:
         StaggeredCouplingTerm const& coupling_term) override;
 
 
+    /*
     void setInitialConditionsConcreteProcess(double const t,
                                              GlobalVector const& x) override;
+                                             */
     void preTimestepConcreteProcess(GlobalVector const& x, double const t,
                                     double const dt) override;
 
