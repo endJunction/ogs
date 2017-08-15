@@ -14,6 +14,7 @@
 #include "MaterialLib/SolidModels/MechanicsBase.h"
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
 #include "ProcessLib/LocalAssemblerInterface.h"
+#include "ProcessLib/SmallDeformationCommon/Common.h"
 
 namespace ProcessLib
 {
@@ -22,8 +23,19 @@ namespace SmallDeformation
 template <int DisplacementDim>
 struct SmallDeformationLocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
+      public NodalForceCalculationInterface,
       public NumLib::ExtrapolatableElement
 {
+    virtual void readIntegrationPointData(std::vector<char> const& data) = 0;
+    virtual std::size_t writeIntegrationPointData(std::vector<char>& data) = 0;
+
+    virtual std::vector<double> const& getIntPtEpsPV(
+        std::vector<double>& cache) const = 0;
+    virtual std::vector<double> const& getIntPtEpsPDXX(
+        std::vector<double>& cache) const = 0;
+    virtual std::vector<double> const& getIntPtDamage(
+        std::vector<double>& cache) const = 0;
+
     virtual std::vector<double> const& getIntPtFreeEnergyDensity(
         std::vector<double>& cache) const = 0;
 
