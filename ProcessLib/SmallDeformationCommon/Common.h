@@ -19,6 +19,7 @@
 #include "ProcessLib/Deformation/BMatrixPolicy.h"
 #include "ProcessLib/Deformation/LinearBMatrix.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
+#include "ProcessLib/Parameter/Parameter.h"
 
 namespace ProcessLib
 {
@@ -26,54 +27,12 @@ namespace SmallDeformation
 {
 struct NodalForceCalculationInterface
 {
-    virtual std::vector<double> const& getNodalForces(
-        std::vector<double>& nodal_values) const = 0;
-
     virtual std::vector<double> const& getMaterialForces(
         std::vector<double> const& local_x,
         std::vector<double>& nodal_values) = 0;
 
     virtual ~NodalForceCalculationInterface() = default;
 };
-
-template <int DisplacementDim, typename ShapeFunction,
-          typename ShapeMatricesType, typename NodalDisplacementVectorType,
-          typename BMatrixType, typename IPData, typename IntegrationMethod>
-std::vector<double> const& getNodalForces(
-    std::vector<double>& nodal_values,
-    IntegrationMethod const& _integration_method, IPData const& _ip_data,
-    MeshLib::Element const& element, bool const is_axially_symmetric)
-{
-    nodal_values.clear();
-    auto local_b = MathLib::createZeroedVector<NodalDisplacementVectorType>(
-        nodal_values, ShapeFunction::NPOINTS * DisplacementDim);
-
-    unsigned const n_integration_points =
-        _integration_method.getNumberOfPoints();
-
-    SpatialPosition x_position;
-    x_position.setElementID(element.getID());
-
-    for (unsigned ip = 0; ip < n_integration_points; ip++)
-    {
-        x_position.setIntegrationPoint(ip);
-        auto const& w = _ip_data[ip].integration_weight;
-
-        auto const x_coord =
-            interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
-                element, _ip_data[ip].N);
-        auto const B =
-            LinearBMatrix::computeBMatrix<DisplacementDim,
-                                          ShapeFunction::NPOINTS, BMatrixType>(
-                _ip_data[ip].dNdx, _ip_data[ip].N, x_coord,
-                is_axially_symmetric);
-        auto const& sigma = _ip_data[ip].sigma;
-
-        local_b.noalias() += B.transpose() * sigma * w;
-    }
-
-    return nodal_values;
-}
 
 template <int DisplacementDim, typename ShapeFunction,
           typename ShapeMatricesType, typename NodalForceVectorType,
