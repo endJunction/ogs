@@ -11,6 +11,7 @@
 
 #include <cassert>
 
+#include "BaseLib/Functional.h"
 #include "NumLib/DOF/DOFTableUtil.h"
 #include "ProcessLib/Process.h"
 #include "ProcessLib/SmallDeformationCommon/Common.h"
@@ -61,7 +62,7 @@ public:
 
 private:
     using LocalAssemblerInterface =
-        SmallDeformationNonlocalLocalAssemblerInterface;
+        SmallDeformationNonlocalLocalAssemblerInterface<DisplacementDim>;
 
     void initializeConcreteProcess(
         NumLib::LocalToGlobalIndexMap const& dof_table,
@@ -69,120 +70,166 @@ private:
         unsigned const integration_order) override
     {
         ProcessLib::SmallDeformationNonlocal::createLocalAssemblers<
-            DisplacementDim, LocalAssemblerData>(
-            mesh.getDimension(), mesh.getElements(), dof_table,
-            _local_assemblers, mesh.isAxiallySymmetric(), integration_order,
-            _process_data);
+            DisplacementDim, SmallDeformationNonlocalLocalAssembler>(
+            mesh.getElements(), dof_table, _local_assemblers,
+            mesh.isAxiallySymmetric(), integration_order, _process_data);
 
         // TODO move the two data members somewhere else.
         // for extrapolation of secondary variables
         std::vector<MeshLib::MeshSubsets> all_mesh_subsets_single_component;
         all_mesh_subsets_single_component.emplace_back(
             _mesh_subset_all_nodes.get());
-        _local_to_global_index_map_single_component.reset(
-            new NumLib::LocalToGlobalIndexMap(
+        _local_to_global_index_map_single_component =
+            std::make_unique<NumLib::LocalToGlobalIndexMap>(
                 std::move(all_mesh_subsets_single_component),
                 // by location order is needed for output
-                NumLib::ComponentOrder::BY_LOCATION));
+                NumLib::ComponentOrder::BY_LOCATION);
         _nodal_forces->resize(DisplacementDim * mesh.getNumberOfNodes());
         _material_forces->resize(DisplacementDim * mesh.getNumberOfNodes());
 
         Base::_secondary_variables.addSecondaryVariable(
-            "eps_p_V", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtEpsPV));
+            "sigma",
+            makeExtrapolator(ProcessLib::KelvinVectorType<
+                                 DisplacementDim>::RowsAtCompileTime,
+                             getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtSigma));
         Base::_secondary_variables.addSecondaryVariable(
-            "eps_p_D_xx", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtEpsPDXX));
+            "eps_p_V",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtEpsPV));
+        Base::_secondary_variables.addSecondaryVariable(
+            "eps_p_D_xx",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtEpsPDXX));
 
         Base::_secondary_variables.addSecondaryVariable(
-            "damage", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtDamage));
+            "damage",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtDamage));
+        // TODO remove the component-wise methods
+        Base::_secondary_variables.addSecondaryVariable(
+            "sigma_xx",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtSigmaXX));
 
         Base::_secondary_variables.addSecondaryVariable(
-            "sigma_xx", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtSigmaXX));
+            "sigma_yy",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtSigmaYY));
 
         Base::_secondary_variables.addSecondaryVariable(
-            "sigma_yy", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtSigmaYY));
+            "sigma_zz",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtSigmaZZ));
 
         Base::_secondary_variables.addSecondaryVariable(
-            "sigma_zz", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtSigmaZZ));
-
-        Base::_secondary_variables.addSecondaryVariable(
-            "sigma_xy", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtSigmaXY));
+            "sigma_xy",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtSigmaXY));
 
         if (DisplacementDim == 3)
         {
             Base::_secondary_variables.addSecondaryVariable(
-                "sigma_xz", 1,
-                makeExtrapolator(
-                    getExtrapolator(), _local_assemblers,
-                    &SmallDeformationNonlocalLocalAssemblerInterface::
-                        getIntPtSigmaXZ));
+                "sigma_xz",
+                makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                                 &LocalAssemblerInterface::getIntPtSigmaXZ));
 
             Base::_secondary_variables.addSecondaryVariable(
-                "sigma_yz", 1,
-                makeExtrapolator(
-                    getExtrapolator(), _local_assemblers,
-                    &SmallDeformationNonlocalLocalAssemblerInterface::
-                        getIntPtSigmaYZ));
+                "sigma_yz",
+                makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                                 &LocalAssemblerInterface::getIntPtSigmaYZ));
         }
 
         Base::_secondary_variables.addSecondaryVariable(
-            "epsilon_xx", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtEpsilonXX));
+            "epsilon",
+            makeExtrapolator(ProcessLib::KelvinVectorType<
+                                 DisplacementDim>::RowsAtCompileTime,
+                             getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtEpsilon));
+
+        // TODO remove the component-wise methods
+        Base::_secondary_variables.addSecondaryVariable(
+            "epsilon_xx",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtEpsilonXX));
 
         Base::_secondary_variables.addSecondaryVariable(
-            "epsilon_yy", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtEpsilonYY));
+            "epsilon_yy",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtEpsilonYY));
 
         Base::_secondary_variables.addSecondaryVariable(
-            "epsilon_zz", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtEpsilonZZ));
+            "epsilon_zz",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtEpsilonZZ));
 
         Base::_secondary_variables.addSecondaryVariable(
-            "epsilon_xy", 1,
-            makeExtrapolator(getExtrapolator(), _local_assemblers,
-                             &SmallDeformationNonlocalLocalAssemblerInterface::
-                                 getIntPtEpsilonXY));
+            "epsilon_xy",
+            makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                             &LocalAssemblerInterface::getIntPtEpsilonXY));
         if (DisplacementDim == 3)
         {
             Base::_secondary_variables.addSecondaryVariable(
-                "epsilon_yz", 1,
-                makeExtrapolator(
-                    getExtrapolator(), _local_assemblers,
-                    &SmallDeformationNonlocalLocalAssemblerInterface::
-                        getIntPtEpsilonYZ));
+                "epsilon_yz",
+                makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                                 &LocalAssemblerInterface::getIntPtEpsilonYZ));
 
             Base::_secondary_variables.addSecondaryVariable(
-                "epsilon_xz", 1,
-                makeExtrapolator(
-                    getExtrapolator(), _local_assemblers,
-                    &SmallDeformationNonlocalLocalAssemblerInterface::
-                        getIntPtEpsilonXZ));
+                "epsilon_xz",
+                makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                                 &LocalAssemblerInterface::getIntPtEpsilonXZ));
+        }
+
+        // enable output of internal variables defined by material models
+        auto const internal_variables =
+            _process_data.material->getInternalVariables();
+        for (auto const& internal_variable : internal_variables)
+        {
+            auto const& name = internal_variable.name;
+            auto const& fct = internal_variable.getter;
+            auto const num_components = internal_variable.num_components;
+            DBUG("Registering internal variable %s.", name.c_str());
+
+            auto getIntPtValues = BaseLib::easyBind(
+                [fct, num_components](
+                    LocalAssemblerInterface const& loc_asm,
+                    const double /*t*/,
+                    GlobalVector const& /*current_solution*/,
+                    NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+                    std::vector<double>& cache) -> std::vector<double> const& {
+
+                    const unsigned num_int_pts =
+                        loc_asm.getNumberOfIntegrationPoints();
+
+                    cache.clear();
+                    auto cache_mat = MathLib::createZeroedMatrix<
+                        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                      Eigen::RowMajor>>(cache, num_components,
+                                                        num_int_pts);
+
+                    // TODO avoid the heap allocation (one per finite element)
+                    std::vector<double> cache_column(num_int_pts);
+
+                    for (unsigned i = 0; i < num_int_pts; ++i)
+                    {
+                        auto const& state =
+                            loc_asm.getMaterialStateVariablesAt(i);
+
+                        auto const& int_pt_values = fct(state, cache_column);
+                        assert(int_pt_values.size() == num_components);
+                        auto const int_pt_values_vec =
+                            MathLib::toVector(int_pt_values);
+
+                        cache_mat.col(i).noalias() = int_pt_values_vec;
+                    }
+
+                    return cache;
+                });
+
+            Base::_secondary_variables.addSecondaryVariable(
+                name,
+                makeExtrapolator(num_components, getExtrapolator(),
+                                 _local_assemblers, std::move(getIntPtValues)));
         }
 
 #ifdef PROTOBUF_FOUND
@@ -194,8 +241,8 @@ private:
 #endif  // PROTOBUF_FOUND
 
         GlobalExecutor::executeMemberOnDereferenced(
-            &SmallDeformationNonlocalLocalAssemblerInterface::nonlocal,
-            _local_assemblers, _local_assemblers);
+            &LocalAssemblerInterface::nonlocal, _local_assemblers,
+            _local_assemblers);
     }
 
     std::size_t writeIntegrationPointData(
@@ -255,6 +302,10 @@ private:
             _global_assembler, &VectorMatrixAssembler::assembleWithJacobian,
             _local_assemblers, *_local_to_global_index_map, t, x, xdot,
             dxdot_dx, dx_dx, M, K, b, Jac, coupling_term);
+
+        b.copyValues(*_nodal_forces);
+        std::transform(_nodal_forces->begin(), _nodal_forces->end(),
+                       _nodal_forces->begin(), [](double val) { return -val; });
     }
 
     void preTimestepConcreteProcess(GlobalVector const& x, double const t,
@@ -266,16 +317,13 @@ private:
         _process_data.t = t;
 
         GlobalExecutor::executeMemberOnDereferenced(
-            &SmallDeformationNonlocalLocalAssemblerInterface::preTimestep,
-            _local_assemblers, *_local_to_global_index_map, x, t, dt);
+            &LocalAssemblerInterface::preTimestep, _local_assemblers,
+            *_local_to_global_index_map, x, t, dt);
     }
 
     void postTimestepConcreteProcess(GlobalVector const& x) override
     {
         DBUG("PostTimestep SmallDeformationNonlocalProcess.");
-
-        ProcessLib::SmallDeformation::writeNodalForces(
-            *_nodal_forces, _local_assemblers, *_local_to_global_index_map);
 
         ProcessLib::SmallDeformation::writeMaterialForces(
             *_material_forces, _local_assemblers, *_local_to_global_index_map,

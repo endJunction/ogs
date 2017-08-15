@@ -109,7 +109,7 @@ struct IntegrationPointData final
 
     std::vector<std::tuple<
         // element's local assembler
-        SmallDeformationNonlocalLocalAssemblerInterface const* const,
+        SmallDeformationNonlocalLocalAssemblerInterface<DisplacementDim> const* const,
         int,     // integration point id,
         double,  // squared distance to current integration point
         double   // alpha_kl

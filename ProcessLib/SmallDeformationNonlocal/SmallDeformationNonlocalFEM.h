@@ -48,7 +48,7 @@ struct SecondaryData
 template <typename ShapeFunction, typename IntegrationMethod,
           int DisplacementDim_>
 class SmallDeformationNonlocalLocalAssembler
-    : public SmallDeformationNonlocalLocalAssemblerInterface
+    : public SmallDeformationNonlocalLocalAssemblerInterface<DisplacementDim_>
 {
 public:
     static int const DisplacementDim = DisplacementDim_;
@@ -133,10 +133,11 @@ public:
                          (1 - distance2 / (internal_length2));
     }
 
-    void nonlocal(std::size_t const /*mesh_item_id*/,
-                  std::vector<std::unique_ptr<
-                      SmallDeformationNonlocalLocalAssemblerInterface>> const&
-                      local_assemblers) override
+    void nonlocal(
+        std::size_t const /*mesh_item_id*/,
+        std::vector<
+            std::unique_ptr<SmallDeformationNonlocalLocalAssemblerInterface<
+                DisplacementDim>>> const& local_assemblers) override
     {
         // std::cout << "\nXXX nonlocal in element " << _element.getID() <<
         // "\n";
@@ -551,16 +552,6 @@ public:
         }
     }
 
-    std::vector<double> const& getNodalForces(
-        std::vector<double>& nodal_values) const override
-    {
-        return ProcessLib::SmallDeformation::getNodalForces<
-            DisplacementDim, ShapeFunction, ShapeMatricesType,
-            NodalDisplacementVectorType, typename BMatricesType::BMatrixType>(
-            nodal_values, _integration_method, _ip_data, _element,
-            _is_axially_symmetric);
-    }
-
     std::vector<double> const& getMaterialForces(
         std::vector<double> const& local_x,
         std::vector<double>& nodal_values) override
@@ -671,6 +662,9 @@ public:
     }
 
     std::vector<double> const& getIntPtFreeEnergyDensity(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         cache.clear();
@@ -685,6 +679,9 @@ public:
     }
 
     std::vector<double> const& getIntPtEpsPV(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         cache.clear();
@@ -697,7 +694,11 @@ public:
 
         return cache;
     }
+
     std::vector<double> const& getIntPtEpsPDXX(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         cache.clear();
@@ -711,7 +712,49 @@ public:
         return cache;
     }
 
+    std::vector<double> const& getIntPtSigma(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& cache) const override
+    {
+        using KelvinVectorType = typename BMatricesType::KelvinVectorType;
+        auto const kelvin_vector_size =
+            KelvinVectorDimensions<DisplacementDim>::value;
+        auto const num_intpts = _ip_data.size();
+
+        cache.clear();
+        auto cache_mat = MathLib::createZeroedMatrix<Eigen::Matrix<
+            double, kelvin_vector_size, Eigen::Dynamic, Eigen::RowMajor>>(
+            cache, kelvin_vector_size, num_intpts);
+
+        // TODO make a general implementation for converting KelvinVectors
+        // back to symmetric rank-2 tensors.
+        for (unsigned ip = 0; ip < num_intpts; ++ip)
+        {
+            auto const& sigma = _ip_data[ip].sigma;
+
+            for (typename KelvinVectorType::Index component = 0;
+                 component < kelvin_vector_size && component < 3;
+                 ++component)
+            {  // xx, yy, zz components
+                cache_mat(component, ip) = sigma[component];
+            }
+            for (typename KelvinVectorType::Index component = 3;
+                 component < kelvin_vector_size;
+                 ++component)
+            {  // mixed xy, yz, xz components
+                cache_mat(component, ip) = sigma[component] / std::sqrt(2);
+            }
+        }
+
+        return cache;
+    }
+
     std::vector<double> const& getIntPtDamage(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         cache.clear();
@@ -719,37 +762,56 @@ public:
 
         for (auto const& ip_data : _ip_data)
         {
-            cache.push_back(ip_data.damage);
+            auto const& state =
+                static_cast<MaterialLib::Solids::Ehlers::StateVariables<
+                    DisplacementDim> const&>(*ip_data.material_state_variables);
+            cache.push_back(state.damage.value());
         }
 
         return cache;
     }
 
+    // TODO remove the component-wise methods.
     std::vector<double> const& getIntPtSigmaXX(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtSigma(cache, 0);
     }
 
     std::vector<double> const& getIntPtSigmaYY(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtSigma(cache, 1);
     }
 
     std::vector<double> const& getIntPtSigmaZZ(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtSigma(cache, 2);
     }
 
     std::vector<double> const& getIntPtSigmaXY(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtSigma(cache, 3);
     }
 
     std::vector<double> const& getIntPtSigmaXZ(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         assert(DisplacementDim == 3);
@@ -757,49 +819,123 @@ public:
     }
 
     std::vector<double> const& getIntPtSigmaYZ(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         assert(DisplacementDim == 3);
         return getIntPtSigma(cache, 5);
     }
 
+    virtual std::vector<double> const& getIntPtEpsilon(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& cache) const override
+    {
+        using KelvinVectorType = typename BMatricesType::KelvinVectorType;
+        auto const kelvin_vector_size =
+            KelvinVectorDimensions<DisplacementDim>::value;
+        auto const num_intpts = _ip_data.size();
+
+        cache.clear();
+        auto cache_mat = MathLib::createZeroedMatrix<Eigen::Matrix<
+            double, kelvin_vector_size, Eigen::Dynamic, Eigen::RowMajor>>(
+            cache, kelvin_vector_size, num_intpts);
+
+        // TODO make a general implementation for converting KelvinVectors
+        // back to symmetric rank-2 tensors.
+        for (unsigned ip = 0; ip < num_intpts; ++ip)
+        {
+            auto const& eps = _ip_data[ip].eps;
+
+            for (typename KelvinVectorType::Index component = 0;
+                 component < kelvin_vector_size && component < 3;
+                 ++component)
+            {  // xx, yy, zz components
+                cache_mat(component, ip) = eps[component];
+            }
+            for (typename KelvinVectorType::Index component = 3;
+                 component < kelvin_vector_size;
+                 ++component)
+            {  // mixed xy, yz, xz components
+                cache_mat(component, ip) = eps[component] / std::sqrt(2);
+            }
+        }
+
+        return cache;
+    }
+
+    // TODO remove the component-wise methods
     std::vector<double> const& getIntPtEpsilonXX(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtEpsilon(cache, 0);
     }
 
     std::vector<double> const& getIntPtEpsilonYY(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtEpsilon(cache, 1);
     }
 
     std::vector<double> const& getIntPtEpsilonZZ(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtEpsilon(cache, 2);
     }
 
     std::vector<double> const& getIntPtEpsilonXY(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         return getIntPtEpsilon(cache, 3);
     }
 
-    std::vector<double> const& getIntPtEpsilonXZ(
+    std::vector<double> const& getIntPtEpsilonYZ(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         assert(DisplacementDim == 3);
         return getIntPtEpsilon(cache, 4);
     }
 
-    std::vector<double> const& getIntPtEpsilonYZ(
+    std::vector<double> const& getIntPtEpsilonXZ(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const override
     {
         assert(DisplacementDim == 3);
         return getIntPtEpsilon(cache, 5);
     }
+
+    unsigned getNumberOfIntegrationPoints() const override
+    {
+        return _integration_method.getNumberOfPoints();
+    }
+
+    typename MaterialLib::Solids::MechanicsBase<
+        DisplacementDim>::MaterialStateVariables const&
+    getMaterialStateVariablesAt(unsigned integration_point) const override
+    {
+        return *_ip_data[integration_point].material_state_variables;
+    }
+
 
 private:
     std::vector<double> const& getIntPtSigma(std::vector<double>& cache,
@@ -847,30 +983,6 @@ private:
     MeshLib::Element const& _element;
     bool const _is_axially_symmetric;
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
-};
-
-template <typename ShapeFunction, typename IntegrationMethod,
-          unsigned GlobalDim, int DisplacementDim>
-class LocalAssemblerData final
-    : public SmallDeformationNonlocalLocalAssembler<
-          ShapeFunction, IntegrationMethod, DisplacementDim>
-{
-public:
-    LocalAssemblerData(LocalAssemblerData const&) = delete;
-    LocalAssemblerData(LocalAssemblerData&&) = delete;
-
-    LocalAssemblerData(
-        MeshLib::Element const& e,
-        std::size_t const local_matrix_size,
-        bool is_axially_symmetric,
-        unsigned const integration_order,
-        SmallDeformationNonlocalProcessData<DisplacementDim>& process_data)
-        : SmallDeformationNonlocalLocalAssembler<
-              ShapeFunction, IntegrationMethod, DisplacementDim>(
-              e, local_matrix_size, is_axially_symmetric, integration_order,
-              process_data)
-    {
-    }
 };
 
 }  // namespace SmallDeformationNonlocal
