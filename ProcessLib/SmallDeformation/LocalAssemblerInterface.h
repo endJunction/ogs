@@ -26,6 +26,16 @@ struct SmallDeformationLocalAssemblerInterface
       public MaterialForcesInterface,
       public NumLib::ExtrapolatableElement
 {
+    virtual void readIntegrationPointData(std::vector<char> const& data) = 0;
+    virtual std::size_t writeIntegrationPointData(std::vector<char>& data) = 0;
+
+    virtual std::vector<double> const& getIntPtEpsPV(
+        std::vector<double>& cache) const = 0;
+    virtual std::vector<double> const& getIntPtEpsPDXX(
+        std::vector<double>& cache) const = 0;
+    virtual std::vector<double> const& getIntPtDamage(
+        std::vector<double>& cache) const = 0;
+
     virtual std::vector<double> const& getIntPtFreeEnergyDensity(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
