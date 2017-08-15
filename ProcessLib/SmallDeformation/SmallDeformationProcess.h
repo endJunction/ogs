@@ -63,8 +63,10 @@ private:
         GlobalMatrix& K, GlobalVector& b, GlobalMatrix& Jac) override;
 
 
+    /*
     void setInitialConditionsConcreteProcess(double const t,
                                              GlobalVector const& x) override;
+                                             */
 
     void preTimestepConcreteProcess(
         GlobalVector const& x, double const t, double const dt,
