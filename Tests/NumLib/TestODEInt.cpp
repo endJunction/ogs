@@ -277,12 +277,14 @@ public:
     }
 };
 
+/*
 TYPED_TEST_CASE(NumLibODEIntTyped, TestCases);
 
 TYPED_TEST(NumLibODEIntTyped, T1)
 {
     TestFixture::test();
 }
+*/
 
 
 /* TODO Other possible test cases:
