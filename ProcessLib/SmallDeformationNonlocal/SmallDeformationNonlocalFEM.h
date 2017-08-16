@@ -122,6 +122,8 @@ public:
                 KelvinVectorDimensions<DisplacementDim>::value);
 
             _secondary_data.N[ip] = shape_matrices[ip].N;
+
+            ip_data.coordinates = getSingleIntegrationPointCoordinates(ip);
         }
     }
 
@@ -162,31 +164,23 @@ public:
             //
             // std::cout << "\n\tip = " << k << "\n";
 
-            auto const xyz = getSingleIntegrationPointCoordinates(k);
+            auto const& xyz = _ip_data[k].coordinates;
             // std::cout << "\tCurrent ip_k coords : " << xyz << "\n";
 
             // For all neighbors of element
             for (auto const search_element_id : search_element_ids)
             {
                 auto const& la = local_assemblers[search_element_id];
-                auto const neighbor_ip_coords =
-                    la->getIntegrationPointCoordinates(xyz);
-                for (auto const& n : neighbor_ip_coords)
+                auto const distances = la->getIntegrationPointCoordinates(xyz);
+                for (int ip = 0; ip < distances.size(); ++ip)
                 {
-                    // output
-                    // std::cout << "\t[" << std::get<0>(n) << ", "
-                    //          << std::get<1>(n) << ", (";
-                    // for (int i = 0; i < std::get<2>(n).size(); ++i)
-                    //    std::cout << std::get<2>(n)[i] << ", ";
-                    // std::cout << "), " << std::get<3>(n) << "]\n";
-
+                    if (distances[ip] >= _process_data.internal_length *
+                                             _process_data.internal_length)
+                        continue;
                     // save into current ip_k
                     _ip_data[k].non_local_assemblers.push_back(std::make_tuple(
-                        la.get(), std::get<1>(n), std::get<3>(n),
+                        la.get(), ip, distances[ip],
                         std::numeric_limits<double>::quiet_NaN()));
-                    // std::cout << "\tadd "
-                    //          << _ip_data[k].non_local_assemblers.size()
-                    //          << " points.\n";
                 }
             }
             if (_ip_data[k].non_local_assemblers.size() == 0) {
@@ -216,7 +210,6 @@ public:
                 //    << "alpha_0(d^2_m) = " << alpha_0(distance2_m)
                 //    << "; sum_alpha_km = " << a_k_sum_m << "\n";
             }
-
 
             //
             // Calculate alpha_kl =
@@ -269,29 +262,21 @@ public:
     }
 
     /// \returns for each of the current element's integration points the
-    /// element's id, the integration point number, its coordinates, and the
     /// squared distance from the current integration point.
-    std::vector<std::tuple<int, int, Eigen::Vector3d, double>>
-    getIntegrationPointCoordinates(Eigen::Vector3d const& coords) const override
+    std::vector<double> getIntegrationPointCoordinates(
+        Eigen::Vector3d const& coords) const override
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
-        std::vector<std::tuple<int, int, Eigen::Vector3d, double>> result;
+        std::vector<double> result;
         result.reserve(n_integration_points);
 
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            // std::cout << _element.getID() << ", " << ip << "\n";
-
-            auto const xyz = getSingleIntegrationPointCoordinates(ip);
-            double const distance2 = (xyz - coords).squaredNorm();
-            if (distance2 <
-                _process_data.internal_length * _process_data.internal_length)
-                result.emplace_back(_element.getID(), ip, xyz, distance2);
+            auto const& xyz = _ip_data[ip].coordinates;
+            result.push_back((xyz - coords).squaredNorm());
         }
-        // std::cout << "\tfor element " << _element.getID() << " got "
-        //          << result.size() << " point in internal_length\n";
         return result;
     }
 
@@ -325,20 +310,16 @@ public:
 
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            //std::cout << "\n\tip = " << ip << "\n";
-
-            auto const xyz = getSingleIntegrationPointCoordinates(ip);
-            //std::cout << "\tCurrent ip_k coords : " << xyz << "\n";
+            // std::cout << "\n\tip = " << ip << "\n";
 
             x_position.setIntegrationPoint(ip);
 
             auto const& N = _ip_data[ip].N;
             auto const& dNdx = _ip_data[ip].dNdx;
 
-            auto& x = _ip_data[ip].coordinates;
-            // Take only the first DisplacementDim values, because the function
-            // alway returns 3D vector.
-            x = getSingleIntegrationPointCoordinates(ip).head(DisplacementDim);
+            // std::cout << "\tCurrent ip_k coords : " <<
+            // _ip_data[ip].coordinates
+            //          << "\n";
 
             auto const x_coord =
                 interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
