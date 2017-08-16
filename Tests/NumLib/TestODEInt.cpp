@@ -277,6 +277,7 @@ public:
     }
 };
 
+/*
 TYPED_TEST_CASE(NumLibODEIntTyped, TestCases);
 
 // Temporarily disabled for PETSc issue #1989
@@ -288,6 +289,7 @@ TYPED_TEST(NumLibODEIntTyped, DISABLED_T1)
 {
     TestFixture::test();
 }
+*/
 
 
 /* TODO Other possible test cases:
