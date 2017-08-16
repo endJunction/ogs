@@ -154,8 +154,9 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
             SmallDeformationNonlocalLocalAssemblerInterface>> const&
             local_assemblers) = 0;
 
-    virtual std::vector<double>
-    getIntegrationPointCoordinates(Eigen::Vector3d const& coords) const = 0;
+    virtual void getIntegrationPointCoordinates(
+        Eigen::Vector3d const& coords,
+        std::vector<double>& distances) const = 0;
 };
 
 }  // namespace SmallDeformationNonlocal

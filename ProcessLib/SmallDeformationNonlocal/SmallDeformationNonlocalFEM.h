@@ -152,6 +152,7 @@ public:
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
+        std::vector<double> distances;  // Cache for ip-ip distances.
         //
         // For every integration point in this element collect the neighbouring
         // integration points falling in given radius (internal length) and
@@ -171,7 +172,7 @@ public:
             for (auto const search_element_id : search_element_ids)
             {
                 auto const& la = local_assemblers[search_element_id];
-                auto const distances = la->getIntegrationPointCoordinates(xyz);
+                la->getIntegrationPointCoordinates(xyz, distances);
                 for (int ip = 0; ip < distances.size(); ++ip)
                 {
                     if (distances[ip] >= _process_data.internal_length *
@@ -262,23 +263,23 @@ public:
         return xyz;
     }
 
-    /// \returns for each of the current element's integration points the
-    /// squared distance from the current integration point.
-    std::vector<double> getIntegrationPointCoordinates(
-        Eigen::Vector3d const& coords) const override
+    /// For each of the current element's integration points the squared
+    /// distance from the current integration point is computed and stored in
+    /// the given distances cache.
+    void getIntegrationPointCoordinates(
+        Eigen::Vector3d const& coords,
+        std::vector<double>& distances) const override
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
-        std::vector<double> result;
-        result.reserve(n_integration_points);
+        distances.resize(n_integration_points);
 
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             auto const& xyz = _ip_data[ip].coordinates;
-            result.push_back((xyz - coords).squaredNorm());
+            distances[ip] = (xyz - coords).squaredNorm();
         }
-        return result;
     }
 
     void assemble(double const /*t*/, std::vector<double> const& /*local_x*/,
