@@ -183,20 +183,21 @@ public:
                         std::numeric_limits<double>::quiet_NaN()));
                 }
             }
-            if (_ip_data[k].non_local_assemblers.size() == 0) {
+            if (_ip_data[k].non_local_assemblers.size() == 0)
+            {
                 OGS_FATAL("no neighbours found!");
             }
 
             double a_k_sum_m = 0;
-            for (auto const& tuple_m : _ip_data[k].non_local_assemblers)
+            for (auto const& tuple : _ip_data[k].non_local_assemblers)
             {
                 auto const& la_m =
                     *static_cast<SmallDeformationNonlocalLocalAssembler<
                         ShapeFunction, IntegrationMethod,
-                        DisplacementDim> const* const>(std::get<0>(tuple_m));
+                        DisplacementDim> const* const>(std::get<0>(tuple));
 
-                int const m = std::get<1>(tuple_m);
-                double const distance2_m = std::get<2>(tuple_m);
+                int const m = std::get<1>(tuple);
+                double const distance2_m = std::get<2>(tuple);
 
                 auto const& w_m = la_m._ip_data[m].integration_weight;
 
@@ -305,7 +306,7 @@ public:
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
 
-        //std::cout << "\nXXX nonlocal in element " << _element.getID() <<
+        // std::cout << "\nXXX nonlocal in element " << _element.getID() <<
         //"\n";
 
         for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -399,7 +400,7 @@ public:
 
         // Compute the non-local internal length depending on the material
         // forces and directions dir := x_ip - \xi:
-        // length(x_ip) := 1/Vol \int_{Vol} <g(\xi), dir> / scaling * beta  d\xi,
+        // length(x_ip) := 1/Vol \int_{Vol} <g(\xi), dir> / scaling * beta d\xi,
         // where:
         // beta(x_ip, \xi) := exp(-|dir|) * (1 - exp(-|g(\xi)|)),
         // scaling(x_ip, \xi) := |<g(\xi), dir>|
