@@ -118,7 +118,7 @@ struct IntegrationPointData final
 
     double nonlocal_internal_length;
     typename ShapeMatricesType::GlobalDimVectorType material_force;
-    typename ShapeMatricesType::GlobalDimVectorType coordinates;
+    Eigen::Vector3d coordinates;
 };
 
 }  // namespace SmallDeformationNonlocal
