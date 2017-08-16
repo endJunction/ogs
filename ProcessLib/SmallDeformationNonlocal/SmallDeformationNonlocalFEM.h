@@ -76,7 +76,7 @@ public:
     SmallDeformationNonlocalLocalAssembler(
         MeshLib::Element const& e,
         std::size_t const /*local_matrix_size*/,
-        bool is_axially_symmetric,
+        bool const is_axially_symmetric,
         unsigned const integration_order,
         SmallDeformationNonlocalProcessData<DisplacementDim>& process_data)
         : _process_data(process_data),
@@ -109,15 +109,16 @@ public:
             ip_data.N = sm.N;
             ip_data.dNdx = sm.dNdx;
 
-            ip_data.sigma.resize(
+            // Initialize current time step values
+            ip_data.sigma.setZero(
                 KelvinVectorDimensions<DisplacementDim>::value);
+            ip_data.eps.setZero(KelvinVectorDimensions<DisplacementDim>::value);
+
+            // Previous time step values are not initialized and are set later.
             ip_data.sigma_prev.resize(
                 KelvinVectorDimensions<DisplacementDim>::value);
-            ip_data.eps.resize(KelvinVectorDimensions<DisplacementDim>::value);
             ip_data.eps_prev.resize(
                 KelvinVectorDimensions<DisplacementDim>::value);
-            ip_data.C.resize(KelvinVectorDimensions<DisplacementDim>::value,
-                             KelvinVectorDimensions<DisplacementDim>::value);
 
             _secondary_data.N[ip] = shape_matrices[ip].N;
         }
@@ -939,7 +940,6 @@ public:
         return *_ip_data[integration_point].material_state_variables;
     }
 
-
 private:
     std::vector<double> const& getIntPtSigma(std::vector<double>& cache,
                                              std::size_t const component) const
@@ -966,7 +966,10 @@ private:
 
         for (auto const& ip_data : _ip_data)
         {
-            cache.push_back(ip_data.eps[component]);
+            if (component < 3)  // xx, yy, zz components
+                cache.push_back(ip_data.eps[component]);
+            else  // mixed xy, yz, xz components
+                cache.push_back(ip_data.eps[component] / std::sqrt(2));
         }
 
         return cache;
@@ -984,8 +987,8 @@ private:
 
     IntegrationMethod _integration_method;
     MeshLib::Element const& _element;
-    bool const _is_axially_symmetric;
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
+    bool const _is_axially_symmetric;
 };
 
 }  // namespace SmallDeformationNonlocal
