@@ -188,6 +188,31 @@ public:
                 OGS_FATAL("no neighbours found!");
             }
 
+            double a_k_sum_m = 0;
+            for (auto const& tuple_m : _ip_data[k].non_local_assemblers)
+            {
+                auto const& la_m =
+                    *static_cast<SmallDeformationNonlocalLocalAssembler<
+                        ShapeFunction, IntegrationMethod,
+                        DisplacementDim> const* const>(std::get<0>(tuple_m));
+
+                int const m = std::get<1>(tuple_m);
+                double const distance2_m = std::get<2>(tuple_m);
+
+                auto const& w_m = la_m._ip_data[m].integration_weight;
+
+                a_k_sum_m += w_m * alpha_0(distance2_m);
+
+                // int const m_ele = la_m._element.getID();
+                // std::cout
+                //    << "\tCompute sum_a_km for k = " << k << " and m = ("
+                //    << m_ele << ", " << m
+                //    << "); distance^2_m = " << distance2_m
+                //    << "alpha_0(d^2_m) = " << alpha_0(distance2_m)
+                //    << "; sum_alpha_km = " << a_k_sum_m << "\n";
+            }
+
+
             //
             // Calculate alpha_kl =
             //       alpha_0(|x_k - x_l|) / int_{m \in ip} alpha_0(|x_k - x_m|)
@@ -206,31 +231,6 @@ public:
                 // std::cout << "Compute a_kl for k = " << k << " and l = ("
                 //          << l_ele << ", " << l
                 //          << "); distance^2_l = " << distance2_l << "\n";
-
-                double a_k_sum_m = 0;
-                for (auto const& tuple_m : _ip_data[k].non_local_assemblers)
-                {
-                    auto const& la_m =
-                        *static_cast<SmallDeformationNonlocalLocalAssembler<
-                            ShapeFunction, IntegrationMethod,
-                            DisplacementDim> const* const>(
-                            std::get<0>(tuple_m));
-
-                    int const m = std::get<1>(tuple_m);
-                    double const distance2_m = std::get<2>(tuple_m);
-
-                    auto const& w_m = la_m._ip_data[m].integration_weight;
-
-                    a_k_sum_m += w_m * alpha_0(distance2_m);
-
-                    // int const m_ele = la_m._element.getID();
-                    // std::cout
-                    //    << "\tCompute sum_a_km for k = " << k << " and m = ("
-                    //    << m_ele << ", " << m
-                    //    << "); distance^2_m = " << distance2_m
-                    //    << "alpha_0(d^2_m) = " << alpha_0(distance2_m)
-                    //    << "; sum_alpha_km = " << a_k_sum_m << "\n";
-                }
                 double const a_kl = alpha_0(distance2_l) / a_k_sum_m;
 
                 // std::cout << "alpha_0(d^2_l) = " << alpha_0(distance2_l)
