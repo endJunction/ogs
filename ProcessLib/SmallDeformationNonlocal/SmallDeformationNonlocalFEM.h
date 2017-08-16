@@ -129,8 +129,7 @@ public:
 
     double alpha_0(double const distance2) const
     {
-        double const internal_length2 =
-            _process_data.internal_length * _process_data.internal_length;
+        double const internal_length2 = _process_data.internal_length_squared;
         return (distance2 > internal_length2)
                    ? 0
                    : (1 - distance2 / (internal_length2)) *
@@ -147,7 +146,7 @@ public:
         // "\n";
 
         auto const search_element_ids = MeshLib::findElementsWithinRadius(
-            _element, _process_data.internal_length);
+            _element, _process_data.internal_length_squared);
 
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -175,8 +174,7 @@ public:
                 la->getIntegrationPointCoordinates(xyz, distances);
                 for (int ip = 0; ip < distances.size(); ++ip)
                 {
-                    if (distances[ip] >= _process_data.internal_length *
-                                             _process_data.internal_length)
+                    if (distances[ip] >= _process_data.internal_length_squared)
                         continue;
                     // save into current ip_k
                     _ip_data[k].non_local_assemblers.push_back(std::make_tuple(
