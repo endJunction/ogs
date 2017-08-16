@@ -422,6 +422,7 @@ public:
         // where:
         // beta(x_ip, \xi) := exp(-|dir|) * (1 - exp(-|g(\xi)|)),
         // scaling(x_ip, \xi) := |<g(\xi), dir>|
+        /*
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             auto const& N = _ip_data[ip].N;
@@ -449,6 +450,7 @@ public:
             }
             //INFO("local_length(%d) %g", ip, l)
         }
+        */
 
         // Non-local integration.
         for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -519,6 +521,7 @@ public:
                         "One-function integration failed. v: %f, diff: %f",
                         test_alpha, test_alpha - 1);
 
+                /*
                 double const _gamma_nonlocal = 1.0;
                 // === Overnonlocal formulation ===
                 // Update nonlocal damage with local damage (scaled with 1 -
@@ -527,6 +530,7 @@ public:
                 nonlocal_kappa_d =
                     (1. - _gamma_nonlocal) * _ip_data[ip].getLocalVariable() +
                     _gamma_nonlocal * nonlocal_kappa_d;
+                */
 
                 if (nonlocal_kappa_d < 0.)
                 {
