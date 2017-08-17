@@ -17,13 +17,24 @@ const std::array<std::array<double, 3>, GaussLegendreTet<1>::NPoints>
 template <>
 double const GaussLegendreTet<1>::W[1] = {1. / 6.};
 
-const std::array<std::array<double, 3>, GaussLegendreTet<2>::NPoints>
+/*const std::array<std::array<double, 3>, GaussLegendreTet<2>::NPoints>
 GaussLegendreTet<2>::X = {{ {{1./4., 1./4., 1./4.}},
                             {{1./6., 1./6., 1./6.}},
                             {{1./2., 1./6., 1./6.}},
                             {{1./6., 1./2., 1./6.}},
                             {{1./6., 1./6., 1./2.}} }};
-double const GaussLegendreTet<2>::W[5] = {-2./15., 0.075, 0.075, 0.075, 0.075};
+double const GaussLegendreTet<2>::W[5] = {-2./15., 0.075, 0.075, 0.075, 0.075};*/
+
+const std::array<std::array<double, 3>, GaussLegendreTet<2>::NPoints>
+GaussLegendreTet<2>::X = {{ {{0, 1./3., 1./3.}},
+                            {{1./3., 0, 1./3.}},
+                            {{1./3., 1./3., 0}},
+                            {{1./3., 1./3., 1./3.}},
+                            {{1., 0, 0}},
+                            {{0, 1., 0}},
+                            {{0, 0, 1.}},
+                            {{0, 0, 0}} }};
+double const GaussLegendreTet<2>::W[8] = {9/40*1/6, 9/40*1/6, 9/40*1/6, 9/40*1/6, 1/40*1/6, 1/40*1/6, 1/40*1/6, 1/40*1/6};
 
 std::array<std::array<double, 3>, GaussLegendreTet<3>::NPoints> initGLTet3X()
 {
