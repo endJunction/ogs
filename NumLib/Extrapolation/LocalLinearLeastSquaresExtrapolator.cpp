@@ -34,8 +34,8 @@ LocalLinearLeastSquaresExtrapolator::LocalLinearLeastSquaresExtrapolator(
      */
     if (dof_table.getNumberOfComponents() != 1)
         OGS_FATAL(
-            "The d.o.f. table passed must be for one variable that has "
-            "only one component!");
+            "The d.o.f. table passed must be for one variable that has only "
+            "one component!");
 }
 
 void LocalLinearLeastSquaresExtrapolator::extrapolate(
@@ -137,7 +137,7 @@ void LocalLinearLeastSquaresExtrapolator::extrapolateElement(
 
     if (num_int_pts < static_cast<decltype(num_int_pts)>(num_nodes))
         OGS_FATAL(
-            "Least squares is not possible if there are more nodes than"
+            "Least squares is not possible if there are more nodes than "
             "integration points.");
 
     auto const pair_it_inserted = _qr_decomposition_cache.emplace(
