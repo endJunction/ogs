@@ -120,6 +120,13 @@ std::unique_ptr<Mesh> createQuadraticOrderMesh(Mesh const& linear_mesh)
                 // And delete the original node
                 delete original_node;
             }
+			// move up until XXX
+        else if (e->getCellType() == MeshLib::CellType::PRISM6)
+        {
+            vec_new_eles.push_back(createQuadraticElement<MeshLib::Prism15>(
+                e, vec_edges, vec_new_nodes, org_mesh.getNumberOfNodes()));
+        }
+		// XXX
         }
 
         quadratic_elements.push_back(quadratic_element.release());
