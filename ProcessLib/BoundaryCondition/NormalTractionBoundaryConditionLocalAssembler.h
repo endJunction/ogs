@@ -61,7 +61,9 @@ public:
     using ShapeMatricesTypeDisplacement =
         ShapeMatrixPolicyType<ShapeFunctionDisplacement, GlobalDim>;
     using GlobalDimVectorType =
-        typename ShapeMatricesTypeDisplacement ::GlobalDimVectorType;
+        typename ShapeMatricesTypeDisplacement::GlobalDimVectorType;
+    using GlobalDimNodalMatrixType =
+        typename ShapeMatricesTypeDisplacement::GlobalDimNodalMatrixType;
 
     NormalTractionBoundaryConditionLocalAssembler(
         MeshLib::Element const& e,
@@ -72,8 +74,9 @@ public:
         : _integration_method(integration_order), _pressure(pressure)
     {
         _local_rhs.setZero(local_matrix_size);
-        auto const coordinates = NumLib::createElementPointsCoordinatesMatrix<
-            ShapeFunctionDisplacement::NPOINTS, GlobalDim>(e);
+        GlobalDimNodalMatrixType const coordinates =
+            NumLib::createElementPointsCoordinatesMatrix<
+                GlobalDimNodalMatrixType>(e);
 
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
