@@ -14,6 +14,7 @@
 
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "NumLib/DOF/DOFTableUtil.h"
+#include "NumLib/Fem/FiniteElement/ComputeNormalVector.h"
 #include "ProcessLib/Parameter/Parameter.h"
 
 #include "GenericNaturalBoundaryConditionLocalAssembler.h"
@@ -22,42 +23,6 @@ namespace ProcessLib
 {
 namespace NormalTractionBoundaryCondition
 {
-
-// computeNormalVector :: tangent_space x GlobalDim -> GlobalDimVectorType
-template <int GlobalDim>
-struct ComputeNormalVector
-{
-    template <typename GlobalDimVector, typename TangentSpaceMatrix>
-    static GlobalDimVector calculate(TangentSpaceMatrix const& /*tangents*/)
-    {
-        // TODO: Remove unnecessary instantiations.
-        OGS_FATAL("Invalid for the given GlobalDim.");
-    }
-};
-
-template <>
-struct ComputeNormalVector<3>
-{
-    template <typename GlobalDimVector, typename TangentSpaceMatrix>
-    static GlobalDimVector calculate(TangentSpaceMatrix const& tangents)
-    {
-        GlobalDimVector const normal =
-            tangents.row(0).template cross(tangents.row(1));
-        return normal / normal.norm();
-    }
-};
-
-template <>
-struct ComputeNormalVector<2>
-{
-    template <typename GlobalDimVector, typename TangentSpaceMatrix>
-    static GlobalDimVector calculate(TangentSpaceMatrix const& tangents)
-    {
-        GlobalDimVector normal(2);
-        normal << -tangents(1), tangents(0);
-        return normal / normal.norm();
-    }
-};
 
 template <typename ShapeMatricesTypeDisplacement, int GlobalDim, int NPoints>
 struct IntegrationPointData final
@@ -107,31 +72,11 @@ public:
         : _integration_method(integration_order), _pressure(pressure)
     {
         _local_rhs.setZero(local_matrix_size);
+        auto const coordinates = NumLib::createElementPointsCoordinatesMatrix<
+            ShapeFunctionDisplacement::NPOINTS, GlobalDim>(e);
 
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
-
-        // Create an element's GlobalDim-points coordinates matrix.
-        Eigen::Matrix<double, ShapeFunctionDisplacement::NPOINTS, GlobalDim>
-            coordinates;
-        {
-            auto const n_nodes = e.getNumberOfNodes();
-            assert(ShapeFunctionDisplacement::NPOINTS == n_nodes);
-            std::cout << "----\n";
-            for (unsigned n = 0; n < n_nodes; ++n)
-            {
-                auto const& node = *e.getNode(n);
-                for (int d = 0; d < GlobalDim; ++d)
-                    coordinates(n, d) = node[d];
-                for (int d = 0; d < 3; ++d)
-                    std::cout << node[d] << " ";
-            }
-            std::cout << "\n";
-
-            std::cout << GlobalDim << "-dim; for element " << e.getID()
-                      << "; nodes:\n"
-                      << coordinates << "\n";
-        }
 
         _ip_data.reserve(n_integration_points);
         auto const shape_matrices_u =
@@ -142,12 +87,11 @@ public:
 
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            auto const& dNdr = shape_matrices_u[ip].dNdr;
-            auto const tangents = (dNdr * coordinates).eval();
-
             // TODO Extend to rotated 2d meshes and line elements.
-            GlobalDimVectorType element_normal = ComputeNormalVector<
-                GlobalDim>::template calculate<GlobalDimVectorType>(tangents);
+            GlobalDimVectorType element_normal =
+                NumLib::ComputeNormalVector<GlobalDim>::template calculate<
+                    GlobalDimVectorType>(shape_matrices_u[ip].dNdr,
+                                         coordinates);
             std::cout << ip << ": normal = \n" << element_normal << "\n";
 
             typename ShapeMatricesTypeDisplacement::template MatrixType<
