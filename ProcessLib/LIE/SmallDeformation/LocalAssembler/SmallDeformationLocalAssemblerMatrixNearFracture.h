@@ -43,9 +43,6 @@ public:
     using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
     using BMatricesType = BMatrixPolicyType<ShapeFunction, DisplacementDim>;
 
-    using BMatrixType = typename BMatricesType::BMatrixType;
-    using StiffnessMatrixType = typename BMatricesType::StiffnessMatrixType;
-    using NodalForceVectorType = typename BMatricesType::NodalForceVectorType;
     using NodalDisplacementVectorType =
         typename BMatricesType::NodalForceVectorType;
 
