@@ -84,8 +84,6 @@ public:
     }
 
 public:
-    static int const KelvinVectorSize =
-        ProcessLib::KelvinVectorDimensions<DisplacementDim>::value;
     using KelvinVector = ProcessLib::KelvinVectorType<DisplacementDim>;
     using KelvinMatrix = ProcessLib::KelvinMatrixType<DisplacementDim>;
 

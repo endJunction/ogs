@@ -48,8 +48,5 @@ LinearElasticIsotropic<DisplacementDim>::integrateStress(
         C)};
 }
 
-extern template class LinearElasticIsotropic<2>;
-extern template class LinearElasticIsotropic<3>;
-
 }  // namespace Solids
 }  // namespace MaterialLib
