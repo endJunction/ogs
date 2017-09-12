@@ -34,6 +34,7 @@
 
 #include "ProcessLib/UncoupledProcessesTimeLoop.h"
 
+/*
 #include "ProcessLib/GroundwaterFlow/CreateGroundwaterFlowProcess.h"
 #include "ProcessLib/ComponentTransport/CreateComponentTransportProcess.h"
 #include "ProcessLib/HT/CreateHTProcess.h"
@@ -42,14 +43,15 @@
 #include "ProcessLib/LIE/HydroMechanics/CreateHydroMechanicsProcess.h"
 #include "ProcessLib/LIE/SmallDeformation/CreateSmallDeformationProcess.h"
 #include "ProcessLib/LiquidFlow/CreateLiquidFlowProcess.h"
-#include "ProcessLib/PhaseField/CreatePhaseFieldProcess.h"
 #include "ProcessLib/RichardsFlow/CreateRichardsFlowProcess.h"
-#include "ProcessLib/SmallDeformation/CreateSmallDeformationProcess.h"
 #include "ProcessLib/TES/CreateTESProcess.h"
 #include "ProcessLib/ThermalTwoPhaseFlowWithPP/CreateThermalTwoPhaseFlowWithPPProcess.h"
 #include "ProcessLib/ThermoMechanics/CreateThermoMechanicsProcess.h"
 #include "ProcessLib/TwoPhaseFlowWithPP/CreateTwoPhaseFlowWithPPProcess.h"
 #include "ProcessLib/TwoPhaseFlowWithPrho/CreateTwoPhaseFlowWithPrhoProcess.h"
+*/
+#include "ProcessLib/SmallDeformation/CreateSmallDeformationProcess.h"
+#include "ProcessLib/PhaseField/CreatePhaseFieldProcess.h"
 
 namespace detail
 {
@@ -302,6 +304,7 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
             //! \ogs_file_param{prj__processes__process__jacobian_assembler}
             process_config.getConfigSubtreeOptional("jacobian_assembler"));
 
+        /*
         if (type == "GROUNDWATER_FLOW")
         {
             // The existence check of the in the configuration referenced
@@ -400,7 +403,8 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                     _process_variables, _parameters, integration_order,
                     process_config);
         }
-        else if (type == "PHASE_FIELD")
+        else */
+        if (type == "PHASE_FIELD")
         {
             switch (_mesh_vec[0]->getDimension())
             {
@@ -444,6 +448,7 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                         "given dimension");
             }
         }
+        /*
         else if (type == "SMALL_DEFORMATION_WITH_LIE")
         {
             //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION_WITH_LIE__dimension}
@@ -523,6 +528,7 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                     _process_variables, _parameters, integration_order,
                     process_config, _curves);
         }
+        */
 
         else
         {
