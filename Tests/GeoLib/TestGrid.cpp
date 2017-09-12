@@ -80,6 +80,8 @@ TEST(GeoLib, SearchNearestPointInGrid)
 {
     std::vector<GeoLib::Point*> pnts;
     pnts.push_back(new GeoLib::Point(0.0,0.0,0.0));
+    GeoLib::Grid<GeoLib::Point> gg(pnts.begin(), pnts.end());
+
     GeoLib::Grid<GeoLib::Point> *grid(nullptr);
     ASSERT_NO_THROW(grid = new GeoLib::Grid<GeoLib::Point>(pnts.begin(), pnts.end()));
 
