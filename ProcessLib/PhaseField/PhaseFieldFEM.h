@@ -264,6 +264,7 @@ public:
             "implemented.");
     }
 
+    __attribute__ ((nothrow))
     void assembleWithJacobian(double const t,
                               std::vector<double> const& local_x,
                               std::vector<double> const& local_xdot,
