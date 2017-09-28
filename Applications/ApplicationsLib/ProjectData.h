@@ -19,6 +19,8 @@
 
 #include "BaseLib/ConfigTree.h"
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
+#include "MaterialLib/MPL/mpMedium.h"
+
 #include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/Process.h"
 #include "ProcessLib/ProcessVariable.h"
@@ -109,6 +111,7 @@ private:
 
     void parseCurves(boost::optional<BaseLib::ConfigTree> const& config);
 
+    std::unique_ptr<MaterialPropertyLib::Medium> _medium;
     std::vector<std::unique_ptr<MeshLib::Mesh>> _mesh_vec;
     std::map<std::string, std::unique_ptr<ProcessLib::Process>> _processes;
     std::vector<ProcessLib::ProcessVariable> _process_variables;
