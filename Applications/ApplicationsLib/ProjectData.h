@@ -111,13 +111,14 @@ private:
 
     void parseCurves(boost::optional<BaseLib::ConfigTree> const& config);
 
-    std::unique_ptr<MaterialPropertyLib::Medium> _medium;
     std::vector<std::unique_ptr<MeshLib::Mesh>> _mesh_vec;
     std::map<std::string, std::unique_ptr<ProcessLib::Process>> _processes;
     std::vector<ProcessLib::ProcessVariable> _process_variables;
 
     /// Buffer for each parameter config passed to the process.
     std::vector<std::unique_ptr<ProcessLib::ParameterBase>> _parameters;
+
+    std::unique_ptr<MaterialPropertyLib::Medium> _medium;
 
     /// The time loop used to solve this project's processes.
     std::unique_ptr<TimeLoop> _time_loop;
