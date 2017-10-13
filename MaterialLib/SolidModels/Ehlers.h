@@ -49,7 +49,8 @@ struct MaterialPropertiesParameters
                                  P const& beta_p_, P const& gamma_p_,
                                  P const& delta_p_, P const& epsilon_p_,
                                  P const& m_p_, P const& kappa_,
-                                 P const& hardening_coefficient_)
+                                 P const& hardening_coefficient_,
+                                 P const& tangent_type_)
         : G(G_),
           K(K_),
           alpha(alpha_),
@@ -65,7 +66,8 @@ struct MaterialPropertiesParameters
           epsilon_p(epsilon_p_),
           m_p(m_p_),
           kappa(kappa_),
-          hardening_coefficient(hardening_coefficient_)
+          hardening_coefficient(hardening_coefficient_),
+          tangent_type(tangent_type_)
     {
     }
     // basic material parameters
@@ -89,6 +91,7 @@ struct MaterialPropertiesParameters
 
     P const& kappa;  ///< hardening parameter
     P const& hardening_coefficient;
+    P const& tangent_type;
 };
 
 struct DamagePropertiesParameters
@@ -120,7 +123,8 @@ struct MaterialProperties final
           epsilon_p(mp.epsilon_p(t, x)[0]),
           m_p(mp.m_p(t, x)[0]),
           kappa(mp.kappa(t, x)[0]),
-          hardening_coefficient(mp.hardening_coefficient(t, x)[0])
+          hardening_coefficient(mp.hardening_coefficient(t, x)[0]),
+          tangent_type(mp.tangent_type(t, x)[0])
     {
     }
     double const G;
@@ -142,6 +146,7 @@ struct MaterialProperties final
 
     double const kappa;
     double const hardening_coefficient;
+    double const tangent_type;
 };
 
 /// Evaluated DamagePropertiesParameters container, see its documentation for

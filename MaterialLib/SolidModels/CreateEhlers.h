@@ -166,11 +166,17 @@ std::unique_ptr<SolidEhlers<DisplacementDim>> createEhlers(
 
     DBUG("Use \'%s\' as gammap.", gammap.name.c_str());
 
+    //! \ogs_file_param_special{material__solid__constitutive_relation__Ehlers__tangent_type}
+    auto& tangent_type =
+        ProcessLib::findParameter<double>(config, "tangent_type", parameters, 1);
+
+    DBUG("Use \'%s\' as tangent_type.", tangent_type.name.c_str());
+
     MaterialPropertiesParameters mp{
         shear_modulus, bulk_modulus, alpha,  beta,
         gamma,         delta,        eps,    m,
         alphap,        betap,        gammap, deltap,
-        epsp,          paremeter_mp, kappa,  hardening_modulus};
+        epsp,          paremeter_mp, kappa,  hardening_modulus, tangent_type};
 
     // Damage properties.
     std::unique_ptr<DamagePropertiesParameters> ehlers_damage_properties;
