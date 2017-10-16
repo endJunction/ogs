@@ -338,7 +338,7 @@ public:
         return element_data.ByteSize();
     };
 #else
-    std::size_t writeIntegrationPointData(std::vector<char>& data) override
+    std::size_t writeIntegrationPointData(std::vector<char>& /*data*/) override
     {
         return 0;
     }

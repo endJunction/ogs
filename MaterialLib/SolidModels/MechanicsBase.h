@@ -57,6 +57,7 @@ struct MechanicsBase
 
         virtual void pushBackState() = 0;
         virtual double getLocalVariable() const { return 0; }
+        virtual double getLocalRateKappaD() const { return 0; }
     };
 
     /// Polymorphic creator for MaterialStateVariables objects specific for a

@@ -32,6 +32,7 @@
  */
 #pragma once
 
+#include <iostream>
 #include <Eigen/Eigenvalues>
 #include <boost/math/special_functions/pow.hpp>
 
@@ -397,7 +398,7 @@ typename SolidEhlers<DisplacementDim>::JacobianMatrix calculatePlasticJacobian(
 /// \Returns a new kappa_d.
 template <int DisplacementDim>
 double calculateDamageKappaD(
-    double const eps_p_V_diff,
+    double const /*eps_p_V_diff*/,
     double const eps_p_eff_diff,
     typename SolidEhlers<DisplacementDim>::KelvinVector sigma,
     double kappa_d,
@@ -649,7 +650,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
                     dt, s, solution[KelvinVectorSize * 2 + 2], mp);
             };
 
-            double const damping = 1.;
+            //double const damping = 1.;
             auto const update_solution =
                 [&](ResidualVectorType const& increment) {
                     solution += increment;

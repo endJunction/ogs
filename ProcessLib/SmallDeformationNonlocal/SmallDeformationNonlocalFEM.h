@@ -172,7 +172,7 @@ public:
             {
                 auto const& la = local_assemblers[search_element_id];
                 la->getIntegrationPointCoordinates(xyz, distances);
-                for (int ip = 0; ip < distances.size(); ++ip)
+                for (int ip = 0; ip < static_cast <int>(distances.size()); ++ip)
                 {
                     if (distances[ip] >= _process_data.internal_length_squared)
                         continue;
@@ -612,7 +612,7 @@ public:
         return element_data.ByteSize();
     };
 #else
-    std::size_t writeIntegrationPointData(std::vector<char>& data) override
+    std::size_t writeIntegrationPointData(std::vector<char>& /*data*/) override
     {
         return 0;
     }
