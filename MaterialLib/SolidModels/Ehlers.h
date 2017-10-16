@@ -100,6 +100,7 @@ struct DamagePropertiesParameters
     P const& alpha_d;
     P const& beta_d;
     P const& h_d;
+    P const& m_d;
 };
 
 /// Evaluated MaterialPropertiesParameters container, see its documentation for
@@ -158,12 +159,14 @@ struct DamageProperties
                      DamagePropertiesParameters const& dp)
         : alpha_d(dp.alpha_d(t, x)[0]),
           beta_d(dp.beta_d(t, x)[0]),
-          h_d(dp.h_d(t, x)[0])
+          h_d(dp.h_d(t, x)[0]),
+          m_d(dp.m_d(t, x)[0])
     {
     }
     double const alpha_d;
     double const beta_d;
     double const h_d;
+    double const m_d;
 };
 
 template <typename KelvinVector>
