@@ -59,6 +59,7 @@ struct IntegrationPointData final
     double free_energy_density = 0;
     double damage = 0;
     double nonlocal_kappa_d = 0;
+    double nonlocal_kappa_d_prev = 0;
 
     MaterialLib::Solids::MechanicsBase<DisplacementDim>& solid_material;
     std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
@@ -77,12 +78,18 @@ struct IntegrationPointData final
     {
         eps_prev = eps;
         sigma_prev = sigma;
+        nonlocal_kappa_d_prev = nonlocal_kappa_d;
         material_state_variables->pushBackState();
     }
 
     double getLocalVariable() const
     {
         return material_state_variables->getLocalVariable();
+    }
+
+    double getLocalRateKappaD() const
+    {
+        return material_state_variables->getLocalRateKappaD();
     }
 
     double updateDamage(double const t, SpatialPosition const& x_position,

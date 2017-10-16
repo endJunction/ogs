@@ -228,6 +228,8 @@ struct StateVariables
 
     double getLocalVariable() const override { return damage.kappa_d(); }
 
+    double getLocalRateKappaD() const override { return damage.kappa_d()-damage_prev.kappa_d(); }
+
     using KelvinVector = ProcessLib::KelvinVectorType<DisplacementDim>;
 
     PlasticStrain<KelvinVector> eps_p;  ///< plastic part of the state.
@@ -386,13 +388,13 @@ private:
 /// Computes the damage internal material variable explicitly based on the
 /// results obtained from the local stress return algorithm.
 template <int DisplacementDim>
-Damage calculateDamage(double const eps_p_V_diff,
-                       double const eps_p_eff_diff,
+Damage calculateDamage(double const /*eps_p_V_diff*/,
+                       double const /*eps_p_eff_diff*/,
                        typename ProcessLib::KelvinVectorType<DisplacementDim>
-                           sigma,
+                           /*sigma*/,
                        double const kappa_d,
                        DamageProperties const& dp,
-                       MaterialProperties const& mp)
+                       MaterialProperties const& /*mp*/)
 {
     return {kappa_d, (1 - dp.beta_d) * (1 - std::exp(-kappa_d / dp.alpha_d))};
 }
