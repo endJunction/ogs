@@ -453,16 +453,10 @@ public:
             // auto const& eps_prev = _ip_data[ip].eps_prev;
             // auto const& sigma_prev = _ip_data[ip].sigma_prev;
 
-            auto& eps = _ip_data[ip].eps;
             auto& sigma = _ip_data[ip].sigma;
             auto& C = _ip_data[ip].C;
             // auto& material_state_variables =
             //    *_ip_data[ip].material_state_variables;
-
-            eps.noalias() =
-                B *
-                Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
-                    local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
 
             /*
             if (!_ip_data[ip].solid_material.updateNonlocalDamage(
