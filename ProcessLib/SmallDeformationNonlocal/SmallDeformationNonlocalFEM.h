@@ -521,11 +521,12 @@ public:
                 if (_ip_data[ip].damage < 0. || _ip_data[ip].damage > 1.)
                     std::cerr << "DD " << _ip_data[ip].damage << "\n\n";
 
-                sigma = sigma * (1 - _ip_data[ip].damage);
+                sigma = sigma * (1. - _ip_data[ip].damage);
             }
 
             local_b.noalias() -= B.transpose() * sigma * w;
-            local_Jac.noalias() += B.transpose() * C * B * w;
+            local_Jac.noalias() +=
+                B.transpose() * C * (1. - _ip_data[ip].damage) * B * w;
         }
     }
 

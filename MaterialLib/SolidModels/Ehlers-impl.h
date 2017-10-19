@@ -764,9 +764,15 @@ SolidEhlers<DisplacementDim>::integrateStress(
             tangentStiffness.noalias() += 2 * mp.G * KelvinMatrix::Identity();
         }
         else if (mp.tangent_type == 1)
-             tangentStiffness *= 1 - state.damage.value();
+        {
+            // Nothing
+        }
         else
-             OGS_FATAL("Inadmissible value for tangent_type: 0 = Elastic; 1 = Plastic-Damage secant.");
+        {
+            OGS_FATAL(
+                "Inadmissible value for tangent_type: 0 = Elastic; 1 = "
+                "Plastic-Damage secant.");
+        }
     }
 
     KelvinVector sigma_final = mp.G * sigma;
