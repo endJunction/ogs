@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -472,7 +473,6 @@ public:
 
             {
                 double test_alpha = 0;  // Integration of one-function.
-                double nonlocal_kappa_d = 0;
                 double nonlocal_kappa_d_dot = 0;
 
                 for (auto const& tuple : _ip_data[ip].non_local_assemblers)
@@ -521,13 +521,9 @@ public:
                     _gamma_nonlocal * nonlocal_kappa_d_dot;
 
                 //std::cout << "KappaD total impl" << nonlocal_kappa_d << std::endl;
-                nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d_prev + nonlocal_kappa_d_dot;
-
-                if (nonlocal_kappa_d < 0.)
-                {
-                    //ERR("set kappa_d zero %g", nonlocal_kappa_d);
-                    nonlocal_kappa_d = 0;
-                }
+                double const nonlocal_kappa_d = std::max(
+                    0.,
+                    _ip_data[ip].nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
 
                 _ip_data[ip].nonlocal_kappa_d = nonlocal_kappa_d;
                 _ip_data[ip].damage =
