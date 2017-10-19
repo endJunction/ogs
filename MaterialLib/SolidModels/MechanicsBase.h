@@ -146,7 +146,7 @@ struct MechanicsBase
 
 #ifdef PROTOBUF_FOUND
     virtual OGS::MaterialState writeMaterialState(
-        MaterialStateVariables const& material_state_variables) const
+        MaterialStateVariables const& /*material_state_variables*/) const
     {
         return {};   // Dummy value needed for compilation. Code is not executed
                      // because the integration_point_writer is not created in
