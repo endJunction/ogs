@@ -400,6 +400,7 @@ template <int DisplacementDim>
 double calculateDamageKappaD(
     double const /*eps_p_V_diff*/,
     double const eps_p_eff_diff,
+    double const /*dt*/,
     typename SolidEhlers<DisplacementDim>::KelvinVector sigma,
     double kappa_d,
     DamageProperties const& dp,
@@ -459,7 +460,7 @@ double calculateDamageKappaD(
     {
         x_s = 1 - 3 * dp.h_d + 4 * dp.h_d * std::sqrt(r_s - 1);
     }
-    kappa_d = kappa_d + eps_p_eff_diff / x_s;
+    kappa_d = kappa_d + eps_p_eff_diff / x_s ;
 
     return kappa_d;
 }
@@ -728,8 +729,8 @@ SolidEhlers<DisplacementDim>::integrateStress(
         {
             DamageProperties damage_properties(t, x, *_damage_properties);
             double const kappa_d = calculateDamageKappaD<DisplacementDim>(
-                state.eps_p.V - state.eps_p_prev.V,
-                state.eps_p.eff - state.eps_p_prev.eff, sigma,
+                (state.eps_p.V - state.eps_p_prev.V) ,
+                (state.eps_p.eff - state.eps_p_prev.eff) , dt, sigma,
                 state.damage.kappa_d(), damage_properties, mp);
 
             state.damage = calculateDamage<DisplacementDim>(

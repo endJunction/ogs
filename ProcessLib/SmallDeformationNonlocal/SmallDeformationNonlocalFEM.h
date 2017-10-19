@@ -491,6 +491,7 @@ public:
                             DisplacementDim> const* const>(std::get<0>(tuple))
                             ->_ip_data[l]
                             .getLocalRateKappaD();
+
                     // std::cerr << kappa_d << "\n";
                     double const a_kl = std::get<3>(tuple);
 
@@ -504,22 +505,23 @@ public:
                         "One-function integration failed. v: %f, diff: %f",
                         test_alpha, test_alpha - 1);
 
-                //std::cout << "KappaD total impl" << nonlocal_kappa_d << std::endl;
-                nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d_prev + nonlocal_kappa_d_dot;
-
                 //std::cout << "KappaD rate impl" << nonlocal_kappa_d << std::endl;
 
                 double const _gamma_nonlocal =
                         static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<DisplacementDim>
                         const&>(_ip_data[ip].solid_material).evaluatedDamageProperties(t , x_position).m_d;
                 // double const _gamma_nonlocal = 1.2;
+                //std::cout << "gamma non local" << _gamma_nonlocal << std::endl;
                 // === Overnonlocal formulation ===
                 // Update nonlocal damage with local damage (scaled with 1 -
                 // \gamma_nonlocal) for the current integration point and the
                 // nonlocal integral part.
                 nonlocal_kappa_d_dot =
-                    (1. - _gamma_nonlocal) * _ip_data[ip].getLocalVariable() +
-                    _gamma_nonlocal * nonlocal_kappa_d;
+                    (1. - _gamma_nonlocal) * _ip_data[ip].getLocalRateKappaD() +
+                    _gamma_nonlocal * nonlocal_kappa_d_dot;
+
+                //std::cout << "KappaD total impl" << nonlocal_kappa_d << std::endl;
+                nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d_prev + nonlocal_kappa_d_dot;
 
                 if (nonlocal_kappa_d < 0.)
                 {
