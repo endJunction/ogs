@@ -480,11 +480,7 @@ public:
                     int const& l = std::get<1>(tuple);
 
                     double const kappa_d_dot =
-                        static_cast<SmallDeformationNonlocalLocalAssembler<
-                            ShapeFunction, IntegrationMethod,
-                            DisplacementDim> const* const>(std::get<0>(tuple))
-                            ->_ip_data[l]
-                            .getLocalRateKappaD();
+                        la_l._ip_data[l].getLocalRateKappaD();
 
                     // std::cerr << kappa_d << "\n";
                     double const a_kl = std::get<3>(tuple);
