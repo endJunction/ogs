@@ -498,8 +498,10 @@ public:
                 //std::cout << "KappaD rate impl" << nonlocal_kappa_d << std::endl;
 
                 double const _gamma_nonlocal =
-                        static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<DisplacementDim>
-                        const&>(_ip_data[ip].solid_material).evaluatedDamageProperties(t , x_position).m_d;
+                    static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
+                        DisplacementDim> const&>(_ip_data[ip].solid_material)
+                        .evaluatedDamageProperties(t, x_position)
+                        .m_d;
                 // double const _gamma_nonlocal = 1.2;
                 //std::cout << "gamma non local" << _gamma_nonlocal << std::endl;
                 // === Overnonlocal formulation ===
