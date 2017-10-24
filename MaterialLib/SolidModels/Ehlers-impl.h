@@ -732,7 +732,6 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 (state.eps_p.V - state.eps_p_prev.V) ,
                 (state.eps_p.eff - state.eps_p_prev.eff) , dt, sigma,
                 state.damage.kappa_d(), damage_properties, mp);
-
             state.damage = {
                 kappa_d,
                 state.damage
