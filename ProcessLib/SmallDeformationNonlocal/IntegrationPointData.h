@@ -107,10 +107,13 @@ struct IntegrationPointData final
         auto& state =
             static_cast<MaterialLib::Solids::Ehlers::StateVariables<
                 DisplacementDim> &>(*material_state_variables);
-        state.damage = MaterialLib::Solids::Ehlers::calculateDamage<DisplacementDim>(
-                   state.eps_p.V - state.eps_p_prev.V,
-                   state.eps_p.eff - state.eps_p_prev.eff, sigma,
-                   non_local_kappa_d, damage_properties, material_properties);
+
+        auto const new_damage =
+            MaterialLib::Solids::Ehlers::calculateDamage<DisplacementDim>(
+                state.eps_p.V - state.eps_p_prev.V,
+                state.eps_p.eff - state.eps_p_prev.eff, sigma,
+                non_local_kappa_d, damage_properties, material_properties);
+        state.damage = {state.damage.kappa_d(), new_damage.value()};
         return state.damage.value();
     }
 
