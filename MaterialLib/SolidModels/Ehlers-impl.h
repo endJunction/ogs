@@ -496,20 +496,8 @@ SolidEhlers<DisplacementDim>::integrateStress(
     // do the evaluation once per function call.
     MaterialProperties const mp(t, x, _mp);
 
-    KelvinVector sigma_eff_prev = sigma_prev;  // In case without damage the
-                                               // effective value is same as the
-                                               // previous one.
-    /* XXX
-    if (_damage_properties)
-    {
-        // Compute sigma_eff from damage total stress sigma, which is given by
-        // sigma_eff=sigma_prev / (1-damage)
-        sigma_eff_prev = sigma_prev / (1 - state.damage_prev.value());
-    }
-    */
-
-    KelvinVector sigma = predict_sigma<DisplacementDim>(
-        mp.G, mp.K, sigma_eff_prev, eps, eps_prev, eps_V);
+    KelvinVector sigma = predict_sigma<DisplacementDim>(mp.G, mp.K, sigma_prev,
+                                                        eps, eps_prev, eps_V);
 
     KelvinMatrix tangentStiffness;
 
@@ -694,7 +682,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 .template block<KelvinVectorSize, KelvinVectorSize>(0, 0);
     }
 
-    /* XXX
+    /* XXX Nonfunctional because tangent_type = 1 is the stable method.
     if (_damage_properties && state.damage.value()>0.0)
     {
         if (mp.tangent_type == 0)
@@ -717,7 +705,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
     */
 
     KelvinVector sigma_final = mp.G * sigma;
-    /* XXX
+    /* XXX  Already in the nonlocal FEM.
     if (_damage_properties && _compute_local_damage)
     {
         sigma_final *= 1 - state.damage.value();

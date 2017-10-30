@@ -337,6 +337,7 @@ public:
             auto& sigma = _ip_data[ip].sigma;
             auto& C = _ip_data[ip].C;
             auto& state = _ip_data[ip].material_state_variables;
+            double const& damage_prev = _ip_data[ip].damage_prev;
 
             eps.noalias() =
                 B *
@@ -349,13 +350,13 @@ public:
                 DisplacementDim>::MaterialStateVariables>
                 new_state;
 
-            /// XXX
-            // Compute sigma_eff from damage total stress sigma, which is given
-            // by sigma_eff=sigma_prev / (1-damage)
-            // sigma_eff_prev = sigma_prev / (1 - state.damage_prev.value());
+            // Compute sigma_eff from damage total stress sigma
+            using KelvinVectorType = typename BMatricesType::KelvinVectorType;
+            KelvinVectorType const sigma_eff_prev =
+                sigma_prev / (1 - damage_prev);
 
             auto&& solution = _ip_data[ip].solid_material.integrateStress(
-                t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
+                t, x_position, _process_data.dt, eps_prev, eps, sigma_eff_prev,
                 *state);
 
             if (!solution)

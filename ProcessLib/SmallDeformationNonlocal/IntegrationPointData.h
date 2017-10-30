@@ -58,6 +58,7 @@ struct IntegrationPointData final
     typename BMatricesType::KelvinVectorType eps, eps_prev;
     double free_energy_density = 0;
     double damage = 0;
+    double damage_prev = 0;
     double nonlocal_kappa_d = 0;
     double nonlocal_kappa_d_prev = 0;
 
