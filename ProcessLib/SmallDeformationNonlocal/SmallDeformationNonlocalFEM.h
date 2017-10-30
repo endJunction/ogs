@@ -529,8 +529,6 @@ public:
                         "One-function integration failed. v: %f, diff: %f",
                         test_alpha, test_alpha - 1);
 
-                //std::cout << "KappaD rate impl" << nonlocal_kappa_d << std::endl;
-
                 auto const& ehlers_material =
                     static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
                         DisplacementDim> const&>(_ip_data[ip].solid_material);
@@ -552,13 +550,14 @@ public:
                         _gamma_nonlocal * nonlocal_kappa_d_dot;
                 }
 
-                //std::cout << "KappaD total impl" << nonlocal_kappa_d << std::endl;
                 double& nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d;
                 double const& nonlocal_kappa_d_prev =
                     _ip_data[ip].nonlocal_kappa_d_prev;
 
                 nonlocal_kappa_d =
                     std::max(0., nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
+                // std::cout << "KappaD total impl" << nonlocal_kappa_d
+                //          << std::endl;
 
                 // Update damage based on nonlocal kappa_d
                 {
