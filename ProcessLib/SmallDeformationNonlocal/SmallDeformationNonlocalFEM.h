@@ -31,6 +31,7 @@
 
 #include "ProcessLib/SmallDeformationCommon/integration_point_data.h"
 
+#include "Damage.h"
 #include "IntegrationPointData.h"
 #include "LocalAssemblerInterface.h"
 #include "SmallDeformationNonlocalProcessData.h"
@@ -537,36 +538,14 @@ public:
                 nonlocal_kappa_d =
                     std::max(0., nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
 
-                /// XXX instead of updateDamage call only
-                /// calculateDamage
+                // Update damage based on nonlocal kappa_d
                 {
                     auto const damage_properties =
                         ehlers_material.evaluatedDamageProperties(t,
                                                                   x_position);
-                    auto const material_properties =
-                        ehlers_material.evaluatedMaterialProperties(t,
-                                                                    x_position);
-
-                    // Ehlers material state variables
-                    auto& state_vars =
-                        static_cast<MaterialLib::Solids::Ehlers::StateVariables<
-                            DisplacementDim>&>(
-                            *_ip_data[ip].material_state_variables);
-
-                    double const eps_p_V_diff =
-                        state_vars.eps_p.V - state_vars.eps_p_prev.V;
-                    double const eps_p_eff_diff =
-                        state_vars.eps_p.eff - state_vars.eps_p_prev.eff;
-
-                    damage = MaterialLib::Solids::Ehlers::calculateDamage<
-                                 DisplacementDim>(eps_p_V_diff, eps_p_eff_diff,
-                                                  sigma, nonlocal_kappa_d,
-                                                  damage_properties,
-                                                  material_properties)
-                                 .value();
-
-                    if (damage < 0. || damage > 1.)
-                        std::cerr << "DD " << damage << "\n\n";
+                    damage = calculateDamage(nonlocal_kappa_d,
+                                             damage_properties.alpha_d,
+                                             damage_properties.beta_d);
                 }
 
                 sigma = sigma * (1. - damage);
