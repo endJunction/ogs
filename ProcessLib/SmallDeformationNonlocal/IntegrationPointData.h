@@ -92,31 +92,6 @@ struct IntegrationPointData final
         return material_state_variables->getLocalRateKappaD();
     }
 
-    double updateDamage(double const t, SpatialPosition const& x_position,
-                        double const non_local_kappa_d)
-    {
-        auto const& material = static_cast<
-            MaterialLib::Solids::Ehlers::SolidEhlers<DisplacementDim> const&>(
-            solid_material);
-
-        auto const damage_properties =
-            material.evaluatedDamageProperties(t, x_position);
-        auto const material_properties =
-            material.evaluatedMaterialProperties(t, x_position);
-
-        auto& state =
-            static_cast<MaterialLib::Solids::Ehlers::StateVariables<
-                DisplacementDim> &>(*material_state_variables);
-
-        auto const new_damage =
-            MaterialLib::Solids::Ehlers::calculateDamage<DisplacementDim>(
-                state.eps_p.V - state.eps_p_prev.V,
-                state.eps_p.eff - state.eps_p_prev.eff, sigma,
-                non_local_kappa_d, damage_properties, material_properties);
-        state.damage = {state.damage.kappa_d(), new_damage.value()};
-        return state.damage.value();
-    }
-
     std::vector<std::tuple<
         // element's local assembler
         SmallDeformationNonlocalLocalAssemblerInterface<DisplacementDim> const* const,

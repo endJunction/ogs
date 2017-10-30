@@ -471,8 +471,7 @@ public:
 
             auto& sigma = _ip_data[ip].sigma;
             auto& C = _ip_data[ip].C;
-            // auto& material_state_variables =
-            //    *_ip_data[ip].material_state_variables;
+            double& damage = _ip_data[ip].damage;
 
             /*
             if (!_ip_data[ip].solid_material.updateNonlocalDamage(
@@ -513,10 +512,12 @@ public:
 
                 //std::cout << "KappaD rate impl" << nonlocal_kappa_d << std::endl;
 
-                double const _gamma_nonlocal =
+                auto const& ehlers_material =
                     static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
-                        DisplacementDim> const&>(_ip_data[ip].solid_material)
-                        .evaluatedDamageProperties(t, x_position)
+                        DisplacementDim> const&>(_ip_data[ip].solid_material);
+
+                double const _gamma_nonlocal =
+                    ehlers_material.evaluatedDamageProperties(t, x_position)
                         .m_d;
                 // double const _gamma_nonlocal = 1.2;
                 //std::cout << "gamma non local" << _gamma_nonlocal << std::endl;
@@ -529,33 +530,50 @@ public:
                     _gamma_nonlocal * nonlocal_kappa_d_dot;
 
                 //std::cout << "KappaD total impl" << nonlocal_kappa_d << std::endl;
-                double const nonlocal_kappa_d = std::max(
-                    0.,
-                    _ip_data[ip].nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
+                double& nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d;
+                double const& nonlocal_kappa_d_prev =
+                    _ip_data[ip].nonlocal_kappa_d_prev;
 
-                _ip_data[ip].nonlocal_kappa_d = nonlocal_kappa_d;
+                nonlocal_kappa_d =
+                    std::max(0., nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
+
                 /// XXX instead of updateDamage call only
                 /// calculateDamage
-                /*
-                auto const new_damage =
-                    MaterialLib::Solids::Ehlers::calculateDamage<DisplacementDim>(
-                        state.eps_p.V - state.eps_p_prev.V,
-                        state.eps_p.eff - state.eps_p_prev.eff, sigma,
-                        non_local_kappa_d, damage_properties,
-                material_properties);
-                */
+                {
+                    auto const damage_properties =
+                        ehlers_material.evaluatedDamageProperties(t,
+                                                                  x_position);
+                    auto const material_properties =
+                        ehlers_material.evaluatedMaterialProperties(t,
+                                                                    x_position);
 
-                _ip_data[ip].damage =
-                    _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
-                if (_ip_data[ip].damage < 0. || _ip_data[ip].damage > 1.)
-                    std::cerr << "DD " << _ip_data[ip].damage << "\n\n";
+                    // Ehlers material state variables
+                    auto& state_vars =
+                        static_cast<MaterialLib::Solids::Ehlers::StateVariables<
+                            DisplacementDim>&>(
+                            *_ip_data[ip].material_state_variables);
 
-                sigma = sigma * (1. - _ip_data[ip].damage);
+                    double const eps_p_V_diff =
+                        state_vars.eps_p.V - state_vars.eps_p_prev.V;
+                    double const eps_p_eff_diff =
+                        state_vars.eps_p.eff - state_vars.eps_p_prev.eff;
+
+                    damage = MaterialLib::Solids::Ehlers::calculateDamage<
+                                 DisplacementDim>(eps_p_V_diff, eps_p_eff_diff,
+                                                  sigma, nonlocal_kappa_d,
+                                                  damage_properties,
+                                                  material_properties)
+                                 .value();
+
+                    if (damage < 0. || damage > 1.)
+                        std::cerr << "DD " << damage << "\n\n";
+                }
+
+                sigma = sigma * (1. - damage);
             }
 
             local_b.noalias() -= B.transpose() * sigma * w;
-            local_Jac.noalias() +=
-                B.transpose() * C * (1. - _ip_data[ip].damage) * B * w;
+            local_Jac.noalias() += B.transpose() * C * (1. - damage) * B * w;
         }
     }
 
