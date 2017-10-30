@@ -365,13 +365,28 @@ public:
 
             /// XXX
             /// Compute only kappa_d (the local one)
-            /*
-            DamageProperties damage_properties(t, x, *_damage_properties);
-            double const kappa_d = calculateDamageKappaD<DisplacementDim>(
-                (state.eps_p.V - state.eps_p_prev.V) ,
-                (state.eps_p.eff - state.eps_p_prev.eff) , dt, sigma,
-                state.damage.kappa_d(), damage_properties, mp);
-                */
+
+            auto const& ehlers_material =
+                static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
+                    DisplacementDim> const&>(_ip_data[ip].solid_material);
+            auto const damage_properties =
+                ehlers_material.evaluatedDamageProperties(t, x_position);
+            auto const material_properties =
+                ehlers_material.evaluatedMaterialProperties(t, x_position);
+
+            // Ehlers material state variables
+            auto& state_vars = static_cast<
+                MaterialLib::Solids::Ehlers::StateVariables<DisplacementDim>&>(
+                *_ip_data[ip].material_state_variables);
+
+            double const eps_p_V_diff =
+                state_vars.eps_p.V - state_vars.eps_p_prev.V;
+            double const eps_p_eff_diff =
+                state_vars.eps_p.eff - state_vars.eps_p_prev.eff;
+
+            state_vars.kappa_d = calculateDamageKappaD<DisplacementDim>(
+                eps_p_V_diff, eps_p_eff_diff, sigma, state_vars.kappa_d_prev,
+                damage_properties, material_properties);
         }
 
         // Compute material forces, needed in the non-local assembly, storing
