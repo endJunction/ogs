@@ -184,23 +184,6 @@ struct PlasticStrain final
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
-class Damage final
-{
-public:
-    Damage() = default;
-    Damage(double const kappa_d, double const value)
-        : _kappa_d(kappa_d), _value(value)
-    {
-    }
-
-    double kappa_d() const { return _kappa_d; }
-    double value() const { return _value; }
-
-private:
-    double _kappa_d = 0;  ///< damage driving variable
-    double _value = 0;    ///< isotropic damage variable
-};
-
 template <int DisplacementDim>
 struct StateVariables
     : public MechanicsBase<DisplacementDim>::MaterialStateVariables
@@ -226,18 +209,23 @@ struct StateVariables
         damage_prev = damage;
     }
 
-    double getLocalVariable() const override { return damage.kappa_d(); }
+    double getLocalVariable() const override { return kappa_d; }
 
-    double getLocalRateKappaD() const override { return damage.kappa_d()-damage_prev.kappa_d(); }
+    double getLocalRateKappaD() const override
+    {
+        return kappa_d - kappa_d_prev;
+    }
 
     using KelvinVector = ProcessLib::KelvinVectorType<DisplacementDim>;
 
     PlasticStrain<KelvinVector> eps_p;  ///< plastic part of the state.
-    Damage damage;                      ///< damage part of the state.
+    double damage;                      ///< isotropic damage variable.
+    double kappa_d;                     ///< damage driving variable.
 
     // Initial values from previous timestep
     PlasticStrain<KelvinVector> eps_p_prev;  ///< \copydoc eps_p
-    Damage damage_prev;                      ///< \copydoc damage
+    double damage_prev;                      ///< \copydoc damage
+    double kappa_d_prev;                     ///< \copydoc kappa_d
 
 #ifndef NDEBUG
     friend std::ostream& operator<<(
@@ -370,8 +358,8 @@ public:
 
         ehlers_material_state->set_eps_p_v(state.eps_p.V);
         ehlers_material_state->set_eps_p_eff(state.eps_p.eff);
-        ehlers_material_state->set_kappa_d(state.damage.kappa_d());
-        ehlers_material_state->set_damage(state.damage.value());
+        ehlers_material_state->set_kappa_d(state.kappa_d);
+        ehlers_material_state->set_damage(state.damage);
 
         return material_state;
     };

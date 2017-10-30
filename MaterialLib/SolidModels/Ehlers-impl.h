@@ -735,7 +735,7 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
                  static_cast<StateVariables<DisplacementDim> const&>(state);
 
              cache.resize(1);
-             cache.front() = ehlers_state.damage.kappa_d();
+             cache.front() = ehlers_state.kappa_d;
              return cache;
          }},
         {"damage.value", 1,
@@ -748,7 +748,7 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
                  static_cast<StateVariables<DisplacementDim> const&>(state);
 
              cache.resize(1);
-             cache.front() = ehlers_state.damage.value();
+             cache.front() = ehlers_state.damage;
              return cache;
          }},
         {"eps_p.D", KelvinVector::RowsAtCompileTime,
