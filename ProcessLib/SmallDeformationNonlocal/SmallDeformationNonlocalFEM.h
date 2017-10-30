@@ -347,6 +347,12 @@ public:
             std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
                 DisplacementDim>::MaterialStateVariables>
                 new_state;
+
+            /// XXX
+            // Compute sigma_eff from damage total stress sigma, which is given
+            // by sigma_eff=sigma_prev / (1-damage)
+            // sigma_eff_prev = sigma_prev / (1 - state.damage_prev.value());
+
             auto&& solution = _ip_data[ip].solid_material.integrateStress(
                 t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
                 *state);
@@ -355,6 +361,16 @@ public:
                 OGS_FATAL("Computation of local constitutive relation failed.");
 
             std::tie(sigma, state, C) = std::move(*solution);
+
+            /// XXX
+            /// Compute only kappa_d (the local one)
+            /*
+            DamageProperties damage_properties(t, x, *_damage_properties);
+            double const kappa_d = calculateDamageKappaD<DisplacementDim>(
+                (state.eps_p.V - state.eps_p_prev.V) ,
+                (state.eps_p.eff - state.eps_p_prev.eff) , dt, sigma,
+                state.damage.kappa_d(), damage_properties, mp);
+                */
         }
 
         // Compute material forces, needed in the non-local assembly, storing
@@ -518,6 +534,17 @@ public:
                     _ip_data[ip].nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
 
                 _ip_data[ip].nonlocal_kappa_d = nonlocal_kappa_d;
+                /// XXX instead of updateDamage call only
+                /// calculateDamage
+                /*
+                auto const new_damage =
+                    MaterialLib::Solids::Ehlers::calculateDamage<DisplacementDim>(
+                        state.eps_p.V - state.eps_p_prev.V,
+                        state.eps_p.eff - state.eps_p_prev.eff, sigma,
+                        non_local_kappa_d, damage_properties,
+                material_properties);
+                */
+
                 _ip_data[ip].damage =
                     _ip_data[ip].updateDamage(t, x_position, nonlocal_kappa_d);
                 if (_ip_data[ip].damage < 0. || _ip_data[ip].damage > 1.)

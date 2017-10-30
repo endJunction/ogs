@@ -569,12 +569,15 @@ SolidEhlers<DisplacementDim>::integrateStress(
     KelvinVector sigma_eff_prev = sigma_prev;  // In case without damage the
                                                // effective value is same as the
                                                // previous one.
+    /* XXX
     if (_damage_properties)
     {
         // Compute sigma_eff from damage total stress sigma, which is given by
         // sigma_eff=sigma_prev / (1-damage)
         sigma_eff_prev = sigma_prev / (1 - state.damage_prev.value());
     }
+    */
+
     KelvinVector sigma = predict_sigma<DisplacementDim>(
         mp.G, mp.K, sigma_eff_prev, eps, eps_prev, eps_V);
 
@@ -725,6 +728,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 splitSolutionVector<ResidualVectorType, KelvinVector>(solution);
         }
 
+        /* XXX
         if (_damage_properties)
         {
             DamageProperties damage_properties(t, x, *_damage_properties);
@@ -743,7 +747,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
                     state.eps_p.eff - state.eps_p_prev.eff, sigma, kappa_d,
                     damage_properties, mp);
         }
-
+        */
 
         // Calculate residual derivative w.r.t. strain
         Eigen::Matrix<double, JacobianResidualSize, KelvinVectorSize,
@@ -760,6 +764,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 .template block<KelvinVectorSize, KelvinVectorSize>(0, 0);
     }
 
+    /* XXX
     if (_damage_properties && state.damage.value()>0.0)
     {
         if (mp.tangent_type == 0)
@@ -779,12 +784,15 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 "Plastic-Damage secant.");
         }
     }
+    */
 
     KelvinVector sigma_final = mp.G * sigma;
+    /* XXX
     if (_damage_properties && _compute_local_damage)
     {
         sigma_final *= 1 - state.damage.value();
     }
+    */
     return {std::make_tuple(
         sigma_final,
         std::unique_ptr<
