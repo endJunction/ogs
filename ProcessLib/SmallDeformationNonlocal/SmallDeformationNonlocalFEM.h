@@ -364,30 +364,32 @@ public:
 
             std::tie(sigma, state, C) = std::move(*solution);
 
-            /// XXX
-            /// Compute only kappa_d (the local one)
+            /// Compute only the local kappa_d.
+            {
+                auto const& ehlers_material =
+                    static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
+                        DisplacementDim> const&>(_ip_data[ip].solid_material);
+                auto const damage_properties =
+                    ehlers_material.evaluatedDamageProperties(t, x_position);
+                auto const material_properties =
+                    ehlers_material.evaluatedMaterialProperties(t, x_position);
 
-            auto const& ehlers_material =
-                static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
-                    DisplacementDim> const&>(_ip_data[ip].solid_material);
-            auto const damage_properties =
-                ehlers_material.evaluatedDamageProperties(t, x_position);
-            auto const material_properties =
-                ehlers_material.evaluatedMaterialProperties(t, x_position);
+                // Ehlers material state variables
+                auto& state_vars =
+                    static_cast<MaterialLib::Solids::Ehlers::StateVariables<
+                        DisplacementDim>&>(
+                        *_ip_data[ip].material_state_variables);
 
-            // Ehlers material state variables
-            auto& state_vars = static_cast<
-                MaterialLib::Solids::Ehlers::StateVariables<DisplacementDim>&>(
-                *_ip_data[ip].material_state_variables);
+                double const eps_p_V_diff =
+                    state_vars.eps_p.V - state_vars.eps_p_prev.V;
+                double const eps_p_eff_diff =
+                    state_vars.eps_p.eff - state_vars.eps_p_prev.eff;
 
-            double const eps_p_V_diff =
-                state_vars.eps_p.V - state_vars.eps_p_prev.V;
-            double const eps_p_eff_diff =
-                state_vars.eps_p.eff - state_vars.eps_p_prev.eff;
-
-            state_vars.kappa_d = calculateDamageKappaD<DisplacementDim>(
-                eps_p_V_diff, eps_p_eff_diff, sigma, state_vars.kappa_d_prev,
-                damage_properties, material_properties);
+                state_vars.kappa_d = calculateDamageKappaD<DisplacementDim>(
+                    eps_p_V_diff, eps_p_eff_diff, sigma,
+                    state_vars.kappa_d_prev, damage_properties,
+                    material_properties);
+            }
         }
 
         // Compute material forces, needed in the non-local assembly, storing
