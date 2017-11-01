@@ -35,7 +35,7 @@ template <int DisplacementDim, typename KelvinVectorType>
 double calculateDamageKappaD(
     double const eps_p_eff_diff,
     KelvinVectorType const& sigma,
-    double kappa_d_prev,
+    double const kappa_d_prev,
     MaterialLib::Solids::Ehlers::DamageProperties const& dp,
     MaterialLib::Solids::Ehlers::MaterialProperties const& mp)
 {
