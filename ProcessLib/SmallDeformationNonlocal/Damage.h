@@ -52,11 +52,11 @@ double calculateDamageKappaD(
         {
             if (i == j)
             {
-                stress_mat(i, j) = mp.G * sigma(i);
+                stress_mat(i, j) = sigma(i);
             }
             else
             {
-                stress_mat(i, j) = mp.G * sigma(i + j + 2);
+                stress_mat(i, j) = sigma(i + j + 2);
             }
         }
     }
