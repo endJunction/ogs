@@ -385,9 +385,9 @@ public:
                 double const eps_p_eff_diff =
                     state_vars.eps_p.eff - state_vars.eps_p_prev.eff;
 
-                state_vars.kappa_d = calculateDamageKappaD<DisplacementDim>(
+                _ip_data[ip].kappa_d = calculateDamageKappaD<DisplacementDim>(
                     eps_p_V_diff, eps_p_eff_diff, sigma,
-                    state_vars.kappa_d_prev, damage_properties,
+                    _ip_data[ip].kappa_d_prev, damage_properties,
                     material_properties);
             }
         }

@@ -200,30 +200,19 @@ struct StateVariables
     void setInitialConditions()
     {
         eps_p = eps_p_prev;
-        kappa_d = kappa_d_prev;
     }
 
     void pushBackState() override
     {
         eps_p_prev = eps_p;
-        kappa_d_prev = kappa_d;
-    }
-
-    double getLocalVariable() const override { return kappa_d; }
-
-    double getLocalRateKappaD() const override
-    {
-        return kappa_d - kappa_d_prev;
     }
 
     using KelvinVector = ProcessLib::KelvinVectorType<DisplacementDim>;
 
     PlasticStrain<KelvinVector> eps_p;  ///< plastic part of the state.
-    double kappa_d;                     ///< damage driving variable.
 
     // Initial values from previous timestep
     PlasticStrain<KelvinVector> eps_p_prev;  ///< \copydoc eps_p
-    double kappa_d_prev;                     ///< \copydoc kappa_d
 
 #ifndef NDEBUG
     friend std::ostream& operator<<(
@@ -232,10 +221,8 @@ struct StateVariables
         os << "State:\n"
            << "eps_p_D: " << m.eps_p.D << "\n"
            << "eps_p_eff: " << m.eps_p.eff << "\n"
-           << "kappa_d: " << m.kappa_d << "\n"
            << "eps_p_D_prev: " << m.eps_p_prev.D << "\n"
            << "eps_p_eff_prev: " << m.eps_p_prev.eff << "\n"
-           << "kappa_d_prev: " << m.damage_prev.kappa_d() << "\n"
            << "damage_prev: " << m.damage_prev.value() << "\n"
            << "lambda: " << m.lambda << "\n";
         return os;
@@ -355,7 +342,6 @@ public:
 
         ehlers_material_state->set_eps_p_v(state.eps_p.V);
         ehlers_material_state->set_eps_p_eff(state.eps_p.eff);
-        ehlers_material_state->set_kappa_d(state.kappa_d);
 
         return material_state;
     };

@@ -61,6 +61,8 @@ struct IntegrationPointData final
     double damage_prev = 0;  ///< \copydoc damage
     double nonlocal_kappa_d = 0;
     double nonlocal_kappa_d_prev = 0;
+    double kappa_d = 0;      ///< damage driving variable.
+    double kappa_d_prev = 0;  ///< \copydoc kappa_d
 
     MaterialLib::Solids::MechanicsBase<DisplacementDim>& solid_material;
     std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
@@ -81,18 +83,13 @@ struct IntegrationPointData final
         sigma_prev = sigma;
         nonlocal_kappa_d_prev = nonlocal_kappa_d;
         damage_prev = damage;
+        kappa_d_prev = kappa_d;
         material_state_variables->pushBackState();
     }
 
-    double getLocalVariable() const
-    {
-        return material_state_variables->getLocalVariable();
-    }
+    double getLocalVariable() const { return kappa_d; }
 
-    double getLocalRateKappaD() const
-    {
-        return material_state_variables->getLocalRateKappaD();
-    }
+    double getLocalRateKappaD() const { return kappa_d - kappa_d_prev; }
 
     std::vector<std::tuple<
         // element's local assembler
