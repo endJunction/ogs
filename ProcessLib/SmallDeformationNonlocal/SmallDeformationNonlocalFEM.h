@@ -498,7 +498,10 @@ public:
 
             {
                 double test_alpha = 0;  // Integration of one-function.
-                double nonlocal_kappa_d_dot = 0;
+                // double nonlocal_kappa_d_dot = 0;
+
+                // double& nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d;
+                double nonlocal_kappa_d = 0;
 
                 for (auto const& tuple : _ip_data[ip].non_local_assemblers)
                 {
@@ -510,16 +513,18 @@ public:
                     // integration point l.
                     int const& l = std::get<1>(tuple);
 
-                    double const kappa_d_dot =
-                        la_l._ip_data[l].getLocalRateKappaD();
+                    // double const kappa_d_dot =
+                    //    la_l._ip_data[l].getLocalRateKappaD();
+                    double const kappa_d_l =
+                        la_l._ip_data[l].getLocalVariable();
 
-                    // std::cerr << kappa_d << "\n";
+                    // std::cerr << kappa_d_l << "\n";
                     double const a_kl = std::get<3>(tuple);
 
                     auto const& w_l = la_l._ip_data[l].integration_weight;
 
                     test_alpha += a_kl * w_l;
-                    nonlocal_kappa_d_dot += a_kl * kappa_d_dot * w_l;
+                    nonlocal_kappa_d += a_kl * kappa_d_l * w_l;
                 }
                 if (std::abs(test_alpha - 1) >= 1e-6)
                     OGS_FATAL(
@@ -541,18 +546,23 @@ public:
                     // double const _gamma_nonlocal = 1.2;
                     // std::cout << "gamma non local" << _gamma_nonlocal <<
                     // std::endl;
-                    nonlocal_kappa_d_dot =
-                        (1. - _gamma_nonlocal) *
-                            _ip_data[ip].getLocalRateKappaD() +
-                        _gamma_nonlocal * nonlocal_kappa_d_dot;
+                    // nonlocal_kappa_d_dot =
+                    //    (1. - _gamma_nonlocal) *
+                    //        _ip_data[ip].getLocalRateKappaD() +
+                    //    _gamma_nonlocal * nonlocal_kappa_d_dot;
+                    nonlocal_kappa_d = (1. - _gamma_nonlocal) *
+                                           _ip_data[ip].getLocalVariable() +
+                                       _gamma_nonlocal * nonlocal_kappa_d;
                 }
 
-                double& nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d;
+                /*
                 double const& nonlocal_kappa_d_prev =
                     _ip_data[ip].nonlocal_kappa_d_prev;
 
                 nonlocal_kappa_d =
                     std::max(0., nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
+                    */
+                nonlocal_kappa_d = std::max(0., nonlocal_kappa_d);
                 // std::cout << "KappaD total impl" << nonlocal_kappa_d
                 //          << std::endl;
 
@@ -632,8 +642,8 @@ public:
 
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
-                small_deformation_nonlocal->add_nonlocal_damage(
-                    _ip_data[ip].nonlocal_kappa_d);
+                // small_deformation_nonlocal->add_nonlocal_damage(
+                //_ip_data[ip].nonlocal_kappa_d);
                 small_deformation_nonlocal->add_nonlocal_length(
                     _ip_data[ip].nonlocal_internal_length);
             }

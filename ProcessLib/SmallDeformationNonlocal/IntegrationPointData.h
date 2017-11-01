@@ -59,10 +59,10 @@ struct IntegrationPointData final
     double free_energy_density = 0;
     double damage = 0;       ///< isotropic damage
     double damage_prev = 0;  ///< \copydoc damage
-    double nonlocal_kappa_d = 0;
-    double nonlocal_kappa_d_prev = 0;
     double kappa_d = 0;      ///< damage driving variable.
     double kappa_d_prev = 0;  ///< \copydoc kappa_d
+    // double nonlocal_kappa_d = 0;
+    // double nonlocal_kappa_d_prev = 0;
 
     MaterialLib::Solids::MechanicsBase<DisplacementDim>& solid_material;
     std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
@@ -81,9 +81,9 @@ struct IntegrationPointData final
     {
         eps_prev = eps;
         sigma_prev = sigma;
-        nonlocal_kappa_d_prev = nonlocal_kappa_d;
         damage_prev = damage;
         kappa_d_prev = kappa_d;
+        // nonlocal_kappa_d_prev = nonlocal_kappa_d;
         material_state_variables->pushBackState();
     }
 
