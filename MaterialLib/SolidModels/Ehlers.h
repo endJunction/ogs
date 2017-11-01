@@ -200,14 +200,12 @@ struct StateVariables
     void setInitialConditions()
     {
         eps_p = eps_p_prev;
-        damage = damage_prev;
         kappa_d = kappa_d_prev;
     }
 
     void pushBackState() override
     {
         eps_p_prev = eps_p;
-        damage_prev = damage;
         kappa_d_prev = kappa_d;
     }
 
@@ -221,12 +219,10 @@ struct StateVariables
     using KelvinVector = ProcessLib::KelvinVectorType<DisplacementDim>;
 
     PlasticStrain<KelvinVector> eps_p;  ///< plastic part of the state.
-    double damage;                      ///< isotropic damage variable.
     double kappa_d;                     ///< damage driving variable.
 
     // Initial values from previous timestep
     PlasticStrain<KelvinVector> eps_p_prev;  ///< \copydoc eps_p
-    double damage_prev;                      ///< \copydoc damage
     double kappa_d_prev;                     ///< \copydoc kappa_d
 
 #ifndef NDEBUG
@@ -236,8 +232,7 @@ struct StateVariables
         os << "State:\n"
            << "eps_p_D: " << m.eps_p.D << "\n"
            << "eps_p_eff: " << m.eps_p.eff << "\n"
-           << "kappa_d: " << m.damage.kappa_d() << "\n"
-           << "damage: " << m.damage.value() << "\n"
+           << "kappa_d: " << m.kappa_d << "\n"
            << "eps_p_D_prev: " << m.eps_p_prev.D << "\n"
            << "eps_p_eff_prev: " << m.eps_p_prev.eff << "\n"
            << "kappa_d_prev: " << m.damage_prev.kappa_d() << "\n"
@@ -361,7 +356,6 @@ public:
         ehlers_material_state->set_eps_p_v(state.eps_p.V);
         ehlers_material_state->set_eps_p_eff(state.eps_p.eff);
         ehlers_material_state->set_kappa_d(state.kappa_d);
-        ehlers_material_state->set_damage(state.damage);
 
         return material_state;
     };

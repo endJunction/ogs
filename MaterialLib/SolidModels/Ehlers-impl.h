@@ -738,19 +738,6 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
              cache.front() = ehlers_state.kappa_d;
              return cache;
          }},
-        {"damage.value", 1,
-         [](typename MechanicsBase<
-                DisplacementDim>::MaterialStateVariables const& state,
-            std::vector<double>& cache) -> std::vector<double> const& {
-             assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
-                        &state) != nullptr);
-             auto const& ehlers_state =
-                 static_cast<StateVariables<DisplacementDim> const&>(state);
-
-             cache.resize(1);
-             cache.front() = ehlers_state.damage;
-             return cache;
-         }},
         {"eps_p.D", KelvinVector::RowsAtCompileTime,
          [](typename MechanicsBase<
                 DisplacementDim>::MaterialStateVariables const& state,

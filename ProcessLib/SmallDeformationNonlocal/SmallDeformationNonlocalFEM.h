@@ -800,10 +800,7 @@ public:
 
         for (auto const& ip_data : _ip_data)
         {
-            auto const& state =
-                static_cast<MaterialLib::Solids::Ehlers::StateVariables<
-                    DisplacementDim> const&>(*ip_data.material_state_variables);
-            cache.push_back(state.damage);
+            cache.push_back(ip_data.damage);
         }
 
         return cache;

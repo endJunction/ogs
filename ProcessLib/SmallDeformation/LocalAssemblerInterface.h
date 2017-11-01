@@ -33,8 +33,6 @@ struct SmallDeformationLocalAssemblerInterface
         std::vector<double>& cache) const = 0;
     virtual std::vector<double> const& getIntPtEpsPDXX(
         std::vector<double>& cache) const = 0;
-    virtual std::vector<double> const& getIntPtDamage(
-        std::vector<double>& cache) const = 0;
 
     virtual std::vector<double> const& getIntPtFreeEnergyDensity(
         const double /*t*/,
