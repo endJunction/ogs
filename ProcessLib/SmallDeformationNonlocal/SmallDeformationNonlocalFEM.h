@@ -174,7 +174,7 @@ public:
             {
                 auto const& la = local_assemblers[search_element_id];
                 la->getIntegrationPointCoordinates(xyz, distances);
-                for (int ip = 0; ip < static_cast <int>(distances.size()); ++ip)
+                for (int ip = 0; ip < static_cast<int>(distances.size()); ++ip)
                 {
                     if (distances[ip] >= _process_data.internal_length_squared)
                         continue;
@@ -353,7 +353,7 @@ public:
             // Compute sigma_eff from damage total stress sigma
             using KelvinVectorType = typename BMatricesType::KelvinVectorType;
             KelvinVectorType const sigma_eff_prev =
-                sigma_prev / (1 - damage_prev);
+                sigma_prev / (1. - damage_prev);
 
             auto&& solution = _ip_data[ip].solid_material.integrateStress(
                 t, x_position, _process_data.dt, eps_prev, eps, sigma_eff_prev,
