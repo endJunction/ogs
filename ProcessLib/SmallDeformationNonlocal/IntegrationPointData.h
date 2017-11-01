@@ -80,6 +80,7 @@ struct IntegrationPointData final
         eps_prev = eps;
         sigma_prev = sigma;
         nonlocal_kappa_d_prev = nonlocal_kappa_d;
+        damage_prev = damage;
         material_state_variables->pushBackState();
     }
 

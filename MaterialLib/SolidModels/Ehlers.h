@@ -201,12 +201,14 @@ struct StateVariables
     {
         eps_p = eps_p_prev;
         damage = damage_prev;
+        kappa_d = kappa_d_prev;
     }
 
     void pushBackState() override
     {
         eps_p_prev = eps_p;
         damage_prev = damage;
+        kappa_d_prev = kappa_d;
     }
 
     double getLocalVariable() const override { return kappa_d; }
