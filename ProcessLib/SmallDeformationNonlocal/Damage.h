@@ -33,7 +33,6 @@ inline double calculateDamage(double const kappa_d, double const alpha_d,
 /// \Returns a new kappa_d.
 template <int DisplacementDim, typename KelvinVectorType>
 double calculateDamageKappaD(
-    double const /*eps_p_V_diff*/,
     double const eps_p_eff_diff,
     KelvinVectorType const& sigma,
     double kappa_d_prev,
