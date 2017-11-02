@@ -574,8 +574,8 @@ public:
                     damage = calculateDamage(nonlocal_kappa_d,
                                              damage_properties.alpha_d,
                                              damage_properties.beta_d);
+                    damage = std::max(0., damage);
                 }
-
                 sigma = sigma * (1. - damage);
             }
 
