@@ -30,7 +30,7 @@ struct GaussLegendreTet {
 template <>
 struct GaussLegendreTet<2> {
     static MATHLIB_EXPORT const unsigned Order = 2;
-    static MATHLIB_EXPORT const unsigned NPoints = 8;
+    static MATHLIB_EXPORT const unsigned NPoints = 5;
     static MATHLIB_EXPORT const std::array<std::array<double, 3>, NPoints> X;
     static MATHLIB_EXPORT const double W[NPoints];
 };
