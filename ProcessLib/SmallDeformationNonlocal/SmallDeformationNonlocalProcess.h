@@ -14,7 +14,6 @@
 #include "BaseLib/Functional.h"
 #include "NumLib/DOF/DOFTableUtil.h"
 #include "ProcessLib/Process.h"
-#include "ProcessLib/SmallDeformationCommon/Common.h"
 #include "ProcessLib/SmallDeformationNonlocal/CreateLocalAssemblers.h"
 
 #include "SmallDeformationNonlocalFEM.h"
