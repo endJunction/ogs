@@ -325,8 +325,14 @@ private:
         DBUG("PostTimestep SmallDeformationNonlocalProcess.");
 
         ProcessLib::SmallDeformation::writeMaterialForces(
-            *_material_forces, _local_assemblers, *_local_to_global_index_map,
+            _material_forces, _local_assemblers, *_local_to_global_index_map,
             x);
+
+        auto material_forces_property =
+            MeshLib::getOrCreateMeshProperty<double>(
+                _mesh, "MaterialForces", MeshLib::MeshItemType::Node,
+                DisplacementDim);
+        _material_forces->copyValues(*material_forces_property);
     }
 
 private:
@@ -338,7 +344,7 @@ private:
         _local_to_global_index_map_single_component;
 
     MeshLib::PropertyVector<double>* _nodal_forces = nullptr;
-    MeshLib::PropertyVector<double>* _material_forces = nullptr;
+    std::unique_ptr<GlobalVector> _material_forces;
 };
 
 }  // namespace SmallDeformationNonlocal
