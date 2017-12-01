@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
+#include "ProcessLib/Deformation/MaterialForces.h"
 #include "ProcessLib/IntegrationPointSerialization.h"
 #include "ProcessLib/LocalAssemblerInterface.h"
 
@@ -23,7 +24,7 @@ namespace SmallDeformationNonlocal
 template <int DisplacementDim>
 struct SmallDeformationNonlocalLocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
-      public SmallDeformation::NodalForceCalculationInterface,
+      public SmallDeformation::MaterialForcesInterface,
       public NumLib::ExtrapolatableElement,
       public ProcessLib::IntegrationPointSerialization
 {
