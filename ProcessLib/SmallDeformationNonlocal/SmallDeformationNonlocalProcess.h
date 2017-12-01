@@ -48,9 +48,6 @@ public:
     {
         _nodal_forces = MeshLib::getOrCreateMeshProperty<double>(
             mesh, "NodalForces", MeshLib::MeshItemType::Node, DisplacementDim);
-        _material_forces = MeshLib::getOrCreateMeshProperty<double>(
-            mesh, "MaterialForces", MeshLib::MeshItemType::Node,
-            DisplacementDim);
     }
 
     //! \name ODESystem interface
@@ -84,7 +81,6 @@ private:
                 // by location order is needed for output
                 NumLib::ComponentOrder::BY_LOCATION);
         _nodal_forces->resize(DisplacementDim * mesh.getNumberOfNodes());
-        _material_forces->resize(DisplacementDim * mesh.getNumberOfNodes());
 
         Base::_secondary_variables.addSecondaryVariable(
             "sigma",

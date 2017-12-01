@@ -24,6 +24,7 @@
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
 #include "NumLib/Function/Interpolation.h"
 #include "ProcessLib/Deformation/BMatrixPolicy.h"
+#include "ProcessLib/Deformation/GMatrixPolicy.h"
 #include "ProcessLib/Deformation/LinearBMatrix.h"
 #include "ProcessLib/LocalAssemblerTraits.h"
 #include "ProcessLib/Parameter/Parameter.h"
@@ -64,12 +65,14 @@ public:
     using BMatricesType = BMatrixPolicyType<ShapeFunction, DisplacementDim>;
 
     using BMatrixType = typename BMatricesType::BMatrixType;
-    using GradientVectorType = typename BMatricesType::GradientVectorType;
-    using GradientMatrixType = typename BMatricesType::GradientMatrixType;
     using StiffnessMatrixType = typename BMatricesType::StiffnessMatrixType;
     using NodalForceVectorType = typename BMatricesType::NodalForceVectorType;
     using NodalDisplacementVectorType =
         typename BMatricesType::NodalForceVectorType;
+
+    using GMatricesType = GMatrixPolicyType<ShapeFunction, DisplacementDim>;
+    using GradientVectorType = typename GMatricesType::GradientVectorType;
+    using GradientMatrixType = typename GMatricesType::GradientMatrixType;
 
     SmallDeformationNonlocalLocalAssembler(
         SmallDeformationNonlocalLocalAssembler const&) = delete;
