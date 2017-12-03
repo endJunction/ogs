@@ -32,6 +32,12 @@ target_link_libraries(MaterialLib
     PRIVATE MathLib MeshLib
 )
 
+if(Protobuf_FOUND)
+target_link_libraries(MaterialLib
+    PUBLIC SerializationLib
+)
+endif()
+
 if(OGS_USE_PCH)
     cotire(MaterialLib)
 endif()

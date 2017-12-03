@@ -23,6 +23,10 @@ namespace ProcessLib
 class SpatialPosition;
 }
 
+#ifdef PROTOBUF_FOUND
+#include "SerializationLib/material.pb.h"
+#endif  // PROTOBUF_FOUND
+
 namespace MeshLib
 {
 class Element;
@@ -52,6 +56,8 @@ struct MechanicsBase
             MaterialStateVariables const&) = default;
 
         virtual void pushBackState() = 0;
+        virtual double getLocalVariable() const { return 0; }
+        virtual double getLocalRateKappaD() const { return 0; }
     };
 
     /// Polymorphic creator for MaterialStateVariables objects specific for a
@@ -137,6 +143,16 @@ struct MechanicsBase
         KelvinVector const& eps,
         KelvinVector const& sigma,
         MaterialStateVariables const& material_state_variables) const = 0;
+
+#ifdef PROTOBUF_FOUND
+    virtual OGS::MaterialState writeMaterialState(
+        MaterialStateVariables const& /*material_state_variables*/) const
+    {
+        return {};   // Dummy value needed for compilation. Code is not executed
+                     // because the integration_point_writer is not created in
+                     // absence of protobuffer.
+    }
+#endif
 
     virtual ~MechanicsBase() = default;
 };

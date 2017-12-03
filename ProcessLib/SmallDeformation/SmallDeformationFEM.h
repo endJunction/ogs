@@ -91,9 +91,9 @@ struct SecondaryData
 };
 
 template <typename ShapeFunction, typename IntegrationMethod,
-          int DisplacementDim>
+          int DisplacementDim_>
 class SmallDeformationLocalAssembler
-    : public SmallDeformationLocalAssemblerInterface<DisplacementDim>
+    : public SmallDeformationLocalAssemblerInterface<DisplacementDim_>
 {
 public:
     static int const DisplacementDim = DisplacementDim_;
@@ -313,6 +313,7 @@ public:
         readSmallDeformationIntegrationPointData(data, *this);
     }
 
+#ifdef PROTOBUF_FOUND
     friend OGS::SmallDeformationCommon
     getSmallDeformationCommonIntegrationPointData<
         SmallDeformationLocalAssembler>(
@@ -336,42 +337,12 @@ public:
 
         return element_data.ByteSize();
     };
-
-    std::vector<double> const& getNodalValues(
-        std::vector<double>& nodal_values) const override
+#else
+    std::size_t writeIntegrationPointData(std::vector<char>& /*data*/) override
     {
-        nodal_values.clear();
-        auto local_b = MathLib::createZeroedVector<NodalDisplacementVectorType>(
-            nodal_values, ShapeFunction::NPOINTS * DisplacementDim);
-
-        unsigned const n_integration_points =
-            _integration_method.getNumberOfPoints();
-
-        SpatialPosition x_position;
-        x_position.setElementID(_element.getID());
-
-        for (unsigned ip = 0; ip < n_integration_points; ip++)
-        {
-            x_position.setIntegrationPoint(ip);
-            auto const& w = _ip_data[ip].integration_weight;
-
-            auto const& N = _ip_data[ip].N;
-            auto const& dNdx = _ip_data[ip].dNdx;
-
-            auto const x_coord =
-                interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
-                    _element, N);
-            auto const B = LinearBMatrix::computeBMatrix<
-                DisplacementDim, ShapeFunction::NPOINTS,
-                typename BMatricesType::BMatrixType>(dNdx, N, x_coord,
-                                                     _is_axially_symmetric);
-            auto& sigma = _ip_data[ip].sigma;
-
-            local_b.noalias() += B.transpose() * sigma * w;
-        }
-
-        return nodal_values;
+        return 0;
     }
+#endif
 
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
         const unsigned integration_point) const override

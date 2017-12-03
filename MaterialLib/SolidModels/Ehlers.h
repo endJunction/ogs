@@ -262,6 +262,43 @@ public:
     std::vector<typename MechanicsBase<DisplacementDim>::InternalVariable>
     getInternalVariables() const override;
 
+    MaterialProperties evaluatedMaterialProperties(
+        double const t, ProcessLib::SpatialPosition const& x) const
+    {
+        return MaterialProperties(t, x, _mp);
+    }
+
+    DamageProperties evaluatedDamageProperties(
+        double const t, ProcessLib::SpatialPosition const& x) const
+    {
+        return DamageProperties(t, x, *_damage_properties);
+    }
+
+#ifdef PROTOBUF_FOUND
+    OGS::MaterialState writeMaterialState(
+        typename MechanicsBase<DisplacementDim>::MaterialStateVariables const&
+            material_state_variables) const override
+    {
+        assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
+                   &material_state_variables) != nullptr);
+        auto const& state = static_cast<StateVariables<DisplacementDim> const&>(
+            material_state_variables);
+
+        OGS::MaterialState material_state;
+        auto ehlers_material_state = material_state.mutable_ehlers();
+
+        auto eps_p_D = ehlers_material_state->mutable_eps_p_d();
+        eps_p_D->set_dimension(DisplacementDim);
+        for (int i = 0; i < state.eps_p.D.size(); ++i)
+            eps_p_D->add_value(state.eps_p.D[i]);
+
+        ehlers_material_state->set_eps_p_v(state.eps_p.V);
+        ehlers_material_state->set_eps_p_eff(state.eps_p.eff);
+
+        return material_state;
+    };
+#endif  // PROTOBUF_FOUND
+
 private:
     NumLib::NewtonRaphsonSolverParameters const _nonlinear_solver_parameters;
 

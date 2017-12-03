@@ -23,6 +23,7 @@ template <typename LocalAssembler>
 void readSmallDeformationIntegrationPointData(
     std::vector<char> const& data, LocalAssembler& local_assembler)
 {
+    (void)local_assembler;
 #ifdef PROTOBUF_FOUND
     OGS::ElementData element_data;
     if (!element_data.ParseFromArray(data.data(), data.size()))
