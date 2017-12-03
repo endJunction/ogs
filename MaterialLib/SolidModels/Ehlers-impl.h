@@ -32,6 +32,8 @@
  */
 #pragma once
 
+#include <iostream>
+#include <Eigen/Eigenvalues>
 #include <boost/math/special_functions/pow.hpp>
 
 namespace MaterialLib
@@ -40,69 +42,6 @@ namespace Solids
 {
 namespace Ehlers
 {
-/// Evaluated MaterialPropertiesParameters container, see its documentation for
-/// details.
-struct MaterialProperties final
-{
-    MaterialProperties(double const t, ProcessLib::SpatialPosition const& x,
-                       MaterialPropertiesParameters const& mp)
-        : G(mp.G(t, x)[0]),
-          K(mp.K(t, x)[0]),
-          alpha(mp.alpha(t, x)[0]),
-          beta(mp.beta(t, x)[0]),
-          gamma(mp.gamma(t, x)[0]),
-          delta(mp.delta(t, x)[0]),
-          epsilon(mp.epsilon(t, x)[0]),
-          m(mp.m(t, x)[0]),
-          alpha_p(mp.alpha_p(t, x)[0]),
-          beta_p(mp.beta_p(t, x)[0]),
-          gamma_p(mp.gamma_p(t, x)[0]),
-          delta_p(mp.delta_p(t, x)[0]),
-          epsilon_p(mp.epsilon_p(t, x)[0]),
-          m_p(mp.m_p(t, x)[0]),
-          kappa(mp.kappa(t, x)[0]),
-          hardening_coefficient(mp.hardening_coefficient(t, x)[0])
-    {
-    }
-    double const G;
-    double const K;
-
-    double const alpha;
-    double const beta;
-    double const gamma;
-    double const delta;
-    double const epsilon;
-    double const m;
-
-    double const alpha_p;
-    double const beta_p;
-    double const gamma_p;
-    double const delta_p;
-    double const epsilon_p;
-    double const m_p;
-
-    double const kappa;
-    double const hardening_coefficient;
-};
-
-/// Evaluated DamagePropertiesParameters container, see its documentation for
-/// details.
-struct DamageProperties
-{
-    DamageProperties(double const t,
-                     ProcessLib::SpatialPosition const& x,
-                     DamagePropertiesParameters const& dp)
-        : alpha_d(dp.alpha_d(t, x)[0]),
-          beta_d(dp.beta_d(t, x)[0]),
-          h_d(dp.h_d(t, x)[0])
-    {
-    }
-    double const alpha_d;
-    double const beta_d;
-    double const h_d;
-};
-
-
 /// Special product of \c v with itself: \f$v \odot v\f$.
 /// The tensor \c v is given in Kelvin mapping.
 /// \note Implementation only for 2 and 3 dimensions.
@@ -456,38 +395,6 @@ typename SolidEhlers<DisplacementDim>::JacobianMatrix calculatePlasticJacobian(
     return jacobian;
 }
 
-/// Computes the damage internal material variable explicitly based on the
-/// results obtained from the local stress return algorithm.
-inline Damage calculateDamage(double const eps_p_V_diff,
-                              double const eps_p_eff_diff,
-                              double kappa_d,
-                              DamageProperties const& dp)
-{
-    // Default case of the rate problem. Updated below if volumetric plastic
-    // strain rate is positive (dilatancy).
-
-    // Compute damage current step
-    if (eps_p_V_diff > 0)
-    {
-        double const r_s = eps_p_eff_diff / eps_p_V_diff;
-
-        // Brittleness decrease with confinement for the nonlinear flow rule.
-        // ATTENTION: For linear flow rule -> constant brittleness.
-        double x_s = 0;
-        if (r_s < 1)
-        {
-            x_s = 1 + dp.h_d * r_s * r_s;
-        }
-        else
-        {
-            x_s = 1 - 3 * dp.h_d + 4 * dp.h_d * std::sqrt(r_s);
-        }
-        kappa_d += eps_p_eff_diff / x_s;
-    }
-
-    return {kappa_d, (1 - dp.beta_d) * (1 - std::exp(-kappa_d / dp.alpha_d))};
-}
-
 /// Calculates the derivative of the residuals with respect to total
 /// strain. Implementation fully implicit only.
 template <int DisplacementDim>
@@ -589,27 +496,18 @@ SolidEhlers<DisplacementDim>::integrateStress(
     // do the evaluation once per function call.
     MaterialProperties const mp(t, x, _mp);
 
-    KelvinVector sigma_eff_prev = sigma_prev;  // In case without damage the
-                                               // effective value is same as the
-                                               // previous one.
-    if (_damage_properties)
-    {
-        // Compute sigma_eff from damage total stress sigma, which is given by
-        // sigma_eff=sigma_prev / (1-damage)
-        sigma_eff_prev = sigma_prev / (1 - state.damage_prev.value());
-    }
-    KelvinVector sigma = predict_sigma<DisplacementDim>(
-        mp.G, mp.K, sigma_eff_prev, eps, eps_prev, eps_V);
+    KelvinVector sigma = predict_sigma<DisplacementDim>(mp.G, mp.K, sigma_prev,
+                                                        eps, eps_prev, eps_V);
 
     KelvinMatrix tangentStiffness;
 
     PhysicalStressWithInvariants<DisplacementDim> s{mp.G * sigma};
     // Quit early if sigma is zero (nothing to do) or if we are still in elastic
     // zone.
-    if (sigma.squaredNorm() == 0 ||
-        yieldFunction(mp, s, calculateIsotropicHardening(
-                                 mp.kappa, mp.hardening_coefficient,
-                                 state.eps_p.eff)) < 0)
+    if ((sigma.squaredNorm() == 0 ||
+         yieldFunction(mp, s, calculateIsotropicHardening(
+                                  mp.kappa, mp.hardening_coefficient,
+                                  state.eps_p.eff)) < 0))
     {
         tangentStiffness.setZero();
         tangentStiffness.template topLeftCorner<3, 3>().setConstant(
@@ -674,6 +572,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
                     dt, s, solution[KelvinVectorSize * 2 + 2], mp);
             };
 
+            //double const damping = 1.;
             auto const update_solution =
                 [&](ResidualVectorType const& increment) {
                     solution += increment;
@@ -681,6 +580,49 @@ SolidEhlers<DisplacementDim>::integrateStress(
                         mp.G * solution.template segment<KelvinVectorSize>(0)};
                 };
 
+            /*
+            auto const update_jacobian = [&](JacobianMatrix& jacobian) {
+                jacobian = calculatePlasticJacobian<DisplacementDim>(
+                    dt, s, solution[KelvinVectorSize * 2 + 2], mp);
+                //std::cout << "analytical J:\n" << jacobian << "\n";
+
+                {   // Central differences
+                    ResidualVectorType solution_org = solution;
+
+                    double const pert = 1e-8;
+
+                    JacobianMatrix jacobian_num = JacobianMatrix::Zero();
+
+                    for (int i = 0; i < solution.size(); ++i)
+                    {
+                        solution = solution_org;  // Reset to original
+                        ResidualVectorType num_increment =
+                            ResidualVectorType::Zero();
+                        num_increment[i] += pert;
+
+                        update_solution(num_increment);  // and perturbate+
+
+                        ResidualVectorType residual_plus;
+                        update_residual(residual_plus);
+
+                        solution = solution_org;  // Reset to original
+                        num_increment = ResidualVectorType::Zero();
+                        num_increment[i] -= pert;
+
+                        update_solution(num_increment);  // and perturbate-
+
+                        ResidualVectorType residual_minus;
+                        update_residual(residual_minus);
+                        jacobian_num.col(i) =
+                            (residual_plus - residual_minus) / (2. * pert);
+                    }
+                    //std::cout << "numerical  J:\n" << jacobian_num << "\n";
+                    solution = solution_org;  // Reset to original
+
+                    //std::cout << "difference  J:\n" << jacobian_num - jacobian << "\n";
+                }
+            };
+            */
             auto newton_solver = NumLib::NewtonRaphson<
                 decltype(linear_solver), JacobianMatrix,
                 decltype(update_jacobian), ResidualVectorType,
@@ -704,15 +646,26 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 splitSolutionVector<ResidualVectorType, KelvinVector>(solution);
         }
 
+        /* XXX
         if (_damage_properties)
         {
             DamageProperties damage_properties(t, x, *_damage_properties);
-            state.damage =
-                calculateDamage(state.eps_p.V - state.eps_p_prev.V,
-                                state.eps_p.eff - state.eps_p_prev.eff,
-                                state.damage.kappa_d(), damage_properties);
-        }
+            double const kappa_d = calculateDamageKappaD<DisplacementDim>(
+                (state.eps_p.V - state.eps_p_prev.V) ,
+                (state.eps_p.eff - state.eps_p_prev.eff) , dt, sigma,
+                state.damage.kappa_d(), damage_properties, mp);
+            state.damage = {
+                kappa_d,
+                state.damage
+                    .value()};  // Don't overwrite damage here, only kappa_d.
 
+            if (_compute_local_damage)
+                state.damage = calculateDamage<DisplacementDim>(
+                    state.eps_p.V - state.eps_p_prev.V,
+                    state.eps_p.eff - state.eps_p_prev.eff, sigma, kappa_d,
+                    damage_properties, mp);
+        }
+        */
 
         // Calculate residual derivative w.r.t. strain
         Eigen::Matrix<double, JacobianResidualSize, KelvinVectorSize,
@@ -729,9 +682,8 @@ SolidEhlers<DisplacementDim>::integrateStress(
                 .template block<KelvinVectorSize, KelvinVectorSize>(0, 0);
     }
 
+
     KelvinVector sigma_final = mp.G * sigma;
-    if (_damage_properties)
-        sigma_final *= 1 - state.damage.value();
 
     return {std::make_tuple(
         sigma_final,
@@ -747,32 +699,6 @@ std::vector<typename MechanicsBase<DisplacementDim>::InternalVariable>
 SolidEhlers<DisplacementDim>::getInternalVariables() const
 {
     return {
-        {"damage.kappa_d", 1,
-         [](typename MechanicsBase<
-                DisplacementDim>::MaterialStateVariables const& state,
-            std::vector<double>& cache) -> std::vector<double> const& {
-             assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
-                        &state) != nullptr);
-             auto const& ehlers_state =
-                 static_cast<StateVariables<DisplacementDim> const&>(state);
-
-             cache.resize(1);
-             cache.front() = ehlers_state.damage.kappa_d();
-             return cache;
-         }},
-        {"damage.value", 1,
-         [](typename MechanicsBase<
-                DisplacementDim>::MaterialStateVariables const& state,
-            std::vector<double>& cache) -> std::vector<double> const& {
-             assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
-                        &state) != nullptr);
-             auto const& ehlers_state =
-                 static_cast<StateVariables<DisplacementDim> const&>(state);
-
-             cache.resize(1);
-             cache.front() = ehlers_state.damage.value();
-             return cache;
-         }},
         {"eps_p.D", KelvinVector::RowsAtCompileTime,
          [](typename MechanicsBase<
                 DisplacementDim>::MaterialStateVariables const& state,
