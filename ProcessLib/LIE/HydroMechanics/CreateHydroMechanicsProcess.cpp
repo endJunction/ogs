@@ -273,6 +273,32 @@ std::unique_ptr<Process> createHydroMechanicsProcess(
         frac_prop->biot_coefficient = &ProcessLib::findParameter<double>(
             //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS_WITH_LIE__fracture_properties__biot_coefficient}
             fracture_properties_config, "biot_coefficient", parameters, 1);
+
+        auto permeability_model_config =
+            //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS_WITH_LIE__fracture_properties__permeability_model}
+            fracture_properties_config.getConfigSubtree("permeability_model");
+        auto const permeability_model_type =
+            //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS_WITH_LIE__fracture_properties__premeability_model__type}
+            permeability_model_config.peekConfigParameter<std::string>("type");
+        if (permeability_model_type == "ConstantPermeability")
+            frac_prop->permeability_model =
+                MaterialLib::Fracture::createConstantPermeability(
+                    permeability_model_config);
+        else if (permeability_model_type == "ConstantHydraulicAperture")
+            frac_prop->permeability_model =
+                MaterialLib::Fracture::createConstantHydraulicAperture(
+                    permeability_model_config);
+        else if (permeability_model_type == "CubicLaw")
+            frac_prop->permeability_model =
+                MaterialLib::Fracture::createCubicLaw(
+                    permeability_model_config);
+        else if (permeability_model_type == "CubicLawAfterShearSlip")
+            frac_prop->permeability_model =
+                MaterialLib::Fracture::createCubicLawAfterShearSlip(
+                    permeability_model_config);
+        else
+            OGS_FATAL("Unknown fracture permeability model type \"%s\".",
+                      permeability_model_type.c_str());
     }
 
     // initial effective stress in matrix
