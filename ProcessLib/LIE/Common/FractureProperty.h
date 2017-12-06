@@ -11,6 +11,7 @@
 
 #include <Eigen/Eigen>
 
+#include "MaterialLib/FractureModels/FracturePermeability.h"
 #include "Utils.h"
 
 namespace MeshLib
@@ -44,6 +45,8 @@ struct FracturePropertyHM : public FractureProperty
 {
     ProcessLib::Parameter<double> const* specific_storage = nullptr;
     ProcessLib::Parameter<double> const* biot_coefficient = nullptr;
+
+    std::unique_ptr<MaterialLib::Fracture::Permeability> permeability_model;
 };
 
 /// configure fracture property based on a fracture element assuming
