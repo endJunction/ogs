@@ -28,7 +28,6 @@
                 <mp>mp</mp>
                 <betap>betap</betap>
                 <gammap>gammap</gammap>
-                <tangent_type>tan_type</tangent_type>
 
                 <damage_properties>
                     <alpha_d>alphad</alpha_d>
@@ -42,7 +41,6 @@
                     <error_tolerance>1e-10</error_tolerance>
             </nonlinear_solver>
 
-            <compute_local_damage>0</compute_local_damage>
 
             </constitutive_relation>
 
@@ -225,11 +223,6 @@
             <name>md</name>
             <type>Constant</type>
             <value>1.0</value>
-        </parameter>
-        <parameter>
-            <name>tan_type</name>
-            <type>Constant</type>
-            <value>1</value>
         </parameter>
 
         <parameter>

@@ -26,7 +26,6 @@
                 <mp>mp</mp>
                 <betap>betap</betap>
                 <gammap>gammap</gammap>
-                <tangent_type>tt</tangent_type>
                 <damage_properties>
                     <alpha_d>alphad</alpha_d>
                     <beta_d>betad</beta_d>
@@ -37,7 +36,6 @@
                     <maximum_iterations>10000</maximum_iterations>
                     <error_tolerance>1e-10</error_tolerance>
                 </nonlinear_solver>
-                <compute_local_damage>0</compute_local_damage>
             </constitutive_relation>
             <internal_length>0.0025</internal_length>
             <!--eventually to 2.5mm-->
@@ -216,11 +214,6 @@
             <name>md</name>
             <type>Constant</type>
             <value>1.0</value>
-        </parameter>
-        <parameter>
-            <name>tt</name>
-            <type>Constant</type>
-            <value>1</value>
         </parameter>
         <parameter>
             <name>displacement0</name>
