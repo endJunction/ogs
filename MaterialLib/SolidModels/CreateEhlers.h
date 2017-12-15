@@ -58,8 +58,12 @@ inline std::unique_ptr<DamagePropertiesParameters> createDamageProperties(
 
     DBUG("Use \'%s\' as h_d.", h_d.name.c_str());
 
+    //! \ogs_file_param{material__solid__constitutive_relation__Ehlers__damage_properties__m_d}
+    double const m_d = config.getConfigParameter<double>("m_d");
+    DBUG("Over-non-local value m_d: %g", m_d);
+
     return std::make_unique<DamagePropertiesParameters>(
-        DamagePropertiesParameters{alpha_d, beta_d, h_d});
+        DamagePropertiesParameters{alpha_d, beta_d, h_d, m_d});
 }
 
 template <int DisplacementDim>
