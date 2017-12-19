@@ -538,34 +538,18 @@ public:
 
                 // === Overnonlocal formulation ===
                 // Update nonlocal damage with local damage (scaled with 1 -
-                // \gamma_nonlocal) for the current integration point and the
+                // \gamma_{nonlocal}) for the current integration point and the
                 // nonlocal integral part.
                 {
-                    double const _gamma_nonlocal =
+                    double const gamma_nonlocal =
                         ehlers_material.evaluatedDamageProperties(t, x_position)
                             .m_d;
-                    // double const _gamma_nonlocal = 1.2;
-                    // std::cout << "gamma non local" << _gamma_nonlocal <<
-                    // std::endl;
-                    // nonlocal_kappa_d_dot =
-                    //    (1. - _gamma_nonlocal) *
-                    //        _ip_data[ip].getLocalRateKappaD() +
-                    //    _gamma_nonlocal * nonlocal_kappa_d_dot;
-                    nonlocal_kappa_d = (1. - _gamma_nonlocal) *
+                    nonlocal_kappa_d = (1. - gamma_nonlocal) *
                                            _ip_data[ip].getLocalVariable() +
-                                       _gamma_nonlocal * nonlocal_kappa_d;
+                                       gamma_nonlocal * nonlocal_kappa_d;
                 }
 
-                /*
-                double const& nonlocal_kappa_d_prev =
-                    _ip_data[ip].nonlocal_kappa_d_prev;
-
-                nonlocal_kappa_d =
-                    std::max(0., nonlocal_kappa_d_prev + nonlocal_kappa_d_dot);
-                    */
                 nonlocal_kappa_d = std::max(0., nonlocal_kappa_d);
-                // std::cout << "KappaD total impl" << nonlocal_kappa_d
-                //          << std::endl;
 
                 // Update damage based on nonlocal kappa_d
                 {
