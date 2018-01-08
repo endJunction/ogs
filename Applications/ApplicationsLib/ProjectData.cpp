@@ -98,6 +98,9 @@
 #ifdef OGS_BUILD_PROCESS_THERMOMECHANICS
 #include "ProcessLib/ThermoMechanics/CreateThermoMechanicsProcess.h"
 #endif
+#ifdef OGS_BUILD_PROCESS_TH2M
+#include "ProcessLib/TH2M/CreateTH2MProcess.h"
+#endif
 #ifdef OGS_BUILD_PROCESS_TWOPHASEFLOWWITHPP
 #include "ProcessLib/TwoPhaseFlowWithPP/CreateTwoPhaseFlowWithPPProcess.h"
 #endif
@@ -723,6 +726,32 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                     *_mesh_vec[0], std::move(jacobian_assembler),
                     _process_variables, _parameters, integration_order,
                     process_config, _curves);
+        }
+        else
+#endif
+#ifdef OGS_BUILD_PROCESS_TH2M	
+            if (type == "TH2M")
+        {
+            //! \ogs_file_param{prj__processes__process__TH2M__dimension}
+            switch (process_config.getConfigParameter<int>("dimension"))
+            {
+                case 2:
+                    process = ProcessLib::TH2M::createTH2MProcess<2>(
+                        *_mesh_vec[0], std::move(jacobian_assembler),
+                        _process_variables, _parameters, integration_order,
+                        process_config);
+                    break;
+                case 3:
+                    process = ProcessLib::TH2M::createTH2MProcess<3>(
+                        *_mesh_vec[0], std::move(jacobian_assembler),
+                        _process_variables, _parameters, integration_order,
+                        process_config);
+                    break;
+                default:
+                    OGS_FATAL(
+                        "TH2M process does not support given "
+                        "dimension");
+            }
         }
         else
 #endif
