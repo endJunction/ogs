@@ -12,6 +12,97 @@
 #include "MeshLib/IO/VtkIO/VtuInterface.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 
+static void addSecondaryVar(double const t,
+                            GlobalVector const& x,
+                            NumLib::LocalToGlobalIndexMap const& dof_table,
+                            ProcessLib::SecondaryVariable const& var,
+                            std::string const& output_name,
+                            MeshLib::Mesh& mesh)
+{
+    DBUG("  secondary variable %s", output_name.c_str());
+
+    auto& nodal_values_mesh = *MeshLib::getOrCreateMeshProperty<double>(
+        mesh, output_name, MeshLib::MeshItemType::Node,
+        var.fcts.num_components);
+    if (nodal_values_mesh.size() !=
+        mesh.getNumberOfNodes() * var.fcts.num_components)
+    {
+        OGS_FATAL(
+            "Nodal property `%s' does not have the right number of "
+            "components. Expected: %d, actual: %d",
+            output_name.c_str(),
+            mesh.getNumberOfNodes() * var.fcts.num_components,
+            nodal_values_mesh.size());
+    }
+
+    std::unique_ptr<GlobalVector> result_cache;
+    auto const& nodal_values =
+        var.fcts.eval_field(t, x, dof_table, result_cache);
+    if (nodal_values_mesh.size() !=
+        static_cast<std::size_t>(nodal_values.size()))
+    {
+        OGS_FATAL(
+            "Secondary variable `%s' did not evaluate to the right "
+            "number of components. Expected: %d, actual: %d.",
+            var.name.c_str(), nodal_values_mesh.size(), nodal_values.size());
+    }
+
+    // Copy result
+    for (GlobalIndexType i = 0; i < nodal_values.size(); ++i)
+    {
+        assert(!std::isnan(nodal_values[i]));
+        nodal_values_mesh[i] = nodal_values[i];
+    }
+}
+
+static void addSecondaryVarResiduals(
+    double const t,
+    GlobalVector const& x,
+    NumLib::LocalToGlobalIndexMap const& dof_table,
+    ProcessLib::SecondaryVariable const& var,
+    std::string const& output_name,
+    MeshLib::Mesh& mesh)
+{
+    if (!var.fcts.eval_residuals)
+        return;
+
+    DBUG("  secondary variable %s residual", output_name.c_str());
+    auto const& property_name_res = output_name + "_residual";
+
+    auto& residuals_mesh = *MeshLib::getOrCreateMeshProperty<double>(
+        mesh, property_name_res, MeshLib::MeshItemType::Cell,
+        var.fcts.num_components);
+    if (residuals_mesh.size() !=
+        mesh.getNumberOfElements() * var.fcts.num_components)
+    {
+        OGS_FATAL(
+            "Cell property `%s' does not have the right number of "
+            "components. Expected: %d, actual: %d",
+            property_name_res.c_str(),
+            mesh.getNumberOfElements() * var.fcts.num_components,
+            residuals_mesh.size());
+    }
+
+    std::unique_ptr<GlobalVector> result_cache;
+    auto const& residuals =
+        var.fcts.eval_residuals(t, x, dof_table, result_cache);
+    if (residuals_mesh.size() != static_cast<std::size_t>(residuals.size()))
+    {
+        OGS_FATAL(
+            "Thee residual of secondary variable `%s' did not evaluate "
+            "to the right number of components. Expected: %d, actual: "
+            "%d.",
+            var.name.c_str(), residuals_mesh.size(), residuals.size());
+    }
+
+    // Copy result
+    for (GlobalIndexType i = 0; i < residuals.size(); ++i)
+    {
+        assert(!std::isnan(residuals[i]));
+        residuals_mesh[i] = residuals[i];
+    }
+}
+
 namespace ProcessLib
 {
 void doProcessOutput(std::string const& file_name,
@@ -104,87 +195,8 @@ void doProcessOutput(std::string const& file_name,
     }
 
 #ifndef USE_PETSC
-    auto add_secondary_var = [&](SecondaryVariable const& var,
-                                 std::string const& output_name) {
-        {
-            DBUG("  secondary variable %s", output_name.c_str());
 
-            auto& nodal_values_mesh = *MeshLib::getOrCreateMeshProperty<double>(
-                mesh, output_name, MeshLib::MeshItemType::Node,
-                var.fcts.num_components);
-            if (nodal_values_mesh.size() !=
-                mesh.getNumberOfNodes() * var.fcts.num_components)
-            {
-                OGS_FATAL(
-                    "Nodal property `%s' does not have the right number of "
-                    "components. Expected: %d, actual: %d",
-                    output_name.c_str(),
-                    mesh.getNumberOfNodes() * var.fcts.num_components,
-                    nodal_values_mesh.size());
-            }
-
-            std::unique_ptr<GlobalVector> result_cache;
-            auto const& nodal_values =
-                var.fcts.eval_field(t, x, dof_table, result_cache);
-            if (nodal_values_mesh.size() !=
-                static_cast<std::size_t>(nodal_values.size()))
-            {
-                OGS_FATAL(
-                    "Secondary variable `%s' did not evaluate to the right "
-                    "number of components. Expected: %d, actual: %d.",
-                    var.name.c_str(), nodal_values_mesh.size(),
-                    nodal_values.size());
-            }
-
-            // Copy result
-            for (GlobalIndexType i = 0; i < nodal_values.size(); ++i)
-            {
-                assert(!std::isnan(nodal_values[i]));
-                nodal_values_mesh[i] = nodal_values[i];
-            }
-        }
-
-        if (process_output.output_residuals && var.fcts.eval_residuals)
-        {
-            DBUG("  secondary variable %s residual", output_name.c_str());
-            auto const& property_name_res = output_name + "_residual";
-
-            auto& residuals_mesh = *MeshLib::getOrCreateMeshProperty<double>(
-                mesh, property_name_res, MeshLib::MeshItemType::Cell,
-                var.fcts.num_components);
-            if (residuals_mesh.size() !=
-                mesh.getNumberOfElements() * var.fcts.num_components)
-            {
-                OGS_FATAL(
-                    "Cell property `%s' does not have the right number of "
-                    "components. Expected: %d, actual: %d",
-                    property_name_res.c_str(),
-                    mesh.getNumberOfElements() * var.fcts.num_components,
-                    residuals_mesh.size());
-            }
-
-            std::unique_ptr<GlobalVector> result_cache;
-            auto const& residuals =
-                var.fcts.eval_residuals(t, x, dof_table, result_cache);
-            if (residuals_mesh.size() !=
-                static_cast<std::size_t>(residuals.size()))
-            {
-                OGS_FATAL(
-                    "Thee residual of secondary variable `%s' did not evaluate "
-                    "to the right number of components. Expected: %d, actual: "
-                    "%d.",
-                    var.name.c_str(), residuals_mesh.size(), residuals.size());
-            }
-
-            // Copy result
-            for (GlobalIndexType i = 0; i < residuals.size(); ++i)
-            {
-                assert(!std::isnan(residuals[i]));
-                residuals_mesh[i] = residuals[i];
-            }
-        }
-    };
-
+    // Secondary variables output
     for (auto const& external_variable_name : output_variables)
     {
         if (!already_output.insert(external_variable_name).second) {
@@ -192,8 +204,16 @@ void doProcessOutput(std::string const& file_name,
             continue;
         }
 
-        add_secondary_var(secondary_variables.get(external_variable_name),
-                          external_variable_name);
+        addSecondaryVar(t, x, dof_table,
+                        secondary_variables.get(external_variable_name),
+                        external_variable_name, mesh);
+        if (process_output.output_residuals)
+        {
+            addSecondaryVarResiduals(
+                t, x, dof_table,
+                secondary_variables.get(external_variable_name),
+                external_variable_name, mesh);
+        }
     }
 #else
     (void)secondary_variables;
