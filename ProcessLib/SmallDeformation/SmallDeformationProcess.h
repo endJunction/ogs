@@ -17,6 +17,36 @@ namespace ProcessLib
 {
 namespace SmallDeformation
 {
+struct SigmaIntegrationPointWriter final : public IntegrationPointWriter
+{
+    explicit SigmaIntegrationPointWriter(
+        int const n_components,
+        std::function<std::vector<std::vector<double>>()>
+            callback)
+        : _n_components(n_components), _callback(callback)
+    {
+    }
+
+    int numberOfComponents() const override { return _n_components; }
+
+    std::string name() const override
+    {
+        // TODO (naumov) remove ip suffix. Probably needs modification of the
+        // mesh properties, s.t. there is no "overlapping" with cell/point data.
+        // See getOrCreateMeshProperty.
+        return "sigma_ip";
+    }
+
+    std::vector<std::vector<double>> values() const override
+    {
+        return _callback();
+    }
+
+private:
+    int const _n_components;
+    std::function<std::vector<std::vector<double>>()> _callback;
+};
+
 template <int DisplacementDim>
 class SmallDeformationProcess final : public Process
 {

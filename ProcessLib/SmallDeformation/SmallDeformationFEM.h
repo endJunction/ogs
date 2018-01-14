@@ -314,6 +314,41 @@ public:
         return cache;
     }
 
+    std::vector<double> getSigma() const override
+    {
+        using KelvinVectorType = typename BMatricesType::KelvinVectorType;
+        auto const kelvin_vector_size =
+            KelvinVectorDimensions<DisplacementDim>::value;
+        auto const n_integration_points = _ip_data.size();
+
+        std::vector<double> ip_sigma_values;
+        //ip_sigma_values.resize(kelvin_vector_size * n_integration_points);
+        auto cache_mat = MathLib::createZeroedMatrix<Eigen::Matrix<
+            double, Eigen::Dynamic, kelvin_vector_size, Eigen::RowMajor>>(
+            ip_sigma_values, n_integration_points, kelvin_vector_size);
+
+        // TODO make a general implementation for converting KelvinVectors
+        // back to symmetric rank-2 tensors.
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            auto const& sigma = _ip_data[ip].sigma;
+
+            for (typename KelvinVectorType::Index component = 0;
+                 component < kelvin_vector_size && component < 3;
+                 ++component)
+            {  // xx, yy, zz components
+                cache_mat(ip, component) = sigma[component];
+            }
+            for (typename KelvinVectorType::Index component = 3;
+                 component < kelvin_vector_size;
+                 ++component)
+            {  // mixed xy, yz, xz components
+                cache_mat(ip, component) = sigma[component] / std::sqrt(2);
+            }
+        }
+
+        return ip_sigma_values;
+    }
     std::vector<double> const& getIntPtSigma(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
