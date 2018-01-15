@@ -33,7 +33,7 @@
                     <alpha_d>alphad</alpha_d>
                     <beta_d>betad</beta_d>
                     <h_d>hd</h_d>
-                    <m_d>md</m_d>
+                    <m_d>1.0</m_d>
                 </damage_properties>
 
             <nonlinear_solver>
@@ -230,11 +230,6 @@
             <name>hd</name>
             <type>Constant</type>
             <value>0.0</value>
-        </parameter>
-        <parameter>
-            <name>md</name>
-            <type>Constant</type>
-            <value>1.0</value>
         </parameter>
 
         <parameter>
