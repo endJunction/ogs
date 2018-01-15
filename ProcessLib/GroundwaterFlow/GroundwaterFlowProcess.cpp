@@ -38,6 +38,25 @@ GroundwaterFlowProcess::GroundwaterFlowProcess(
       _balance_pv_name(std::move(balance_pv_name)),
       _balance_out_fname(std::move(balance_out_fname))
 {
+    _integration_point_writer.emplace_back(
+        std::make_unique<DarcyVelocityIntegrationPointWriter>(
+            static_cast<int>(mesh.getDimension()), [this]() {
+                // Result containing integration point data for each local
+                // assembler.
+                std::vector<std::vector<double>> result;
+                result.resize(_local_assemblers.size());
+                /*
+
+                NEEDS precomputed darcy velocity.
+
+                GlobalExecutor::executeMemberDereferenced(
+                    _global_assembler,
+                    &VectorMatrixAssembler::getIntPtDarcyVelocity,
+                    _local_assemblers, *_local_to_global_index_map, t, x,
+                    _local_to_global_index_map, element_result);
+                */
+                return result;
+            }));
 }
 
 void GroundwaterFlowProcess::initializeConcreteProcess(

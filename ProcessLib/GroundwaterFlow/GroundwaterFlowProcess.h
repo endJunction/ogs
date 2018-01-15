@@ -9,11 +9,12 @@
 
 #pragma once
 
-#include "NumLib/DOF/LocalToGlobalIndexMap.h"
-#include "ProcessLib/Process.h"
 #include "GroundwaterFlowFEM.h"
 #include "GroundwaterFlowProcessData.h"
+#include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "ProcessLib/CalculateSurfaceFlux/CalculateSurfaceFlux.h"
+#include "ProcessLib/IntegrationPointWriter.h"
+#include "ProcessLib/Process.h"
 
 // TODO used for output, if output classes are ready this has to be changed
 #include "MeshLib/IO/writeMeshToFile.h"
@@ -22,6 +23,26 @@ namespace ProcessLib
 {
 namespace GroundwaterFlow
 {
+struct DarcyVelocityIntegrationPointWriter final : public IntegrationPointWriter
+{
+    explicit DarcyVelocityIntegrationPointWriter(
+        int const n_components,
+        std::function<std::vector<std::vector<double>>()> callback)
+        : _n_components(n_components), _callback(callback)
+    {
+    }
+    int numberOfComponents() const override { return _n_components; }
+    std::string name() const override { return "darcy_velocity"; }
+    std::vector<std::vector<double>> values() const override
+    {
+        return _callback();
+    }
+
+private:
+    int const _n_components;
+    std::function<std::vector<std::vector<double>>()> _callback;
+};
+
 class GroundwaterFlowProcess final : public Process
 {
     using Base = Process;
