@@ -66,14 +66,14 @@ std::unique_ptr<Process> createPhaseFieldProcess(
     else  // staggered scheme.
     {
         using namespace std::string_literals;
-        for (auto const& variable_name : {"phasefield"s, "displacement"s})
+        for (auto const& variable_name : {"displacement"s, "phasefield"s})
         {
             auto per_process_variables =
                 findProcessVariables(variables, pv_config, {variable_name});
             process_variables.push_back(std::move(per_process_variables));
         }
-        variable_ph = &process_variables[0][0].get();
-        variable_u = &process_variables[1][0].get();
+        variable_u = &process_variables[0][0].get();
+        variable_ph = &process_variables[1][0].get();
     }
 
     DBUG("Associate displacement with process variable \'%s\'.",
@@ -94,7 +94,7 @@ std::unique_ptr<Process> createPhaseFieldProcess(
     if (variable_ph->getNumberOfComponents() != 1)
     {
         OGS_FATAL(
-            "Pressure process variable '%s' is not a scalar variable but has "
+            "Phasefield process variable '%s' is not a scalar variable but has "
             "%d components.",
             variable_ph->getName().c_str(),
             variable_ph->getNumberOfComponents());
