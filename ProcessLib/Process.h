@@ -19,6 +19,7 @@
 #include "ProcessLib/SourceTerms/SourceTermCollection.h"
 #include "ProcessLib/Output/CachedSecondaryVariable.h"
 #include "ProcessLib/Output/ExtrapolatorData.h"
+#include "ProcessLib/Output/IntegrationPointWriter.h"
 #include "ProcessLib/Output/SecondaryVariable.h"
 #include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/SourceTerms/NodalSourceTerm.h"
@@ -124,6 +125,12 @@ public:
     SecondaryVariableCollection const& getSecondaryVariables() const
     {
         return _secondary_variables;
+    }
+
+    std::vector<std::unique_ptr<IntegrationPointWriter>> const&
+    getIntegrationPointWriter() const
+    {
+        return _integration_point_writer;
     }
 
     // Used as a call back for CalculateSurfaceFlux process.
@@ -263,6 +270,9 @@ protected:
     /// The Gauss-Legendre integration method and available orders is
     /// implemented in MathLib::GaussLegendre.
     unsigned const _integration_order;
+
+    std::vector<std::unique_ptr<IntegrationPointWriter>>
+        _integration_point_writer;
 
     GlobalSparsityPattern _sparsity_pattern;
 
