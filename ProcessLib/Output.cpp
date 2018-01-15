@@ -193,7 +193,8 @@ void Output::doOutputAlways(Process const& process,
     doProcessOutput(output_file_path, make_output, _output_file_compression,
                     _output_file_data_mode, t, x, process.getMesh(),
                     process.getDOFTable(), process.getProcessVariables(),
-                    process.getSecondaryVariables(), process_output);
+                    process.getSecondaryVariables(),
+                    process.getIntegrationPointWriter(), process_output);
 
     if (make_output)
     {
@@ -277,7 +278,8 @@ void Output::doOutputNonlinearIteration(Process const& process,
     doProcessOutput(output_file_path, make_output, _output_file_compression,
                     _output_file_data_mode, t, x, process.getMesh(),
                     process.getDOFTable(), process.getProcessVariables(),
-                    process.getSecondaryVariables(), process_output);
+                    process.getSecondaryVariables(),
+                    process.getIntegrationPointWriter(), process_output);
 
     if (make_output)
     {

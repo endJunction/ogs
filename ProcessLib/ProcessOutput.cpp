@@ -12,34 +12,129 @@
 #include "MeshLib/IO/VtkIO/VtuInterface.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 
-namespace ProcessLib
-{
+#include "IntegrationPointWriter.h"
 
-ProcessOutput::ProcessOutput(BaseLib::ConfigTree const& output_config)
+static void addSecondaryVar(double const t,
+                            GlobalVector const& x,
+                            NumLib::LocalToGlobalIndexMap const& dof_table,
+                            ProcessLib::SecondaryVariable const& var,
+                            std::string const& output_name,
+                            MeshLib::Mesh& mesh)
 {
-    //! \ogs_file_param{prj__time_loop__processes__process__output__variables}
-    auto const out_vars = output_config.getConfigSubtree("variables");
+    DBUG("  secondary variable %s", output_name.c_str());
 
-    //! \ogs_file_param{prj__time_loop__processes__process__output__variables__variable}
-    for (auto out_var : out_vars.getConfigParameterList<std::string>("variable"))
+    auto& nodal_values_mesh = *MeshLib::getOrCreateMeshProperty<double>(
+        mesh, output_name, MeshLib::MeshItemType::Node,
+        var.fcts.num_components);
+    if (nodal_values_mesh.size() !=
+        mesh.getNumberOfNodes() * var.fcts.num_components)
     {
-        if (output_variables.find(out_var) != output_variables.cend())
-        {
-            OGS_FATAL("output variable `%s' specified more than once.", out_var.c_str());
-        }
-
-        DBUG("adding output variable `%s'", out_var.c_str());
-        output_variables.insert(out_var);
+        OGS_FATAL(
+            "Nodal property `%s' does not have the right number of "
+            "components. Expected: %d, actual: %d",
+            output_name.c_str(),
+            mesh.getNumberOfNodes() * var.fcts.num_components,
+            nodal_values_mesh.size());
     }
 
-    if (auto out_resid =
-            //! \ogs_file_param{prj__time_loop__processes__process__output__output_extrapolation_residuals}
-            output_config.getConfigParameterOptional<bool>("output_extrapolation_residuals"))
+    std::unique_ptr<GlobalVector> result_cache;
+    auto const& nodal_values =
+        var.fcts.eval_field(t, x, dof_table, result_cache);
+    if (nodal_values_mesh.size() !=
+        static_cast<std::size_t>(nodal_values.size()))
     {
-        output_residuals = *out_resid;
+        OGS_FATAL(
+            "Secondary variable `%s' did not evaluate to the right "
+            "number of components. Expected: %d, actual: %d.",
+            var.name.c_str(), nodal_values_mesh.size(), nodal_values.size());
+    }
+
+    // Copy result
+    for (GlobalIndexType i = 0; i < nodal_values.size(); ++i)
+    {
+        assert(!std::isnan(nodal_values[i]));
+        nodal_values_mesh[i] = nodal_values[i];
     }
 }
 
+static void addSecondaryVarResiduals(
+    double const t,
+    GlobalVector const& x,
+    NumLib::LocalToGlobalIndexMap const& dof_table,
+    ProcessLib::SecondaryVariable const& var,
+    std::string const& output_name,
+    MeshLib::Mesh& mesh)
+{
+    if (!var.fcts.eval_residuals)
+        return;
+
+    DBUG("  secondary variable %s residual", output_name.c_str());
+    auto const& property_name_res = output_name + "_residual";
+
+    auto& residuals_mesh = *MeshLib::getOrCreateMeshProperty<double>(
+        mesh, property_name_res, MeshLib::MeshItemType::Cell,
+        var.fcts.num_components);
+    if (residuals_mesh.size() !=
+        mesh.getNumberOfElements() * var.fcts.num_components)
+    {
+        OGS_FATAL(
+            "Cell property `%s' does not have the right number of "
+            "components. Expected: %d, actual: %d",
+            property_name_res.c_str(),
+            mesh.getNumberOfElements() * var.fcts.num_components,
+            residuals_mesh.size());
+    }
+
+    std::unique_ptr<GlobalVector> result_cache;
+    auto const& residuals =
+        var.fcts.eval_residuals(t, x, dof_table, result_cache);
+    if (residuals_mesh.size() != static_cast<std::size_t>(residuals.size()))
+    {
+        OGS_FATAL(
+            "Thee residual of secondary variable `%s' did not evaluate "
+            "to the right number of components. Expected: %d, actual: "
+            "%d.",
+            var.name.c_str(), residuals_mesh.size(), residuals.size());
+    }
+
+    // Copy result
+    for (GlobalIndexType i = 0; i < residuals.size(); ++i)
+    {
+        assert(!std::isnan(residuals[i]));
+        residuals_mesh[i] = residuals[i];
+    }
+}
+
+// For integration point output of each process
+void addIntegrationPointData(MeshLib::Mesh& mesh,
+                             ProcessLib::IntegrationPointWriter const& writer)
+{
+    auto const& ip_values = writer.values(/*t, x, dof_table*/);
+    assert(ip_values.size() == mesh.getNumberOfElements());
+
+    // create field data and fill it with nodal values, and an offsets cell
+    // array indicating where the cell's integration point data starts.
+    auto& field_data = *MeshLib::getOrCreateMeshProperty<double>(
+        mesh, writer.name(), MeshLib::MeshItemType::IntegrationPoint,
+        writer.numberOfComponents());
+    field_data.clear();
+
+    auto& field_offsets = *MeshLib::getOrCreateMeshProperty<std::size_t>(
+        mesh, writer.name() + "_offsets", MeshLib::MeshItemType::Cell, 1);
+
+    std::size_t offset = 0;
+    for (std::size_t e = 0; e < ip_values.size(); ++e)
+    {
+        auto const& element_ip_values = ip_values[e];
+        std::copy(element_ip_values.begin(), element_ip_values.end(),
+                  std::back_inserter(field_data));
+        field_offsets[e] = offset;
+        offset += element_ip_values.size();
+    }
+}
+
+namespace ProcessLib
+{
 void doProcessOutput(std::string const& file_name,
                      bool const make_output,
                      bool const compress_output,
@@ -51,6 +146,8 @@ void doProcessOutput(std::string const& file_name,
                      std::vector<std::reference_wrapper<ProcessVariable>> const&
                          process_variables,
                      SecondaryVariableCollection secondary_variables,
+                     std::vector<std::unique_ptr<IntegrationPointWriter>> const&
+                         integration_point_writer,
                      ProcessOutput const& process_output)
 {
     DBUG("Process output.");
@@ -130,87 +227,8 @@ void doProcessOutput(std::string const& file_name,
     }
 
 #ifndef USE_PETSC
-    auto add_secondary_var = [&](SecondaryVariable const& var,
-                                 std::string const& output_name) {
-        {
-            DBUG("  secondary variable %s", output_name.c_str());
 
-            auto& nodal_values_mesh = *MeshLib::getOrCreateMeshProperty<double>(
-                mesh, output_name, MeshLib::MeshItemType::Node,
-                var.fcts.num_components);
-            if (nodal_values_mesh.size() !=
-                mesh.getNumberOfNodes() * var.fcts.num_components)
-            {
-                OGS_FATAL(
-                    "Nodal property `%s' does not have the right number of "
-                    "components. Expected: %d, actual: %d",
-                    output_name.c_str(),
-                    mesh.getNumberOfNodes() * var.fcts.num_components,
-                    nodal_values_mesh.size());
-            }
-
-            std::unique_ptr<GlobalVector> result_cache;
-            auto const& nodal_values =
-                var.fcts.eval_field(t, x, dof_table, result_cache);
-            if (nodal_values_mesh.size() !=
-                static_cast<std::size_t>(nodal_values.size()))
-            {
-                OGS_FATAL(
-                    "Secondary variable `%s' did not evaluate to the right "
-                    "number of components. Expected: %d, actual: %d.",
-                    var.name.c_str(), nodal_values_mesh.size(),
-                    nodal_values.size());
-            }
-
-            // Copy result
-            for (GlobalIndexType i = 0; i < nodal_values.size(); ++i)
-            {
-                assert(!std::isnan(nodal_values[i]));
-                nodal_values_mesh[i] = nodal_values[i];
-            }
-        }
-
-        if (process_output.output_residuals && var.fcts.eval_residuals)
-        {
-            DBUG("  secondary variable %s residual", output_name.c_str());
-            auto const& property_name_res = output_name + "_residual";
-
-            auto& residuals_mesh = *MeshLib::getOrCreateMeshProperty<double>(
-                mesh, property_name_res, MeshLib::MeshItemType::Cell,
-                var.fcts.num_components);
-            if (residuals_mesh.size() !=
-                mesh.getNumberOfElements() * var.fcts.num_components)
-            {
-                OGS_FATAL(
-                    "Cell property `%s' does not have the right number of "
-                    "components. Expected: %d, actual: %d",
-                    property_name_res.c_str(),
-                    mesh.getNumberOfElements() * var.fcts.num_components,
-                    residuals_mesh.size());
-            }
-
-            std::unique_ptr<GlobalVector> result_cache;
-            auto const& residuals =
-                var.fcts.eval_residuals(t, x, dof_table, result_cache);
-            if (residuals_mesh.size() !=
-                static_cast<std::size_t>(residuals.size()))
-            {
-                OGS_FATAL(
-                    "Thee residual of secondary variable `%s' did not evaluate "
-                    "to the right number of components. Expected: %d, actual: "
-                    "%d.",
-                    var.name.c_str(), residuals_mesh.size(), residuals.size());
-            }
-
-            // Copy result
-            for (GlobalIndexType i = 0; i < residuals.size(); ++i)
-            {
-                assert(!std::isnan(residuals[i]));
-                residuals_mesh[i] = residuals[i];
-            }
-        }
-    };
-
+    // Secondary variables output
     for (auto const& external_variable_name : output_variables)
     {
         if (!already_output.insert(external_variable_name).second) {
@@ -218,13 +236,28 @@ void doProcessOutput(std::string const& file_name,
             continue;
         }
 
-        add_secondary_var(secondary_variables.get(external_variable_name),
-                          external_variable_name);
+        addSecondaryVar(t, x, dof_table,
+                        secondary_variables.get(external_variable_name),
+                        external_variable_name, mesh);
+        if (process_output.output_residuals)
+        {
+            addSecondaryVarResiduals(
+                t, x, dof_table,
+                secondary_variables.get(external_variable_name),
+                external_variable_name, mesh);
+        }
     }
 #else
     (void)secondary_variables;
     (void)t;
 #endif // USE_PETSC
+
+    // Integration point data stored as field data (contrary to point or cell
+    // data).
+    for (auto const& ip_writer : integration_point_writer)
+    {
+        addIntegrationPointData(mesh, *ip_writer);
+    }
 
     if (!make_output)
     {

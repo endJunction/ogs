@@ -17,11 +17,12 @@
 #include "ProcessLib/SourceTerms/NodalSourceTerm.h"
 #include "ProcessLib/Parameter/Parameter.h"
 
+#include "AbstractJacobianAssembler.h"
+#include "CachedSecondaryVariable.h"
 #include "ExtrapolatorData.h"
+#include "IntegrationPointWriter.h"
 #include "ProcessVariable.h"
 #include "SecondaryVariable.h"
-#include "CachedSecondaryVariable.h"
-#include "AbstractJacobianAssembler.h"
 #include "VectorMatrixAssembler.h"
 
 namespace MeshLib
@@ -117,6 +118,12 @@ public:
     SecondaryVariableCollection const& getSecondaryVariables() const
     {
         return _secondary_variables;
+    }
+
+    std::vector<std::unique_ptr<IntegrationPointWriter>> const&
+    getIntegrationPointWriter() const
+    {
+        return _integration_point_writer;
     }
 
     // Get the solution of the previous time step.
@@ -235,6 +242,9 @@ protected:
     /// The Gauss-Legendre integration method and available orders is
     /// implemented in MathLib::GaussLegendre.
     unsigned const _integration_order;
+
+    std::vector<std::unique_ptr<IntegrationPointWriter>>
+        _integration_point_writer;
 
 private:
     GlobalSparsityPattern _sparsity_pattern;
