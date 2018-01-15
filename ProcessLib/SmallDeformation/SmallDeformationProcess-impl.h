@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cassert>
+#include <nlohmann/json.hpp>
 
 #include "BaseLib/Functional.h"
 #include "ProcessLib/Process.h"
@@ -72,6 +73,8 @@ void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
     MeshLib::Mesh const& mesh,
     unsigned const integration_order)
 {
+    using nlohmann::json;
+
     ProcessLib::SmallDeformation::createLocalAssemblers<
         DisplacementDim, SmallDeformationLocalAssembler>(
         mesh.getElements(), dof_table, _local_assemblers,
@@ -156,6 +159,92 @@ void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
             name,
             makeExtrapolator(num_components, getExtrapolator(),
                              _local_assemblers, std::move(getIntPtValues)));
+    }
+
+    // Set initial conditions for integration point data.
+    for (auto const& ip_writer : _integration_point_writer)
+    {
+        auto const& name = ip_writer->name();
+        if (!mesh.getProperties().existsPropertyVector<double>(name))
+        {
+            continue;
+        }
+
+        auto const& mesh_property =
+            *mesh.getProperties().template getPropertyVector<double>(name);
+
+        if (mesh_property.getMeshItemType() !=
+            MeshLib::MeshItemType::IntegrationPoint)
+        {
+            continue;
+        }
+
+        if (!mesh.getProperties().existsPropertyVector<char>(
+                "IntegrationPointMetaData"))
+        {
+            OGS_FATAL(
+                "Integration point data '%s' is present in the vtk field data "
+                "but the required \"IntegrationPointMetaData\" array is not "
+                "available.",
+                name.c_str());
+        }
+
+        auto const& mesh_property_ip_meta_data =
+            *mesh.getProperties().template getPropertyVector<char>(
+                "IntegrationPointMetaData");
+
+        if (mesh_property_ip_meta_data.getMeshItemType() !=
+            MeshLib::MeshItemType::IntegrationPoint)
+        {
+            OGS_FATAL("IntegrationPointMetaData array must be field data.");
+        }
+
+        // Parse the meta data into json object
+        auto const json_meta_data =
+            json::parse(mesh_property_ip_meta_data.begin(),
+                        mesh_property_ip_meta_data.end());
+
+        // Find the current integration point data entry and extract the meta
+        // data.
+        int n_components = 0;
+        int integration_order = 0;
+
+        for (auto const& md : json_meta_data["integration_point_arrays"])
+        {
+            if (md["name"] != name)
+            {
+                continue;
+            }
+
+            n_components = md["number_of_components"];
+            if (n_components != mesh_property.getNumberOfComponents())
+            {
+                OGS_FATAL(
+                    "Different number of components in meta data (%d) than in "
+                    "the integration point field data for \"%s\": %d.",
+                    n_components, name.c_str(),
+                    mesh_property.getNumberOfComponents());
+            }
+
+            integration_order = md["integration_order"];
+        }
+
+        // Now we have a properly named vtk's field data array and the
+        // corresponding meta data.
+        std::size_t position = 0;
+        for (auto& local_asm : _local_assemblers)
+        {
+            std::size_t const integration_points_read =
+                local_asm->setIPDataInitialConditions(
+                    name, &mesh_property[position], integration_order);
+            if (integration_points_read == 0)
+            {
+                OGS_FATAL(
+                    "No integration points read in the integration point "
+                    "initial conditions set function.");
+            }
+            position += integration_points_read * n_components;
+        }
     }
 }
 
