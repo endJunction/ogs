@@ -105,6 +105,34 @@ static void addSecondaryVarResiduals(
     }
 }
 
+// For integration point output of each process
+void addIntegrationPointData(MeshLib::Mesh& mesh,
+                             ProcessLib::IntegrationPointWriter const& writer)
+{
+    auto const& ip_values = writer.values(/*t, x, dof_table*/);
+    assert(ip_values.size() == mesh.getNumberOfElements());
+
+    // create field data and fill it with nodal values, and an offsets cell
+    // array indicating where the cell's integration point data starts.
+    auto& field_data = *MeshLib::getOrCreateMeshProperty<double>(
+        mesh, writer.name(), MeshLib::MeshItemType::IntegrationPoint,
+        writer.numberOfComponents());
+    field_data.clear();
+
+    auto& field_offsets = *MeshLib::getOrCreateMeshProperty<std::size_t>(
+        mesh, writer.name() + "_offsets", MeshLib::MeshItemType::Cell, 1);
+
+    std::size_t offset = 0;
+    for (std::size_t e = 0; e < ip_values.size(); ++e)
+    {
+        auto const& element_ip_values = ip_values[e];
+        std::copy(element_ip_values.begin(), element_ip_values.end(),
+                  std::back_inserter(field_data));
+        field_offsets[e] = offset;
+        offset += element_ip_values.size();
+    }
+}
+
 namespace ProcessLib
 {
 void doProcessOutput(std::string const& file_name,
@@ -223,6 +251,13 @@ void doProcessOutput(std::string const& file_name,
     (void)secondary_variables;
     (void)t;
 #endif // USE_PETSC
+
+    // Integration point data stored as field data (contrary to point or cell
+    // data).
+    for (auto const& ip_writer : integration_point_writer)
+    {
+        addIntegrationPointData(mesh, *ip_writer);
+    }
 
     if (!make_output)
     {
