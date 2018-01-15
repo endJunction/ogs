@@ -26,6 +26,9 @@ struct SmallDeformationLocalAssemblerInterface
       public MaterialForcesInterface,
       public NumLib::ExtrapolatableElement
 {
+    virtual void setIPDataInitialConditions(std::string const& name,
+                                            double const* values) = 0;
+
     virtual std::vector<double> const& getIntPtFreeEnergyDensity(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,

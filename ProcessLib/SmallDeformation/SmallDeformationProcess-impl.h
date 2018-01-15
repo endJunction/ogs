@@ -157,6 +157,60 @@ void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
             makeExtrapolator(num_components, getExtrapolator(),
                              _local_assemblers, std::move(getIntPtValues)));
     }
+
+    // Set initial conditions for integration point data.
+    for (auto const& ip_writer : _integration_point_writer)
+    {
+        auto const& name = ip_writer->name();
+        if (!mesh.getProperties().existsPropertyVector<double>(name))
+        {
+            continue;
+        }
+
+        auto const& mesh_property =
+            *mesh.getProperties().template getPropertyVector<double>(name);
+
+        if (mesh_property.getMeshItemType() !=
+            MeshLib::MeshItemType::IntegrationPoint)
+        {
+            continue;
+        }
+
+        auto const offsets_array_name = name + "_offsets";
+        if (!mesh.getProperties().existsPropertyVector<std::size_t>(
+                offsets_array_name))
+        {
+            OGS_FATAL(
+                "Integration point data '%s' is present in the vtk field data "
+                "but the corresponding '%s' array is not available.",
+                name.c_str(), offsets_array_name.c_str());
+        }
+
+        auto const& mesh_property_offsets =
+            *mesh.getProperties().template getPropertyVector<std::size_t>(
+                offsets_array_name);
+
+        if (mesh_property_offsets.getMeshItemType() !=
+            MeshLib::MeshItemType::Cell)
+        {
+            OGS_FATAL(
+                "Integration point data '%s' is present in the vtk field data "
+                "but the corresponding '%s' array is not defined on cells.",
+                name.c_str(), offsets_array_name.c_str());
+        }
+
+        // Now we have a properly named vtk's field data array and the
+        // corresponding offsets array.
+        for (std::size_t i = 0; i < _local_assemblers.size(); ++i)
+        {
+            auto& local_asm = _local_assemblers[i];
+            auto const offset = mesh_property_offsets[i];
+
+            // TODO (naumov) Check sizes / read size / etc.
+            // OR reconstruct dimensions from size / component = ip_points
+            local_asm->setIPDataInitialConditions(name, &mesh_property[offset]);
+        }
+    }
 }
 
 template <int DisplacementDim>
