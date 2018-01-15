@@ -12,6 +12,8 @@
 #include "MeshLib/IO/VtkIO/VtuInterface.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 
+#include "IntegrationPointWriter.h"
+
 #ifndef USE_PETSC  // Not used in PETSc case
 static void addSecondaryVariableNodes(
     double const t,
@@ -115,6 +117,8 @@ void processOutputData(
     std::vector<std::reference_wrapper<ProcessVariable>> const&
         process_variables,
     SecondaryVariableCollection secondary_variables,
+    std::vector<std::unique_ptr<IntegrationPointWriter>> const&
+        integration_point_writer,
     ProcessOutput const& process_output)
 {
     DBUG("Process output data.");
