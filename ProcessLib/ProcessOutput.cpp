@@ -12,6 +12,8 @@
 #include "MeshLib/IO/VtkIO/VtuInterface.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 
+#include "IntegrationPointWriter.h"
+
 static void addSecondaryVar(double const t,
                             GlobalVector const& x,
                             NumLib::LocalToGlobalIndexMap const& dof_table,
@@ -116,6 +118,8 @@ void doProcessOutput(std::string const& file_name,
                      std::vector<std::reference_wrapper<ProcessVariable>> const&
                          process_variables,
                      SecondaryVariableCollection secondary_variables,
+                     std::vector<std::unique_ptr<IntegrationPointWriter>> const&
+                         integration_point_writer,
                      ProcessOutput const& process_output)
 {
     DBUG("Process output.");

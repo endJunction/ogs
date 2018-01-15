@@ -14,6 +14,7 @@
 
 namespace ProcessLib
 {
+struct IntegrationPointWriter;
 
 //! Holds information about which variables to write to output files.
 struct ProcessOutput final
@@ -41,6 +42,8 @@ void doProcessOutput(std::string const& file_name,
                      std::vector<std::reference_wrapper<ProcessVariable>> const&
                          process_variables,
                      SecondaryVariableCollection secondary_variables,
+                     std::vector<std::unique_ptr<IntegrationPointWriter>> const&
+                         integration_point_writer,
                      ProcessOutput const& process_output);
 
 } // ProcessLib
