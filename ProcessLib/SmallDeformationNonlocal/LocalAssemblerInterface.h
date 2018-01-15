@@ -26,6 +26,9 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
       public SmallDeformation::MaterialForcesInterface,
       public NumLib::ExtrapolatableElement
 {
+    virtual void setIPDataInitialConditions(std::string const& name,
+                                            double const* values) = 0;
+
     virtual std::vector<double> const& getIntPtEpsPV(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
@@ -36,6 +39,7 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const = 0;
+    virtual std::vector<double> getDamage() const = 0;
     virtual std::vector<double> const& getIntPtDamage(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,

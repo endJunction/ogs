@@ -23,6 +23,32 @@ namespace ProcessLib
 {
 namespace SmallDeformationNonlocal
 {
+struct DamageIntegrationPointWriter final : public IntegrationPointWriter
+{
+    explicit DamageIntegrationPointWriter(
+        std::function<std::vector<std::vector<double>>()> callback)
+        : _callback(callback)
+    {
+    }
+
+    int numberOfComponents() const override { return 1; }
+
+    std::string name() const override
+    {
+        // TODO (naumov) remove ip suffix. Probably needs modification of the
+        // mesh properties, s.t. there is no "overlapping" with cell/point data.
+        // See getOrCreateMeshProperty.
+        return "damage_ip";
+    }
+
+    std::vector<std::vector<double>> values() const override
+    {
+        return _callback();
+    }
+
+private:
+    std::function<std::vector<std::vector<double>>()> _callback;
+};
 template <int DisplacementDim>
 class SmallDeformationNonlocalProcess final : public Process
 {

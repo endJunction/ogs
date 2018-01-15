@@ -130,6 +130,15 @@ public:
         }
     }
 
+    void setIPDataInitialConditions(std::string const& name,
+                                    double const* values) override
+    {
+        if (name == "damage_ip")
+        {
+            setDamage(values);
+        }
+    }
+
     double alpha_0(double const distance2) const
     {
         double const internal_length2 = _process_data.internal_length_squared;
@@ -727,6 +736,32 @@ public:
         }
 
         return cache;
+    }
+
+    void setDamage(double const* values)
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+             _ip_data[ip].damage = values[ip];
+        }
+    }
+    std::vector<double> getDamage() const override
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        std::vector<double> result_values;
+        result_values.resize(n_integration_points);
+
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+             result_values[ip] = _ip_data[ip].damage;
+        }
+
+        return result_values;
     }
 
     std::vector<double> const& getIntPtDamage(
