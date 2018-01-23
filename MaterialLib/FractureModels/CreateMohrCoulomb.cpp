@@ -16,6 +16,25 @@ namespace MaterialLib
 {
 namespace Fracture
 {
+// TODO (naumov); this is copy-paste from CreateEhlers => extract.
+inline NumLib::NewtonRaphsonSolverParameters
+createNewtonRaphsonSolverParameters(BaseLib::ConfigTree const& config)
+{
+    DBUG("Create local nonlinear solver parameters.");
+    auto const maximum_iterations =
+        //! \ogs_file_param{material__solid__constitutive_relation__Ehlers__nonlinear_solver__maximum_iterations}
+        config.getConfigParameter<int>("maximum_iterations");
+
+    DBUG("\tmaximum_iterations: %d.", maximum_iterations);
+
+    auto const error_tolerance =
+        //! \ogs_file_param{material__solid__constitutive_relation__Ehlers__nonlinear_solver__error_tolerance}
+        config.getConfigParameter<double>("error_tolerance");
+
+    DBUG("\terror_tolerance: %g.", error_tolerance);
+
+    return {maximum_iterations, error_tolerance};
+}
 
 template <int DisplacementDim>
 std::unique_ptr<FractureModelBase<DisplacementDim>>
@@ -58,8 +77,15 @@ createMohrCoulomb(
     typename MohrCoulomb::MohrCoulomb<DisplacementDim>::MaterialProperties mp{
         Kn, Ks, friction_angle, dilatancy_angle, cohesion};
 
+    auto const& nonlinear_solver_config =
+        //! \ogs_file_param{material__solid__constitutive_relation__Ehlers__nonlinear_solver}
+        config.getConfigSubtree("nonlinear_solver");
+    auto const nonlinear_solver_parameters =
+        createNewtonRaphsonSolverParameters(nonlinear_solver_config);
+
     return std::make_unique<MohrCoulomb::MohrCoulomb<DisplacementDim>>(
-        penalty_aperture_cutoff, tension_cutoff, mp);
+        nonlinear_solver_parameters, penalty_aperture_cutoff, tension_cutoff,
+        mp);
 }
 
 
