@@ -40,14 +40,6 @@ template <int DisplacementDim>
 class CohesiveZoneModeI final : public FractureModelBase<DisplacementDim>
 {
 public:
-    std::unique_ptr<
-        typename FractureModelBase<DisplacementDim>::MaterialStateVariables>
-    createMaterialStateVariables() override
-    {
-        return std::make_unique<StateVariables<DisplacementDim>>();
-    }
-
-public:
     /// Variables specific to the material model
     struct MaterialProperties
     {
@@ -58,11 +50,9 @@ public:
         MaterialProperties(P const& normal_stiffness_,
                            P const& shear_stiffness_,
                            P const& fracture_toughness,
-                           P const& peak_normal_traction,
-                           double const residual_stiffness_)
+                           P const& peak_normal_traction)
             : normal_stiffness(normal_stiffness_),
               shear_stiffness(shear_stiffness_),
-              residual_stiffness(residual_stiffness_),
               _fracture_toughness(fracture_toughness),
               _peak_normal_traction(peak_normal_traction)
         {
@@ -89,8 +79,6 @@ public:
         P const& normal_stiffness;
         /// Shear stiffness given in units of stress per length.
         P const& shear_stiffness;
-        /// Residual stiffness given in units of stress.
-        double const residual_stiffness;
 
     private:
         /// Fracture toughness/critical energy release rate given in of stress
@@ -99,6 +87,13 @@ public:
         /// Peak normal traction given in units of stress.
         P const& _peak_normal_traction;
     };
+
+    std::unique_ptr<
+        typename FractureModelBase<DisplacementDim>::MaterialStateVariables>
+    createMaterialStateVariables() override
+    {
+        return std::make_unique<StateVariables<DisplacementDim>>();
+    }
 
 public:
     explicit CohesiveZoneModeI(double const penalty_aperture_cutoff,
