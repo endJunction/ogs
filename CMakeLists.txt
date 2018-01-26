@@ -38,7 +38,7 @@ set(OGS_CPU_ARCHITECTURE "native" CACHE STRING "Processor architecture, \
 option(OGS_ENABLE_AVX2 "Enable the use of AVX2 instructions" OFF)
 option(OGS_BUILD_TESTS "Should the test executables be built?" ON)
 option(OGS_USE_PCH "Should pre-compiled headers be used?" ON)
-option(OGS_USE_CONAN "Should Conan package manager be used?" OFF)
+option(OGS_USE_CONAN "Should Conan package manager be used?" ON)
 set(OGS_CONAN_BUILD "missing" CACHE STRING "Possible values: all, missing, \
     never or list of libs to build" )
 if(OGS_USE_PETSC)
