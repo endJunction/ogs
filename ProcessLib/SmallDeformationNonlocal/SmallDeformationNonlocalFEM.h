@@ -594,6 +594,16 @@ public:
                 sigma = sigma * (1. - damage);
             }
 
+            //if (_process_data.crack_volume != 0)
+
+            if (damage > 0)
+            {
+                double pressure = _process_data.pressure;
+                    //_process_data.injected_volume / _process_data.crack_volume;
+                sigma.template topLeftCorner<3, 1>() -=
+                    Eigen::Matrix<double, 3, 1>::Constant(pressure);
+            }
+
             local_b.noalias() -= B.transpose() * sigma * w;
             local_Jac.noalias() += B.transpose() * C * (1. - damage) * B * w;
         }
@@ -609,6 +619,78 @@ public:
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             _ip_data[ip].pushBackState();
+        }
+    }
+
+    void computeCrackIntegral(std::size_t mesh_item_id,
+                              NumLib::LocalToGlobalIndexMap const& dof_table,
+                              GlobalVector const& x,
+                              double& crack_volume) override
+    {
+        auto const indices = NumLib::getIndices(mesh_item_id, dof_table);
+        auto local_x = x.get(indices);
+
+        auto u = Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
+            local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
+
+        int const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        // Create matrix of all N's and collect a vector of integration point's
+        // damages.
+        Eigen::Matrix<double, Eigen::Dynamic, ShapeFunction::NPOINTS> NN(
+            n_integration_points, ShapeFunction::NPOINTS);
+        Eigen::Matrix<double, Eigen::Dynamic, 1> d_ip(n_integration_points);
+
+        for (int ip = 0; ip < n_integration_points; ip++)
+        {
+            NN.row(ip) = _ip_data[ip].N.transpose();
+            d_ip[ip] = _ip_data[ip].damage;
+        }
+        // Invert to get damage in nodes.
+        NodalVectorType d = NN.fullPivLu().solve(d_ip);
+
+        // Check if the computed d is correct.
+        /*
+        std::cerr << "Damage_ip =\n" << d_ip << "\n";
+        std::cerr << "Damage    =\n" << d << "\n";
+        */
+        for (int ip = 0; ip < n_integration_points; ip++)
+        {
+#ifndef NDEBUG
+            auto const& N = _ip_data[ip].N;
+#endif  // NDEBUG
+            /*
+            std::cerr << "for " << ip << ", computed: " << N * d
+                      << " expected: " << _ip_data[ip].damage
+                      << " with error: " << N * d - _ip_data[ip].damage << "\n";
+            */
+            assert(N * d - _ip_data[ip].damage < 1e-15);
+        }
+
+        SpatialPosition x_position;
+        x_position.setElementID(_element.getID());
+
+        for (int ip = 0; ip < n_integration_points; ip++)
+        {
+            x_position.setIntegrationPoint(ip);
+            auto const& w = _ip_data[ip].integration_weight;
+            auto const& N = _ip_data[ip].N;
+            auto const& dNdx = _ip_data[ip].dNdx;
+
+            typename ShapeMatricesType::template MatrixType<DisplacementDim,
+                                                            displacement_size>
+                N_u = ShapeMatricesType::template MatrixType<
+                    DisplacementDim,
+                    displacement_size>::Zero(DisplacementDim,
+                                             displacement_size);
+
+            for (int i = 0; i < DisplacementDim; ++i)
+                N_u.template block<1, displacement_size / DisplacementDim>(
+                       i, i * displacement_size / DisplacementDim)
+                    .noalias() = N;
+
+            crack_volume += (N_u * u).dot(dNdx * d) * w;
         }
     }
 
@@ -883,6 +965,9 @@ private:
     MeshLib::Element const& _element;
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
     bool const _is_axially_symmetric;
+
+    static const int displacement_size =
+        ShapeFunction::NPOINTS * DisplacementDim;
 };
 
 }  // namespace SmallDeformationNonlocal

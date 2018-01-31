@@ -31,6 +31,11 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
     virtual void setIPDataInitialConditionsFromCellData(
         std::string const& name, std::vector<double> const& value) = 0;
 
+    virtual void computeCrackIntegral(
+        std::size_t mesh_item_id,
+        NumLib::LocalToGlobalIndexMap const& dof_table, GlobalVector const& x,
+        double& crack_volume) = 0;
+
     virtual std::vector<double> const& getIntPtEpsPV(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,

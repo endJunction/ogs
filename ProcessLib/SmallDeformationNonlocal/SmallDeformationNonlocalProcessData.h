@@ -54,6 +54,14 @@ struct SmallDeformationNonlocalProcessData
     double dt = 0;
     double t = 0;
     double const internal_length_squared;
+
+    double injected_volume = 0.0;
+    double crack_volume = 0.0;
+    bool propagating_crack = true;
+
+    double pressure = 0.0;
+    double pressure_old = 0.0;
+    double pressure_error = 0.0;
 };
 
 }  // namespace SmallDeformationNonlocal
