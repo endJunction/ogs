@@ -95,6 +95,9 @@ private:
 
     void postTimestepConcreteProcess(GlobalVector const& x) override;
 
+    NumLib::IterationResult postIterationConcreteProcess(
+        GlobalVector const& x) override;
+
 private:
     SmallDeformationNonlocalProcessData<DisplacementDim> _process_data;
 

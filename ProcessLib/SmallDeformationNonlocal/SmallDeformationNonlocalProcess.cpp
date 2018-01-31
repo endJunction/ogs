@@ -343,6 +343,7 @@ void SmallDeformationNonlocalProcess<
 
     _process_data.dt = dt;
     _process_data.t = t;
+    _process_data.injected_volume = _process_data.t;
 
     GlobalExecutor::executeMemberOnDereferenced(
         &LocalAssemblerInterface::preTimestep, _local_assemblers,
@@ -361,6 +362,56 @@ void SmallDeformationNonlocalProcess<
     auto material_forces_property = MeshLib::getOrCreateMeshProperty<double>(
         _mesh, "MaterialForces", MeshLib::MeshItemType::Node, DisplacementDim);
     _material_forces->copyValues(*material_forces_property);
+}
+
+template <int DisplacementDim>
+NumLib::IterationResult
+SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
+    GlobalVector const& x)
+{
+    _process_data.crack_volume = 0.0;
+
+    DBUG("PostNonLinearSolver crack volume computation.");
+
+    GlobalExecutor::executeMemberOnDereferenced(
+        &LocalAssemblerInterface::computeCrackIntegral, _local_assemblers,
+        *_local_to_global_index_map, x, _process_data.crack_volume);
+
+    INFO("Integral of crack: %g", _process_data.crack_volume);
+
+    if (_process_data.propagating_crack)
+    {
+        _process_data.pressure_old = _process_data.pressure;
+        _process_data.pressure =
+            _process_data.crack_volume == 0
+                ? 0
+                : _process_data.injected_volume / _process_data.crack_volume;
+
+        _process_data.pressure_error =
+            _process_data.pressure == 0 ? 0
+                                        : std::abs(_process_data.pressure_old -
+                                                   _process_data.pressure) /
+                                              _process_data.pressure;
+
+        INFO("Internal pressure: %g and Pressure error: %.4e",
+             _process_data.pressure, _process_data.pressure_error);
+
+        // TODO (parisio) Is this correct?
+        // Update displacement field
+        assert(_coupled_solutions == nullptr);
+        MathLib::LinAlg::scale(const_cast<GlobalVector&>(x),
+                               _process_data.pressure);
+    }
+
+    // TODO (parisio) try this to enforce pressure convergence.
+    /*
+    if (_process_data.pressure_error > 1e-4)
+    {
+        return NumLib::IterationResult::REPEAT_ITERATION;
+    }
+    */
+
+    return NumLib::IterationResult::SUCCESS;
 }
 
 template class SmallDeformationNonlocalProcess<2>;
