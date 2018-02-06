@@ -266,7 +266,7 @@ void PhaseFieldProcess<DisplacementDim>::assembleConcreteProcess(
     else
     {
         // For the staggered scheme
-        if (_coupled_solutions->process_id == 0)
+        if (_coupled_solutions->process_id == 1)
         {
             DBUG(
                 "Assemble the equations of phase field in "

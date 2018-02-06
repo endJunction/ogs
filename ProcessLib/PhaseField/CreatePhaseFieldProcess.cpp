@@ -22,7 +22,6 @@ namespace ProcessLib
 {
 namespace PhaseField
 {
-
 template <int DisplacementDim>
 std::unique_ptr<Process> createPhaseFieldProcess(
     MeshLib::Mesh& mesh,
@@ -56,9 +55,9 @@ std::unique_ptr<Process> createPhaseFieldProcess(
         auto per_process_variables = findProcessVariables(
             variables, pv_config,
             {//! \ogs_file_param_special{prj__processes__process__PHASE_FIELD__process_variables__phasefield}
-            "phasefield",
+             "phasefield",
              //! \ogs_file_param_special{prj__processes__process__PHASE_FIELD__process_variables__displacement}
-            "displacement"});
+             "displacement"});
         variable_ph = &per_process_variables[0].get();
         variable_u = &per_process_variables[1].get();
         process_variables.push_back(std::move(per_process_variables));
@@ -118,11 +117,13 @@ std::unique_ptr<Process> createPhaseFieldProcess(
         material = nullptr;
     if (type == "LinearElasticIsotropic")
     {
-        auto elastic_model = MaterialLib::Solids::createLinearElasticIsotropic<
-                DisplacementDim>(parameters, constitutive_relation_config);
-        material =
-                std::make_unique<MaterialLib::Solids::LinearElasticIsotropicPhaseField<
-                DisplacementDim>>(std::move(elastic_model->getMaterialProperties()));
+        auto elastic_model =
+            MaterialLib::Solids::createLinearElasticIsotropic<DisplacementDim>(
+                parameters, constitutive_relation_config);
+        material = std::make_unique<
+            MaterialLib::Solids::LinearElasticIsotropicPhaseField<
+                DisplacementDim>>(
+            std::move(elastic_model->getMaterialProperties()));
     }
     else
     {
@@ -224,10 +225,10 @@ std::unique_ptr<Process> createPhaseFieldProcess(
                                          named_function_caller);
 
     return std::make_unique<PhaseFieldProcess<DisplacementDim>>(
-            mesh, std::move(jacobian_assembler), parameters, integration_order,
-            std::move(process_variables), std::move(process_data),
-            std::move(secondary_variables), std::move(named_function_caller),
-            use_monolithic_scheme);
+        mesh, std::move(jacobian_assembler), parameters, integration_order,
+        std::move(process_variables), std::move(process_data),
+        std::move(secondary_variables), std::move(named_function_caller),
+        use_monolithic_scheme);
 }
 
 template std::unique_ptr<Process> createPhaseFieldProcess<2>(
