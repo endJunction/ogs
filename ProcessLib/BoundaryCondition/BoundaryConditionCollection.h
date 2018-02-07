@@ -44,6 +44,16 @@ public:
         NumLib::LocalToGlobalIndexMap const& dof_table,
         unsigned const integration_order);
 
+    void preTimestep(const double t, GlobalVector const& x)
+    {
+        auto const n_bcs = _boundary_conditions.size();
+        for (std::size_t i = 0; i < n_bcs; ++i)
+        {
+            auto& bc = *_boundary_conditions[i];
+            bc.preTimestep(t, x);
+        }
+    }
+
 private:
     mutable std::vector<NumLib::IndexValueVector<GlobalIndexType>> _dirichlet_bcs;
     std::vector<std::unique_ptr<BoundaryCondition>> _boundary_conditions;
