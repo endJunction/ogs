@@ -8,6 +8,9 @@
  */
 
 #include "NumLib/ODESolver/TimeDiscretizationBuilder.h"
+#ifdef USE_PETSC
+#include "NumLib/ODESolver/PETScNonlinearSolver.h"
+#endif  // USE_PETSC
 #include "NumLib/TimeStepping/CreateTimeStepper.h"
 #include "ProcessLib/Output/CreateProcessOutput.h"
 
@@ -43,6 +46,16 @@ static std::unique_ptr<ProcessData> makeProcessData(
             std::move(conv_crit), std::move(time_disc), process,
             std::move(process_output));
     }
+#ifdef USE_PETSC
+    if (auto* nonlinear_solver_petsc =
+            dynamic_cast<NumLib::PETScNonlinearSolver*>(&nonlinear_solver))
+    {
+        return std::make_unique<ProcessData>(
+            std::move(timestepper), Tag::Newton, *nonlinear_solver_petsc,
+            std::move(conv_crit), std::move(time_disc), process,
+            std::move(process_output));
+    }
+#endif  // USE_PETSC
 
     OGS_FATAL("Encountered unknown nonlinear solver type. Aborting");
 }
