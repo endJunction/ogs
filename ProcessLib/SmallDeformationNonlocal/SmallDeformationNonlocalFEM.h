@@ -596,9 +596,9 @@ public:
 
             //if (_process_data.crack_volume != 0)
 
-            if (damage > 0)
+            //if (damage > 0)
             {
-                double pressure = _process_data.pressure;
+                double pressure = _process_data.pressure * damage;
                     //_process_data.injected_volume / _process_data.crack_volume;
                 sigma.template topLeftCorner<3, 1>() -=
                     Eigen::Matrix<double, 3, 1>::Constant(pressure);
