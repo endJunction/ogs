@@ -8,6 +8,7 @@
  */
 
 #include "SmallDeformationNonlocalProcess.h"
+#include <iostream>
 
 namespace ProcessLib
 {
@@ -382,25 +383,24 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
     if (_process_data.propagating_crack)
     {
         _process_data.pressure_old = _process_data.pressure;
-        _process_data.pressure =
-            _process_data.crack_volume == 0
-                ? 0
-                : _process_data.injected_volume / _process_data.crack_volume;
+        _process_data.pressure = (_process_data.injected_volume - _process_data.crack_volume)*2e6;
 
+        std::cout << "\n Pressure = " << _process_data.pressure << "\n";
         _process_data.pressure_error =
-            _process_data.pressure == 0 ? 0
-                                        : std::abs(_process_data.pressure_old -
-                                                   _process_data.pressure) /
-                                              _process_data.pressure;
+            _process_data.pressure == 0
+                ? 0
+                : std::abs(_process_data.pressure_old -
+                           _process_data.pressure) /
+                           _process_data.pressure;
 
         INFO("Internal pressure: %g and Pressure error: %.4e",
              _process_data.pressure, _process_data.pressure_error);
 
         // TODO (parisio) Is this correct?
         // Update displacement field
-        assert(_coupled_solutions == nullptr);
-        MathLib::LinAlg::scale(const_cast<GlobalVector&>(x),
-                               _process_data.pressure);
+        //assert(_coupled_solutions == nullptr);
+        //MathLib::LinAlg::scale(const_cast<GlobalVector&>(x),
+        //                       _process_data.pressure);
     }
 
     // TODO (parisio) try this to enforce pressure convergence.
