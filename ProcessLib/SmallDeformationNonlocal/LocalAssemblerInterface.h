@@ -28,6 +28,8 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
 {
     virtual void setIPDataInitialConditions(std::string const& name,
                                             double const* values) = 0;
+    virtual void setIPDataInitialConditionsFromCellData(
+        std::string const& name, std::vector<double> const& value) = 0;
 
     virtual void computeCrackIntegral(
         std::size_t mesh_item_id,
