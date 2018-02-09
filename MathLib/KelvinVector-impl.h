@@ -24,8 +24,8 @@ template <int KelvinVectorSize>
 double Invariants<KelvinVectorSize>::J2(
     Eigen::Matrix<double, KelvinVectorSize, 1> const& deviatoric_v)
 {
-    assert(std::abs(trace(deviatoric_v)) <=
-           5e-14 * diagonal(deviatoric_v).norm());
+    //assert(std::abs(trace(deviatoric_v)) <=
+    //       5e-14 * diagonal(deviatoric_v).norm());
     return 0.5 * deviatoric_v.transpose() * deviatoric_v;
 }
 
@@ -35,8 +35,8 @@ template <int KelvinVectorSize>
 double Invariants<KelvinVectorSize>::J3(
     Eigen::Matrix<double, KelvinVectorSize, 1> const& deviatoric_v)
 {
-    assert(std::abs(trace(deviatoric_v)) <=
-           5e-14 * diagonal(deviatoric_v).norm());
+    //assert(std::abs(trace(deviatoric_v)) <=
+    //       5e-14 * diagonal(deviatoric_v).norm());
     return determinant(deviatoric_v);
 }
 
