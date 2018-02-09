@@ -136,25 +136,25 @@ public:
     void setIPDataInitialConditions(std::string const& name,
                                     double const* values) override
     {
-        if (name == "damage_ip")
+        if (name == "kappa_d_ip")
         {
-            setDamage(values);
+            setKappaD(values);
         }
     }
 
     void setIPDataInitialConditionsFromCellData(
         std::string const& name, std::vector<double> const& value) override
     {
-        if (name == "damage_ip")
+        if (name == "kappa_d_ip")
         {
             if (value.size() != 1)
             {
                 OGS_FATAL(
-                    "CellData for damage initial conditions has wrong number "
+                    "CellData for kappa_d initial conditions has wrong number "
                     "of components. 1 expected, got %d.",
                     value.size());
             }
-            setDamage(value[0]);
+            setKappaD(value[0]);
         }
     }
 
@@ -772,24 +772,24 @@ public:
         return cache;
     }
 
-    void setDamage(double const* values)
+    void setKappaD(double const* values)
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
-             _ip_data[ip].damage = values[ip];
+            _ip_data[ip].kappa_d = values[ip];
         }
     }
-    void setDamage(double value)
+    void setKappaD(double value)
     {
         for (auto& ip_data : _ip_data)
         {
-            ip_data.damage = value;
+            ip_data.kappa_d = value;
         }
     }
-    std::vector<double> getDamage() const override
+    std::vector<double> getKappaD() const override
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -799,7 +799,7 @@ public:
 
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
-             result_values[ip] = _ip_data[ip].damage;
+            result_values[ip] = _ip_data[ip].kappa_d;
         }
 
         return result_values;
