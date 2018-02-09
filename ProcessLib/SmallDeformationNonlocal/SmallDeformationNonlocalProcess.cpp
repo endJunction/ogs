@@ -348,13 +348,14 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
         *_local_to_global_index_map, x, _process_data.crack_volume);
 
     INFO("Integral of crack: %g", _process_data.crack_volume);
+    INFO("Volume injected: %g", _process_data.injected_volume);
 
     if (_process_data.propagating_crack)
     {
         _process_data.pressure_old = _process_data.pressure;
-        _process_data.pressure = (_process_data.injected_volume - _process_data.crack_volume)*2e6;
+        _process_data.pressure =
+                (_process_data.injected_volume - _process_data.crack_volume)*2.15e9;
 
-        std::cout << "\n Pressure = " << _process_data.pressure << "\n";
         _process_data.pressure_error =
             _process_data.pressure == 0
                 ? 0
