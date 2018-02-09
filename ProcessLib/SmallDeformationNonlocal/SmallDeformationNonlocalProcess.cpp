@@ -36,7 +36,7 @@ SmallDeformationNonlocalProcess<DisplacementDim>::
         mesh, "NodalForces", MeshLib::MeshItemType::Node, DisplacementDim);
 
     _integration_point_writer.emplace_back(
-        std::make_unique<DamageIntegrationPointWriter>([this]() {
+        std::make_unique<KappaDIntegrationPointWriter>([this]() {
             // Result containing integration point data for each local
             // assembler.
             std::vector<std::vector<double>> result;
@@ -46,7 +46,7 @@ SmallDeformationNonlocalProcess<DisplacementDim>::
             {
                 auto const& local_asm = *_local_assemblers[i];
 
-                result[i] = local_asm.getDamage();
+                result[i] = local_asm.getKappaD();
             }
 
             return result;

@@ -46,7 +46,7 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& cache) const = 0;
-    virtual std::vector<double> getDamage() const = 0;
+    virtual std::vector<double> getKappaD() const = 0;
     virtual std::vector<double> const& getIntPtDamage(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
