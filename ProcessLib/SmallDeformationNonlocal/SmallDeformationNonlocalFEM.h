@@ -573,10 +573,12 @@ public:
                 sigma = sigma * (1. - damage);
             }
 
-            if (_process_data.crack_volume != 0)
+            //if (_process_data.crack_volume != 0)
+
+            if (damage > 0)
             {
-                double const pressure =
-                    _process_data.injected_volume / _process_data.crack_volume;
+                double pressure = _process_data.pressure;
+                    //_process_data.injected_volume / _process_data.crack_volume;
                 sigma.template topLeftCorner<3, 1>() -=
                     Eigen::Matrix<double, 3, 1>::Constant(pressure);
             }
