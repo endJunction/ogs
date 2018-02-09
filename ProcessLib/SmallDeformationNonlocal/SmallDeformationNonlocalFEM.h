@@ -142,6 +142,22 @@ public:
         }
     }
 
+    void setIPDataInitialConditionsFromCellData(
+        std::string const& name, std::vector<double> const& value) override
+    {
+        if (name == "damage_ip")
+        {
+            if (value.size() != 1)
+            {
+                OGS_FATAL(
+                    "CellData for damage initial conditions has wrong number "
+                    "of components. 1 expected, got %d.",
+                    value.size());
+            }
+            setDamage(value[0]);
+        }
+    }
+
     double alpha_0(double const distance2) const
     {
         double const internal_length2 = _process_data.internal_length_squared;
@@ -764,6 +780,13 @@ public:
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
              _ip_data[ip].damage = values[ip];
+        }
+    }
+    void setDamage(double value)
+    {
+        for (auto& ip_data : _ip_data)
+        {
+            ip_data.damage = value;
         }
     }
     std::vector<double> getDamage() const override
