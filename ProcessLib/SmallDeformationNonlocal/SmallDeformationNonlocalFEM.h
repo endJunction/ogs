@@ -645,7 +645,7 @@ public:
         for (int ip = 0; ip < n_integration_points; ip++)
         {
             NN.row(ip) = _ip_data[ip].N.transpose();
-            d_ip[ip] = _ip_data[ip].damage;
+            d_ip[ip] = (1. - _ip_data[ip].damage);
         }
         // Invert to get damage in nodes.
         NodalVectorType d = NN.fullPivLu().solve(d_ip);
@@ -665,7 +665,7 @@ public:
                       << " expected: " << _ip_data[ip].damage
                       << " with error: " << N * d - _ip_data[ip].damage << "\n";
             */
-            assert(N * d - _ip_data[ip].damage < 1e-15);
+            assert(N * d - (1. - _ip_data[ip].damage) < 1e-15);
         }
 
         SpatialPosition x_position;
