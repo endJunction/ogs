@@ -339,6 +339,7 @@ NumLib::IterationResult
 SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
     GlobalVector const& x)
 {
+    _process_data.crack_volume_old = _process_data.crack_volume;
     _process_data.crack_volume = 0.0;
 
     DBUG("PostNonLinearSolver crack volume computation.");
@@ -353,8 +354,8 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
     if (_process_data.propagating_crack)
     {
         _process_data.pressure_old = _process_data.pressure;
-        _process_data.pressure =
-                (_process_data.injected_volume - _process_data.crack_volume)*2.15e9;
+        _process_data.pressure +=
+                (_process_data.injected_volume - _process_data.crack_volume)*2.15e11;
 
         _process_data.pressure_error =
             _process_data.pressure == 0
