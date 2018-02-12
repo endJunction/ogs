@@ -56,6 +56,7 @@ struct SmallDeformationNonlocalProcessData
     double const internal_length_squared;
 
     double injected_volume = 0.0;
+    double crack_volume_old = 0.0;
     double crack_volume = 0.0;
     bool propagating_crack = true;
 
