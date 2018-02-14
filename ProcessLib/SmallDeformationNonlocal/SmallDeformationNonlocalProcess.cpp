@@ -355,7 +355,7 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
     {
         _process_data.pressure_old = _process_data.pressure;
         _process_data.pressure +=
-                (_process_data.injected_volume - _process_data.crack_volume)*2.15e11;
+                (_process_data.injected_volume - _process_data.crack_volume)*_process_data.stiffness;
 
         _process_data.pressure_error =
             _process_data.pressure == 0
@@ -363,6 +363,8 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
                 : std::abs(_process_data.pressure_old -
                            _process_data.pressure) /
                            _process_data.pressure;
+
+        //_process_data.stiffness *= _process_data.pressure_error;
 
         INFO("Internal pressure: %g and Pressure error: %.4e",
              _process_data.pressure, _process_data.pressure_error);
@@ -375,12 +377,11 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
     }
 
     // TODO (parisio) try this to enforce pressure convergence.
-    /*
-    if (_process_data.pressure_error > 1e-4)
+    /*if (_process_data.pressure_error > 1e-2)
     {
         return NumLib::IterationResult::REPEAT_ITERATION;
-    }
-    */
+    }*/
+
 
     return NumLib::IterationResult::SUCCESS;
 }
