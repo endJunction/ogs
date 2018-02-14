@@ -632,44 +632,8 @@ public:
         int const n_integration_points =
             _integration_method.getNumberOfPoints();
 
-        // Create matrix of all N's and collect a vector of integration point's
-        // damages.
-        Eigen::Matrix<double, Eigen::Dynamic, ShapeFunction::NPOINTS> NN(
-            n_integration_points, ShapeFunction::NPOINTS);
-        Eigen::Matrix<double, Eigen::Dynamic, 1> d_ip(n_integration_points);
-
-        for (int ip = 0; ip < n_integration_points; ip++)
-        {
-            NN.row(ip) = _ip_data[ip].N.transpose();
-            d_ip[ip] = (1. - _ip_data[ip].damage);
-        }
-        // Invert to get damage in nodes.
-        NodalVectorType d = NN.fullPivLu().solve(d_ip);
-
-        // Check if the computed d is correct.
-        /*
-        std::cerr << "Damage_ip =\n" << d_ip << "\n";
-        std::cerr << "Damage    =\n" << d << "\n";
-        */
-        for (int ip = 0; ip < n_integration_points; ip++)
-        {
-#ifndef NDEBUG
-            auto const& N = _ip_data[ip].N;
-#endif  // NDEBUG
-
-            //std::cerr << "for " << ip << ", computed: " << N * d
-            //          << " expected: " << 1.0 - _ip_data[ip].damage
-            //          << " with error: " << N * d - (1.0 - _ip_data[ip].damage) << "\n";
-
-            assert(N * d - (1. - _ip_data[ip].damage) < 1e-15);
-        }
-
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
-
-        typename ShapeMatricesType::template MatrixType<ShapeFunction::NPOINTS,
-        displacement_size>DNDx_u = ShapeMatricesType::template MatrixType<
-        ShapeFunction::NPOINTS,displacement_size>::Zero(ShapeFunction::NPOINTS,displacement_size);
 
         for (int ip = 0; ip < n_integration_points; ip++)
         {
@@ -677,6 +641,7 @@ public:
             auto const& w = _ip_data[ip].integration_weight;
             auto const& N = _ip_data[ip].N;
             auto const& dNdx = _ip_data[ip].dNdx;
+            auto const& d = _ip_data[ip].damage;
 
             auto const& x_coord =
                 interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
@@ -686,7 +651,8 @@ public:
                                         ShapeFunction::NPOINTS>(
                 dNdx, G, _is_axially_symmetric, N, x_coord);
 
-            crack_volume += (G * u).dot(d) * w;
+            // TODO(naumov) Simplify divergence(u) computation.
+            crack_volume += (G * u).head(DisplacementDim).sum() * (1 - d) * w;
         }
     }
 
