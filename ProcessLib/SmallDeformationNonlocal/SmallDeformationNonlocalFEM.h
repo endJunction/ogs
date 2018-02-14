@@ -667,6 +667,10 @@ public:
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
 
+        typename ShapeMatricesType::template MatrixType<ShapeFunction::NPOINTS,
+        displacement_size>DNDx_u = ShapeMatricesType::template MatrixType<
+        ShapeFunction::NPOINTS,displacement_size>::Zero(ShapeFunction::NPOINTS,displacement_size);
+
         for (int ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
@@ -674,19 +678,19 @@ public:
             auto const& N = _ip_data[ip].N;
             auto const& dNdx = _ip_data[ip].dNdx;
 
-            typename ShapeMatricesType::template MatrixType<DisplacementDim,
-                                                            displacement_size>
-                N_u = ShapeMatricesType::template MatrixType<
-                    DisplacementDim,
-                    displacement_size>::Zero(DisplacementDim,
-                                             displacement_size);
+            auto const& x_coord =
+                interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
+                    _element, N);
+            auto const& B = LinearBMatrix::computeBMatrix<
+                DisplacementDim, ShapeFunction::NPOINTS,
+                typename BMatricesType::BMatrixType>(dNdx, N, x_coord,
+                                                     _is_axially_symmetric);
 
-            for (int i = 0; i < DisplacementDim; ++i)
-                N_u.template block<1, displacement_size / DisplacementDim>(
-                       i, i * displacement_size / DisplacementDim)
-                    .noalias() = N;
+            DNDx_u.template block<1, displacement_size / DisplacementDim>(
+                   i, i * displacement_size / DisplacementDim)
+                .noalias() = dNdx;
 
-            crack_volume += (N_u * u).dot(dNdx * d) * w;
+            crack_volume += (DNDx_u * u).dot(d) * w;
         }
     }
 
