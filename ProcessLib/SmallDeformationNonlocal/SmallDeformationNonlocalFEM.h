@@ -598,7 +598,8 @@ public:
 
             //if (damage > 0)
             {
-                double pressure = _process_data.pressure * damage;
+                //double pressure = _process_data.pressure * damage;
+                double pressure = 1.0e6* damage;
                     //_process_data.injected_volume / _process_data.crack_volume;
                 sigma.template topLeftCorner<3, 1>() -=
                     Eigen::Matrix<double, 3, 1>::Constant(pressure);
@@ -660,11 +661,11 @@ public:
 #ifndef NDEBUG
             auto const& N = _ip_data[ip].N;
 #endif  // NDEBUG
-            /*
-            std::cerr << "for " << ip << ", computed: " << N * d
-                      << " expected: " << _ip_data[ip].damage
-                      << " with error: " << N * d - _ip_data[ip].damage << "\n";
-            */
+
+            //std::cerr << "for " << ip << ", computed: " << N * d
+            //          << " expected: " << 1.0 - _ip_data[ip].damage
+            //          << " with error: " << N * d - (1.0 - _ip_data[ip].damage) << "\n";
+
             assert(N * d - (1. - _ip_data[ip].damage) < 1e-15);
         }
 
