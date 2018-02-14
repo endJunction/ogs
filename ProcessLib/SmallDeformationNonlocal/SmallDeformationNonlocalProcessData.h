@@ -60,6 +60,8 @@ struct SmallDeformationNonlocalProcessData
     double crack_volume = 0.0;
     bool propagating_crack = true;
 
+    double stiffness = 2.15e11;
+
     double pressure = 0.0;
     double pressure_old = 0.0;
     double pressure_error = 0.0;
