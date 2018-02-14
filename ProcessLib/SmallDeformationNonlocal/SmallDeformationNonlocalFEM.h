@@ -681,16 +681,12 @@ public:
             auto const& x_coord =
                 interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
                     _element, N);
-            auto const& B = LinearBMatrix::computeBMatrix<
-                DisplacementDim, ShapeFunction::NPOINTS,
-                typename BMatricesType::BMatrixType>(dNdx, N, x_coord,
-                                                     _is_axially_symmetric);
+            GradientMatrixType G;
+            Deformation::computeGMatrix<DisplacementDim,
+                                        ShapeFunction::NPOINTS>(
+                dNdx, G, _is_axially_symmetric, N, x_coord);
 
-            DNDx_u.template block<1, displacement_size / DisplacementDim>(
-                   i, i * displacement_size / DisplacementDim)
-                .noalias() = dNdx;
-
-            crack_volume += (DNDx_u * u).dot(d) * w;
+            crack_volume += (G * u).dot(d) * w;
         }
     }
 
