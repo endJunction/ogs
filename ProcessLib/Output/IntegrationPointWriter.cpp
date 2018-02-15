@@ -17,6 +17,37 @@
 
 using nlohmann::json;
 
+/// Adds a JSON description of the used integration scheme including the number
+/// of integration points for each element type and integration order.
+///
+/// TODO(naumov) Add integration point coordinates and weights, which are
+/// specific to each element.
+static void addIntegrationPointDictionary(MeshLib::Mesh& mesh)
+{
+    json ip_dict;
+    ip_dict["scheme"] = "GaussLegendre";
+    ip_dict["elements"] = json::array();
+    auto& elements = ip_dict["elements"];
+
+    for (auto const& mesh_elem_type : MeshLib::getMeshElemTypes())
+    {
+        json j;
+        j["name"] = MeshElemType2String(mesh_elem_type);
+        j["type"] = static_cast<int>(mesh_elem_type);
+        j["dimension"] = /* NEEDS MAPPING TO ELEMENT */ nullptr;
+        j["integrationPoint"] = { {"number", 1}, {"number", 2} /*, etc*/ }
+    }
+    , elements.push_back({});
+}
+std::string const json = ip_dict.dump();
+std::cout << json << "\n";
+
+auto& dictionary = *MeshLib::getOrCreateMeshProperty<char>(
+    mesh, "IntegrationPointDictionary", MeshLib::MeshItemType::IntegrationPoint,
+    1);
+dictionary.clear();
+std::copy(json.begin(), json.end(), std::back_inserter(dictionary));
+}
 /// Returns meta data for the written integration point data.
 static ProcessLib::IntegrationPointMetaData addIntegrationPointData(
     MeshLib::Mesh& mesh, ProcessLib::IntegrationPointWriter const& writer)
