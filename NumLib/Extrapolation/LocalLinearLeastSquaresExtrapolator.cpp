@@ -265,6 +265,7 @@ void LocalLinearLeastSquaresExtrapolator::extrapolateElement(
         _nodal_values->add(indices, nodal_values.data());
         counts.add(indices, std::vector<double>(indices.size(), 1.0));
     }
+    MathLib::LinAlg::finalizeAssembly(_nodal_values);
 }
 
 void LocalLinearLeastSquaresExtrapolator::calculateResidualElement(
