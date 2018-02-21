@@ -26,6 +26,8 @@
 #include "LocalAssemblerInterface.h"
 #include "TH2MProcessData.h"
 
+#include <iostream>
+
 namespace ProcessLib
 {
 namespace TH2M
@@ -225,6 +227,12 @@ public:
 
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
+        double const& dt = _process_data.dt;
+
+        auto u = Eigen::Map<typename ShapeMatricesTypeDisplacement::
+                                                    template VectorType<displacement_size> const>(
+                                local_x.data() + displacement_index, displacement_size);
+
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
@@ -247,6 +255,8 @@ public:
                 typename BMatricesType::BMatrixType>(dNdx_u, N_u, x_coord,
                                                      _is_axially_symmetric);
 
+
+            auto& eps = _ip_data[ip].eps;
             auto const& sigma_eff = _ip_data[ip].sigma_eff;
 
             double const S = _process_data.specific_storage(t, x_position)[0];
@@ -261,6 +271,11 @@ public:
             auto const& b = _process_data.specific_body_force;
             auto const& identity2 = MaterialLib::SolidModels::Invariants<
                 KelvinVectorDimensions<DisplacementDim>::value>::identity2;
+
+            eps.noalias() = B * u;
+
+            auto C = _ip_data[ip].updateConstitutiveRelation(t, x_position, dt, u);
+
 
             //
             // mass balance:
@@ -492,6 +507,14 @@ public:
         // displacement equation
         local_rhs.template segment<displacement_size>(displacement_index)
             .noalias() += Kup * p_GR;
+
+
+
+        local_Jac.template block<cap_pressure_size+temperature_size,
+        cap_pressure_size+temperature_size>(cap_pressure_index, cap_pressure_index).setIdentity();
+
+   //     local_rhs.template segment<cap_pressure_size+temperature_size>(cap_pressure_index).setOnes();
+
     }
 
     void preTimestepConcrete(std::vector<double> const& /*local_x*/,

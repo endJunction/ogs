@@ -184,6 +184,7 @@ void TH2MProcess<DisplacementDim>::assembleWithJacobianConcreteProcess(
     GlobalVector& b, GlobalMatrix& Jac)
 {
     DBUG("AssembleJacobian TH2MProcess.");
+    DBUG("x: %i", x.size());
 
     // Call global assembler for each local assembly item.
     GlobalExecutor::executeMemberDereferenced(
