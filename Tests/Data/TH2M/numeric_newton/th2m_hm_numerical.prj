@@ -9,8 +9,8 @@
             <integration_order>3</integration_order>
             <jacobian_assembler>
                 <type>CentralDifferences</type>
-                <component_magnitudes>1e4 1e+5</component_magnitudes>
-                <relative_epsilons>1e-6 1e-6</relative_epsilons>
+                <component_magnitudes>1e+5 1e+5 1e+2 1e+0 1e+0 1e+0 1e+0</component_magnitudes>
+                <relative_epsilons>1e-12 1e-12 1e-9 1e-7 1e-7 1e-7 1e-7</relative_epsilons>
             </jacobian_assembler>
             <dimension>2</dimension>
             <constitutive_relation>

@@ -57,7 +57,7 @@
                 <time_stepping>
                     <type>FixedTimeStepping</type>
                     <t_initial>0</t_initial>
-                    <t_end>5.1</t_end>
+                    <t_end>0.5</t_end>
                     <timesteps>
                         <pair>
                             <repeat>1</repeat>
