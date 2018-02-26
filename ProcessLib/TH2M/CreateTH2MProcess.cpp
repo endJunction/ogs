@@ -12,7 +12,7 @@
 #include <cassert>
 
 #include "MaterialLib/SolidModels/CreateLinearElasticIsotropic.h"
-#include "ProcessLib/Utils/ParseSecondaryVariables.h"
+#include "ProcessLib/Output/CreateSecondaryVariables.h"
 
 #include "TH2MProcess.h"
 #include "TH2MProcessData.h"
@@ -207,7 +207,7 @@ std::unique_ptr<Process> createTH2MProcess(
         {"TH2M_gas_pressure", "TH2M_capillary_pressure", "TH2M_temperature",
          "TH2M_displacement"});
 
-    ProcessLib::parseSecondaryVariables(config, secondary_variables,
+    ProcessLib::createSecondaryVariables(config, secondary_variables,
                                         named_function_caller);
 
     return std::make_unique<TH2MProcess<DisplacementDim>>(

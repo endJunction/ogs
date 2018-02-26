@@ -72,7 +72,8 @@ private:
                                     double const dt,
                                     const int process_id) override;
 
-    void postTimestepConcreteProcess(GlobalVector const& x) override;
+    void postTimestepConcreteProcess(GlobalVector const& x,
+                                     int const process_id) override;
 
 private:
     std::vector<MeshLib::Node*> _base_nodes;

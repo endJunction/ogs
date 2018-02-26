@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include "MaterialLib/SolidModels/KelvinVector.h"
+#include "MathLib/KelvinVector.h"
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "NumLib/DOF/DOFTableUtil.h"
@@ -83,7 +83,7 @@ struct IntegrationPointData final
         if (!solution)
             OGS_FATAL("Computation of local constitutive relation failed.");
 
-        KelvinMatrixType<DisplacementDim> C;
+        MathLib::KelvinVector::KelvinMatrixType<DisplacementDim> C;
         std::tie(sigma_eff, material_state_variables, C) = std::move(*solution);
 
         return C;
@@ -269,8 +269,9 @@ public:
             auto const porosity = _process_data.porosity(t, x_position)[0];
             auto const rho = rho_sr * (1 - porosity) + porosity * rho_fr;
             auto const& b = _process_data.specific_body_force;
-            auto const& identity2 = MaterialLib::SolidModels::Invariants<
-                KelvinVectorDimensions<DisplacementDim>::value>::identity2;
+            auto const& identity2 = MathLib::KelvinVector::Invariants<
+                    MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value>::identity2;
+
 
             eps.noalias() = B * u;
 
@@ -441,8 +442,8 @@ public:
             auto const rho_fr = _process_data.fluid_density(t, x_position)[0];
             auto const porosity = _process_data.porosity(t, x_position)[0];
             auto const& b = _process_data.specific_body_force;
-            auto const& identity2 = MaterialLib::SolidModels::Invariants<
-                KelvinVectorDimensions<DisplacementDim>::value>::identity2;
+            auto const& identity2 = MathLib::KelvinVector::Invariants<
+                    MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value>::identity2;
 
             //
             // displacement equation, displacement part
@@ -763,7 +764,7 @@ private:
     static const int Nu_intPoints = ShapeFunctionDisplacement::NPOINTS * DisplacementDim;
     static const int displacement_size = Nu_intPoints;
     static const int kelvin_vector_size =
-        KelvinVectorDimensions<DisplacementDim>::value;
+            MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
 };
 
 }  // namespace TH2M
