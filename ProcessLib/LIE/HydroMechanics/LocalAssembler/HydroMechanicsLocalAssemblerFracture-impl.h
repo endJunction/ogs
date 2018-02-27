@@ -17,6 +17,8 @@
 
 #include "ProcessLib/LIE/Common/LevelSetFunction.h"
 
+#include "MaterialLib/FractureModels/CohesiveZoneModeI.h"
+
 namespace ProcessLib
 {
 namespace LIE
@@ -240,8 +242,33 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             t, x_position, ip_data.aperture0, stress0, w_prev, w,
             effective_stress_prev, effective_stress, C, state);
 
+        /*
+        if (dynamic_cast<MaterialLib::Fracture::CohesiveZoneModeI::
+                StateVariables<GlobalDim>&>(
+                    *ip_data.material_state_variables).damage == 1.0)
+        {
+            double const pressure = (_process_data.crack_volume == 0) ? 1.0 :
+            _process_data.pressure;
+            effective_stress -= identity2 * pressure;
+        }
+
+        */
+
+        double const pressure = (_process_data.crack_volume == 0) ? 1.0 :
+        _process_data.pressure;
+        effective_stress -= identity2 * pressure *
+                static_cast<MaterialLib::Fracture::CohesiveZoneModeI::
+                StateVariables<GlobalDim>&>(*ip_data.material_state_variables).damage;
+
+        double degradation = dynamic_cast<MaterialLib::Fracture::CohesiveZoneModeI::
+                StateVariables<GlobalDim>&>(
+                    *ip_data.material_state_variables).damage;
+
         // permeability
-        double const local_k = b_m * b_m / 12;
+        double const local_k = degradation * b_m * b_m / 12;
+
+        // permeability
+        //double const local_k = b_m * b_m / 12;
         ip_data.permeability = local_k;
         GlobalDimVector local_k_tensor = GlobalDimVector::Zero();
         local_k_tensor.head(GlobalDim - 1).setConstant(local_k);
@@ -249,7 +276,8 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             R.transpose() * local_k_tensor.asDiagonal() * R;
 
         // derivative of permeability respect to aperture
-        double const local_dk_db = b_m / 6.;
+        double const local_dk_db = degradation * b_m / 6.;
+        //double const local_dk_db = b_m / 6.;
         local_dk_db_tensor.diagonal()
             .head(GlobalDim - 1)
             .setConstant(local_dk_db);
