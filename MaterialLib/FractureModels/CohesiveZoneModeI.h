@@ -77,6 +77,11 @@ public:
         double fracture_opening_at_residual_traction(double const t,
                                                      X const& x) const
         {
+            if (_peak_normal_traction(t, x)[0] == 0.0)
+            {
+                return 0.0;
+            }
+
             return 2 * _fracture_toughness(t, x)[0] /
                    _peak_normal_traction(t, x)[0];
         }
