@@ -46,6 +46,14 @@ template <>
 double const GaussLobatto<4>::X[6];
 template <>
 double const GaussLobatto<4>::W[6];
+template <>
+double const GaussLobatto<5>::X[7];
+template <>
+double const GaussLobatto<5>::W[7];
+template <>
+double const GaussLobatto<6>::X[8];
+template <>
+double const GaussLobatto<6>::W[8];
 #endif
 
 }  // namespace MathLib
