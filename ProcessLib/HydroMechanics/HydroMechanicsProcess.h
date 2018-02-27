@@ -91,6 +91,9 @@ private:
     void postNonLinearSolverConcreteProcess(GlobalVector const& x, const double t,
                                      int const process_id) override;
 
+    void computeSecondaryVariableConcrete(double const t,
+                                          GlobalVector const& x) override;
+
     NumLib::LocalToGlobalIndexMap const& getDOFTable(
         const int process_id) const override;
 

@@ -226,6 +226,12 @@ void HydroMechanicsProcess<DisplacementDim>::initializeConcreteProcess(
         makeExtrapolator(mesh.getDimension(), getExtrapolator(),
                          _local_assemblers,
                          &LocalAssemblerInterface::getIntPtDarcyVelocity));
+
+    auto mesh_prop_nodal_p = MeshLib::getOrCreateMeshProperty<double>(
+        const_cast<MeshLib::Mesh&>(mesh), "pressure_interpolated",
+        MeshLib::MeshItemType::Node, 1);
+    mesh_prop_nodal_p->resize(mesh.getNumberOfNodes());
+    _process_data.mesh_prop_nodal_p = mesh_prop_nodal_p;
 }
 
 template <int DisplacementDim>
