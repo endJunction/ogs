@@ -111,4 +111,14 @@ void LocalAssemblerInterface::postNonLinearSolver(
     postNonLinearSolverConcrete(local_x, t, use_monolithic_scheme);
 }
 
+void LocalAssemblerInterface::computeCrackIntegral(
+    std::size_t const mesh_item_id,
+    NumLib::LocalToGlobalIndexMap const& dof_table,
+    GlobalVector const& x, double &crack_volume)
+{
+    auto const indices = NumLib::getIndices(mesh_item_id, dof_table);
+    auto const local_x = x.get(indices);
+
+    computeCrackIntegralConcrete(local_x, crack_volume);
+}
 }  // namespace ProcessLib

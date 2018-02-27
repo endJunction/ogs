@@ -73,6 +73,12 @@ private:
                                     double const dt,
                                     const int /*process_id*/) override;
 
+    void postNonLinearSolverConcreteProcess(GlobalVector const& x,
+                                            const double t, int const/*process_id*/ ) override;
+
+    NumLib::IterationResult postIterationConcreteProcess(
+        GlobalVector const& x) override;
+
 private:
     HydroMechanicsProcessData<GlobalDim> _process_data;
 

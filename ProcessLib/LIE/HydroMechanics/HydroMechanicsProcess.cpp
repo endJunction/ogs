@@ -28,6 +28,8 @@
 #include "LocalAssembler/HydroMechanicsLocalAssemblerMatrix.h"
 #include "LocalAssembler/HydroMechanicsLocalAssemblerMatrixNearFracture.h"
 
+#include <cmath>
+
 namespace ProcessLib
 {
 namespace LIE
@@ -578,10 +580,50 @@ void HydroMechanicsProcess<GlobalDim>::preTimestepConcreteProcess(
 
     _process_data.dt = dt;
     _process_data.t = t;
+    _process_data.injected_volume = _process_data.t;
 
     GlobalExecutor::executeMemberOnDereferenced(
         &HydroMechanicsLocalAssemblerInterface::preTimestep, _local_assemblers,
         *_local_to_global_index_map, x, t, dt);
+}
+
+template <int GlobalDim>
+void HydroMechanicsProcess<GlobalDim>::postNonLinearSolverConcreteProcess(
+    GlobalVector const& x, const double t, const int /*process_id*/)
+{
+    DBUG("PostNonLinearSolver HydroMechanicsProcess.");
+    // Calculate crack volume.
+    GlobalExecutor::executeMemberOnDereferenced(
+        &HydroMechanicsLocalAssemblerInterface::postNonLinearSolver, _local_assemblers,
+        *_local_to_global_index_map, x, t, _use_monolithic_scheme);
+}
+
+template <int GlobalDim>
+NumLib::IterationResult
+HydroMechanicsProcess<GlobalDim>::postIterationConcreteProcess(
+    GlobalVector const& x)
+{
+    _process_data.crack_volume = 0.0;
+    DBUG("PostNonLinearSolver crack volume computation.");
+
+    GlobalExecutor::executeMemberOnDereferenced(
+                &HydroMechanicsLocalAssemblerInterface::computeCrackIntegral, _local_assemblers,
+                *_local_to_global_index_map, x, _process_data.crack_volume);
+
+    INFO("Injected Volume: %g \n      Integral of crack: %g \n      internal pressure: %g",
+         _process_data.injected_volume, _process_data.crack_volume, _process_data.pressure);
+
+    _process_data.pressure_old = _process_data.pressure;
+    _process_data.pressure = _process_data.pressure *
+            _process_data.injected_volume / _process_data.crack_volume;
+
+    _process_data.pressure_error = std::abs(_process_data.pressure_old
+                                            -_process_data.pressure) /_process_data.pressure;
+
+    if (_process_data.pressure_error > 1e-4)
+        return NumLib::IterationResult::REPEAT_ITERATION;
+    else
+        return NumLib::IterationResult::SUCCESS;
 }
 
 // ------------------------------------------------------------------------------------

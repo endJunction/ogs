@@ -82,7 +82,9 @@ public:
                              NumLib::LocalToGlobalIndexMap const& dof_table,
                              GlobalVector const& x, double const t,
                              bool const use_monolithic_scheme);
-
+    void computeCrackIntegral(std::size_t const mesh_item_id,
+                             NumLib::LocalToGlobalIndexMap const& dof_table,
+                             GlobalVector const& x, double &crack_volume);
     /// Computes the flux in the point \c p_local_coords that is given in local
     /// coordinates using the values from \c local_x.
     virtual Eigen::Vector3d getFlux(
@@ -100,6 +102,11 @@ private:
     }
 
     virtual void postTimestepConcrete(std::vector<double> const& /*local_x*/) {}
+
+    virtual void computeCrackIntegralConcrete(
+        std::vector<double> const& /*local_x*/, double & /*crack_volume*/)
+    {
+    }
 
     virtual void postNonLinearSolverConcrete(
         std::vector<double> const& /*local_x*/, double const /*t*/,

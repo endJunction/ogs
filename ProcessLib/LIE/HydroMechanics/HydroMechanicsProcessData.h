@@ -124,6 +124,12 @@ struct HydroMechanicsProcessData
     double dt = 0.0;
     double t = 0.0;
 
+    double pressure = 1.0;
+    double pressure_old = 0.0;
+    double pressure_error = 0.0;
+    double injected_volume = 0.0;
+    double crack_volume = 0.0;
+
     // mesh properties for output
     MeshLib::PropertyVector<double>* mesh_prop_stress_xx = nullptr;
     MeshLib::PropertyVector<double>* mesh_prop_stress_yy = nullptr;

@@ -414,7 +414,62 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         (*_process_data.mesh_prop_velocity)[element_id * 3 + i] =
             ele_velocity[i];
 }
+template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
+          typename IntegrationMethod, int GlobalDim>
+void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
+                                          ShapeFunctionPressure,
+                                          IntegrationMethod, GlobalDim>::
+    postNonLinearSolverConcrete(std::vector<double> const& local_x,
+                                double const /*t*/, bool const /*use_monolithic_scheme*/)
+{
 
+}
+template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
+          typename IntegrationMethod, int GlobalDim>
+void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
+                                          ShapeFunctionPressure,
+                                          IntegrationMethod, GlobalDim>::
+    computeCrackIntegralConcrete(std::vector<double> const& local_x,
+                                double& crack_volume)
+{
+    auto const local_x_ = Eigen::Map<Eigen::VectorXd const>(local_x.data(), local_x.size());
+    auto const g = local_x_.segment(displacement_index, displacement_size);
+
+    auto const& frac_prop = *_process_data.fracture_property;
+    auto const& R = frac_prop.R;
+
+    // the index of a normal (normal to a fracture plane) component
+    // in a displacement vector
+    auto constexpr index_normal = GlobalDim - 1;
+
+    SpatialPosition x_position;
+    x_position.setElementID(_element.getID());
+
+    unsigned const n_integration_points = _ip_data.size();
+    for (unsigned ip = 0; ip < n_integration_points; ip++)
+    {
+        x_position.setIntegrationPoint(ip);
+
+        auto& ip_data = _ip_data[ip];
+        /*
+        if (dynamic_cast<MaterialLib::Fracture::CohesiveZoneModeI::
+                StateVariables<GlobalDim>&>(
+                    *ip_data.material_state_variables).damage < 1.0)
+        {
+            continue;
+        }
+        */
+        auto const& ip_w = ip_data.integration_weight;
+        auto const& H_g = ip_data.H_u;
+
+        // displacement jumps in local coordinates
+        auto& w = R * H_g * g;
+
+        crack_volume += w[index_normal] * ip_w *
+                static_cast<MaterialLib::Fracture::CohesiveZoneModeI::
+                StateVariables<GlobalDim>&>(*ip_data.material_state_variables).damage;
+    }
+}
 }  // namespace HydroMechanics
 }  // namespace LIE
 }  // namespace ProcessLib
