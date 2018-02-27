@@ -20,6 +20,10 @@ inline double Heaviside(double v)
     return (v < 0.0) ? 0.0 : 1.0;
 }
 
+inline double Heaviside1(double v)
+{
+    return (v < 0.0) ? -1.0 : 1.0;
+}
 }  // namespace
 
 namespace ProcessLib
