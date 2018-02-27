@@ -232,11 +232,25 @@ void PostProcessTool::calculateTotalDisplacement(unsigned const n_fractures)
         auto const& g =
             *_output_mesh->getProperties().getPropertyVector<double>(
                 "displacement_jump" + std::to_string(fracture_id + 1));
-        for (unsigned i = 0; i < _output_mesh->getNodes().size(); i++)
+        const int TypeofHeaviside = 1;
+        switch (TypeofHeaviside)
         {
-            for (int j = 0; j < n_u_comp; j++)
-                total_u[i * n_u_comp + j] +=
-                    nodal_levelset[i] * g[i * n_u_comp + j];
+        case 1:
+            for (unsigned i = 0; i < _output_mesh->getNodes().size(); i++)
+            {
+                for (int j = 0; j < n_u_comp; j++)
+                    total_u[i * n_u_comp + j] +=
+                        nodal_levelset[i] * g[i * n_u_comp + j];
+            }
+            break;
+        case 2:
+            for (unsigned i = 0; i < _output_mesh->getNodes().size(); i++)
+            {
+                for (int j = 0; j < n_u_comp; j++)
+                    total_u[i * n_u_comp + j] +=
+                        0.5 * nodal_levelset[i] * g[i * n_u_comp + j];
+            }
+            break;
         }
     }
 }

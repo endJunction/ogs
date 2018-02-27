@@ -33,8 +33,17 @@ namespace LIE
 double calculateLevelSetFunction(FractureProperty const& frac, double const* x_)
 {
     Eigen::Map<Eigen::Vector3d const> x(x_, 3);
-    return Heaviside(
-        boost::math::sign(frac.normal_vector.dot(x - frac.point_on_fracture)));
+    const int TypeofHeaviside = 1;
+    switch (TypeofHeaviside)
+    {
+    case 1:
+        return Heaviside(
+            boost::math::sign(frac.normal_vector.dot(x - frac.point_on_fracture)));
+    case 2:
+        return Heaviside1(
+            boost::math::sign(frac.normal_vector.dot(x - frac.point_on_fracture)));
+    }
+
 }
 
 }  // namespace LIE

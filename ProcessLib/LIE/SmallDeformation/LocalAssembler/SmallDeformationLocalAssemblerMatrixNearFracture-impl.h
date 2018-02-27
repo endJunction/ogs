@@ -216,9 +216,21 @@ void SmallDeformationLocalAssemblerMatrixNearFracture<
 
         // nodal displacement = u^hat + sum_i(levelset_i(x) * [u]_i)
         NodalDisplacementVectorType nodal_total_u = nodal_u;
-        for (unsigned i = 0; i < n_fractures; i++)
+        const int TypeofHeaviside = 1;
+        switch (TypeofHeaviside)
         {
-            nodal_total_u += levelsets[i] * vec_nodal_g[i];
+        case 1:
+            for (unsigned i = 0; i < n_fractures; i++)
+            {
+                nodal_total_u += levelsets[i] * vec_nodal_g[i];
+            }
+            break;
+        case 2:
+            for (unsigned i = 0; i < n_fractures; i++)
+            {
+                nodal_total_u += 0.5 * levelsets[i] * vec_nodal_g[i];
+            }
+            break;
         }
 
         auto const x_coord =
@@ -254,32 +266,71 @@ void SmallDeformationLocalAssemblerMatrixNearFracture<
         // r_u = B^T * Sigma = B^T * C * B * (u+phi*[u])
         // r_[u] = (phi*B)^T * Sigma = (phi*B)^T * C * B * (u+phi*[u])
         local_b_u.noalias() -= B.transpose() * sigma * w;
-        for (unsigned i = 0; i < n_fractures; i++)
+
+        switch (TypeofHeaviside)
         {
-            vec_local_b_g[i].noalias() -=
-                levelsets[i] * B.transpose() * sigma * w;
+        case 1:
+            for (unsigned i = 0; i < n_fractures; i++)
+            {
+                vec_local_b_g[i].noalias() -=
+                    levelsets[i] * B.transpose() * sigma * w;
+            }
+            break;
+        case 2:
+            for (unsigned i = 0; i < n_fractures; i++)
+            {
+                vec_local_b_g[i].noalias() -=
+                    0.5 * levelsets[i] * B.transpose() * sigma * w;
+            }
+            break;
         }
 
         // J_uu += B^T * C * B
         local_J_uu.noalias() += B.transpose() * C * B * w;
 
-        for (unsigned i = 0; i < n_fractures; i++)
+        switch (TypeofHeaviside)
         {
-            // J_u[u] += B^T * C * (levelset * B)
-            vec_local_J_ug[i].noalias() +=
-                B.transpose() * C * (levelsets[i] * B) * w;
-
-            // J_[u]u += (levelset * B)^T * C * B
-            vec_local_J_gu[i].noalias() +=
-                (levelsets[i] * B.transpose()) * C * B * w;
-
-            for (unsigned j = 0; j < n_fractures; j++)
+        case 1:
+            for (unsigned i = 0; i < n_fractures; i++)
             {
-                // J_[u][u] += (levelset * B)^T * C * (levelset * B)
-                vec_local_J_gg[i][j].noalias() +=
-                    (levelsets[i] * B.transpose()) * C * (levelsets[j] * B) * w;
+                // J_u[u] += B^T * C * (levelset * B)
+                vec_local_J_ug[i].noalias() +=
+                    B.transpose() * C * (levelsets[i] * B) * w;
+
+                // J_[u]u += (levelset * B)^T * C * B
+                vec_local_J_gu[i].noalias() +=
+                    (levelsets[i] * B.transpose()) * C * B * w;
+
+                for (unsigned j = 0; j < n_fractures; j++)
+                {
+                    // J_[u][u] += (levelset * B)^T * C * (levelset * B)
+                    vec_local_J_gg[i][j].noalias() +=
+                        (levelsets[i] * B.transpose()) * C * (levelsets[j] * B) * w;
+                }
             }
+            break;
+        case 2:
+            for (unsigned i = 0; i < n_fractures; i++)
+            {
+                // J_u[u] += B^T * C * (levelset * B)
+                vec_local_J_ug[i].noalias() +=
+                    B.transpose() * C * (0.5 * levelsets[i] * B) * w;
+
+                // J_[u]u += (levelset * B)^T * C * B
+                vec_local_J_gu[i].noalias() +=
+                    (0.5 * levelsets[i] * B.transpose()) * C * B * w;
+
+                for (unsigned j = 0; j < n_fractures; j++)
+                {
+                    // J_[u][u] += (levelset * B)^T * C * (levelset * B)
+                    vec_local_J_gg[i][j].noalias() +=
+                        (0.5 * levelsets[i] * B.transpose()) * C * (0.5 * levelsets[j] * B) * w;
+                }
+            }
+            break;
         }
+
+
     }
 }
 

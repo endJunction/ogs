@@ -93,8 +93,21 @@ void HydroMechanicsLocalAssemblerMatrixNearFracture<
     auto const g = local_x.segment(displacement_jump_index, displacement_size);
     auto const g_dot =
         local_x_dot.segment(displacement_jump_index, displacement_size);
-    Eigen::VectorXd const total_u = u + ele_levelset * g;
-    Eigen::VectorXd const total_u_dot = u_dot + ele_levelset * g_dot;
+
+    Eigen::VectorXd total_u = u;
+    Eigen::VectorXd total_u_dot = u_dot;
+    const int TypeofHeaviside = 1;
+    switch (TypeofHeaviside)
+    {
+    case 1:
+        total_u += ele_levelset * g;
+        total_u_dot += ele_levelset * g_dot;
+        break;
+    case 2:
+        total_u += 0.5 * ele_levelset * g;
+        total_u_dot += 0.5 * ele_levelset * g_dot;
+        break;
+    }
 
     // evaluate residuals and Jacobians for pressure and displacements
     Base::assembleBlockMatricesWithJacobian(t, p, p_dot, total_u, total_u_dot,
@@ -114,12 +127,26 @@ void HydroMechanicsLocalAssemblerMatrixNearFracture<
     auto J_gg = local_J.block(displacement_jump_index, displacement_jump_index,
                               displacement_size, displacement_size);
 
-    rhs_g = ele_levelset * rhs_u;
-    J_pg = ele_levelset * J_pu;
-    J_ug = ele_levelset * J_uu;
-    J_gp = ele_levelset * J_up;
-    J_gu = ele_levelset * J_uu;
-    J_gg = ele_levelset * ele_levelset * J_uu;
+    switch (TypeofHeaviside)
+    {
+    case 1:
+        rhs_g = ele_levelset * rhs_u;
+        J_pg = ele_levelset * J_pu;
+        J_ug = ele_levelset * J_uu;
+        J_gp = ele_levelset * J_up;
+        J_gu = ele_levelset * J_uu;
+        J_gg = ele_levelset * ele_levelset * J_uu;
+        break;
+    case 2:
+        rhs_g = 0.5 * ele_levelset * rhs_u;
+        J_pg = 0.5 * ele_levelset * J_pu;
+        J_ug = 0.5 * ele_levelset * J_uu;
+        J_gp = 0.5 * ele_levelset * J_up;
+        J_gu = 0.5 * ele_levelset * J_uu;
+        J_gg = 0.5 * ele_levelset * 0.5 * ele_levelset * J_uu;
+        break;
+    }
+
 }
 
 template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
@@ -153,7 +180,17 @@ void HydroMechanicsLocalAssemblerMatrixNearFracture<
 
     // compute true displacements
     auto const g = local_x.segment(displacement_jump_index, displacement_size);
-    Eigen::VectorXd const total_u = u + ele_levelset * g;
+    Eigen::VectorXd total_u = u;
+    const int TypeofHeaviside = 1;
+    switch (TypeofHeaviside)
+    {
+    case 1:
+        total_u += ele_levelset * g;
+        break;
+    case 2:
+        total_u += 0.5 * ele_levelset * g;
+        break;
+    }
 
     // evaluate residuals and Jacobians for pressure and displacements
     Base::computeSecondaryVariableConcreteWithBlockVectors(t, p, total_u);

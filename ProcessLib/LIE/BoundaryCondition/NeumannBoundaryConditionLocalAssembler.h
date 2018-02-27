@@ -75,9 +75,20 @@ public:
             double const levelsets = calculateLevelSetFunction(
                 _fracture_prop, ip_physical_coords.getCoords());
 
-            _local_rhs.noalias() += sm.N * levelsets *
-                                    _neumann_bc_parameter(t, pos)[0] * sm.detJ *
-                                    wp.getWeight() * sm.integralMeasure;
+            const int TypeofHeaviside = 1;
+            switch (TypeofHeaviside)
+            {
+            case 1:
+                _local_rhs.noalias() += sm.N * levelsets *
+                                        _neumann_bc_parameter(t, pos)[0] * sm.detJ *
+                                        wp.getWeight() * sm.integralMeasure;
+                break;
+            case 2:
+                _local_rhs.noalias() += sm.N * 0.5 * levelsets *
+                                        _neumann_bc_parameter(t, pos)[0] * sm.detJ *
+                                        wp.getWeight() * sm.integralMeasure;
+                break;
+            }
         }
 
         auto const indices = NumLib::getIndices(id, dof_table_boundary);
