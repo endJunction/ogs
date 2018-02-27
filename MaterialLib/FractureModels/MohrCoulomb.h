@@ -31,15 +31,22 @@ struct StateVariables
 
     void pushBackState() override { w_p_prev = w_p; }
 
-    Eigen::Matrix<double, DisplacementDim, 1> w_p =
+    Eigen::Matrix<double, DisplacementDim, 1> w_p;
+/*
         Eigen::Matrix<double, DisplacementDim,
                       1>::Zero();  ///< plastic component of
                                    ///< the displacement jump
-                                   ///< in fracture's local coordinates.
+ */                                 ///< in fracture's local coordinates.
 
     // Initial values from previous timestep
-    Eigen::Matrix<double, DisplacementDim, 1> w_p_prev =
+    Eigen::Matrix<double, DisplacementDim, 1> w_p_prev;
+/*
         Eigen::Matrix<double, DisplacementDim, 1>::Zero();  ///< \copydoc w_p
+*/
+        StateVariables() {
+            w_p.setZero();
+            w_p_prev.setZero();
+}
 };
 
 template <int DisplacementDim>
