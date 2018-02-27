@@ -13,6 +13,8 @@
 
 #include <Eigen/Eigen>
 
+#include "MaterialLib/FractureModels/CohesiveZoneModeI.h"
+
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 
 #include "ProcessLib/Utils/InitShapeMatrices.h"

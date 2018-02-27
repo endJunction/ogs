@@ -100,7 +100,6 @@ public:
 
         computeSecondaryVariableConcreteWithVector(t, _local_u);
     }
-
 protected:
     virtual void assembleWithJacobianConcrete(double const t,
                                               Eigen::VectorXd const& local_u,
@@ -110,7 +109,6 @@ protected:
 
     virtual void computeSecondaryVariableConcreteWithVector(
         double const t, Eigen::VectorXd const& local_u) = 0;
-
     MeshLib::Element const& _element;
     bool const _is_axially_symmetric;
 

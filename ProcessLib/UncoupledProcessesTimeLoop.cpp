@@ -286,7 +286,6 @@ bool solveOneTimeStepOneProcess(int const process_id, GlobalVector& x,
     // preTimestep() hook.
 
     time_disc.nextTimestep(t, delta_t);
-
     applyKnownSolutions(ode_sys, nl_tag, x);
 
     auto const post_iteration_callback = [&](unsigned iteration,
