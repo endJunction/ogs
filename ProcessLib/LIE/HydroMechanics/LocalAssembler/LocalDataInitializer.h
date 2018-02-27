@@ -242,6 +242,8 @@ public:
                                         mesh_item.getNodeIndex(k));
                     auto global_index =
                         _dof_table.getGlobalIndex(l, var_id, var_comp_id);
+                    //INFO("ele %d: var_id %d, var_comp_id %d, node_id %d, GI %d, dof_id %d, local_id %d",
+                    //    id, var_id, var_comp_id, mesh_item.getNodeIndex(k), global_index, dof_id, local_id);
                     if (global_index != NumLib::MeshComponentMap::nop)
                         dofIndex_to_localIndex[dof_id++] = local_id;
                     local_id++;
