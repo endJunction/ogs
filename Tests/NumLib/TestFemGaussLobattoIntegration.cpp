@@ -385,3 +385,39 @@ TEST_F(NumLibFemIntegrationGaussLobatto1D, P9_4)
         1000, ac::make_arbitrary(ac::RandomPolynomialGenerator<9>()),
         gtest_reporter);
 }
+
+TEST_F(NumLibFemIntegrationGaussLobatto1D, P10_5)
+{
+    ac::check<Polynomial<10>>(
+        IntegrationTester<IntegrationMethod>{IntegrationMethod(5), 1e-15,
+                                             1e-12},
+        1000, ac::make_arbitrary(ac::RandomPolynomialGenerator<10>()),
+        gtest_reporter);
+}
+
+TEST_F(NumLibFemIntegrationGaussLobatto1D, P11_5)
+{
+    ac::check<Polynomial<11>>(
+        IntegrationTester<IntegrationMethod>{IntegrationMethod(5), 1e-15,
+                                             1e-12},
+        1000, ac::make_arbitrary(ac::RandomPolynomialGenerator<11>()),
+        gtest_reporter);
+}
+
+TEST_F(NumLibFemIntegrationGaussLobatto1D, P12_6)
+{
+    ac::check<Polynomial<12>>(
+        IntegrationTester<IntegrationMethod>{IntegrationMethod(6), 1e-15,
+                                             1e-12},
+        1000, ac::make_arbitrary(ac::RandomPolynomialGenerator<12>()),
+        gtest_reporter);
+}
+
+TEST_F(NumLibFemIntegrationGaussLobatto1D, P13_6)
+{
+    ac::check<Polynomial<13>>(
+        IntegrationTester<IntegrationMethod>{IntegrationMethod(6), 1e-15,
+                                             1e-12},
+        1000, ac::make_arbitrary(ac::RandomPolynomialGenerator<13>()),
+        gtest_reporter);
+}
