@@ -10,6 +10,7 @@
  */
 
 #include <cassert>
+#include "BaseLib/Error.h"
 
 namespace NumLib
 {
@@ -68,6 +69,14 @@ IntegrationGaussLobattoRegular<N_DIM>::getWeightedPoint(unsigned order,
             return getWeightedPoint<MathLib::GaussLobatto<3>>(pos);
         case 4:
             return getWeightedPoint<MathLib::GaussLobatto<4>>(pos);
+        case 5:
+            return getWeightedPoint<MathLib::GaussLobatto<5>>(pos);
+        case 6:
+            return getWeightedPoint<MathLib::GaussLobatto<6>>(pos);
+        default:
+            OGS_FATAL(
+                "Gauss-Lobatto integration for order %d is not implemented.",
+                order);
     }
 
     return MathLib::TemplateWeightedPoint<double, double, N_DIM>(
