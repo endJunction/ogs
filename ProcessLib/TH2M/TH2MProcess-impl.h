@@ -71,26 +71,26 @@ void TH2MProcess<DisplacementDim>::constructDofTable()
 
     if (_use_monolithic_scheme)
     {
-        // For pressure, which is the first
+        // Collect the mesh subsets in a vector.
         std::vector<MeshLib::MeshSubsets> all_mesh_subsets;
-        all_mesh_subsets.emplace_back(_mesh_subset_base_nodes.get());
 
-        // For displacement.
+        // For gas pressure, capillary pressure, and temperature:
+        for (int i = 0; i <= indexTemperature; i++)
+            all_mesh_subsets.emplace_back(_mesh_subset_base_nodes.get());
+
+        // For displacement:
         const int monolithic_process_id = 0;
         std::generate_n(
-            std::back_inserter(all_mesh_subsets),
-            getProcessVariables(monolithic_process_id)[1]
-                .get()
-                .getNumberOfComponents(),
-            [&]() {
-                return MeshLib::MeshSubsets{_mesh_subset_all_nodes.get()};
-            });
+                std::back_inserter(all_mesh_subsets),
+                getProcessVariables(monolithic_process_id)[indexDisplacement].get().getNumberOfComponents(),
+                [&]() { return MeshLib::MeshSubsets{_mesh_subset_all_nodes.get()}; });
 
-        std::vector<int> const vec_n_components{1, DisplacementDim};
+        std::vector<int> const vec_n_components{1,1,1, DisplacementDim};
         _local_to_global_index_map =
-            std::make_unique<NumLib::LocalToGlobalIndexMap>(
-                std::move(all_mesh_subsets), vec_n_components,
-                NumLib::ComponentOrder::BY_LOCATION);
+                std::make_unique<NumLib::LocalToGlobalIndexMap>(
+                        std::move(all_mesh_subsets), vec_n_components,
+                        NumLib::ComponentOrder::BY_LOCATION);
+
         assert(_local_to_global_index_map);
     }
     else
@@ -106,12 +106,12 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
     unsigned const integration_order)
 {
     const int mechanical_process_id = _use_monolithic_scheme ? 0 : 1;
-    const int deformation_variable_id = _use_monolithic_scheme ? 1 : 0;
+   // const int deformation_variable_id = _use_monolithic_scheme ? 1 : 0;
     ProcessLib::TH2M::createLocalAssemblers<
         DisplacementDim, TH2MLocalAssembler>(
         mesh.getDimension(), mesh.getElements(), dof_table,
         // use displacement process variable to set shape function order
-        getProcessVariables(mechanical_process_id)[deformation_variable_id]
+        getProcessVariables(mechanical_process_id)[indexDisplacement]
             .get()
             .getShapeFunctionOrder(),
         _local_assemblers, mesh.isAxiallySymmetric(), integration_order,
@@ -224,7 +224,7 @@ void TH2MProcess<DisplacementDim>::
     if (_use_monolithic_scheme)
     {
         DBUG(
-            "Assemble the Jacobian of HydroMechanics for the monolithic"
+            "Assemble the Jacobian of TH2M for the monolithic"
             " scheme.");
         dof_tables.emplace_back(*_local_to_global_index_map);
     }
