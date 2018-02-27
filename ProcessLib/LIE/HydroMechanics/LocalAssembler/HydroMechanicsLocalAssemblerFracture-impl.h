@@ -399,6 +399,7 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
 
     double ele_b = 0;
     double ele_k = 0;
+    double ele_d = 0;
     typename HMatricesType::ForceVectorType ele_sigma_eff =
         HMatricesType::ForceVectorType::Zero(GlobalDim);
     typename HMatricesType::ForceVectorType ele_w =
@@ -414,15 +415,19 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         ele_Fs = std::max(
             ele_Fs, ip.material_state_variables->getShearYieldFunctionValue());
         ele_velocity += ip.darcy_velocity;
+        ele_d += static_cast<MaterialLib::Fracture::CohesiveZoneModeI::
+                StateVariables<GlobalDim>&>(*ip.material_state_variables).damage;
     }
     ele_b /= static_cast<double>(n_integration_points);
     ele_k /= static_cast<double>(n_integration_points);
+    ele_d /= static_cast<double>(n_integration_points);
     ele_w /= static_cast<double>(n_integration_points);
     ele_sigma_eff /= static_cast<double>(n_integration_points);
     ele_velocity /= static_cast<double>(n_integration_points);
     auto const element_id = _element.getID();
     (*_process_data.mesh_prop_b)[element_id] = ele_b;
     (*_process_data.mesh_prop_k_f)[element_id] = ele_k;
+    (*_process_data.mesh_prop_d)[element_id] = ele_d;
     (*_process_data.mesh_prop_w_n)[element_id] = ele_w[index_normal];
     (*_process_data.mesh_prop_w_s)[element_id] = ele_w[0];
     (*_process_data.mesh_prop_fracture_stress_normal)[element_id] =
@@ -430,6 +435,7 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
     (*_process_data.mesh_prop_fracture_stress_shear)[element_id] =
         ele_sigma_eff[0];
     (*_process_data.mesh_prop_fracture_shear_failure)[element_id] = ele_Fs;
+    (*_process_data.mesh_prop_pressure)[element_id] = _process_data.pressure;
 
     if (GlobalDim == 3)
     {
