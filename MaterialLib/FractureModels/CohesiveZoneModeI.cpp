@@ -104,7 +104,11 @@ void CohesiveZoneModeI<DisplacementDim>::computeConstitutiveRelation(
     C(index_ns, index_ns) =
         mp.Kn *
         logPenaltyDerivative(aperture0, aperture, _penalty_aperture_cutoff);
-
+    /*
+    std::cerr << "sigma " << sigma.coeffRef(index_ns) << "\n";
+    std::cerr << "w_n " << w_n << "\n";
+    std::cerr << "C " << C(index_ns, index_ns) << "\n";
+    */
     // Exit if fracture is closing
     // TODO (nagel) to be based on the stress state when initial stress effects
     // are included.
