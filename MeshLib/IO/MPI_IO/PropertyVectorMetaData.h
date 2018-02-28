@@ -69,6 +69,7 @@ inline void writePropertyVectorMetaDataBinary(
 
 inline void writePropertyVectorMetaData(PropertyVectorMetaData const& pvmd)
 {
+    void(pvmd);  // Silence warning if DBUG output is not compiled.
     DBUG("size of name: %d", pvmd.property_name.length());
     DBUG("name: '%s'", pvmd.property_name.c_str());
     DBUG("is_int_data_type: %d", pvmd.is_int_type);
