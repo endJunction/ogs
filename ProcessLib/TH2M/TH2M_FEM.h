@@ -193,34 +193,72 @@ public:
         const auto matrix_size = gas_pressure_size + cap_pressure_size +
                 temperature_size + displacement_size;
 
+
+        // create mass matrix
         auto local_M = MathLib::createZeroedMatrix<
             typename ShapeMatricesTypeDisplacement::template MatrixType<
             matrix_size, matrix_size>>(
             local_M_data, matrix_size, matrix_size);
 
+        // create stiffness matrix:
         auto local_K = MathLib::createZeroedMatrix<
             typename ShapeMatricesTypeDisplacement::template MatrixType<
             matrix_size, matrix_size>>(
             local_K_data, matrix_size, matrix_size);
 
+        //create rhs-vector:
         auto local_rhs = MathLib::createZeroedVector<
-            typename ShapeMatricesTypeDisplacement::template VectorType<
-            matrix_size>>(
-            local_rhs_data, matrix_size);
+                    typename ShapeMatricesTypeDisplacement::template VectorType<
+                    matrix_size>>(
+                    local_rhs_data, matrix_size);
 
-        typename ShapeMatricesTypePressure::NodalMatrixType laplace_p =
-            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
-                    gas_pressure_size);
+        // assign sub-matrices:
+        // water component equation (aka non-wetting-pressure eq.)
 
-        typename ShapeMatricesTypePressure::NodalMatrixType storage_p =
-            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
-                    gas_pressure_size);
+        // mass-matrix, gas pressure
+        auto Mpp =
+                local_M.template block<gas_pressure_size, gas_pressure_size>(gas_pressure_index,
+                                      gas_pressure_index);
 
-        typename ShapeMatricesTypeDisplacement::template MatrixType<
-        Nu_intPoints, Np_intPoints>
-            Kup = ShapeMatricesTypeDisplacement::template MatrixType<
-                displacement_size, gas_pressure_size>::Zero(displacement_size,
-                                                        gas_pressure_size);
+        // mass-matrix, displacement
+        auto Mpu =
+                local_M.template block<gas_pressure_size, displacement_size>(gas_pressure_index,
+                                        displacement_index);
+
+        // stiffness-matrix, gas pressure
+        auto Kpp =
+                local_K.template block<gas_pressure_size, gas_pressure_size>(gas_pressure_index,
+                            gas_pressure_index);
+
+        // rhs-vector, gas pressure
+        auto fp =
+                local_rhs.template segment<gas_pressure_size>(gas_pressure_index);
+
+
+        // displacement equation
+        // stiffness-matrix, gas pressure
+        auto Kup =
+                local_K.template block<displacement_size, gas_pressure_size>(displacement_index,
+                             gas_pressure_index);
+
+        // rhs-vector, displacement
+        auto fu =
+                local_rhs.template segment<displacement_size>(displacement_index);
+
+
+//        typename ShapeMatricesTypePressure::NodalMatrixType laplace_p =
+//            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
+//                    gas_pressure_size);
+//
+//        typename ShapeMatricesTypePressure::NodalMatrixType storage_p =
+//            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
+//                    gas_pressure_size);
+//
+//        typename ShapeMatricesTypeDisplacement::template MatrixType<
+//        Nu_intPoints, Np_intPoints>
+//            Kup = ShapeMatricesTypeDisplacement::template MatrixType<
+//                displacement_size, gas_pressure_size>::Zero(displacement_size,
+//                                                        gas_pressure_size);
 
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
@@ -278,45 +316,24 @@ public:
             auto C = _ip_data[ip].updateConstitutiveRelation(t, x_position, dt, u);
 
 
-            //
             // mass balance:
-            //
 
-            // Mpp
-            local_M.template block<gas_pressure_size, gas_pressure_size>(gas_pressure_index,
-                                gas_pressure_index).noalias() += N_p.transpose() * S * N_p * w;
+            Mpp.noalias() += N_p.transpose() * S * N_p * w;
+            Mpu.noalias() += N_p.transpose() * alpha * identity2.transpose() * B * w;
 
-            // Mpu
-            local_M.template block<gas_pressure_size, displacement_size>(gas_pressure_index,
-                                displacement_index).noalias() += N_p.transpose() * alpha * identity2.transpose() * B * w;
-
-            // Kpp
-            local_K.template block<gas_pressure_size, gas_pressure_size>(gas_pressure_index,
-                    gas_pressure_index).noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
+            Kpp.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
 
             // Kpu = 0
 
-            // fp
-            local_rhs.template segment<gas_pressure_size>(gas_pressure_index)
-                .noalias() += dNdx_p.transpose() * rho_fr * K_over_mu * b * w;
+            fp.noalias() += dNdx_p.transpose() * rho_fr * K_over_mu * b * w;
 
-
-            //
             // momentum balance:
-            //
 
             //Muu = Mup = 0
-
-            // Kup
-            local_K.template block<displacement_size, gas_pressure_size>(displacement_index,
-                     gas_pressure_index).noalias() -= B.transpose() * alpha * identity2 * N_p * w;
-
+            Kup.noalias() -= B.transpose() * alpha * identity2 * N_p * w;
             // Kuu = 0
+            fu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
-            // fu
-            local_rhs.template segment<displacement_size>(displacement_index)
-                                         .noalias() -=
-                                         (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
         }
     }
