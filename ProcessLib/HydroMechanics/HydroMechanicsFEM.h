@@ -169,6 +169,9 @@ public:
                                      double const t,
                                      bool const use_monolithic_scheme) override;
 
+    void computeSecondaryVariableConcrete(
+        const double t, std::vector<double> const& local_x) override;
+
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
         const unsigned integration_point) const override
     {

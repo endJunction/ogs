@@ -17,6 +17,8 @@
 #include "NumLib/Function/Interpolation.h"
 #include "ProcessLib/CoupledSolutionsForStaggeredScheme.h"
 
+#include "PressureInterpolation.h"
+
 namespace ProcessLib
 {
 namespace HydroMechanics
@@ -260,6 +262,23 @@ void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
     // displacement equation
     local_rhs.template segment<displacement_size>(displacement_index)
         .noalias() += Kup * p;
+}
+
+template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
+          typename IntegrationMethod, int DisplacementDim>
+void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
+                                  ShapeFunctionPressure, IntegrationMethod,
+                                  DisplacementDim>::
+    computeSecondaryVariableConcrete(const double t,
+                                     std::vector<double> const& local_x)
+{
+    auto p = Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+        pressure_size> const>(local_x.data() + pressure_index, pressure_size);
+
+    ProcessLib::HydroMechanics::interpolatePressureOnLowerOrderElement<
+        ShapeMatricesTypeDisplacement, ShapeFunctionPressure,
+        typename ShapeFunctionDisplacement::MeshElement, DisplacementDim>(
+        p, _element, _is_axially_symmetric, *_process_data.mesh_prop_nodal_p);
 }
 
 template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,

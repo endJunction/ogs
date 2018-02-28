@@ -20,6 +20,9 @@ struct LocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
       public NumLib::ExtrapolatableElement
 {
+    void computeSecondaryVariableConcrete(
+        const double t, std::vector<double> const& local_x_) = 0;
+
     virtual std::vector<double> const& getIntPtSigmaXX(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,

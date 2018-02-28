@@ -235,6 +235,16 @@ void HydroMechanicsProcess<DisplacementDim>::initializeConcreteProcess(
 }
 
 template <int DisplacementDim>
+void HydroMechanicsProcess<DisplacementDim>::computeSecondaryVariableConcrete(
+    const double t, GlobalVector const& x)
+{
+    DBUG("Compute the secondary variables for HydroMechanicsProcess.");
+    GlobalExecutor::executeMemberOnDereferenced(
+        &LocalAssemblerInterface::computeSecondaryVariable, _local_assemblers,
+        *_local_to_global_index_map, t, x, _coupled_solutions);
+}
+
+template <int DisplacementDim>
 void HydroMechanicsProcess<DisplacementDim>::initializeBoundaryConditions()
 {
     if (_use_monolithic_scheme)

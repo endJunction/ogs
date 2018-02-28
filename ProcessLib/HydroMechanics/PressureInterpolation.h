@@ -30,8 +30,9 @@ void interpolatePressureOnLowerOrderElement(
     using FemType = NumLib::TemplateIsoparametric<ShapeFunctionPressure,
                                                   ShapeMatricesTypePressure>;
 
-    FemType fe(*static_cast<const typename ShapeFunctionPressure::MeshElement*>(
-        &element));
+    //auto lower_order_element = 
+    FemType fe(static_cast<typename ShapeFunctionPressure::MeshElement const&>(
+        element));
     int const number_base_nodes = element.getNumberOfBaseNodes();
     int const number_all_nodes = element.getNumberOfNodes();
 
