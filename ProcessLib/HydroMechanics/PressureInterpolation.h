@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "NumLib/Fem/CoordinatesMapping/NaturalNodeCoordinates.h"
+
 namespace ProcessLib
 {
 namespace HydroMechanics
