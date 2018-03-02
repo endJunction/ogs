@@ -517,6 +517,7 @@ public:
             // auto const& sigma_prev = _ip_data[ip].sigma_prev;
 
             auto& sigma = _ip_data[ip].sigma;
+            auto sigma_r = _ip_data[ip].sigma;
             auto& C = _ip_data[ip].C;
             double& damage = _ip_data[ip].damage;
 
@@ -598,14 +599,18 @@ public:
 
             //if (damage > 0)
             {
-                //double pressure = _process_data.pressure * damage;
-                double pressure = 1.0e6* damage;
-                    //_process_data.injected_volume / _process_data.crack_volume;
-                sigma.template topLeftCorner<3, 1>() -=
-                    Eigen::Matrix<double, 3, 1>::Constant(pressure);
+                double pressure = _process_data.pressure * damage;
+                // INFO("Pressure at effective stress: %.4e and sigma_prev %.4e
+                // %.4e %.4e",
+                //     _process_data.pressure,sigma_prev[0],sigma_prev[1],sigma_prev[2]);
+                // double pressure = 1.0e6* damage;
+                //_process_data.injected_volume / _process_data.crack_volume;
+                sigma_r = sigma;
+                // sigma_r.template topLeftCorner<3, 1>() -=
+                //     Eigen::Matrix<double, 3, 1>::Constant(pressure);
             }
 
-            local_b.noalias() -= B.transpose() * sigma * w;
+            local_b.noalias() -= B.transpose() * sigma_r * w;
             local_Jac.noalias() += B.transpose() * C * (1. - damage) * B * w;
         }
     }
