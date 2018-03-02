@@ -650,7 +650,9 @@ public:
             auto const& x_coord =
                 interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
                     _element, N);
-            GradientMatrixType G;
+            GradientMatrixType G(DisplacementDim * DisplacementDim +
+                                     (DisplacementDim == 2 ? 1 : 0),
+                                 DisplacementDim * ShapeFunction::NPOINTS);
             Deformation::computeGMatrix<DisplacementDim,
                                         ShapeFunction::NPOINTS>(
                 dNdx, G, _is_axially_symmetric, N, x_coord);
