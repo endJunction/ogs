@@ -438,7 +438,6 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
     }
 
     // TODO (parisio) try this to enforce pressure convergence.
-
     if (_process_data.pressure_error > 1e-4)
     {
         //return NumLib::IterationResult::REPEAT_ITERATION;
