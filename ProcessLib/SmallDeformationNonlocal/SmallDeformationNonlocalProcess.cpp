@@ -8,6 +8,8 @@
  */
 
 #include "SmallDeformationNonlocalProcess.h"
+
+#include <nlohmann/json.hpp>
 #include <iostream>
 
 namespace ProcessLib
@@ -38,21 +40,41 @@ SmallDeformationNonlocalProcess<DisplacementDim>::
         _mesh, "MaterialForces", MeshLib::MeshItemType::Node, DisplacementDim);
 
     _integration_point_writer.emplace_back(
-        std::make_unique<KappaDIntegrationPointWriter>([this]() {
-            // Result containing integration point data for each local
-            // assembler.
-            std::vector<std::vector<double>> result;
-            result.resize(_local_assemblers.size());
+        std::make_unique<SigmaIntegrationPointWriter>(
+            static_cast<int>(mesh.getDimension() == 2 ? 4 : 6) /*n components*/,
+            integration_order, [this]() {
+                // Result containing integration point data for each local
+                // assembler.
+                std::vector<std::vector<double>> result;
+                result.resize(_local_assemblers.size());
 
-            for (std::size_t i = 0; i < _local_assemblers.size(); ++i)
-            {
-                auto const& local_asm = *_local_assemblers[i];
+                for (std::size_t i = 0; i < _local_assemblers.size(); ++i)
+                {
+                    auto const& local_asm = *_local_assemblers[i];
 
-                result[i] = local_asm.getKappaD();
-            }
+                    result[i] = local_asm.getSigma();
+                }
 
-            return result;
-        }));
+                return result;
+            }));
+
+    _integration_point_writer.emplace_back(
+        std::make_unique<KappaDIntegrationPointWriter>(
+            integration_order, [this]() {
+                // Result containing integration point data for each local
+                // assembler.
+                std::vector<std::vector<double>> result;
+                result.resize(_local_assemblers.size());
+
+                for (std::size_t i = 0; i < _local_assemblers.size(); ++i)
+                {
+                    auto const& local_asm = *_local_assemblers[i];
+
+                    result[i] = local_asm.getKappaD();
+                }
+
+                return result;
+            }));
 }
 
 template <int DisplacementDim>
@@ -176,48 +198,42 @@ void SmallDeformationNonlocalProcess<DisplacementDim>::
             auto const& mesh_property =
                 *mesh.getProperties().template getPropertyVector<double>(name);
 
+            // The mesh property must be defined on integration points.
             if (mesh_property.getMeshItemType() !=
                 MeshLib::MeshItemType::IntegrationPoint)
             {
                 continue;
             }
 
-            auto const offsets_array_name = name + "_offsets";
-            if (!mesh.getProperties().existsPropertyVector<std::size_t>(
-                    offsets_array_name))
+            auto const ip_meta_data = getIntegrationPointMetaData(mesh, name);
+
+            // Check the number of components.
+            if (ip_meta_data.n_components !=
+                mesh_property.getNumberOfComponents())
             {
                 OGS_FATAL(
-                    "Integration point data '%s' is present in the vtk field "
-                    "data "
-                    "but the corresponding '%s' array is not available.",
-                    name.c_str(), offsets_array_name.c_str());
-            }
-
-            auto const& mesh_property_offsets =
-                *mesh.getProperties().template getPropertyVector<std::size_t>(
-                    offsets_array_name);
-
-            if (mesh_property_offsets.getMeshItemType() !=
-                MeshLib::MeshItemType::Cell)
-            {
-                OGS_FATAL(
-                    "Integration point data '%s' is present in the vtk field "
-                    "data "
-                    "but the corresponding '%s' array is not defined on cells.",
-                    name.c_str(), offsets_array_name.c_str());
+                    "Different number of components in meta data (%d) than in "
+                    "the integration point field data for \"%s\": %d.",
+                    ip_meta_data.n_components, name.c_str(),
+                    mesh_property.getNumberOfComponents());
             }
 
             // Now we have a properly named vtk's field data array and the
-            // corresponding offsets array.
-            for (std::size_t i = 0; i < _local_assemblers.size(); ++i)
+            // corresponding meta data.
+            std::size_t position = 0;
+            for (auto& local_asm : _local_assemblers)
             {
-                auto& local_asm = _local_assemblers[i];
-                auto const offset = mesh_property_offsets[i];
-
-                // TODO (naumov) Check sizes / read size / etc.
-                // OR reconstruct dimensions from size / component = ip_points
-                local_asm->setIPDataInitialConditions(name,
-                                                      &mesh_property[offset]);
+                std::size_t const integration_points_read =
+                    local_asm->setIPDataInitialConditions(
+                        name, &mesh_property[position],
+                        ip_meta_data.integration_order);
+                if (integration_points_read == 0)
+                {
+                    OGS_FATAL(
+                        "No integration points read in the integration point "
+                        "initial conditions set function.");
+                }
+                position += integration_points_read * ip_meta_data.n_components;
             }
         }
         else if (mesh.getProperties().existsPropertyVector<double>(name +
@@ -234,8 +250,8 @@ void SmallDeformationNonlocalProcess<DisplacementDim>::
             // Now we have a vtk's cell data array containing the initial
             // conditions for the corresponding integration point writer.
 
-            // For each assembler use the single cell value for all integration
-            // points.
+            // For each assembler use the single cell value for all
+            // integration points.
             for (std::size_t i = 0; i < _local_assemblers.size(); ++i)
             {
                 auto& local_asm = _local_assemblers[i];
@@ -244,7 +260,8 @@ void SmallDeformationNonlocalProcess<DisplacementDim>::
                     &mesh_property[i],
                     &mesh_property[i] + mesh_property.getNumberOfComponents());
                 // TODO (naumov) Check sizes / read size / etc.
-                // OR reconstruct dimensions from size / component = ip_points
+                // OR reconstruct dimensions from size / component =
+                // ip_points
                 local_asm->setIPDataInitialConditionsFromCellData(name, value);
             }
         }

@@ -23,16 +23,53 @@ namespace ProcessLib
 {
 namespace SmallDeformationNonlocal
 {
+struct SigmaIntegrationPointWriter final : public IntegrationPointWriter
+{
+    explicit SigmaIntegrationPointWriter(
+        int const n_components,
+        int const integration_order,
+        std::function<std::vector<std::vector<double>>()>
+            callback)
+        : _n_components(n_components),
+          _integration_order(integration_order),
+          _callback(callback)
+    {
+    }
+
+    int numberOfComponents() const override { return _n_components; }
+    int integrationOrder() const override { return _integration_order; }
+
+    std::string name() const override
+    {
+        // TODO (naumov) remove ip suffix. Probably needs modification of the
+        // mesh properties, s.t. there is no "overlapping" with cell/point data.
+        // See getOrCreateMeshProperty.
+        return "sigma_ip";
+    }
+
+    std::vector<std::vector<double>> values() const override
+    {
+        return _callback();
+    }
+
+private:
+    int const _n_components;
+    int const _integration_order;
+    std::function<std::vector<std::vector<double>>()> _callback;
+};
+
 struct KappaDIntegrationPointWriter final : public IntegrationPointWriter
 {
     explicit KappaDIntegrationPointWriter(
-        std::function<std::vector<std::vector<double>>()> callback)
-        : _callback(callback)
+        int const integration_order,
+        std::function<std::vector<std::vector<double>>()>
+            callback)
+        : _integration_order(integration_order), _callback(callback)
     {
     }
 
     int numberOfComponents() const override { return 1; }
-    int integrationOrder() const override { return 2; }
+    int integrationOrder() const override { return _integration_order; }
 
     std::string name() const override
     {
@@ -48,6 +85,7 @@ struct KappaDIntegrationPointWriter final : public IntegrationPointWriter
     }
 
 private:
+    int const _integration_order;
     std::function<std::vector<std::vector<double>>()> _callback;
 };
 template <int DisplacementDim>
