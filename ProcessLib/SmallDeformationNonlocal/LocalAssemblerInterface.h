@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 
+#include "MaterialLib/SolidModels/Ehlers.h"
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
 #include "ProcessLib/Deformation/MaterialForces.h"
 #include "ProcessLib/LocalAssemblerInterface.h"
