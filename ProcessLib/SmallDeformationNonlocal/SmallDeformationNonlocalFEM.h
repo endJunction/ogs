@@ -599,7 +599,7 @@ public:
 
             //if (damage > 0)
             {
-                double pressure = _process_data.pressure * damage;
+                // double pressure = _process_data.pressure * damage;
                 // INFO("Pressure at effective stress: %.4e and sigma_prev %.4e
                 // %.4e %.4e",
                 //     _process_data.pressure,sigma_prev[0],sigma_prev[1],sigma_prev[2]);
