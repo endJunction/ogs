@@ -11,6 +11,9 @@
 
 #include <Eigen/Eigenvalues>
 #include <boost/math/special_functions/pow.hpp>
+#include <logog/include/logog.hpp>
+
+#include "MaterialLib/SolidModels/Ehlers.h"
 
 namespace ProcessLib
 {
