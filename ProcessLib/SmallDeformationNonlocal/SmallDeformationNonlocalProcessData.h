@@ -9,6 +9,9 @@
 
 #pragma once
 
+#include <memory>
+#include <utility>
+
 namespace MeshLib
 {
 class Element;
