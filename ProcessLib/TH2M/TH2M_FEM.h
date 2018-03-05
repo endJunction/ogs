@@ -11,12 +11,14 @@
 
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include "MathLib/KelvinVector.h"
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "NumLib/DOF/DOFTableUtil.h"
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
+#include "NumLib/Function/Interpolation.h"
 #include "ProcessLib/Deformation/BMatrixPolicy.h"
 #include "ProcessLib/Deformation/LinearBMatrix.h"
 #include "ProcessLib/LocalAssemblerTraits.h"
@@ -212,6 +214,9 @@ public:
                     matrix_size>>(
                     local_rhs_data, matrix_size);
 
+
+
+
         // assign sub-matrices:
         // water component equation (aka non-wetting-pressure eq.)
 
@@ -246,19 +251,52 @@ public:
                 local_rhs.template segment<displacement_size>(displacement_index);
 
 
-//        typename ShapeMatricesTypePressure::NodalMatrixType laplace_p =
-//            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
-//                    gas_pressure_size);
-//
-//        typename ShapeMatricesTypePressure::NodalMatrixType storage_p =
-//            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
-//                    gas_pressure_size);
-//
-//        typename ShapeMatricesTypeDisplacement::template MatrixType<
-//        Nu_intPoints, Np_intPoints>
-//            Kup = ShapeMatricesTypeDisplacement::template MatrixType<
-//                displacement_size, gas_pressure_size>::Zero(displacement_size,
-//                                                        gas_pressure_size);
+
+//         ********************************************************************
+//        from H2:
+//         ********************************************************************
+
+        auto Mgp =
+              local_M.template block<gas_pressure_size, gas_pressure_size>(
+                  gas_pressure_index, gas_pressure_index);
+
+          auto Mgpc = local_M.template block<gas_pressure_size, cap_pressure_size>(
+              gas_pressure_index, cap_pressure_index);
+
+          auto Mlpc = local_M.template block<cap_pressure_size, cap_pressure_size>(
+              cap_pressure_index, cap_pressure_index);
+
+//          NodalMatrixType laplace_operator =
+//              NodalMatrixType::Zero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
+
+          typename ShapeMatricesTypePressure::NodalMatrixType laplace_operator =
+              ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
+                                                               gas_pressure_size);
+
+
+          auto Kgp =
+              local_K.template block<gas_pressure_size, gas_pressure_size>(
+                  gas_pressure_index, gas_pressure_index);
+
+          auto Klp = local_K.template block<cap_pressure_size, gas_pressure_size>(
+              cap_pressure_index, gas_pressure_index);
+
+          auto Klpc = local_K.template block<cap_pressure_size, cap_pressure_size>(
+              cap_pressure_index, cap_pressure_index);
+
+          auto Bg = local_rhs.template segment<gas_pressure_size>(
+              gas_pressure_index);
+
+          auto Bl = local_rhs.template segment<cap_pressure_size>(cap_pressure_index);
+
+
+          auto gravity_operator =
+                  local_rhs.template segment<gas_pressure_size>(gas_pressure_index);
+
+
+//         ********************************************************************
+
+
 
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
@@ -301,12 +339,19 @@ public:
             double const K_over_mu =
                 _process_data.intrinsic_permeability(t, x_position)[0] /
                 _process_data.fluid_viscosity(t, x_position)[0];
+
+            auto const permeability = _process_data.intrinsic_permeability(t, x_position)[0];
+
             auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
             auto const rho_sr = _process_data.solid_density(t, x_position)[0];
             auto const rho_fr = _process_data.fluid_density(t, x_position)[0];
-            auto const porosity = _process_data.porosity(t, x_position)[0];
+            // auto const porosity = _process_data.porosity(t, x_position)[0];
+            double const porosity = 0.2975;
             auto const rho = rho_sr * (1 - porosity) + porosity * rho_fr;
             auto const& b = _process_data.specific_body_force;
+
+
+
             auto const& identity2 = MathLib::KelvinVector::Invariants<
                     MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value>::identity2;
 
@@ -316,23 +361,100 @@ public:
             auto C = _ip_data[ip].updateConstitutiveRelation(t, x_position, dt, u);
 
 
-            // mass balance:
+//            // mass balance:
+//
+//            Mpp.noalias() += N_p.transpose() * S * N_p * w;
+//            Mpu.noalias() += N_p.transpose() * alpha * identity2.transpose() * B * w;
+//
+//            Kpp.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
+//
+//            // Kpu = 0
+//
+//            fp.noalias() += dNdx_p.transpose() * rho_fr * K_over_mu * b * w;
+//
+//            // momentum balance:
+//
+//            //Muu = Mup = 0
+//            Kup.noalias() -= B.transpose() * alpha * identity2 * N_p * w;
+//            // Kuu = 0
+//            fu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
-            Mpp.noalias() += N_p.transpose() * S * N_p * w;
-            Mpu.noalias() += N_p.transpose() * alpha * identity2.transpose() * B * w;
 
-            Kpp.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
+            double pc_int_pt = 0.;
+            double pn_int_pt = 0.;
+            NumLib::shapeFunctionInterpolate(local_x, N_p, pn_int_pt,
+                                             pc_int_pt);
 
-            // Kpu = 0
+            _pressure_wet[ip] = pn_int_pt - pc_int_pt;
 
-            fp.noalias() += dNdx_p.transpose() * rho_fr * K_over_mu * b * w;
+            const double temperature = 293.15;
+            const double molar_mass  = 0.2896;
+            const double gas_constant = 8.3144621;
 
-            // momentum balance:
+            double const rho_nonwet = molar_mass * pn_int_pt / gas_constant / temperature;
 
-            //Muu = Mup = 0
-            Kup.noalias() -= B.transpose() * alpha * identity2 * N_p * w;
-            // Kuu = 0
-            fu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
+            double const rho_wet = 1000.;
+
+            const double m_sw =-1.00623E-05;
+            const double n_sw = 1.0;
+
+            double const Sw = m_sw * pc_int_pt + n_sw;
+
+            _saturation[ip] = Sw;
+            double dSw_dpc = m_sw;
+
+            double const drhononwet_dpn = molar_mass / gas_constant / temperature;
+
+            double const Se = std::min(0.8,Sw/0.8);
+
+            // gas
+            double const k_rel_nonwet = std::max(0.0001,(1.-Se)*(1.-Se)*(1-std::pow(Se, 1.+2./3.)));
+
+            double const mu_nonwet = 1.8e-5;
+            double const lambda_nonwet = k_rel_nonwet / mu_nonwet;
+
+            // liquid
+            double const m_krel = 2.352941176;
+            double const n_krel = -1.352941176;
+            double const k_rel_wet = m_krel*Sw+n_krel;
+            double const mu_wet = 1.0e-3;
+            double const lambda_wet = k_rel_wet / mu_wet;
+
+
+
+            // Assemble M matrix
+            // nonwetting
+
+            Mgp.noalias() +=
+                porosity * (1 - Sw) * drhononwet_dpn * N_p.transpose() * N_p;
+            Mgpc.noalias() +=
+                -porosity * rho_nonwet * dSw_dpc * N_p.transpose() * N_p;
+
+            Mlpc.noalias() +=
+                porosity * dSw_dpc * rho_wet * N_p.transpose() * N_p;
+
+
+
+
+            laplace_operator.noalias() = dNdx_p.transpose() *
+                                         permeability * dNdx_p *
+                                         w;
+
+            Kgp.noalias() += rho_nonwet * lambda_nonwet * laplace_operator;
+
+            Klp.noalias() += rho_wet * lambda_wet * laplace_operator;
+            Klpc.noalias() += -rho_wet * lambda_wet * laplace_operator;
+
+
+
+                gravity_operator = dNdx_p.transpose() * permeability * b *
+                                                               w;
+
+                Bg.noalias() +=
+                    rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
+                Bl.noalias() += rho_wet * rho_wet * lambda_wet * gravity_operator;
+
+
 
 
         }
@@ -767,6 +889,14 @@ private:
     SecondaryData<
         typename ShapeMatricesTypeDisplacement::ShapeMatrices::ShapeType>
         _secondary_data;
+
+
+    // output vector for wetting phase saturation and pressure with
+    // respect to each integration point
+    std::vector<double> _saturation;
+    std::vector<double> _pressure_wet;
+    // Todo: do I need those, or do they belong into ip_data container??
+
 
     static const int Np_intPoints = ShapeFunctionPressure::NPOINTS;
     static const int gas_pressure_index = 0;
