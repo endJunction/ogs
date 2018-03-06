@@ -600,8 +600,8 @@ public:
                 //double pressure = 1.0e6* damage;
                     //_process_data.injected_volume / _process_data.crack_volume;
                 sigma_r = sigma;
-                sigma_r.template topLeftCorner<3, 1>() -=
-                    Eigen::Matrix<double, 3, 1>::Constant(pressure);
+                //sigma_r.template topLeftCorner<3, 1>() -=
+                //  Eigen::Matrix<double, 3, 1>::Constant(pressure);
             }
 
             local_b.noalias() -= B.transpose() * sigma_r * w;

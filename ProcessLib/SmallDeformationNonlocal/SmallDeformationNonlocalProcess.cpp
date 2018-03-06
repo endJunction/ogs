@@ -441,7 +441,7 @@ SmallDeformationNonlocalProcess<DisplacementDim>::postIterationConcreteProcess(
 
     if (_process_data.pressure_error > 1e-4)
     {
-        return NumLib::IterationResult::REPEAT_ITERATION;
+        //return NumLib::IterationResult::REPEAT_ITERATION;
     }
 
 

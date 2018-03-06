@@ -243,7 +243,7 @@ private:
                                     ConstructorArgs&&...)>;
 
     template <typename ShapeFunction>
-    using IntegrationMethod = typename NumLib::GaussLobattoIntegrationPolicy<
+    using IntegrationMethod = typename NumLib::GaussLegendreIntegrationPolicy<
         typename ShapeFunction::MeshElement>::IntegrationMethod;
 
     template <typename ShapeFunction>
