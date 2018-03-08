@@ -22,6 +22,14 @@ CentralDifferencesJacobianAssembler::CentralDifferencesJacobianAssembler(
         OGS_FATAL("No values for the absolute epsilons have been given.");
 }
 
+void printStdVector (std::vector<double> v)
+{
+    for (unsigned i=0; i<v.size(); i++)
+    {
+        std::cout << "   " << v[i] << "\n";
+    }
+}
+
 void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     LocalAssemblerInterface& local_assembler, const double t,
     const std::vector<double>& local_x_data,
@@ -71,10 +79,60 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         local_assembler.assemble(t, _local_x_perturbed_data, local_M_data,
                                  local_K_data, local_b_data);
 
+        std::cout << "=============\n";
+        std::cout << "   local_x   \n";
+        std::cout << "=============\n";
+
+        std::cout << local_x;
+        std::cout << "\n";
+        std::cout << "=================\n";
+        std::cout << "   local_x_dot   \n";
+        std::cout << "=================\n";
+
+        std::cout << local_xdot;
+        std::cout << "\n";
+        std::cout << "=============\n";
+        std::cout << "   M(x+eps)  \n";
+        std::cout << "=============\n";
+
+        printStdVector(local_M_data);
+        std::cout << "\n";
+        std::cout << "=============\n";
+        std::cout << "   K(x+eps)  \n";
+        std::cout << "=============\n";
+
+        printStdVector(local_K_data);
+        std::cout << "\n";
+        std::cout << "=============\n";
+        std::cout << "   b(x+eps)  \n";
+        std::cout << "=============\n";
+
+        printStdVector(local_b_data);
+        std::cout << "\n";
+
         _local_x_perturbed_data[i] = local_x_data[i] - eps;
         local_assembler.assemble(t, _local_x_perturbed_data, _local_M_data,
                                  _local_K_data, _local_b_data);
 
+
+        std::cout << "=============\n";
+        std::cout << "   M(x-eps)  \n";
+        std::cout << "=============\n";
+
+        printStdVector(local_M_data);
+        std::cout << "\n";
+        std::cout << "=============\n";
+        std::cout << "   K(x-eps)  \n";
+        std::cout << "=============\n";
+
+        printStdVector(local_K_data);
+        std::cout << "\n";
+        std::cout << "=============\n";
+        std::cout << "   b(x-eps)  \n";
+        std::cout << "=============\n";
+
+        printStdVector(local_b_data);
+        std::cout << "\n";
         _local_x_perturbed_data[i] = local_x_data[i];
 
         if (!local_M_data.empty()) {
@@ -125,6 +183,36 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_K * dx_dx;
     }
+
+
+    if (num_r_c > 8) // in case of th2m
+    {
+           local_Jac.template block<20, 20>(8,8).setIdentity();
+    }
+
+//    auto const rows = local_Jac.rows();
+//    auto const cols = local_Jac.cols();
+
+    auto const rows = 8;
+    auto const cols = 8;
+
+    std::cout << "--------------\n";
+    std::cout << "Jacobi-Matrix:\n";
+    std::cout << "--------------\n";
+    for (int r=0; r<rows; r++)
+    {
+        for (int c=0; c<cols; c++)
+        {
+            std::cout << local_Jac(r,c) << " ";
+        }
+
+        std::cout << "\n";
+    }
+    std::cout << "--------------\n";
+
+    std::cout << "done.\n";
+   OGS_FATAL("Ende Gelände.");
+
 }
 
 std::unique_ptr<CentralDifferencesJacobianAssembler>
