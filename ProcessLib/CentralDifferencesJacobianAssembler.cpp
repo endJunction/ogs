@@ -39,13 +39,13 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     std::vector<double>& local_Jac_data)
 {
     // TODO do not check in every call.
-    if (local_x_data.size() % _absolute_epsilons.size() != 0) {
-        OGS_FATAL(
-            "The number of specified epsilons (%u) and the number of local "
-            "d.o.f.s (%u) do not match, i.e., the latter is not divisable by "
-            "the former.",
-            _absolute_epsilons.size(), local_x_data.size());
-    }
+//    if (local_x_data.size() % _absolute_epsilons.size() != 0) {
+//        OGS_FATAL(
+//            "The number of specified epsilons (%u) and the number of local "
+//            "d.o.f.s (%u) do not match, i.e., the latter is not divisable by "
+//            "the former.",
+//            _absolute_epsilons.size(), local_x_data.size());
+//    }
 
     auto const num_r_c =
         static_cast<Eigen::MatrixXd::Index>(local_x_data.size());
@@ -73,7 +73,10 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     {
         // assume that local_x_data is ordered by component.
         auto const component = i / num_dofs_per_component;
-        auto const eps = _absolute_epsilons[component];
+   //     auto const eps = _absolute_epsilons[component];
+
+   // HACK!!!
+        auto const eps = 1.0e-7;
 
         _local_x_perturbed_data[i] += eps;
         local_assembler.assemble(t, _local_x_perturbed_data, local_M_data,
