@@ -174,14 +174,123 @@ void TwoPhaseFlowWithPPLocalAssembler<
         if (_process_data.has_gravity)
         {
             auto const& b = _process_data.specific_body_force;
+            auto const& dNdx_T = _ip_data[ip].dNdx.transpose();
+            auto const& K = permeability;
+            auto const& w = _ip_data[ip].integration_weight;
 
             NodalVectorType gravity_operator = _ip_data[ip].dNdx.transpose() *
-                                               permeability * b *
-                                               _ip_data[ip].integration_weight;
+                                        permeability * b *
+                                        _ip_data[ip].integration_weight;
+
+
+//            Im Gegensatz zu TH2M funktioniert das hier:
+
+//            auto const gravity_operator =_ip_data[ip].dNdx.transpose() *
+//                    permeability * b *
+//                    _ip_data[ip].integration_weight;
+
             Bg.noalias() +=
-                rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
+                    rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
             Bl.noalias() += rho_wet * rho_wet * lambda_wet * gravity_operator;
+
+//            std::cout << "------------------------\n";
+//            std::cout << "Constitutive parameters:\n\n";
+//            std::cout << "------------------------\n";
+//
+//            std::cout << "gas_pressure         : " <<  pn_int_pt << "\n";
+//            std::cout << "capillary_pressure   : " <<  pc_int_pt << "\n";
+//            std::cout << "liquid_pressure      : " << _pressure_wet[ip] << "\n";
+//
+//            std::cout << "temperature          : " << temperature << "\n";
+//            std::cout << "density_gas          : " << rho_nonwet << "\n";
+//            std::cout << "density_liquid       : " << rho_wet << "\n";
+//
+//            std::cout << "saturation_liquid    : " << Sw << "\n";
+//
+//            std::cout << "dSw/dpc              : " << dSw_dpc << "\n";
+//            std::cout << "porosity             : " << porosity << "\n";
+//
+//            std::cout << "drho_gas/dp_gas      : " << drhononwet_dpn  << "\n";
+//            std::cout << "rel_permeability_gas : " << k_rel_nonwet << "\n";
+//            std::cout << "viscosity_gas        : " << mu_nonwet << "\n";
+//
+//            std::cout << "rel_permeability_liq : " << k_rel_wet << "\n";
+//            std::cout << "viscosity_liqid      : " << mu_wet << "\n";
+//
+//            std::cout << "permeability_tensor  :\n";
+//            std::cout << permeability << "\n";
+//
+//            std::cout << "specific_body_force  :\n";
+//            std::cout << b << "\n";
+//
+//            std::cout << "\n";
+//
+//            std::cout << "-------------------------\n";
+//            std::cout << "Element shape_functtions:\n\n";
+//            std::cout << "-------------------------\n\n";
+//
+//            std::cout << "N_p                  :\n";
+//            std::cout << _ip_data[ip].N << "\n";
+//
+//            std::cout << "dNdx_p               :\n";
+//            std::cout << _ip_data[ip].dNdx << "\n";
+//
+//            std::cout << "dNdx_p.transpose()   :\n";
+//            std::cout << _ip_data[ip].dNdx.transpose() << "\n";
+//
+//            std::cout << "integration_weight   :" << _ip_data[ip].integration_weight << "\n";
+//            std::cout << "\n";
+//
+//
+//            std::cout << "--------------------------------\n";
+//            std::cout << "Auxiliary matrices and vectors :\n\n";
+//            std::cout << "--------------------------------\n\n";
+//
+//            std::cout << "laplace_operator     :\n";
+//            std::cout << laplace_operator << "\n";
+//            std::cout << "\n";
+//            std::cout << "gravity_operator     :\n";
+//            std::cout << gravity_operator << "\n";
+//            std::cout << "\n";
+//
+//            std::cout << "-------------------------------\n";
+//            std::cout << "Element mass matrix components:\n\n";
+//            std::cout << "-------------------------------\n\n";
+//
+//            std::cout << "Mgpg:\n";
+//            std::cout << Mgp << "\n";
+//            std::cout << "Mgpc:\n";
+//            std::cout << Mgpc << "\n";
+//            std::cout << "Mlpc:\n";
+//            std::cout << Mlpc << "\n";
+//            std::cout << "\n";
+//
+//            std::cout << "------------------------------------\n";
+//            std::cout << "Element stiffness matrix components:\n\n";
+//            std::cout << "------------------------------------\n\n";
+//
+//            std::cout << "Kgpg:\n";
+//            std::cout << Kgp << "\n";
+//            std::cout << "Klpg:\n";
+//            std::cout << Klp << "\n";
+//            std::cout << "Klpc:\n";
+//            std::cout << Klpc << "\n";
+//            std::cout << "\n";
+//
+//            std::cout << "------------------------------\n";
+//            std::cout << "Element rhs vector components:\n\n";
+//            std::cout << "------------------------------\n\n";
+//
+//            std::cout << "fg:\n";
+//            std::cout << Bg << "\n";
+//            std::cout << "fl:\n";
+//            std::cout << Bl << "\n";
+//            std::cout << "\n";
+//
+//            std::cout << "------------------------------\n\n";
+
         }  // end of has gravity
+
     }
     if (_process_data.has_mass_lumping)
     {
