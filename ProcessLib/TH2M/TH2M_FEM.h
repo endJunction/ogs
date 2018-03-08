@@ -125,7 +125,9 @@ public:
         : _process_data(process_data),
           _integration_method(integration_order),
           _element(e),
-          _is_axially_symmetric(is_axially_symmetric)
+          _is_axially_symmetric(is_axially_symmetric),
+          _saturation(std::vector<double>(_integration_method.getNumberOfPoints())),
+          _pressure_wet(std::vector<double>(_integration_method.getNumberOfPoints()))
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -195,6 +197,12 @@ public:
         const auto matrix_size = gas_pressure_size + cap_pressure_size +
                 temperature_size + displacement_size;
 
+
+        auto p_GR = Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+            gas_pressure_size> const>(local_x.data() + gas_pressure_index, gas_pressure_size);
+
+        auto p_cap = Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+            cap_pressure_size> const>(local_x.data() + cap_pressure_index, cap_pressure_size);
 
         // create mass matrix
         auto local_M = MathLib::createZeroedMatrix<
@@ -289,9 +297,9 @@ public:
 
           auto Bl = local_rhs.template segment<cap_pressure_size>(cap_pressure_index);
 
-
-          auto gravity_operator =
-                  local_rhs.template segment<gas_pressure_size>(gas_pressure_index);
+//
+//          auto gravity_operator =
+//                  local_rhs.template segment<gas_pressure_size>(gas_pressure_index);
 
 
 //         ********************************************************************
@@ -309,6 +317,17 @@ public:
                                                     template VectorType<displacement_size> const>(
                                 local_x.data() + displacement_index, displacement_size);
 
+//
+//        const Eigen::MatrixXd& perm = _process_data.material->getPermeability(
+//            material_id, t, pos, _element.getDimension());
+//        assert(perm.rows() == _element.getDimension() || perm.rows() == 1);
+//        GlobalDimMatrixType permeability = GlobalDimMatrixType::Zero(
+//            _element.getDimension(), _element.getDimension());
+//        if (perm.rows() == _element.getDimension())
+//            permeability = perm;
+//        else if (perm.rows() == 1)
+//            permeability.diagonal().setConstant(perm(0, 0));
+
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
@@ -321,6 +340,9 @@ public:
 
             auto const& N_p = _ip_data[ip].N_p;
             auto const& dNdx_p = _ip_data[ip].dNdx_p;
+
+            auto const& mass_operator = N_p.transpose()*N_p*w;
+
 
             auto const x_coord =
                 interpolateXCoordinate<ShapeFunctionDisplacement,
@@ -341,6 +363,16 @@ public:
                 _process_data.fluid_viscosity(t, x_position)[0];
 
             auto const permeability = _process_data.intrinsic_permeability(t, x_position)[0];
+
+            using permTensorType = Eigen::Matrix<double, DisplacementDim, DisplacementDim>;
+
+            permTensorType perm_tensor;
+
+            perm_tensor.template block<2,
+            2>(0,0).setIdentity();
+
+            auto permeability_tensor = permeability * perm_tensor;
+
 
             auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
             auto const rho_sr = _process_data.solid_density(t, x_position)[0];
@@ -379,16 +411,14 @@ public:
 //            // Kuu = 0
 //            fu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
+            auto const pc_int_pt = p_cap.dot(N_p);
+            auto const pn_int_pt = p_GR.dot(N_p);
 
-            double pc_int_pt = 0.;
-            double pn_int_pt = 0.;
-            NumLib::shapeFunctionInterpolate(local_x, N_p, pn_int_pt,
-                                             pc_int_pt);
 
             _pressure_wet[ip] = pn_int_pt - pc_int_pt;
 
             const double temperature = 293.15;
-            const double molar_mass  = 0.2896;
+            const double molar_mass  = 0.02896;
             const double gas_constant = 8.3144621;
 
             double const rho_nonwet = molar_mass * pn_int_pt / gas_constant / temperature;
@@ -405,7 +435,9 @@ public:
 
             double const drhononwet_dpn = molar_mass / gas_constant / temperature;
 
-            double const Se = std::min(0.8,Sw/0.8);
+            const double _sw = std::min(std::max(0.0,Sw),0.8);
+
+            double const Se = _sw/0.8;
 
             // gas
             double const k_rel_nonwet = std::max(0.0001,(1.-Se)*(1.-Se)*(1-std::pow(Se, 1.+2./3.)));
@@ -426,19 +458,16 @@ public:
             // nonwetting
 
             Mgp.noalias() +=
-                porosity * (1 - Sw) * drhononwet_dpn * N_p.transpose() * N_p;
+                    porosity * (1 - Sw) * drhononwet_dpn * N_p.transpose() * N_p * w;
             Mgpc.noalias() +=
-                -porosity * rho_nonwet * dSw_dpc * N_p.transpose() * N_p;
+                    -porosity * rho_nonwet * dSw_dpc * N_p.transpose() * N_p * w;
 
             Mlpc.noalias() +=
-                porosity * dSw_dpc * rho_wet * N_p.transpose() * N_p;
-
-
-
+                    porosity * dSw_dpc * rho_wet * N_p.transpose() * N_p * w;
 
             laplace_operator.noalias() = dNdx_p.transpose() *
-                                         permeability * dNdx_p *
-                                         w;
+                    permeability_tensor * dNdx_p *
+                    w;
 
             Kgp.noalias() += rho_nonwet * lambda_nonwet * laplace_operator;
 
@@ -447,14 +476,135 @@ public:
 
 
 
-                gravity_operator = dNdx_p.transpose() * permeability * b *
-                                                               w;
+// Das kompiliert, aber der erste Eintrag der Ergebnismatrix ist null!
 
-                Bg.noalias() +=
-                    rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
-                Bl.noalias() += rho_wet * rho_wet * lambda_wet * gravity_operator;
+//          auto const gravity_operator = dNdx_p.transpose() * permeability_tensor * b * w;
+//
+// Viel schlimmer noch, bei Ausgabe der einzelnen Komponenten mittels
+// for r { for c { std::cout << gravity_operator(r,c);}} kommen andere
+// Ergebnisse raus als bei std::cout << gravity_operator;
 
 
+
+// Das geht nicht, weil ich angeblich Matrizen unterschiedlicher Größe
+// verwenden würde (?)
+
+//          Eigen::Matrix<double, 4, 1> gravity_operator;
+//          gravity_operator.setZero();
+//          gravity_operator=dNdx_p.transpose() * permeability_tensor * b * w;
+//
+//  btw.: die Multiplikation geht, der Fehler tritt erst bei der Berechnung
+//  von Bg auf.
+//
+//            Bg.noalias() +=
+//                    rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
+//
+//            Bl.noalias() += rho_wet * rho_wet * lambda_wet * gravity_operator;
+
+
+//  Das hier geht immerhin.
+
+            Bg.noalias() +=
+                    rho_nonwet * rho_nonwet * lambda_nonwet *
+                    dNdx_p.transpose() * permeability_tensor * b * w;
+
+            Bl.noalias() += rho_wet * rho_wet * lambda_wet *
+                    dNdx_p.transpose() * permeability_tensor * b * w;
+
+
+//            std::cout << "------------------------\n";
+//            std::cout << "Constitutive parameters:\n\n";
+//            std::cout << "------------------------\n";
+//
+//            std::cout << "gas_pressure         : " <<  pn_int_pt << "\n";
+//            std::cout << "capillary_pressure   : " <<  pc_int_pt << "\n";
+//            std::cout << "liquid_pressure      : " << _pressure_wet[ip] << "\n";
+//
+//            std::cout << "temperature          : " << temperature << "\n";
+//            std::cout << "density_gas          : " << rho_nonwet << "\n";
+//            std::cout << "density_liquid       : " << rho_wet << "\n";
+//
+//            std::cout << "saturation_liquid    : " << Sw << "\n";
+//
+//            std::cout << "dSw/dpc              : " << dSw_dpc << "\n";
+//            std::cout << "porosity             : " << porosity << "\n";
+//
+//            std::cout << "drho_gas/dp_gas      : " << drhononwet_dpn  << "\n";
+//            std::cout << "rel_permeability_gas : " << k_rel_nonwet << "\n";
+//            std::cout << "viscosity_gas        : " << mu_nonwet << "\n";
+//
+//            std::cout << "rel_permeability_liq : " << k_rel_wet << "\n";
+//            std::cout << "viscosity_liqid      : " << mu_wet << "\n";
+//
+//            std::cout << "permeability_tensor  :\n";
+//            std::cout << permeability_tensor << "\n";
+//
+//            std::cout << "specific_body_force  :\n";
+//            std::cout << b << "\n";
+//
+//            std::cout << "\n";
+//
+//            std::cout << "-------------------------\n";
+//            std::cout << "Element shape_functtions:\n\n";
+//            std::cout << "-------------------------\n\n";
+//
+//            std::cout << "N_p                  :\n";
+//            std::cout << _ip_data[ip].N_p << "\n";
+//
+//            std::cout << "dNdx_p               :\n";
+//            std::cout << _ip_data[ip].dNdx_p << "\n";
+//
+//            std::cout << "dNdx_p.transpose()   :\n";
+//            std::cout << _ip_data[ip].dNdx_p.transpose() << "\n";
+//
+//            std::cout << "integration_weight   :" << _ip_data[ip].integration_weight << "\n";
+//            std::cout << "\n";
+//
+//
+//            std::cout << "--------------------------------\n";
+//            std::cout << "Auxiliary matrices and vectors :\n\n";
+//            std::cout << "--------------------------------\n\n";
+//
+//            std::cout << "laplace_operator     :\n";
+//            std::cout << laplace_operator << "\n";
+//            std::cout << "\n";
+
+
+//            std::cout << "-------------------------------\n";
+//            std::cout << "Element mass matrix components:\n\n";
+//            std::cout << "-------------------------------\n\n";
+//
+//            std::cout << "Mgpg:\n";
+//            std::cout << Mgp << "\n";
+//            std::cout << "Mgpc:\n";
+//            std::cout << Mgpc << "\n";
+//            std::cout << "Mlpc:\n";
+//            std::cout << Mlpc << "\n";
+//            std::cout << "\n";
+//
+//            std::cout << "------------------------------------\n";
+//            std::cout << "Element stiffness matrix components:\n\n";
+//            std::cout << "------------------------------------\n\n";
+//
+//            std::cout << "Kgpg:\n";
+//            std::cout << Kgp << "\n";
+//            std::cout << "Klpg:\n";
+//            std::cout << Klp << "\n";
+//            std::cout << "Klpc:\n";
+//            std::cout << Klpc << "\n";
+//            std::cout << "\n";
+//
+//            std::cout << "------------------------------\n";
+//            std::cout << "Element rhs vector components:\n\n";
+//            std::cout << "------------------------------\n\n";
+//
+//            std::cout << "fg:\n";
+//            std::cout << Bg << "\n";
+//            std::cout << "fl:\n";
+//            std::cout << Bl << "\n";
+//            std::cout << "\n";
+//
+//            std::cout << "------------------------------\n\n";
 
 
         }
@@ -791,6 +941,26 @@ public:
         return getIntPtEpsilon(cache, 5);
     }
 
+    std::vector<double> const& getIntPtSaturation(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_saturation.empty());
+        return _saturation;
+    }
+
+    std::vector<double> const& getIntPtWetPressure(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_pressure_wet.empty());
+        return _pressure_wet;
+    }
+
     std::vector<double> const& getIntPtDarcyVelocity(
         const double t,
         GlobalVector const& current_solution,
@@ -895,7 +1065,7 @@ private:
     // respect to each integration point
     std::vector<double> _saturation;
     std::vector<double> _pressure_wet;
-    // Todo: do I need those, or do they belong into ip_data container??
+
 
 
     static const int Np_intPoints = ShapeFunctionPressure::NPOINTS;
