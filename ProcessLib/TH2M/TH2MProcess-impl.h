@@ -137,6 +137,19 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
         makeExtrapolator(1, getExtrapolator(), _local_assemblers,
                          &LocalAssemblerInterface::getIntPtSigmaXY));
 
+    Base::_secondary_variables.addSecondaryVariable(
+        "saturation",
+        makeExtrapolator(
+            1, getExtrapolator(), _local_assemblers,
+            &LocalAssemblerInterface::getIntPtSaturation));
+
+    Base::_secondary_variables.addSecondaryVariable(
+        "pressure_wet",
+        makeExtrapolator(
+            1, getExtrapolator(), _local_assemblers,
+            &LocalAssemblerInterface::getIntPtWetPressure));
+
+
     if (DisplacementDim == 3)
     {
         Base::_secondary_variables.addSecondaryVariable(
