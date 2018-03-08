@@ -296,6 +296,8 @@ void PhaseFieldProcess<DisplacementDim>::preTimestepConcreteProcess(
     _process_data.dt = dt;
     _process_data.t = t;
     _process_data.injected_volume = _process_data.t;
+    _x_previous_timestep =
+        MathLib::MatrixVectorTraits<GlobalVector>::newInstance(x);
 
     GlobalExecutor::executeMemberOnDereferenced(
         &LocalAssemblerInterface::preTimestep, _local_assemblers,
@@ -382,6 +384,14 @@ void PhaseFieldProcess<DisplacementDim>::postNonLinearSolverConcreteProcess(
                                    1 / _process_data.pressure);
         }
     }
+}
+
+template <int DisplacementDim>
+void PhaseFieldProcess<DisplacementDim>::updateConstraints(GlobalVector& lower,
+                                                           GlobalVector& upper)
+{
+    lower.setZero();
+    MathLib::LinAlg::copy(*_x_previous_timestep, upper);
 }
 }  // namespace PhaseField
 }  // namespace ProcessLib
