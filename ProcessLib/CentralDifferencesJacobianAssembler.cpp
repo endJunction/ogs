@@ -9,8 +9,8 @@
 
 #include "CentralDifferencesJacobianAssembler.h"
 #include "BaseLib/Error.h"
-#include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "LocalAssemblerInterface.h"
+#include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 
 namespace ProcessLib
 {
@@ -39,7 +39,8 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     std::vector<double>& local_Jac_data)
 {
     // TODO do not check in every call.
-    if (local_x_data.size() % _absolute_epsilons.size() != 0) {
+    if (local_x_data.size() % _absolute_epsilons.size() != 0)
+    {
         OGS_FATAL(
             "The number of specified epsilons (%u) and the number of local "
             "d.o.f.s (%u) do not match, i.e., the latter is not divisable by "
@@ -55,9 +56,13 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     auto const local_xdot =
         MathLib::toVector<Eigen::VectorXd>(local_xdot_data, num_r_c);
 
-    auto local_Jac = MathLib::createZeroedMatrix(local_Jac_data,
-                                             num_r_c, num_r_c);
-    _local_x_perturbed_data = local_x_data;
+    auto local_Jac =
+        MathLib::createZeroedMatrix(local_Jac_data, num_r_c, num_r_c);
+
+    std::vector<double> local_M_data_;
+    std::vector<double> local_K_data_;
+    std::vector<double> local_b_data_;
+    std::vector<double> local_x_perturbed_data_(local_x_data);
 
     auto const num_dofs_per_component =
         local_x_data.size() / _absolute_epsilons.size();
@@ -74,74 +79,68 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     {
         // assume that local_x_data is ordered by component.
         auto const component = i / num_dofs_per_component;
-  //    auto const eps = _absolute_epsilons[component];
+        auto const eps = _absolute_epsilons[component];
 
-        // Hack! size of _absolute_epsilons must equal the size of local_x_data!
-        auto const eps = _absolute_epsilons[i];
-
-
-        _local_x_perturbed_data[i] += eps;
-        local_assembler.assemble(t, _local_x_perturbed_data, local_M_data,
+        local_x_perturbed_data_[i] += eps;
+        local_assembler.assemble(t, local_x_perturbed_data_, local_M_data,
                                  local_K_data, local_b_data);
 
+        local_x_perturbed_data_[i] = local_x_data[i] - eps;
+        local_assembler.assemble(t, local_x_perturbed_data_, local_M_data_,
+                                 local_K_data_, local_b_data_);
 
-        _local_x_perturbed_data[i] = local_x_data[i] - eps;
-        local_assembler.assemble(t, _local_x_perturbed_data, _local_M_data,
-                                 _local_K_data, _local_b_data);
+        local_x_perturbed_data_[i] = local_x_data[i];
 
-        _local_x_perturbed_data[i] = local_x_data[i];
-
-        if (!local_M_data.empty()) {
+        if (!local_M_data.empty())
+        {
             auto const local_M_p =
                 MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
             auto const local_M_m =
-                MathLib::toMatrix(_local_M_data, num_r_c, num_r_c);
+                MathLib::toMatrix(local_M_data_, num_r_c, num_r_c);
             local_Jac.col(i).noalias() +=
                 // dM/dxi * x_dot
                 (local_M_p - local_M_m) * local_xdot / (2.0 * eps);
-
             local_M_data.clear();
-            _local_M_data.clear();
+            local_M_data_.clear();
         }
-        if (!local_K_data.empty()) {
+        if (!local_K_data.empty())
+        {
             auto const local_K_p =
                 MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
             auto const local_K_m =
-                MathLib::toMatrix(_local_K_data, num_r_c, num_r_c);
+                MathLib::toMatrix(local_K_data_, num_r_c, num_r_c);
             local_Jac.col(i).noalias() +=
                 // dK/dxi * x
                 (local_K_p - local_K_m) * local_x / (2.0 * eps);
-
             local_K_data.clear();
-            _local_K_data.clear();
+            local_K_data_.clear();
         }
-        if (!local_b_data.empty()) {
+        if (!local_b_data.empty())
+        {
             auto const local_b_p =
                 MathLib::toVector<Eigen::VectorXd>(local_b_data, num_r_c);
             auto const local_b_m =
-                MathLib::toVector<Eigen::VectorXd>(_local_b_data, num_r_c);
+                MathLib::toVector<Eigen::VectorXd>(local_b_data_, num_r_c);
             local_Jac.col(i).noalias() -=
                 // db/dxi
                 (local_b_p - local_b_m) / (2.0 * eps);
-
             local_b_data.clear();
-            _local_b_data.clear();
+            local_b_data_.clear();
         }
     }
-
-
 
     // Assemble with unperturbed local x.
     local_assembler.assemble(t, local_x_data, local_M_data, local_K_data,
                              local_b_data);
 
     // Compute remaining terms of the Jacobian.
-    if (dxdot_dx != 0.0 && !local_M_data.empty()) {
+    if (dxdot_dx != 0.0 && !local_M_data.empty())
+    {
         auto local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_M * dxdot_dx;
     }
-
-    if (dx_dx != 0.0 && !local_K_data.empty()) {
+    if (dx_dx != 0.0 && !local_K_data.empty())
+    {
         auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_K * dx_dx;
     }
@@ -186,7 +185,8 @@ createCentralDifferencesJacobianAssembler(BaseLib::ConfigTree const& config)
     auto comp_mag = config.getConfigParameterOptional<std::vector<double>>(
         "component_magnitudes");
 
-    if (!!rel_eps != !!comp_mag) {
+    if (!!rel_eps != !!comp_mag)
+    {
         OGS_FATAL(
             "Either both or none of <relative_epsilons> and "
             "<component_magnitudes> have to be specified.");
@@ -194,18 +194,23 @@ createCentralDifferencesJacobianAssembler(BaseLib::ConfigTree const& config)
 
     std::vector<double> abs_eps;
 
-    if (rel_eps) {
-        if (rel_eps->size() != comp_mag->size()) {
+    if (rel_eps)
+    {
+        if (rel_eps->size() != comp_mag->size())
+        {
             OGS_FATAL(
                 "The numbers of components of  <relative_epsilons> and "
                 "<component_magnitudes> do not match.");
         }
 
         abs_eps.resize(rel_eps->size());
-        for (std::size_t i=0; i<rel_eps->size(); ++i) {
+        for (std::size_t i = 0; i < rel_eps->size(); ++i)
+        {
             abs_eps[i] = (*rel_eps)[i] * (*comp_mag)[i];
         }
-    } else {
+    }
+    else
+    {
         // By default 1e-8 is used as epsilon for all components.
         // TODO: remove this default value.
         abs_eps.emplace_back(1e-8);

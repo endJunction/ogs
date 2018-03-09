@@ -59,13 +59,6 @@ public:
 
 private:
     std::vector<double> const _absolute_epsilons;
-
-    // temporary data only stored here in order to avoid frequent memory
-    // reallocations.
-    std::vector<double> _local_M_data;
-    std::vector<double> _local_K_data;
-    std::vector<double> _local_b_data;
-    std::vector<double> _local_x_perturbed_data;
 };
 
 std::unique_ptr<CentralDifferencesJacobianAssembler>

@@ -9,12 +9,13 @@
 
 #include "VectorMatrixAssembler.h"
 
+#include <omp.h>
 #include <cassert>
 #include <functional>  // for std::reference_wrapper.
 
-#include "NumLib/DOF/DOFTableUtil.h"
-#include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "LocalAssemblerInterface.h"
+#include "MathLib/LinAlg/Eigen/EigenMapTools.h"
+#include "NumLib/DOF/DOFTableUtil.h"
 
 #include "CoupledSolutionsForStaggeredScheme.h"
 #include "Process.h"
@@ -56,9 +57,7 @@ void VectorMatrixAssembler::assemble(
     auto const& indices = (cpl_xs == nullptr)
                               ? indices_of_processes[0]
                               : indices_of_processes[cpl_xs->process_id];
-    _local_M_data.clear();
-    _local_K_data.clear();
-    _local_b_data.clear();
+    std::vector<double> _local_M_data, _local_K_data, _local_b_data;
 
     if (cpl_xs == nullptr)
     {
@@ -86,20 +85,25 @@ void VectorMatrixAssembler::assemble(
     auto const r_c_indices =
         NumLib::LocalToGlobalIndexMap::RowColumnIndices(indices, indices);
 
-    if (!_local_M_data.empty())
+#pragma omp critical(OGS_VectorMatrixAssembler_WriteToMatrices)
     {
-        auto const local_M = MathLib::toMatrix(_local_M_data, num_r_c, num_r_c);
-        M.add(r_c_indices, local_M);
-    }
-    if (!_local_K_data.empty())
-    {
-        auto const local_K = MathLib::toMatrix(_local_K_data, num_r_c, num_r_c);
-        K.add(r_c_indices, local_K);
-    }
-    if (!_local_b_data.empty())
-    {
-        assert(_local_b_data.size() == num_r_c);
-        b.add(indices, _local_b_data);
+        if (!_local_M_data.empty())
+        {
+            auto const local_M =
+                MathLib::toMatrix(_local_M_data, num_r_c, num_r_c);
+            M.add(r_c_indices, local_M);
+        }
+        if (!_local_K_data.empty())
+        {
+            auto const local_K =
+                MathLib::toMatrix(_local_K_data, num_r_c, num_r_c);
+            K.add(r_c_indices, local_K);
+        }
+        if (!_local_b_data.empty())
+        {
+            assert(_local_b_data.size() == num_r_c);
+            b.add(indices, _local_b_data);
+        }
     }
 }
 
@@ -125,10 +129,8 @@ void VectorMatrixAssembler::assembleWithJacobian(
                               : indices_of_processes[cpl_xs->process_id];
     auto const local_xdot = xdot.get(indices);
 
-    _local_M_data.clear();
-    _local_K_data.clear();
-    _local_b_data.clear();
-    _local_Jac_data.clear();
+    std::vector<double> _local_M_data, _local_K_data, _local_b_data,
+        _local_Jac_data;
 
     if (cpl_xs == nullptr)
     {
@@ -158,32 +160,38 @@ void VectorMatrixAssembler::assembleWithJacobian(
     auto const r_c_indices =
         NumLib::LocalToGlobalIndexMap::RowColumnIndices(indices, indices);
 
-    if (!_local_M_data.empty())
+#pragma omp critical(OGS_VectorMatrixAssembler_WriteToMatrices)
     {
-        auto const local_M = MathLib::toMatrix(_local_M_data, num_r_c, num_r_c);
-        M.add(r_c_indices, local_M);
-    }
-    if (!_local_K_data.empty())
-    {
-        auto const local_K = MathLib::toMatrix(_local_K_data, num_r_c, num_r_c);
-        K.add(r_c_indices, local_K);
-    }
-    if (!_local_b_data.empty())
-    {
-        assert(_local_b_data.size() == num_r_c);
-        b.add(indices, _local_b_data);
-    }
-    if (!_local_Jac_data.empty())
-    {
-        auto const local_Jac =
-            MathLib::toMatrix(_local_Jac_data, num_r_c, num_r_c);
-        Jac.add(r_c_indices, local_Jac);
-    }
-    else
-    {
-        OGS_FATAL(
-            "No Jacobian has been assembled! This might be due to programming "
-            "errors in the local assembler of the current process.");
+        if (!_local_M_data.empty())
+        {
+            auto const local_M =
+                MathLib::toMatrix(_local_M_data, num_r_c, num_r_c);
+            M.add(r_c_indices, local_M);
+        }
+        if (!_local_K_data.empty())
+        {
+            auto const local_K =
+                MathLib::toMatrix(_local_K_data, num_r_c, num_r_c);
+            K.add(r_c_indices, local_K);
+        }
+        if (!_local_b_data.empty())
+        {
+            assert(_local_b_data.size() == num_r_c);
+            b.add(indices, _local_b_data);
+        }
+        if (!_local_Jac_data.empty())
+        {
+            auto const local_Jac =
+                MathLib::toMatrix(_local_Jac_data, num_r_c, num_r_c);
+            Jac.add(r_c_indices, local_Jac);
+        }
+        else
+        {
+            OGS_FATAL(
+                "No Jacobian has been assembled! This might be due to "
+                "programming "
+                "errors in the local assembler of the current process.");
+        }
     }
 }
 
