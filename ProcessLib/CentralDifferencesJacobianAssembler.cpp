@@ -82,61 +82,19 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         local_assembler.assemble(t, _local_x_perturbed_data, local_M_data,
                                  local_K_data, local_b_data);
 
-        std::cout << "=============\n";
-        std::cout << "   local_x   \n";
-        std::cout << "=============\n";
-
-        std::cout << local_x;
-        std::cout << "\n";
-        std::cout << "=================\n";
-        std::cout << "   local_x_dot   \n";
-        std::cout << "=================\n";
-
-        std::cout << local_xdot;
-        std::cout << "\n";
-        std::cout << "=============\n";
-        std::cout << "   M(x+eps)  \n";
-        std::cout << "=============\n";
-
-        printStdVector(local_M_data);
-        std::cout << "\n";
-        std::cout << "=============\n";
-        std::cout << "   K(x+eps)  \n";
-        std::cout << "=============\n";
-
-        printStdVector(local_K_data);
-        std::cout << "\n";
-        std::cout << "=============\n";
-        std::cout << "   b(x+eps)  \n";
-        std::cout << "=============\n";
-
-        printStdVector(local_b_data);
-        std::cout << "\n";
 
         _local_x_perturbed_data[i] = local_x_data[i] - eps;
         local_assembler.assemble(t, _local_x_perturbed_data, _local_M_data,
                                  _local_K_data, _local_b_data);
 
-
-        std::cout << "=============\n";
-        std::cout << "   M(x-eps)  \n";
-        std::cout << "=============\n";
-
-        printStdVector(local_M_data);
-        std::cout << "\n";
-        std::cout << "=============\n";
-        std::cout << "   K(x-eps)  \n";
-        std::cout << "=============\n";
-
-        printStdVector(local_K_data);
-        std::cout << "\n";
-        std::cout << "=============\n";
-        std::cout << "   b(x-eps)  \n";
-        std::cout << "=============\n";
-
-        printStdVector(local_b_data);
-        std::cout << "\n";
         _local_x_perturbed_data[i] = local_x_data[i];
+
+
+//        if (i<8)
+//        {
+//            std::cout << " vor M:\n";
+//            std::cout << local_Jac << "\n";
+//        }
 
         if (!local_M_data.empty()) {
             auto const local_M_p =
@@ -146,6 +104,13 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
             local_Jac.col(i).noalias() +=
                 // dM/dxi * x_dot
                 (local_M_p - local_M_m) * local_xdot / (2.0 * eps);
+
+//            if (i<8)
+//            {
+//                std::cout << "nach M:\n";
+//                std::cout << local_Jac << "\n";
+//            }
+
             local_M_data.clear();
             _local_M_data.clear();
         }
@@ -157,6 +122,13 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
             local_Jac.col(i).noalias() +=
                 // dK/dxi * x
                 (local_K_p - local_K_m) * local_x / (2.0 * eps);
+
+//            if (i<8)
+//            {
+//                std::cout << "nach K:\n";
+//                std::cout << local_Jac << "\n";
+//            }
+
             local_K_data.clear();
             _local_K_data.clear();
         }
@@ -168,6 +140,13 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
             local_Jac.col(i).noalias() -=
                 // db/dxi
                 (local_b_p - local_b_m) / (2.0 * eps);
+
+//            if (i<8)
+//            {
+//                std::cout << "nach b:\n";
+//                std::cout << local_Jac << "\n";
+//            }
+
             local_b_data.clear();
             _local_b_data.clear();
         }
@@ -187,34 +166,28 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         local_Jac.noalias() += local_K * dx_dx;
     }
 
-
-    if (num_r_c > 8) // in case of th2m
+    if (num_r_c > 16) // in case of th2m
     {
            local_Jac.template block<20, 20>(8,8).setIdentity();
     }
 
 //    auto const rows = local_Jac.rows();
 //    auto const cols = local_Jac.cols();
+//
+//    std::cout << "Jacobi-Matrix:\n";
+//
+//    for (int r = 0; r < rows; r++)
+//    {
+//        for (int c = 0; c < cols; c++)
+//        {
+//            std::cout << local_Jac(r,c) << " ";
+//        }
+//        std::cout << "\n";
+//    }
+//
+//    std::cout << "done.\n";
+//    OGS_FATAL("Intended halt.");
 
-    auto const rows = 8;
-    auto const cols = 8;
-
-    std::cout << "--------------\n";
-    std::cout << "Jacobi-Matrix:\n";
-    std::cout << "--------------\n";
-    for (int r=0; r<rows; r++)
-    {
-        for (int c=0; c<cols; c++)
-        {
-            std::cout << local_Jac(r,c) << " ";
-        }
-
-        std::cout << "\n";
-    }
-    std::cout << "--------------\n";
-
-    std::cout << "done.\n";
-   OGS_FATAL("Ende Gelände.");
 
 }
 
