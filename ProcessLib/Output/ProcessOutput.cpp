@@ -138,7 +138,7 @@ void processOutputData(
 {
     DBUG("Process output data.");
 
-    addOgsVersion(mesh);
+    //addOgsVersion(mesh);
 
     // Copy result
 #ifdef USE_PETSC
