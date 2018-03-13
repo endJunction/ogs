@@ -33,7 +33,7 @@ namespace LIE
 double calculateLevelSetFunction(FractureProperty const& frac, double const* x_)
 {
     Eigen::Map<Eigen::Vector3d const> x(x_, 3);
-    const int TypeofHeaviside = 1;
+    const int TypeofHeaviside = 2;
     switch (TypeofHeaviside)
     {
     case 1:

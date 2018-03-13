@@ -232,7 +232,7 @@ void PostProcessTool::calculateTotalDisplacement(unsigned const n_fractures)
         auto const& g =
             *_output_mesh->getProperties().getPropertyVector<double>(
                 "displacement_jump" + std::to_string(fracture_id + 1));
-        const int TypeofHeaviside = 1;
+        const int TypeofHeaviside = 2;
         switch (TypeofHeaviside)
         {
         case 1:

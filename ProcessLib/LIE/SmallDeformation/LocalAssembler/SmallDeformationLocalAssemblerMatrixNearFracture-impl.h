@@ -216,7 +216,7 @@ void SmallDeformationLocalAssemblerMatrixNearFracture<
 
         // nodal displacement = u^hat + sum_i(levelset_i(x) * [u]_i)
         NodalDisplacementVectorType nodal_total_u = nodal_u;
-        const int TypeofHeaviside = 1;
+        const int TypeofHeaviside = 2;
         switch (TypeofHeaviside)
         {
         case 1:

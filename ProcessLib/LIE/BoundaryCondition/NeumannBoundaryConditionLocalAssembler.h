@@ -75,7 +75,7 @@ public:
             double const levelsets = calculateLevelSetFunction(
                 _fracture_prop, ip_physical_coords.getCoords());
 
-            const int TypeofHeaviside = 1;
+            const int TypeofHeaviside = 2;
             switch (TypeofHeaviside)
             {
             case 1:

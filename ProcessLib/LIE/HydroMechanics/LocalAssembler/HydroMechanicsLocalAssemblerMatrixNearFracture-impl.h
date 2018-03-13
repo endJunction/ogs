@@ -96,7 +96,7 @@ void HydroMechanicsLocalAssemblerMatrixNearFracture<
 
     Eigen::VectorXd total_u = u;
     Eigen::VectorXd total_u_dot = u_dot;
-    const int TypeofHeaviside = 1;
+    const int TypeofHeaviside = 2;
     switch (TypeofHeaviside)
     {
     case 1:
@@ -181,7 +181,7 @@ void HydroMechanicsLocalAssemblerMatrixNearFracture<
     // compute true displacements
     auto const g = local_x.segment(displacement_jump_index, displacement_size);
     Eigen::VectorXd total_u = u;
-    const int TypeofHeaviside = 1;
+    const int TypeofHeaviside = 2;
     switch (TypeofHeaviside)
     {
     case 1:
