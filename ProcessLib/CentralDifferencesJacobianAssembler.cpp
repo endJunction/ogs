@@ -168,8 +168,10 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
 
     if (num_r_c > 16) // in case of th2m
     {
-           local_Jac.template block<20, 20>(8,8).setIdentity();
+   //     local_Jac.template block<20, 20>(8,8).setIdentity(); //H2
+        local_Jac.template block<4, 4>(8,8).setIdentity(); //TH2M
     }
+
 
 //    auto const rows = local_Jac.rows();
 //    auto const cols = local_Jac.cols();

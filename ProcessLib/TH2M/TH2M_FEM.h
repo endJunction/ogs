@@ -412,7 +412,6 @@ public:
             double const lambda_wet = k_rel_wet / mu_wet;
 
 
-
             //
             //            Kpp.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
             //
@@ -427,9 +426,6 @@ public:
             //            // Kuu = 0
             //            fu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
-
-
-
             // Assemble M matrix
             // nonwetting
 
@@ -440,42 +436,43 @@ public:
             Mgpc.noalias() +=
                     -porosity * rho_nonwet * dSw_dpc * N_p.transpose() * N_p * w;
 
-      //      Mgu.noalias() += N_p.transpose() * Sg * rho_nonwet * alpha * identity2.transpose() * B * w;
+
+    //        Mgu.noalias() += N_p.transpose() * Sg * rho_nonwet * alpha * identity2.transpose() * B * w;
 
             Mlpc.noalias() +=
                     porosity * dSw_dpc * rho_wet * N_p.transpose() * N_p * w;
 
-      //      Mlu.noalias() += N_p.transpose() * Sw * rho_wet * alpha * identity2.transpose() * B * w;
+
+    //        Mlu.noalias() += N_p.transpose() * Sw * rho_wet * alpha * identity2.transpose() * B * w;
 
 
             laplace_operator.noalias() = dNdx_p.transpose() *
                     permeability_tensor * dNdx_p *
                     w;
 
-            KTT.noalias() += laplace_operator;
+    //    KTT.noalias() += laplace_operator;
 
-            Kgp.noalias() += rho_nonwet * lambda_nonwet * laplace_operator;
+          Kgp.noalias() += rho_nonwet * lambda_nonwet * laplace_operator;
 
-    //        Kupg.noalias() -= B.transpose() * alpha * identity2 * N_p * w;
 
-            Klp.noalias() += rho_wet * lambda_wet * laplace_operator;
+ //         Kupg.noalias() -= B.transpose() * alpha * identity2 * N_p * w;
 
-            Klpc.noalias() += -rho_wet * lambda_wet * laplace_operator;
+          Klpc.noalias() += -rho_wet * lambda_wet * laplace_operator;
 
-    //      Kupc.noalias() += B.transpose() * alpha * identity2 * Sw * N_p * w;
+  //        Kupc.noalias() += B.transpose() * alpha * identity2 * Sw * N_p * w;
 
-//            Kuu.noalias() +=  B.transpose() * C * B * w;
 
             auto const gravity_operator = (dNdx_p.transpose() *
                     permeability_tensor * b * w).eval();
 
             Bg.noalias() +=
-                    rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
+                          rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
 
             Bl.noalias() += rho_wet * rho_wet * lambda_wet * gravity_operator;
 
 
-//            Bu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * 2000.0 * b) * w;
+
+            Bu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
         }
     }
