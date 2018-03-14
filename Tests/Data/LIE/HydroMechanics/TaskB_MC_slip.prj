@@ -233,7 +233,8 @@
             <name>fracture_effective_stress0</name>
             <type>Constant</type>
             <!-- values: shear stress, normal stress -->
-            <values>-0.65113778e6 -5.10363053e6</values>
+            <values>-0.648368307134e6 -5.10034689276e6</values--> <!--p = 0.5 -->
+            <!--values>-0.648368307134e6 -5.60034689276e6</values-->  <!-- p = 0 -->
         </parameter>
         <parameter>
             <name>zero_u</name>
