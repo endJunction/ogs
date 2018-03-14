@@ -39,8 +39,8 @@
                 <penalty_aperture_cutoff>10e-6</penalty_aperture_cutoff>
                 <tension_cutoff>1</tension_cutoff>
                 <nonlinear_solver>
-                    <maximum_iterations>100</maximum_iterations>
-                    <error_tolerance>1e-14</error_tolerance>
+                    <maximum_iterations>1000</maximum_iterations>
+                    <error_tolerance>1e-8</error_tolerance>
                 </nonlinear_solver>
             </fracture_model>
             <fracture_properties>
