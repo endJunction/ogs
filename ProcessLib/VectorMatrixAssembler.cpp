@@ -56,15 +56,17 @@ void VectorMatrixAssembler::assemble(
     auto const& indices = (cpl_xs == nullptr)
                               ? indices_of_processes[0]
                               : indices_of_processes[cpl_xs->process_id];
-    _local_M_data.clear();
-    _local_K_data.clear();
-    _local_b_data.clear();
+
+    // TODO(naumov) Reserve guesses?
+    std::vector<double> local_M_data;
+    std::vector<double> local_K_data;
+    std::vector<double> local_b_data;
 
     if (cpl_xs == nullptr)
     {
         auto const local_x = x.get(indices);
-        local_assembler.assemble(t, local_x, _local_M_data, _local_K_data,
-                                 _local_b_data);
+        local_assembler.assemble(t, local_x, local_M_data, local_K_data,
+                                 local_b_data);
     }
     else
     {
@@ -77,8 +79,8 @@ void VectorMatrixAssembler::assemble(
             cpl_xs->dt, cpl_xs->process_id, std::move(local_coupled_xs0),
             std::move(local_coupled_xs));
 
-        local_assembler.assembleForStaggeredScheme(t, _local_M_data,
-                                                   _local_K_data, _local_b_data,
+        local_assembler.assembleForStaggeredScheme(t, local_M_data,
+                                                   local_K_data, local_b_data,
                                                    local_coupled_solutions);
     }
 
@@ -86,20 +88,20 @@ void VectorMatrixAssembler::assemble(
     auto const r_c_indices =
         NumLib::LocalToGlobalIndexMap::RowColumnIndices(indices, indices);
 
-    if (!_local_M_data.empty())
+    if (!local_M_data.empty())
     {
-        auto const local_M = MathLib::toMatrix(_local_M_data, num_r_c, num_r_c);
+        auto const local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
         M.add(r_c_indices, local_M);
     }
-    if (!_local_K_data.empty())
+    if (!local_K_data.empty())
     {
-        auto const local_K = MathLib::toMatrix(_local_K_data, num_r_c, num_r_c);
+        auto const local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         K.add(r_c_indices, local_K);
     }
-    if (!_local_b_data.empty())
+    if (!local_b_data.empty())
     {
-        assert(_local_b_data.size() == num_r_c);
-        b.add(indices, _local_b_data);
+        assert(local_b_data.size() == num_r_c);
+        b.add(indices, local_b_data);
     }
 }
 
@@ -125,17 +127,18 @@ void VectorMatrixAssembler::assembleWithJacobian(
                               : indices_of_processes[cpl_xs->process_id];
     auto const local_xdot = xdot.get(indices);
 
-    _local_M_data.clear();
-    _local_K_data.clear();
-    _local_b_data.clear();
-    _local_Jac_data.clear();
+    // TODO(naumov) Reserve guesses?
+    std::vector<double> local_M_data;
+    std::vector<double> local_K_data;
+    std::vector<double> local_b_data;
+    std::vector<double> local_Jac_data;
 
     if (cpl_xs == nullptr)
     {
         auto const local_x = x.get(indices);
         _jacobian_assembler->assembleWithJacobian(
             local_assembler, t, local_x, local_xdot, dxdot_dx, dx_dx,
-            _local_M_data, _local_K_data, _local_b_data, _local_Jac_data);
+            local_M_data, local_K_data, local_b_data, local_Jac_data);
     }
     else
     {
@@ -149,8 +152,8 @@ void VectorMatrixAssembler::assembleWithJacobian(
             std::move(local_coupled_xs));
 
         _jacobian_assembler->assembleWithJacobianForStaggeredScheme(
-            local_assembler, t, local_xdot, dxdot_dx, dx_dx, _local_M_data,
-            _local_K_data, _local_b_data, _local_Jac_data,
+            local_assembler, t, local_xdot, dxdot_dx, dx_dx, local_M_data,
+            local_K_data, local_b_data, local_Jac_data,
             local_coupled_solutions);
     }
 
@@ -158,25 +161,25 @@ void VectorMatrixAssembler::assembleWithJacobian(
     auto const r_c_indices =
         NumLib::LocalToGlobalIndexMap::RowColumnIndices(indices, indices);
 
-    if (!_local_M_data.empty())
+    if (!local_M_data.empty())
     {
-        auto const local_M = MathLib::toMatrix(_local_M_data, num_r_c, num_r_c);
+        auto const local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
         M.add(r_c_indices, local_M);
     }
-    if (!_local_K_data.empty())
+    if (!local_K_data.empty())
     {
-        auto const local_K = MathLib::toMatrix(_local_K_data, num_r_c, num_r_c);
+        auto const local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         K.add(r_c_indices, local_K);
     }
-    if (!_local_b_data.empty())
+    if (!local_b_data.empty())
     {
-        assert(_local_b_data.size() == num_r_c);
-        b.add(indices, _local_b_data);
+        assert(local_b_data.size() == num_r_c);
+        b.add(indices, local_b_data);
     }
-    if (!_local_Jac_data.empty())
+    if (!local_Jac_data.empty())
     {
         auto const local_Jac =
-            MathLib::toMatrix(_local_Jac_data, num_r_c, num_r_c);
+            MathLib::toMatrix(local_Jac_data, num_r_c, num_r_c);
         Jac.add(r_c_indices, local_Jac);
     }
     else
