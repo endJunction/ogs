@@ -45,6 +45,10 @@ namespace BHE
         const double bhe_grout_thermal_conductivity = bhe_conf.getConfigParameter<double>("bhe_grout_thermal_conductivity");
         const double bhe_pipe_distance = bhe_conf.getConfigParameter<double>("bhe_pipe_distance");
 
+        auto const bhe_use_ext_therm_resis_conf =
+            bhe_conf.getConfigParameterOptional<bool>(
+                "bhe_use_external_therm_resis");
+
         // optional parameters
         double bhe_power_in_watt_val;
         double bhe_intern_resistance;
@@ -60,8 +64,7 @@ namespace BHE
         // give default values to optional parameters
         // if the BHE is using external given thermal resistance values
         bool bhe_use_ext_therm_resis = false;
-        if (auto const bhe_use_ext_therm_resis_conf =
-            config.getConfigParameterOptional<bool>("bhe_use_external_therm_resis"))
+        if (*bhe_use_ext_therm_resis_conf == true)
         {
             DBUG("If using external given thermal resistance values : %s",
                 (*bhe_use_ext_therm_resis_conf) ? "true" : "false");
@@ -184,4 +187,4 @@ namespace BHE
 
         return m_bhe_1u;
     }
-}
+    }  // namespace BHE

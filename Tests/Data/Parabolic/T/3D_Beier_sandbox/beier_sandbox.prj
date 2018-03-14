@@ -88,7 +88,6 @@
                     <abstol>1.e-6</abstol>
                 </convergence_criterion>
                 <time_discretization><type>BackwardEuler</type></time_discretization>
-
                 <output>
                     <variables>
                         <variable> temperature_soil </variable>
@@ -97,19 +96,17 @@
                         <variable> heat_flux_z </variable>
                     </variables>
                 </output>
+                <time_stepping>
+                    <type>FixedTimeStepping</type>
+                    <t_initial> 0.0 </t_initial>
+                    <t_end> 186420 </t_end>
+                    <timesteps>
+                        <pair><repeat>3107</repeat><delta_t>60</delta_t></pair>
+                    </timesteps>
+                </time_stepping>
             </process>
         </processes>
-
-        <time_stepping>
-            <type>FixedTimeStepping</type>
-            <t_initial> 0.0 </t_initial>
-            <t_end> 186420 </t_end>
-            <timesteps>
-                <pair><repeat>3107</repeat><delta_t>60</delta_t></pair>
-            </timesteps>
-        </time_stepping>
-
-        <output>
+       <output>
             <type>VTK</type>
             <prefix>beier_sandbox</prefix>
             <timesteps>
