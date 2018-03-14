@@ -21,6 +21,59 @@ class LocalToGlobalIndexMap;
 
 namespace ProcessLib
 {
+struct TupleStorage
+{
+    NumLib::LocalToGlobalIndexMap::RowColumnIndices::LineIndex indices;
+    std::vector<double> data;
+
+    // vector add
+    void add(NumLib::LocalToGlobalIndexMap::RowColumnIndices::LineIndex const&
+                 local_indices,
+             std::vector<double> const& local_vector)
+    {
+        if (local_vector.empty())
+            return;
+        indices.insert(indices.end(), local_indices.begin(),
+                       local_indices.end());
+        data.insert(data.end(), local_vector.begin(), local_vector.end());
+    }
+
+    void append(TupleStorage const& other)
+    {
+        indices.insert(indices.end(), other.indices.begin(),
+                       other.indices.end());
+        data.insert(data.end(), other.data.begin(), other.data.end());
+    }
+};
+
+struct TripletStorage
+{
+    std::vector<Eigen::Triplet<double>> data;
+
+    void add(NumLib::LocalToGlobalIndexMap::RowColumnIndices const& r_c_indices,
+             std::vector<double> const& local_matrix)
+    {
+        if (local_matrix.empty())
+            return;
+        auto const n_rows = r_c_indices.rows.size();
+        auto const n_cols = r_c_indices.columns.size();
+        for (auto i = decltype(n_rows){0}; i < n_rows; i++)
+        {
+            auto const row = r_c_indices.rows[i];
+            for (auto j = decltype(n_cols){0}; j < n_cols; j++)
+            {
+                auto const col = r_c_indices.columns[j];
+                data.emplace_back(row, col, local_matrix[i * n_cols + j]);
+            }
+        }
+    }
+
+    void append(TripletStorage const& other)
+    {
+        data.insert(data.end(), other.data.begin(), other.data.end());
+    }
+};
+
 struct CoupledSolutionsForStaggeredScheme;
 
 class LocalAssemblerInterface;
