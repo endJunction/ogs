@@ -10,9 +10,10 @@
 #pragma once
 
 #include <vector>
-#include "NumLib/NumericsConfig.h"
 #include "AbstractJacobianAssembler.h"
 #include "CoupledSolutionsForStaggeredScheme.h"
+#include "NumLib/DOF/LocalToGlobalIndexMap.h"
+#include "NumLib/NumericsConfig.h"
 
 namespace NumLib
 {
@@ -112,8 +113,8 @@ public:
             std::reference_wrapper<NumLib::LocalToGlobalIndexMap>> const&
             dof_tables,
         const double t, GlobalVector const& x, GlobalVector const& xdot,
-        const double dxdot_dx, const double dx_dx, GlobalMatrix& M,
-        GlobalMatrix& K, GlobalVector& b, GlobalMatrix& Jac,
+        const double dxdot_dx, const double dx_dx, TripletStorage& M,
+        TripletStorage& K, TupleStorage& b, TripletStorage& Jac,
         CoupledSolutionsForStaggeredScheme const* const cpl_xs);
 
 private:

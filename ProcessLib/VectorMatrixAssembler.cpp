@@ -110,8 +110,8 @@ void VectorMatrixAssembler::assembleWithJacobian(
     std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>> const&
         dof_tables,
     const double t, GlobalVector const& x, GlobalVector const& xdot,
-    const double dxdot_dx, const double dx_dx, GlobalMatrix& M, GlobalMatrix& K,
-    GlobalVector& b, GlobalMatrix& Jac,
+    const double dxdot_dx, const double dx_dx, TripletStorage& M,
+    TripletStorage& K, TupleStorage& b, TripletStorage& Jac,
     CoupledSolutionsForStaggeredScheme const* const cpl_xs)
 {
     std::vector<std::vector<GlobalIndexType>> indices_of_processes;
@@ -157,37 +157,20 @@ void VectorMatrixAssembler::assembleWithJacobian(
             local_coupled_solutions);
     }
 
-    auto const num_r_c = indices.size();
     auto const r_c_indices =
         NumLib::LocalToGlobalIndexMap::RowColumnIndices(indices, indices);
 
-    if (!local_M_data.empty())
-    {
-        auto const local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
-        M.add(r_c_indices, local_M);
-    }
-    if (!local_K_data.empty())
-    {
-        auto const local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
-        K.add(r_c_indices, local_K);
-    }
-    if (!local_b_data.empty())
-    {
-        assert(local_b_data.size() == num_r_c);
-        b.add(indices, local_b_data);
-    }
-    if (!local_Jac_data.empty())
-    {
-        auto const local_Jac =
-            MathLib::toMatrix(local_Jac_data, num_r_c, num_r_c);
-        Jac.add(r_c_indices, local_Jac);
-    }
-    else
+    M.add(r_c_indices, local_M_data);
+    K.add(r_c_indices, local_K_data);
+
+    if (local_Jac_data.empty())
     {
         OGS_FATAL(
             "No Jacobian has been assembled! This might be due to programming "
             "errors in the local assembler of the current process.");
     }
+    Jac.add(r_c_indices, local_Jac_data);
+    b.add(indices, local_b_data);
 }
 
 }  // namespace ProcessLib
