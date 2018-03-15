@@ -143,11 +143,52 @@ void HTProcess::assembleWithJacobianConcreteProcess(
         dof_tables.emplace_back(std::ref(*_local_to_global_index_map));
     }
 
+#ifndef _OPENMP
     // Call global assembler for each local assembly item.
     GlobalExecutor::executeMemberDereferenced(
         _global_assembler, &VectorMatrixAssembler::assembleWithJacobian,
         _local_assemblers, dof_tables, t, x, xdot, dxdot_dx, dx_dx, M, K, b,
         Jac, _coupled_solutions);
+#else  // _OPENMP
+    TripletStorage M_storage;
+    TripletStorage K_storage;
+    TripletStorage Jac_storage;
+    TupleStorage b_storage;
+#pragma omp parallel
+    {
+        TripletStorage M_storage_p;
+        TripletStorage K_storage_p;
+        TripletStorage Jac_storage_p;
+        TupleStorage b_storage_p;
+
+        // Call global assembler for each local assembly item.
+        auto const size = _local_assemblers.size();
+#pragma omp for
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            _global_assembler.assembleWithJacobian(
+                i, *_local_assemblers[i], dof_tables, t, x, xdot, dxdot_dx,
+                dx_dx, M_storage_p, K_storage_p, b_storage_p, Jac_storage_p,
+                _coupled_solutions);
+        }
+
+#pragma omp critical
+        {
+            M_storage.append(M_storage_p);
+            K_storage.append(K_storage_p);
+            Jac_storage.append(Jac_storage_p);
+            b_storage.append(b_storage_p);
+        }
+    }
+
+    M.getRawMatrix().setFromTriplets(M_storage.data.begin(),
+                                     M_storage.data.end());
+    K.getRawMatrix().setFromTriplets(K_storage.data.begin(),
+                                     K_storage.data.end());
+    Jac.getRawMatrix().setFromTriplets(Jac_storage.data.begin(),
+                                       Jac_storage.data.end());
+    b.add(b_storage.indices, b_storage.data);
+#endif  // _OPENMP
 }
 
 void HTProcess::preTimestepConcreteProcess(GlobalVector const& x,
