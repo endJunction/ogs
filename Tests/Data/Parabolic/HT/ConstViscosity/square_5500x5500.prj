@@ -64,7 +64,7 @@
                 <convergence_criterion>
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <abstol>1.e-3</abstol>
+                    <abstol>1.e-15</abstol>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
@@ -322,9 +322,9 @@
             </petsc>
             <eigen>
                 <solver_type>BiCGSTAB</solver_type>
-                <precon_type>ILUT</precon_type>
+                <precon_type>DIAGONAL</precon_type>
                 <max_iteration_step>10000</max_iteration_step>
-                <error_tolerance>1e-12</error_tolerance>
+                <error_tolerance>1e-16</error_tolerance>
             </eigen>
         </linear_solver>
     </linear_solvers>
