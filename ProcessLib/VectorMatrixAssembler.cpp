@@ -42,8 +42,9 @@ void VectorMatrixAssembler::assemble(
     const std::size_t mesh_item_id, LocalAssemblerInterface& local_assembler,
     std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>> const&
         dof_tables,
-    const double t, const GlobalVector& x, GlobalMatrix& M, GlobalMatrix& K,
-    GlobalVector& b, CoupledSolutionsForStaggeredScheme const* const cpl_xs)
+    const double t, const GlobalVector& x, MatrixCoordinateStorage& M,
+    MatrixCoordinateStorage& K, VectorCoordinateStorage& b,
+    CoupledSolutionsForStaggeredScheme const* const cpl_xs)
 {
     std::vector<std::vector<GlobalIndexType>> indices_of_processes;
     indices_of_processes.reserve(dof_tables.size());
@@ -84,25 +85,13 @@ void VectorMatrixAssembler::assemble(
                                                    local_coupled_solutions);
     }
 
-    auto const num_r_c = indices.size();
     auto const r_c_indices =
         NumLib::LocalToGlobalIndexMap::RowColumnIndices(indices, indices);
 
-    if (!local_M_data.empty())
-    {
-        auto const local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
-        M.add(r_c_indices, local_M);
-    }
-    if (!local_K_data.empty())
-    {
-        auto const local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
-        K.add(r_c_indices, local_K);
-    }
-    if (!local_b_data.empty())
-    {
-        assert(local_b_data.size() == num_r_c);
-        b.add(indices, local_b_data);
-    }
+    M.add(r_c_indices, local_M_data);
+    K.add(r_c_indices, local_K_data);
+    assert(local_b_data.size() == indices.size());
+    b.add(indices, local_b_data);
 }
 
 void VectorMatrixAssembler::assembleWithJacobian(
