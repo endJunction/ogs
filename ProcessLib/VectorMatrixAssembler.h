@@ -21,6 +21,35 @@ class LocalToGlobalIndexMap;
 
 namespace ProcessLib
 {
+struct MatrixCoordinateStorage
+{
+    std::vector<GlobalIndexType> rows;
+    std::vector<GlobalIndexType> columns;
+    std::vector<double> entries;
+
+    void add(NumLib::LocalToGlobalIndexMap::RowColumnIndices const& r_c_indices,
+             std::vector<double> const& local_matrix)
+    {
+        if (local_matrix.empty())
+            return;
+        rows.insert(rows.end(), r_c_indices.rows.cbegin(),
+                    r_c_indices.rows.cend());
+        columns.insert(columns.end(), r_c_indices.columns.cbegin(),
+                       r_c_indices.columns.cend());
+        entries.insert(entries.end(), local_matrix.cbegin(),
+                       local_matrix.cend());
+    }
+
+    void append(MatrixCoordinateStorage const& other)
+    {
+        rows.insert(rows.end(), other.rows.cbegin(), other.rows.cend());
+        columns.insert(columns.end(), other.columns.cbegin(),
+                       other.columns.cend());
+        entries.insert(entries.end(), other.entries.cbegin(),
+                       other.entries.cend());
+    }
+};
+
 struct CoupledSolutionsForStaggeredScheme;
 
 class LocalAssemblerInterface;
