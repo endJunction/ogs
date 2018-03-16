@@ -11,16 +11,38 @@
 
 #include <vector>
 #include "NumLib/NumericsConfig.h"
+#include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "AbstractJacobianAssembler.h"
 #include "CoupledSolutionsForStaggeredScheme.h"
 
-namespace NumLib
-{
-class LocalToGlobalIndexMap;
-}  // NumLib
-
 namespace ProcessLib
 {
+struct VectorCoordinateStorage
+{
+    NumLib::LocalToGlobalIndexMap::RowColumnIndices::LineIndex indices;
+    std::vector<double> entries;
+
+    void add(NumLib::LocalToGlobalIndexMap::RowColumnIndices::LineIndex const&
+                 local_indices,
+             std::vector<double> const& local_vector)
+    {
+        if (local_vector.empty())
+            return;
+        indices.insert(indices.end(), local_indices.begin(),
+                       local_indices.end());
+        entries.insert(entries.end(), local_vector.cbegin(),
+                       local_vector.cend());
+    }
+
+    void append(VectorCoordinateStorage const& other)
+    {
+        indices.insert(indices.end(), other.indices.cbegin(),
+                       other.indices.cend());
+        entries.insert(entries.end(), other.entries.cbegin(),
+                       other.entries.cend());
+    }
+};
+
 struct MatrixCoordinateStorage
 {
     std::vector<GlobalIndexType> rows;
