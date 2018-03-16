@@ -121,6 +121,38 @@ void HTProcess::assembleConcreteProcess(const double t,
     GlobalExecutor::executeMemberDereferenced(
         _global_assembler, &VectorMatrixAssembler::assemble, _local_assemblers,
         dof_tables, t, x, M, K, b, _coupled_solutions);
+    MatrixCoordinateStorage M_storage;
+    MatrixCoordinateStorage K_storage;
+    VectorCoordinateStorage b_storage;
+
+        // Call global assembler for each local assembly item.
+        auto const size = _local_assemblers.size();
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            _global_assembler.assemble(i, *_local_assemblers[i], dof_tables, t,
+                                       x, M_storage, K_storage, b_storage,
+                                       _coupled_solutions);
+        }
+
+#ifdef USE_PETSC
+    MatSetValues(M.getRawMatrix(), M_storage.rows.size(), M_storage.rows.data(),
+                 M_storage.columns.size(), M_storage.columns.data(),
+                 M_storage.entries.data(), ADD_VALUES);
+
+    MatSetValues(K.getRawMatrix(), K_storage.rows.size(), K_storage.rows.data(),
+                 K_storage.columns.size(), K_storage.columns.data(),
+                 K_storage.entries.data(), ADD_VALUES);
+
+    VecSetValues(b.getRawVector(), b_storage.indices.size(),
+                 b_storage.indices.data(), b_storage.entries.data(),
+                 ADD_VALUES);
+#else   // USE_PETSC
+    M.getRawMatrix().setFromTriplets(M_storage.data.begin(),
+                                     M_storage.data.end());
+    K.getRawMatrix().setFromTriplets(K_storage.data.begin(),
+                                     K_storage.data.end());
+    b.add(b_storage.indices, b_storage.data);
+#endif  // USE_PETSC
 }
 
 void HTProcess::assembleWithJacobianConcreteProcess(
