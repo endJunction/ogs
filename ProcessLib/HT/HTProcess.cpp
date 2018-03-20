@@ -117,8 +117,8 @@ void HTProcess::assembleConcreteProcess(const double t,
         dof_tables.emplace_back(*_local_to_global_index_map);
     }
 
-    MatrixCoordinateStorage M_storage;
-    MatrixCoordinateStorage K_storage;
+    MatrixCoordinateStorage M_storage(M.getNumberOfColumns());
+    MatrixCoordinateStorage K_storage(K.getNumberOfColumns());
     VectorCoordinateStorage b_storage;
 
     // Call global assembler for each local assembly item.

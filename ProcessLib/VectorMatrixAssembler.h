@@ -45,10 +45,12 @@ struct VectorCoordinateStorage
 
 struct MatrixCoordinateStorage
 {
+    MatrixCoordinateStorage(PetscInt const n_columns) : _ncols(n_columns) {}
     std::vector<GlobalIndexType> rows;
     std::vector<GlobalIndexType> columns;
     std::vector<double> entries;
     std::vector<GlobalIndexType> blocks;
+    PetscInt const _ncols;
 
     void add(NumLib::LocalToGlobalIndexMap::RowColumnIndices const& r_c_indices,
              std::vector<double> const& local_matrix)
