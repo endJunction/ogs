@@ -10,6 +10,7 @@
 #include "HTProcess.h"
 
 #include <omp.h>
+#include <sched.h>
 #include <cassert>
 
 #include "NumLib/DOF/DOFTableUtil.h"
@@ -132,7 +133,8 @@ void HTProcess::assembleConcreteProcess(const double t,
 
         // Call global assembler for each local assembly item.
         auto const size = _local_assemblers.size();
-        INFO("XXX %d of %d", omp_get_thread_num(), omp_get_num_threads());
+        INFO("XXX %d of %d on cpu %d", omp_get_thread_num(),
+             omp_get_num_threads(), sched_getcpu());
 #pragma omp for
         for (std::size_t i = 0; i < size; ++i)
         {
