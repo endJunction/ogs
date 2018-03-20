@@ -137,7 +137,7 @@ void HTProcess::assembleConcreteProcess(const double t,
         {
             MatSetValues(M.getRawMatrix(), b, M_storage.rows.data() + position,
                          b, M_storage.columns.data() + position,
-                         M_storage.entries.data(), ADD_VALUES);
+                         M_storage.entries.data() + position, ADD_VALUES);
             position += b;
         }
     }
@@ -148,7 +148,7 @@ void HTProcess::assembleConcreteProcess(const double t,
         {
             MatSetValues(K.getRawMatrix(), b, K_storage.rows.data() + position,
                          b, K_storage.columns.data() + position,
-                         K_storage.entries.data(), ADD_VALUES);
+                         K_storage.entries.data() + position, ADD_VALUES);
             position += b;
         }
     }
