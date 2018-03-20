@@ -136,9 +136,17 @@ void HTProcess::assembleConcreteProcess(const double t,
         GlobalIndexType position2 = 0;
         for (GlobalIndexType bi : M_storage.blocks)
         {
-            MatSetValues(M.getRawMatrix(), bi, M_storage.rows.data() + position,
-                         bi, M_storage.columns.data() + position,
-                         M_storage.entries.data() + position2, ADD_VALUES);
+            for (GlobalIndexType i = 0; i < bi; ++i)
+            {
+                for (GlobalIndexType j = 0; j < bi; ++j)
+                {
+                    double const value =
+                        M_storage.entries[position2 + i * bi + j];
+                    GlobalIndexType r = M_storage.rows[position + i];
+                    GlobalIndexType c = M_storage.columns[position + j];
+                    MatSetValue(M.getRawMatrix(), r, c, value, ADD_VALUES);
+                }
+            }
             position += bi;
             position2 += bi * bi;
         }
@@ -149,17 +157,27 @@ void HTProcess::assembleConcreteProcess(const double t,
         GlobalIndexType position2 = 0;
         for (GlobalIndexType bi : K_storage.blocks)
         {
-            MatSetValues(K.getRawMatrix(), bi, K_storage.rows.data() + position,
-                         bi, K_storage.columns.data() + position,
-                         K_storage.entries.data() + position2, ADD_VALUES);
+            for (GlobalIndexType i = 0; i < bi; ++i)
+            {
+                for (GlobalIndexType j = 0; j < bi; ++j)
+                {
+                    double const value =
+                        K_storage.entries[position2 + i * bi + j];
+                    GlobalIndexType r = K_storage.rows[position + i];
+                    GlobalIndexType c = K_storage.columns[position + j];
+                    MatSetValue(K.getRawMatrix(), r, c, value, ADD_VALUES);
+                }
+            }
             position += bi;
             position2 += bi * bi;
         }
     }
 
-    VecSetValues(b.getRawVector(), b_storage.indices.size(),
-                 b_storage.indices.data(), b_storage.entries.data(),
-                 ADD_VALUES);
+    for (GlobalIndexType i = 0; i < b_storage.indices.size(); ++i)
+    {
+        VecSetValue(b.getRawVector(), b_storage.indices[i],
+                    b_storage.entries[i], ADD_VALUES);
+    }
 #else   // USE_PETSC
     M.getRawMatrix().setFromTriplets(M_storage.data.begin(),
                                      M_storage.data.end());
