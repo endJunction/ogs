@@ -133,23 +133,29 @@ void HTProcess::assembleConcreteProcess(const double t,
 #ifdef USE_PETSC
     {
         GlobalIndexType position = 0;
-        for (GlobalIndexType b : M_storage.blocks)
+        GlobalIndexType position2 = 0;
+        for (GlobalIndexType block_size : M_storage.blocks)
         {
-            MatSetValues(M.getRawMatrix(), b, M_storage.rows.data() + position,
-                         b, M_storage.columns.data() + position,
-                         M_storage.entries.data(), ADD_VALUES);
-            position += b;
+            MatSetValues(M.getRawMatrix(), block_size,
+                         M_storage.rows.data() + position, block_size,
+                         M_storage.columns.data() + position,
+                         M_storage.entries.data() + position2, ADD_VALUES);
+            position += block_size;
+            position2 += block_size * block_size;
         }
     }
 
     {
         GlobalIndexType position = 0;
-        for (GlobalIndexType b : K_storage.blocks)
+        GlobalIndexType position2 = 0;
+        for (GlobalIndexType block_size : K_storage.blocks)
         {
-            MatSetValues(K.getRawMatrix(), b, K_storage.rows.data() + position,
-                         b, K_storage.columns.data() + position,
-                         K_storage.entries.data(), ADD_VALUES);
-            position += b;
+            MatSetValues(K.getRawMatrix(), block_size,
+                         K_storage.rows.data() + position, block_size,
+                         K_storage.columns.data() + position,
+                         K_storage.entries.data() + position2, ADD_VALUES);
+            position += block_size;
+            position2 += block_size * block_size;
         }
     }
 
