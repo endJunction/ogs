@@ -9,6 +9,7 @@
 
 #include "HTProcess.h"
 
+#include <omp.h>
 #include <cassert>
 
 #include "NumLib/DOF/DOFTableUtil.h"
@@ -117,18 +118,41 @@ void HTProcess::assembleConcreteProcess(const double t,
         dof_tables.emplace_back(*_local_to_global_index_map);
     }
 
+#ifndef _OPENMP
+#else  // _OPENMP
+    INFO("XXX starting openmp threads");
     MatrixCoordinateStorage M_storage(M.getNumberOfColumns());
     MatrixCoordinateStorage K_storage(K.getNumberOfColumns());
     VectorCoordinateStorage b_storage;
-
-    // Call global assembler for each local assembly item.
-    auto const size = _local_assemblers.size();
-    for (std::size_t i = 0; i < size; ++i)
+#pragma omp parallel
     {
-        _global_assembler.assemble(i, *_local_assemblers[i], dof_tables, t, x,
-                                   M_storage, K_storage, b_storage,
-                                   _coupled_solutions);
+        MatrixCoordinateStorage M_storage_p(M.getNumberOfColumns());
+        MatrixCoordinateStorage K_storage_p(M.getNumberOfColumns());
+        VectorCoordinateStorage b_storage_p;
+
+        // Call global assembler for each local assembly item.
+        auto const size = _local_assemblers.size();
+        INFO("XXX %d of %d", omp_get_thread_num(), omp_get_num_threads());
+#pragma omp for
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            // INFO("XXX %d of %d; i = %d", omp_get_thread_num(),
+            // omp_get_num_threads(), i);
+            _global_assembler.assemble(i, *_local_assemblers[i], dof_tables, t,
+                                       x, M_storage_p, K_storage_p, b_storage_p,
+                                       _coupled_solutions);
+        }
+
+#pragma omp critical
+        {
+            INFO("XXX openmp critical section %d of %d", omp_get_thread_num(),
+                 omp_get_num_threads());
+            M_storage.append(M_storage_p);
+            K_storage.append(K_storage_p);
+            b_storage.append(b_storage_p);
+        }
     }
+    INFO("XXX openmp finished");
 
 #ifdef USE_PETSC
     {
@@ -169,6 +193,7 @@ void HTProcess::assembleConcreteProcess(const double t,
                                      K_storage.data.end());
     b.add(b_storage.indices, b_storage.data);
 #endif  // USE_PETSC
+#endif  // _OPENMP
 }
 
 void HTProcess::assembleWithJacobianConcreteProcess(
