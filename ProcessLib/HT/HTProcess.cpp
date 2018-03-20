@@ -117,31 +117,41 @@ void HTProcess::assembleConcreteProcess(const double t,
         dof_tables.emplace_back(*_local_to_global_index_map);
     }
 
-    // Call global assembler for each local assembly item.
-    GlobalExecutor::executeMemberDereferenced(
-        _global_assembler, &VectorMatrixAssembler::assemble, _local_assemblers,
-        dof_tables, t, x, M, K, b, _coupled_solutions);
     MatrixCoordinateStorage M_storage;
     MatrixCoordinateStorage K_storage;
     VectorCoordinateStorage b_storage;
 
-        // Call global assembler for each local assembly item.
-        auto const size = _local_assemblers.size();
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            _global_assembler.assemble(i, *_local_assemblers[i], dof_tables, t,
-                                       x, M_storage, K_storage, b_storage,
-                                       _coupled_solutions);
-        }
+    // Call global assembler for each local assembly item.
+    auto const size = _local_assemblers.size();
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        _global_assembler.assemble(i, *_local_assemblers[i], dof_tables, t, x,
+                                   M_storage, K_storage, b_storage,
+                                   _coupled_solutions);
+    }
 
 #ifdef USE_PETSC
-    MatSetValues(M.getRawMatrix(), M_storage.rows.size(), M_storage.rows.data(),
-                 M_storage.columns.size(), M_storage.columns.data(),
-                 M_storage.entries.data(), ADD_VALUES);
+    {
+        GlobalIndexType position = 0;
+        for (GlobalIndexType b : M_storage.blocks)
+        {
+            MatSetValues(M.getRawMatrix(), b, M_storage.rows.data() + position,
+                         b, M_storage.columns.data() + position,
+                         M_storage.entries.data(), ADD_VALUES);
+            position += b;
+        }
+    }
 
-    MatSetValues(K.getRawMatrix(), K_storage.rows.size(), K_storage.rows.data(),
-                 K_storage.columns.size(), K_storage.columns.data(),
-                 K_storage.entries.data(), ADD_VALUES);
+    {
+        GlobalIndexType position = 0;
+        for (GlobalIndexType b : K_storage.blocks)
+        {
+            MatSetValues(K.getRawMatrix(), b, K_storage.rows.data() + position,
+                         b, K_storage.columns.data() + position,
+                         K_storage.entries.data(), ADD_VALUES);
+            position += b;
+        }
+    }
 
     VecSetValues(b.getRawVector(), b_storage.indices.size(),
                  b_storage.indices.data(), b_storage.entries.data(),

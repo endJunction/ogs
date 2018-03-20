@@ -48,6 +48,7 @@ struct MatrixCoordinateStorage
     std::vector<GlobalIndexType> rows;
     std::vector<GlobalIndexType> columns;
     std::vector<double> entries;
+    std::vector<GlobalIndexType> blocks;
 
     void add(NumLib::LocalToGlobalIndexMap::RowColumnIndices const& r_c_indices,
              std::vector<double> const& local_matrix)
@@ -60,6 +61,7 @@ struct MatrixCoordinateStorage
                        r_c_indices.columns.cend());
         entries.insert(entries.end(), local_matrix.cbegin(),
                        local_matrix.cend());
+        blocks.push_back(r_c_indices.rows.size());
     }
 
     void append(MatrixCoordinateStorage const& other)
@@ -69,6 +71,8 @@ struct MatrixCoordinateStorage
                        other.columns.cend());
         entries.insert(entries.end(), other.entries.cbegin(),
                        other.entries.cend());
+        std::copy(other.blocks.begin(), other.blocks.end(),
+                  std::back_inserter(blocks));
     }
 };
 
