@@ -79,7 +79,7 @@
                 <time_stepping>
                     <type>FixedTimeStepping</type>
                     <t_initial> 0.0 </t_initial>
-                    <t_end> 5e10 </t_end>
+                    <t_end> 1e-7 </t_end>
                     <timesteps>
                         <pair>
                             <repeat>1</repeat>
@@ -308,7 +308,7 @@
         <nonlinear_solver>
             <name>basic_picard</name>
             <type>Picard</type>
-            <max_iter>1000</max_iter>
+            <max_iter>1</max_iter>
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
