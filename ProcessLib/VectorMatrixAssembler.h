@@ -59,8 +59,16 @@ struct MatrixCoordinateStorage
             return;
         rows.insert(rows.end(), r_c_indices.rows.cbegin(),
                     r_c_indices.rows.cend());
-        columns.insert(columns.end(), r_c_indices.columns.cbegin(),
-                       r_c_indices.columns.cend());
+
+        for (auto c : r_c_indices.columns)
+        {
+            // Ghost entries, and its original index is 0.
+            if (c == -_ncols)
+                columns.push_back(0);
+            else
+                columns.push_back(std::abs(c));
+        }
+
         entries.insert(entries.end(), local_matrix.cbegin(),
                        local_matrix.cend());
         blocks.push_back(r_c_indices.rows.size());
