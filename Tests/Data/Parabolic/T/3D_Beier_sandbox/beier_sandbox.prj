@@ -48,6 +48,7 @@
 
             <process_variables>
                 <process_variable>temperature_soil</process_variable>
+                <process_variable>temperature_BHE_1</process_variable>
             </process_variables>
 
             <secondary_variables>

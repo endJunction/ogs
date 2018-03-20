@@ -390,13 +390,14 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
 #endif
 #ifdef OGS_BUILD_PROCESS_HYDROMECHANICS
             if (type == "HYDRO_MECHANICS")
-            == == == = else if (type == "PIPE_NETWORK")
-            {
-                process = ProcessLib::PipeNetwork::createPipeNetworkProcess(
-                    *_mesh_vec[0], std::move(jacobian_assembler),
-                    _process_variables, _parameters, integration_order,
-                    process_config, _curves);
-            }
+=======
+        else if (type == "PIPE_NETWORK")
+        {
+            process = ProcessLib::PipeNetwork::createPipeNetworkProcess(
+                *_mesh_vec[0], std::move(jacobian_assembler),
+                _process_variables, _parameters, integration_order,
+                process_config, _curves);
+        }
         else if (type == "HYDRO_MECHANICS")
 >>>>>>> linking the process PIPE_NETWORK
         {
