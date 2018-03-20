@@ -11,6 +11,8 @@
 
 #include <cassert>
 
+#include "MathLib/LinAlg/PETSc/PETScMatrix.h"
+#include "MathLib/LinAlg/PETSc/PETScVector.h"
 #include "NumLib/DOF/DOFTableUtil.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 
@@ -131,6 +133,31 @@ void HTProcess::assembleConcreteProcess(const double t,
     }
 
 #ifdef USE_PETSC
+    auto store_matrix = [&](MathLib::PETScMatrix& matrix,
+                            std::string const& name) {
+        PetscViewer viewer;
+        PetscViewerASCIIOpen(PETSC_COMM_WORLD, name.c_str(), &viewer);
+        PetscViewerPushFormat(viewer, PETSC_VIEWER_DEFAULT);
+
+        matrix.finalizeAssembly();
+
+        PetscObjectSetName((PetscObject)matrix.getRawMatrix(), name.c_str());
+        MatView(matrix.getRawMatrix(), viewer);
+    };
+    auto store_vector = [&](MathLib::PETScVector& vector,
+                            std::string const& name) {
+        PetscViewer viewer;
+        PetscViewerASCIIOpen(PETSC_COMM_WORLD, name.c_str(), &viewer);
+        PetscViewerPushFormat(viewer, PETSC_VIEWER_DEFAULT);
+
+        vector.finalizeAssembly();
+
+        PetscObjectSetName((PetscObject)vector.getRawVector(), name.c_str());
+        VecView(vector.getRawVector(), viewer);
+    };
+    int rank;
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
     {
         GlobalIndexType position = 0;
         GlobalIndexType position2 = 0;
@@ -142,6 +169,7 @@ void HTProcess::assembleConcreteProcess(const double t,
             position += bi;
             position2 += bi * bi;
         }
+        store_matrix(M, "M." + std::to_string(rank));
     }
 
     {
@@ -155,11 +183,13 @@ void HTProcess::assembleConcreteProcess(const double t,
             position += bi;
             position2 += bi * bi;
         }
+        store_matrix(K, "K." + std::to_string(rank));
     }
 
     VecSetValues(b.getRawVector(), b_storage.indices.size(),
                  b_storage.indices.data(), b_storage.entries.data(),
                  ADD_VALUES);
+    store_vector(b, "b." + std::to_string(rank));
 #else   // USE_PETSC
     M.getRawMatrix().setFromTriplets(M_storage.data.begin(),
                                      M_storage.data.end());
