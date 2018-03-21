@@ -55,6 +55,7 @@
 
                     <!--type>CubicLawAfterShearSlip</type>
                     <minimum_permeability>1e-12</minimum_permeability-->
+                    <initial_creation_aperture>0</initial_creation_aperture>
                 </permeability_model>
             </fracture_properties>
             <secondary_variables>
