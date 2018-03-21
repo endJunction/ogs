@@ -50,12 +50,12 @@
                 <biot_coefficient>biot_f</biot_coefficient>
                 <permeability_model>
                     <!--type>CubicLaw</type-->
-                    <type>ConstantPermeability</type>
-                    <value>1e-14</value>
+                    <!--type>ConstantPermeability</type>
+                    <value>1e-14</value-->
 
-                    <!--type>CubicLawAfterShearSlip</type>
-                    <minimum_permeability>1e-12</minimum_permeability-->
+                    <type>CubicLawAfterShearSlip</type>
                     <initial_creation_aperture>0</initial_creation_aperture>
+                    <minimum_permeability>1e-12</minimum_permeability>
                 </permeability_model>
             </fracture_properties>
             <secondary_variables>
@@ -347,7 +347,7 @@
         <nonlinear_solver>
             <name>basic_newton</name>
             <type>Newton</type>
-            <max_iter>15</max_iter>
+            <max_iter>100</max_iter>
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
