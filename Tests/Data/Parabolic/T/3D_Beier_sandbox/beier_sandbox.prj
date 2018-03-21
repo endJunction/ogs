@@ -8,6 +8,10 @@
             <name>HeatTransportBHE</name>
             <type>HEAT_TRANSPORT_BHE</type>
             <integration_order>2</integration_order>
+            <process_variables>
+                <process_variable>temperature_soil</process_variable>
+                <process_variable>temperature_BHE1</process_variable>
+            </process_variables>
 
             <thermal_conductivity_solid>K_s</thermal_conductivity_solid>
             <heat_capacity_solid>Cp_s</heat_capacity_solid>
@@ -45,11 +49,6 @@
                     <bhe_switch_off_threshold>0.001</bhe_switch_off_threshold>
                 </borehole_heat_exchanger>
             </borehole_heat_exchangers>
-
-            <process_variables>
-                <process_variable>temperature_soil</process_variable>
-                <process_variable>temperature_BHE_1</process_variable>
-            </process_variables>
 
             <secondary_variables>
                <secondary_variable type="static" internal_name="heat_flux_x" output_name="heat_flux_x" />
@@ -170,6 +169,11 @@
             <value>295.25</value>
         </parameter>
         <parameter>
+            <name>T0_BHE1</name>
+            <type>Constant</type>
+            <values>295.25 295.25 295.25 295.25</values>
+        </parameter>
+        <parameter>
             <name>T_bound</name>
             <type>Constant</type>
             <value>300.0</value>
@@ -193,10 +197,10 @@
            </boundary_conditions>
         </process_variable>
                 <process_variable>
-            <name>temperature_BHE_1</name>
-            <components>1</components>
+            <name>temperature_BHE1</name>
+            <components>4</components>
             <order>1</order>
-            <initial_condition>T0</initial_condition>
+            <initial_condition>T0_BHE1</initial_condition>
             <boundary_conditions>
             </boundary_conditions>
         </process_variable>
