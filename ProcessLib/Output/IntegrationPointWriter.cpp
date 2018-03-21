@@ -36,7 +36,7 @@ static ProcessLib::IntegrationPointMetaData addIntegrationPointData(
     for (std::size_t e = 0; e < ip_values.size(); ++e)
     {
         auto const& element_ip_values = ip_values[e];
-        INFO("Write %d ip_values for cell %d", element_ip_values.size(), e);
+        //INFO("Write %d ip_values for cell %d", element_ip_values.size(), e);
         std::copy(element_ip_values.begin(), element_ip_values.end(),
                   std::back_inserter(field_data));
     }
