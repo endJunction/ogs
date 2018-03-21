@@ -182,9 +182,7 @@
             <name>temperature_soil</name>
             <components>1</components>
             <order>1</order>
-
             <initial_condition>T0</initial_condition>
-
             <boundary_conditions>
                 <boundary_condition>
                     <geometrical_set>beier_sandbox</geometrical_set>
@@ -193,7 +191,14 @@
                     <parameter>T_bound</parameter>
                 </boundary_condition>
            </boundary_conditions>
-
+        </process_variable>
+                <process_variable>
+            <name>temperature_BHE_1</name>
+            <components>1</components>
+            <order>1</order>
+            <initial_condition>T0</initial_condition>
+            <boundary_conditions>
+            </boundary_conditions>
         </process_variable>
     </process_variables>
 

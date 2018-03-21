@@ -8,11 +8,11 @@
 */
 
 #include "CreateBHE1U.h"
-#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
 #include "MaterialLib/Fluid/FluidProperty.h"
+#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
+#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
 #include "MaterialLib/Fluid/SpecificHeatCapacity/CreateSpecificFluidHeatCapacityModel.h"
 #include "MaterialLib/Fluid/ThermalConductivity/CreateFluidThermalConductivityModel.h"
-#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
 
 namespace BHE
 {
