@@ -252,7 +252,8 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             if (ps != nullptr)
             {
                 ps->shear_slip_occured =
-                    state.getShearYieldFunctionValue() >= 0;
+                    ps->shear_slip_occured ||
+                    (state.getShearYieldFunctionValue() >= 0);
             }
         }
 
