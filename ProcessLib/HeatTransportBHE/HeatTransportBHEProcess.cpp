@@ -11,6 +11,7 @@
 
 #include <cassert>
 
+#include "ProcessLib/HeatTransportBHE/BHE/MeshUtils.h"
 #include "ProcessLib/Utils/CreateLocalAssemblers.h"
 
 namespace ProcessLib
@@ -32,6 +33,67 @@ namespace ProcessLib
                 std::move(secondary_variables), std::move(named_function_caller)),
             _process_data(std::move(process_data))
         {
+            getBHEDataInMesh(mesh,
+                             _vec_soil_elements,
+                             _vec_BHE_mat_IDs,
+                             _vec_BHE_elements,
+                             _vec_BHE_nodes);
+        }
+
+        void HeatTransportBHEProcess::constructDofTable()
+        {
+            //------------------------------------------------------------
+            // prepare mesh subsets to define DoFs
+            //------------------------------------------------------------
+            // for extrapolation
+            _mesh_subset_all_nodes =
+                std::make_unique<MeshLib::MeshSubset>(_mesh, &_mesh.getNodes());
+
+            // actually all the nodes in the mesh belongs to the soil
+            // compartment
+            _mesh_subset_soil_nodes =
+                std::make_unique<MeshLib::MeshSubset>(_mesh, &_mesh.getNodes());
+            // the BHE nodes need to be cherry-picked from the vector
+            for (unsigned i = 0; i < _vec_BHE_nodes.size(); i++)
+            {
+                _mesh_subset_BHE_nodes.push_back(
+                    std::make_unique<MeshLib::MeshSubset const>(
+                        _mesh, &_vec_BHE_nodes[i]));
+            }
+
+            // Collect the mesh subsets in a vector.
+            std::vector<MeshLib::MeshSubsets> all_mesh_subsets;
+            std::generate_n(std::back_inserter(all_mesh_subsets), 1, [&]() {
+                return MeshLib::MeshSubsets{_mesh_subset_soil_nodes.get()};
+            });
+
+            for (auto& ms : _mesh_subset_BHE_nodes)
+            {
+                std::generate_n(
+                    std::back_inserter(all_mesh_subsets),
+                    4 /*TODO: temp solution*/,
+                    [&]() { return MeshLib::MeshSubsets{ms.get()}; });
+            }
+            /*
+                        std::vector<int> const vec_n_components(1 +
+               _vec_fracture_mat_IDs.size(), DisplacementDim);
+
+                        std::vector<std::vector<MeshLib::Element*> const*>
+               vec_var_elements;
+                        vec_var_elements.push_back(&_vec_matrix_elements);
+                        for (unsigned i = 0; i <
+               _vec_fracture_matrix_elements.size(); i++)
+                        {
+                            vec_var_elements.push_back(&_vec_fracture_matrix_elements[i]);
+                        }
+
+                        _local_to_global_index_map =
+                            std::make_unique<NumLib::LocalToGlobalIndexMap>(
+                                std::move(all_mesh_subsets),
+                                vec_n_components,
+                                vec_var_elements,
+                                NumLib::ComponentOrder::BY_COMPONENT);
+                         */
         }
 
         void HeatTransportBHEProcess::initializeConcreteProcess(
