@@ -9,20 +9,20 @@
 
 #include "CreateHeatTransportBHEProcess.h"
 
-#include "ProcessLib/Output/CreateSecondaryVariables.h"
-#include "ProcessLib/Utils/ProcessUtils.h"
-#include "HeatTransportBHEProcess.h"
-#include "HeatTransportBHEProcessData.h"
 #include "BHE/BHEAbstract.h"
 #include "BHE/BHE_1U.h"
 #include "BHE/BHE_Net.h"
 #include "BHE/CreateBHE1U.h"
+#include "BaseLib/reorderVector.h"
+#include "HeatTransportBHEProcess.h"
+#include "HeatTransportBHEProcessData.h"
+#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
 #include "MaterialLib/Fluid/FluidProperty.h"
-#include "MaterialLib/Fluid/Density/createFluidDensityModel.h"
-#include "MaterialLib/Fluid/Viscosity/createViscosityModel.h"
 #include "MaterialLib/Fluid/SpecificHeatCapacity/CreateSpecificFluidHeatCapacityModel.h"
 #include "MaterialLib/Fluid/ThermalConductivity/CreateFluidThermalConductivityModel.h"
-#include "BaseLib/reorderVector.h"
+#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
+#include "ProcessLib/Output/CreateSecondaryVariables.h"
+#include "ProcessLib/Utils/ProcessUtils.h"
 
 namespace ProcessLib
 {
@@ -48,29 +48,24 @@ namespace ProcessLib
             auto const pv_config = config.getConfigSubtree("process_variables");
             std::vector<std::vector<std::reference_wrapper<ProcessVariable>>> process_variables;
 
-            // reading primary variables for each
-            // BHE----------------------------------------------------------
+            // reading primary variables for each BHE----------------------------------------------------------
             auto range =
                 //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__process_variables__process_variable}
-                pv_config.getConfigParameterList<std::string>(
-                    "process_variable");
-            std::vector<std::reference_wrapper<ProcessVariable>>
-                per_process_variables;
+                pv_config.getConfigParameterList<std::string>("process_variable");
+            std::vector<std::reference_wrapper<ProcessVariable>> per_process_variables;
 
             for (std::string const& pv_name : range)
             {
-                if (pv_name != "temperature_soil" &&
-                    pv_name.find("temperature_BHE") != 0)
+                if (pv_name != "temperature_soil" && pv_name.find("temperature_BHE") != 0)
                 {
                     OGS_FATAL(
                         "Found a process variable name '%s'. It should be "
                         "'temperature_soil' or 'temperature_BHE_X'");
                 }
-                auto variable =
-                    std::find_if(variables.cbegin(), variables.cend(),
-                                 [&pv_name](ProcessVariable const& v) {
-                                     return v.getName() == pv_name;
-                                 });
+                auto variable = std::find_if(variables.cbegin(), variables.cend(),
+                    [&pv_name](ProcessVariable const& v) {
+                    return v.getName() == pv_name;
+                });
 
                 if (variable == variables.end())
                 {
@@ -81,13 +76,16 @@ namespace ProcessLib
                         pv_name.c_str(), "process_variable");
                 }
                 DBUG("Found process variable \'%s\' for config tag <%s>.",
-                     variable->getName().c_str(), "process_variable");
+                    variable->getName().c_str(), "process_variable");
 
-                per_process_variables.emplace_back(
-                    const_cast<ProcessVariable&>(*variable));
+                per_process_variables.emplace_back(const_cast<ProcessVariable&>(*variable));
             }
-            // end of reading primary variables for each
-            // BHE----------------------------------------------------------
+            // end of reading primary variables for each BHE----------------------------------------------------------
+
+
+
+
+
 
             // solid phase thermal conductivity parameter.
             auto& thermal_conductivity_solid = findParameter<double>(
@@ -199,8 +197,8 @@ namespace ProcessLib
                     BHE_network.add_bhe_net_pipe(m_bhe_pipe_1u, m_bhe_1u->get_ele_name(), 0,
                         m_bhe_1u->get_ele_name(), 0);
 
-                    // creating 4 components for the primary variable
-                    // temperature on this BHE
+                    // creating 4 components for the primary variable temperature on this BHE
+
                 }
                 else if (bhe_type_str == "BHE_TYPE_2U")
                 {
