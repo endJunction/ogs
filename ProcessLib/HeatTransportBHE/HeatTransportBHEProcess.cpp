@@ -71,7 +71,9 @@ namespace ProcessLib
             {
                 std::generate_n(
                     std::back_inserter(all_mesh_subsets),
-                    1 /*one mesh subset for each BHE*/,
+                    4 /*TODO: The number "4" needs to be changed according to
+                         BHE type*/
+                    ,
                     [&]() { return MeshLib::MeshSubsets{ms.get()}; });
             }
 
@@ -81,9 +83,8 @@ namespace ProcessLib
             // now the BHE subsets
             for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
             {
-                /*TODO: The number "4" needs to be changed according to BHE
-                 * type*/
-                vec_n_components.push_back(4);
+                /*TODO: The number "4" needs to be changed according to BHE type*/
+                vec_n_components.push_back(4); 
             }
 
             std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
@@ -99,7 +100,8 @@ namespace ProcessLib
                     vec_n_components,
                     vec_var_elements,
                     NumLib::ComponentOrder::BY_COMPONENT);
-        }
+            
+		}
 
 		void HeatTransportBHEProcess::initializeConcreteProcess(
             NumLib::LocalToGlobalIndexMap const& dof_table,
