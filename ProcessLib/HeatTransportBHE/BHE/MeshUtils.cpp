@@ -80,7 +80,7 @@ namespace HeatTransportBHE
                 vec_nodes, [](MeshLib::Node* node1, MeshLib::Node* node2) {
                 return node1->getID() < node2->getID();
             });
-            DBUG("-> found %d nodes on the fracture %d", vec_nodes.size(), bhe_id);
+            DBUG("-> found %d nodes on the BHE_%d", vec_nodes.size(), bhe_id);
         }
     }
 

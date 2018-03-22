@@ -40,6 +40,7 @@ namespace ProcessLib
                 GlobalVector const& x) override;
 
         private:
+
             void constructDofTable() override;
 
             void initializeConcreteProcess(
@@ -64,8 +65,7 @@ namespace ProcessLib
             std::vector<std::vector<MeshLib::Element*>> _vec_BHE_elements;
             std::vector<MeshLib::Element*> _vec_soil_elements;
             std::vector<std::vector<MeshLib::Node*>> _vec_BHE_nodes;
-            std::vector<std::unique_ptr<MeshLib::MeshSubset const>>
-                _mesh_subset_BHE_nodes;
+            std::vector<std::unique_ptr<MeshLib::MeshSubset const>> _mesh_subset_BHE_nodes;
             std::unique_ptr<MeshLib::MeshSubset const> _mesh_subset_soil_nodes;
             std::vector<int> _vec_BHE_mat_IDs;
         };
