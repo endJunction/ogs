@@ -69,19 +69,28 @@ namespace ProcessLib
 
             for (auto& ms : _mesh_subset_BHE_nodes)
             {
-                std::generate_n(std::back_inserter(all_mesh_subsets),
-                    4 /*TODO: temp solution*/,
-                    [&]() { return MeshLib::MeshSubsets{ ms.get() }; });
+                std::generate_n(
+                    std::back_inserter(all_mesh_subsets),
+                    1 /*one mesh subset for each BHE*/,
+                    [&]() { return MeshLib::MeshSubsets{ms.get()}; });
             }
-/*
-            std::vector<int> const vec_n_components(1 + _vec_fracture_mat_IDs.size(),
-                DisplacementDim);
+
+            std::vector<int> vec_n_components;
+            // this is the soil temperature for first mesh subset
+            vec_n_components.push_back(1);
+            // now the BHE subsets
+            for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+            {
+                /*TODO: The number "4" needs to be changed according to BHE
+                 * type*/
+                vec_n_components.push_back(4);
+            }
 
             std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
-            vec_var_elements.push_back(&_vec_matrix_elements);
-            for (unsigned i = 0; i < _vec_fracture_matrix_elements.size(); i++)
+            vec_var_elements.push_back(&_vec_soil_elements);
+            for (unsigned i = 0; i < _vec_BHE_elements.size(); i++)
             {
-                vec_var_elements.push_back(&_vec_fracture_matrix_elements[i]);
+                vec_var_elements.push_back(&_vec_BHE_elements[i]);
             }
 
             _local_to_global_index_map =
@@ -90,8 +99,7 @@ namespace ProcessLib
                     vec_n_components,
                     vec_var_elements,
                     NumLib::ComponentOrder::BY_COMPONENT);
-             */
-		}
+        }
 
 		void HeatTransportBHEProcess::initializeConcreteProcess(
             NumLib::LocalToGlobalIndexMap const& dof_table,
