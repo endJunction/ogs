@@ -69,12 +69,9 @@ namespace ProcessLib
 
             for (auto& ms : _mesh_subset_BHE_nodes)
             {
-                std::generate_n(
-                    std::back_inserter(all_mesh_subsets),
-                    4 /*TODO: The number "4" needs to be changed according to
-                         BHE type*/
-                    ,
-                    [&]() { return MeshLib::MeshSubsets{ms.get()}; });
+                std::generate_n(std::back_inserter(all_mesh_subsets),
+                    4 /*TODO: The number "4" needs to be changed according to BHE type*/,
+                    [&]() { return MeshLib::MeshSubsets{ ms.get() }; });
             }
 
             std::vector<int> vec_n_components;

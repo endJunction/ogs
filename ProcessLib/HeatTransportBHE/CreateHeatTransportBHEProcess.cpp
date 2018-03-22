@@ -80,6 +80,7 @@ namespace ProcessLib
 
                 per_process_variables.emplace_back(const_cast<ProcessVariable&>(*variable));
             }
+            process_variables.push_back(std::move(per_process_variables));
             // end of reading primary variables for each BHE----------------------------------------------------------
 
 
