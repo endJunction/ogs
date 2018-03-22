@@ -19,19 +19,20 @@ namespace ProcessLib
 
         struct PipeNetworkProcessData
         {
-            PipeNetworkProcessData(Parameter<double> const& thermal_conductivity_,
-                Parameter<double> const& heat_capacity_,
-                Parameter<double> const& density_)
-                : thermal_conductivity(thermal_conductivity_),
-                heat_capacity(heat_capacity_),
-                density(density_)
+            PipeNetworkProcessData(
+                Parameter<double> const& pipe_diameter_,
+                Parameter<double> const& pipe_roughness_,
+                Parameter<double> const& minorloss_coefficient_)
+                : pipe_diameter(pipe_diameter_),
+                  pipe_roughness(pipe_roughness_),
+                  minorloss_coefficient(minorloss_coefficient_)
             {
             }
 
             PipeNetworkProcessData(PipeNetworkProcessData&& other)
-                : thermal_conductivity(other.thermal_conductivity),
-                heat_capacity(other.heat_capacity),
-                density(other.density)
+                : pipe_diameter(other.pipe_diameter),
+                  pipe_roughness(other.pipe_roughness),
+                  minorloss_coefficient(other.minorloss_coefficient)
             {
             }
 
@@ -44,12 +45,9 @@ namespace ProcessLib
             //! Assignments are not needed.
             void operator=(PipeNetworkProcessData&&) = delete;
 
-            // TODO
-            // these 3 parameters need to be changed accordingly. 
-            Parameter<double> const& thermal_conductivity;
-            Parameter<double> const& heat_capacity;
-            Parameter<double> const& density;
-            
+            Parameter<double> const& pipe_diameter;
+            Parameter<double> const& pipe_roughness;
+            Parameter<double> const& minorloss_coefficient;
         };
 
     }  // namespace PipeNetwork
