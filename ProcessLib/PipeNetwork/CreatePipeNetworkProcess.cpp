@@ -35,15 +35,13 @@ namespace ProcessLib
             //! \ogs_file_param{prj__processes__process__PIPE_NETWORK__process_variables}
             auto const pv_config = config.getConfigSubtree("process_variables");
 
-            std::vector<std::vector<std::reference_wrapper<ProcessVariable>>>
-                process_variables;
+            std::vector<std::vector<std::reference_wrapper<ProcessVariable>>> process_variables;
 
-            auto per_process_variables = findProcessVariables(
-                variables, pv_config,
+            auto per_process_variables = findProcessVariables(variables, pv_config,
                 {//! \ogs_file_param_special{prj__processes__process__PIPE_NETWORK__process_variables__flow_rate}
-                 "flow_rate",
+                "flow_rate",
                  //! \ogs_file_param_special{prj__processes__process__PIPE_NETWORK__process_variables__head}
-                 "head"});
+                 "head" });
             process_variables.push_back(std::move(per_process_variables));
 
             // Process variable.
@@ -55,7 +53,7 @@ namespace ProcessLib
                 "pipe_diameter", parameters, 1);
 
             DBUG("Use \'%s\' as pipe diameter parameter.",
-                 pipe_diameter.name.c_str());
+                pipe_diameter.name.c_str());
 
             // pipe roughness parameter.
             auto& pipe_roughness = findParameter<double>(
@@ -63,8 +61,7 @@ namespace ProcessLib
                 //! \ogs_file_param_special{prj__processes__process__PIPE_NETWORK__pipe_roughness}
                 "pipe_roughness", parameters, 1);
 
-            DBUG("Use \'%s\' as pipe roughness parameter.",
-                 pipe_roughness.name.c_str());
+            DBUG("Use \'%s\' as pipe roughness parameter.", pipe_roughness.name.c_str());
 
             // minorLoss coefficient parameter.
             auto& minorloss_coefficient = findParameter<double>(
@@ -72,16 +69,16 @@ namespace ProcessLib
                 //! \ogs_file_param_special{prj__processes__process__PIPE_NETWORK__minorLoss_coefficient}
                 "minorloss_coefficient", parameters, 1);
 
-            DBUG("Use \'%s\' as minorloss coefficient parameter.",
-                 minorloss_coefficient.name.c_str());
+            DBUG("Use \'%s\' as minorloss coefficient parameter.", minorloss_coefficient.name.c_str());
 
-            PipeNetworkProcessData process_data{pipe_diameter, pipe_roughness,
-                                                minorloss_coefficient};
+            PipeNetworkProcessData process_data{ pipe_diameter,
+                pipe_roughness,
+                minorloss_coefficient };
 
             SecondaryVariableCollection secondary_variables;
 
             NumLib::NamedFunctionCaller named_function_caller(
-                {"PipeNetwork_flow_rate"});  // TODO be changed accordingly.
+                { "PipeNetwork_flow_rate" }); // TODO be changed accordingly. 
 
             ProcessLib::createSecondaryVariables(config, secondary_variables,
                 named_function_caller);

@@ -19,20 +19,19 @@ namespace ProcessLib
 
         struct PipeNetworkProcessData
         {
-            PipeNetworkProcessData(
-                Parameter<double> const& pipe_diameter_,
+            PipeNetworkProcessData(Parameter<double> const& pipe_diameter_,
                 Parameter<double> const& pipe_roughness_,
                 Parameter<double> const& minorloss_coefficient_)
                 : pipe_diameter(pipe_diameter_),
-                  pipe_roughness(pipe_roughness_),
-                  minorloss_coefficient(minorloss_coefficient_)
+                pipe_roughness(pipe_roughness_),
+                minorloss_coefficient(minorloss_coefficient_)
             {
             }
 
             PipeNetworkProcessData(PipeNetworkProcessData&& other)
                 : pipe_diameter(other.pipe_diameter),
-                  pipe_roughness(other.pipe_roughness),
-                  minorloss_coefficient(other.minorloss_coefficient)
+                pipe_roughness(other.pipe_roughness),
+                minorloss_coefficient(other.minorloss_coefficient)
             {
             }
 
@@ -48,6 +47,7 @@ namespace ProcessLib
             Parameter<double> const& pipe_diameter;
             Parameter<double> const& pipe_roughness;
             Parameter<double> const& minorloss_coefficient;
+            
         };
 
     }  // namespace PipeNetwork
