@@ -1,24 +1,24 @@
 /**
- * \copyright
- * Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
- *            Distributed under a Modified BSD License.
- *              See accompanying file LICENSE.txt or
- *              http://www.opengeosys.org/project/license
- *
- */
+* \copyright
+* Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
+*            Distributed under a Modified BSD License.
+*              See accompanying file LICENSE.txt or
+*              http://www.opengeosys.org/project/license
+*
+*/
 
 #pragma once
 
-#include "BHE_CXC.h"
 #include "ProcessLib/Process.h"
+#include "BHE_CXC.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
-BHE::BHE_CXC* CreateBHECXC(
-    BaseLib::ConfigTree const& config,
-    BaseLib::ConfigTree const& bhe_conf,
-    std::map<std::string,
-             std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
-        curves);
+    BHE::BHE_CXC *
+        CreateBHECXC(BaseLib::ConfigTree const& config,
+                    BaseLib::ConfigTree const& bhe_conf, 
+                    std::map<std::string,
+                    std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const& curves);
 
-}  // namespace BHE
+
+}  // end of namespace
