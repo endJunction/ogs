@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <OpenGeoSysProject>
-    <mesh>pipeNetwork_testcase_0.vtu</mesh>
-    <geometry>pipeNetwork_testcase_0.gml</geometry>
+    <mesh>pipeNetwork_test.vtu</mesh>
+    <geometry>pipeNetwork_test.gml</geometry>
     <processes>
         <process>
-            <name>pipeNetwork_testcase_0</name>
+            <name>pipeNetwork_test</name>
             <type>PIPE_NETWORK</type>
             <integration_order>2</integration_order>
             <pipe_diameter>diameter</pipe_diameter>
@@ -22,7 +22,7 @@
     </processes>
     <time_loop>
         <processes>
-            <process ref="pipeNetwork_testcase_0">
+            <process ref="pipeNetwork_test">
                 <nonlinear_solver>basic_newton</nonlinear_solver>
                 <convergence_criterion>
                     <type>DeltaX</type>
@@ -66,17 +66,47 @@
 		<parameter>
             <name>diameter</name>
             <type>MeshElement</type>
-            <field_name>diameter</field_name>
+            <field_name>MaterialIDs</field_name>
         </parameter>
 		<parameter>
             <name>roughness</name>
             <type>MeshElement</type>
-            <field_name>roughness</field_name>
+            <field_name>MaterialIDs</field_name>
         </parameter>
         <parameter>
             <name>minorLoss_coef</name>
             <type>Constant</type>
             <value>0</value>
+        </parameter>
+		<parameter>
+            <name>diameter_mat_group_0</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+		<parameter>
+            <name>roughness_mat_group_0</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+		<parameter>
+            <name>diameter_mat_group_1</name>
+            <type>Constant</type>
+            <value>0.3048</value>
+        </parameter>
+        <parameter>
+            <name>roughness_mat_group_1</name>
+            <type>Constant</type>
+            <value>100</value>
+        </parameter>
+		<parameter>
+            <name>diameter_mat_group_2</name>
+            <type>Constant</type>
+            <value>0.6096</value>
+        </parameter>
+        <parameter>
+            <name>roughness_mat_group_2</name>
+            <type>Constant</type>
+            <value>300</value>
         </parameter>
         <parameter>
             <name>demand</name>
@@ -94,25 +124,23 @@
             <value>1</value>
         </parameter>
 		<parameter>
+            <name>initial_pipeflow_and_head_random_value</name>
+            <type>Constant</type>
+            <value>0.5</value>
+        </parameter>
+        <parameter>
             <name>pump_mat_group_0</name>
             <type>CurveScaled</type>
             <curve>pump_curve_0</curve>
             <parameter>p_spatial</parameter>
         </parameter>
-		<parameter>
-            <name>initial_pipeflow_and_head_random_value</name>
-            <type>Constant</type>
-            <value>0.5</value>
-        </parameter>
     </parameters>
 	<curves>
         <curve>
             <name>pump_curve_0</name>
-			<coords>0	5</coords>
-			<values>
-			10	0
-			</values>
-		</curve>
+            <coords>0	5</coords>
+            <values>10	 0</values>
+        </curve>
     </curves>
     <process_variables>
         <process_variable>
