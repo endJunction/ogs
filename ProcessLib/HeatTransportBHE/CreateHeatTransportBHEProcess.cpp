@@ -9,22 +9,22 @@
 
 #include "CreateHeatTransportBHEProcess.h"
 
+#include "ProcessLib/Output/CreateSecondaryVariables.h"
+#include "ProcessLib/Utils/ProcessUtils.h"
+#include "HeatTransportBHEProcess.h"
+#include "HeatTransportBHEProcessData.h"
 #include "BHE/BHEAbstract.h"
 #include "BHE/BHE_1U.h"
 #include "BHE/BHE_2U.h"
 #include "BHE/BHE_Net.h"
 #include "BHE/CreateBHE1U.h"
 #include "BHE/CreateBHE2U.h"
-#include "BaseLib/reorderVector.h"
-#include "HeatTransportBHEProcess.h"
-#include "HeatTransportBHEProcessData.h"
-#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
 #include "MaterialLib/Fluid/FluidProperty.h"
+#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
+#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
 #include "MaterialLib/Fluid/SpecificHeatCapacity/CreateSpecificFluidHeatCapacityModel.h"
 #include "MaterialLib/Fluid/ThermalConductivity/CreateFluidThermalConductivityModel.h"
-#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
-#include "ProcessLib/Output/CreateSecondaryVariables.h"
-#include "ProcessLib/Utils/ProcessUtils.h"
+#include "BaseLib/reorderVector.h"
 
 namespace ProcessLib
 {
@@ -206,20 +206,16 @@ namespace ProcessLib
                 else if (bhe_type_str == "BHE_TYPE_2U")
                 {
                     // initialize the 2U type BHE
-                    BHE::BHE_2U* m_bhe_2u =
-                        BHE::CreateBHE2U(config, bhe_conf, curves);
+                    BHE::BHE_2U * m_bhe_2u = BHE::CreateBHE2U(config, bhe_conf, curves);
 
                     vec_BHEs.push_back(std::move(m_bhe_2u));
                     BHE_network.add_bhe_net_elem(m_bhe_2u);
 
                     // now adding a pipeline connecting the bottom of this BHE
-                    BHE::BHE_Net_ELE_Pipe_Inner_2U* m_bhe_pipe_2u;
-                    m_bhe_pipe_2u = new BHE::BHE_Net_ELE_Pipe_Inner_2U(
-                        m_bhe_2u->get_ele_name().append("_INNER_PIPE"),
-                        m_bhe_2u);
-                    BHE_network.add_bhe_net_pipe(m_bhe_pipe_2u,
-                                                 m_bhe_2u->get_ele_name(), 0,
-                                                 m_bhe_2u->get_ele_name(), 0);
+                    BHE::BHE_Net_ELE_Pipe_Inner_2U * m_bhe_pipe_2u;
+                    m_bhe_pipe_2u = new BHE::BHE_Net_ELE_Pipe_Inner_2U(m_bhe_2u->get_ele_name().append("_INNER_PIPE"), m_bhe_2u);
+                    BHE_network.add_bhe_net_pipe(m_bhe_pipe_2u, m_bhe_2u->get_ele_name(), 0,
+                        m_bhe_2u->get_ele_name(), 0);
                 }
                 else if (bhe_type_str == "BHE_TYPE_CXC")
                 {
