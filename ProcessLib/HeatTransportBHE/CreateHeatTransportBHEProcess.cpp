@@ -9,6 +9,10 @@
 
 #include "CreateHeatTransportBHEProcess.h"
 
+#include "ProcessLib/Output/CreateSecondaryVariables.h"
+#include "ProcessLib/Utils/ProcessUtils.h"
+#include "HeatTransportBHEProcess.h"
+#include "HeatTransportBHEProcessData.h"
 #include "BHE/BHEAbstract.h"
 #include "BHE/BHE_1U.h"
 #include "BHE/BHE_2U.h"
@@ -19,16 +23,12 @@
 #include "BHE/CreateBHE2U.h"
 #include "BHE/CreateBHECXA.h"
 #include "BHE/CreateBHECXC.h"
-#include "BaseLib/reorderVector.h"
-#include "HeatTransportBHEProcess.h"
-#include "HeatTransportBHEProcessData.h"
-#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
 #include "MaterialLib/Fluid/FluidProperty.h"
+#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
+#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
 #include "MaterialLib/Fluid/SpecificHeatCapacity/CreateSpecificFluidHeatCapacityModel.h"
 #include "MaterialLib/Fluid/ThermalConductivity/CreateFluidThermalConductivityModel.h"
-#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
-#include "ProcessLib/Output/CreateSecondaryVariables.h"
-#include "ProcessLib/Utils/ProcessUtils.h"
+#include "BaseLib/reorderVector.h"
 
 namespace ProcessLib
 {
@@ -224,38 +224,30 @@ namespace ProcessLib
                 else if (bhe_type_str == "BHE_TYPE_CXC")
                 {
                     // initialize the CXC type BHE
-                    BHE::BHE_CXC* m_bhe_CXC =
-                        BHE::CreateBHECXC(config, bhe_conf, curves);
+                    BHE::BHE_CXC * m_bhe_CXC = BHE::CreateBHECXC(config, bhe_conf, curves);
 
                     vec_BHEs.push_back(std::move(m_bhe_CXC));
                     BHE_network.add_bhe_net_elem(m_bhe_CXC);
 
                     // now adding a pipeline connecting the bottom of this BHE
-                    BHE::BHE_Net_ELE_Pipe_Inner_CXC* m_bhe_pipe_CXC;
-                    m_bhe_pipe_CXC = new BHE::BHE_Net_ELE_Pipe_Inner_CXC(
-                        m_bhe_CXC->get_ele_name().append("_INNER_PIPE"),
-                        m_bhe_CXC);
-                    BHE_network.add_bhe_net_pipe(m_bhe_pipe_CXC,
-                                                 m_bhe_CXC->get_ele_name(), 0,
-                                                 m_bhe_CXC->get_ele_name(), 0);
+                    BHE::BHE_Net_ELE_Pipe_Inner_CXC * m_bhe_pipe_CXC;
+                    m_bhe_pipe_CXC = new BHE::BHE_Net_ELE_Pipe_Inner_CXC(m_bhe_CXC->get_ele_name().append("_INNER_PIPE"), m_bhe_CXC);
+                    BHE_network.add_bhe_net_pipe(m_bhe_pipe_CXC, m_bhe_CXC->get_ele_name(), 0,
+                        m_bhe_CXC->get_ele_name(), 0);
                 }
                 else if (bhe_type_str == "BHE_TYPE_CXA")
                 {
                     // initialize the CXA type BHE
-                    BHE::BHE_CXA* m_bhe_CXA =
-                        BHE::CreateBHECXA(config, bhe_conf, curves);
+                    BHE::BHE_CXA * m_bhe_CXA = BHE::CreateBHECXA(config, bhe_conf, curves);
 
                     vec_BHEs.push_back(std::move(m_bhe_CXA));
                     BHE_network.add_bhe_net_elem(m_bhe_CXA);
 
                     // now adding a pipeline connecting the bottom of this BHE
-                    BHE::BHE_Net_ELE_Pipe_Inner_CXA* m_bhe_pipe_CXA;
-                    m_bhe_pipe_CXA = new BHE::BHE_Net_ELE_Pipe_Inner_CXA(
-                        m_bhe_CXA->get_ele_name().append("_INNER_PIPE"),
-                        m_bhe_CXA);
-                    BHE_network.add_bhe_net_pipe(m_bhe_pipe_CXA,
-                                                 m_bhe_CXA->get_ele_name(), 0,
-                                                 m_bhe_CXA->get_ele_name(), 0);
+                    BHE::BHE_Net_ELE_Pipe_Inner_CXA * m_bhe_pipe_CXA;
+                    m_bhe_pipe_CXA = new BHE::BHE_Net_ELE_Pipe_Inner_CXA(m_bhe_CXA->get_ele_name().append("_INNER_PIPE"), m_bhe_CXA);
+                    BHE_network.add_bhe_net_pipe(m_bhe_pipe_CXA, m_bhe_CXA->get_ele_name(), 0,
+                        m_bhe_CXA->get_ele_name(), 0);
                 }
 
 

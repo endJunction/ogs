@@ -7,21 +7,23 @@
             <name>pipeNetwork_testcase_0</name>
             <type>PIPE_NETWORK</type>
             <integration_order>2</integration_order>
-            <thermal_conductivity>lambda</thermal_conductivity>
-            <heat_capacity>c_p</heat_capacity>
-            <density>rho</density>
+            <pipe_diameter>diameter</pipe_diameter>
+            <pipe_roughness>roughness</pipe_roughness>
+			<minorloss_coefficient>minorLoss_coef</minorloss_coefficient>
             <process_variables>
-                <process_variable>flow_velocity</process_variable>
+                <flow_rate>flow_rate</flow_rate>
+				<head>head</head>
             </process_variables>
             <secondary_variables>
-                <secondary_variable type="static" internal_name="head" output_name="head"/>
+                <secondary_variable type="static" internal_name="flow_velocity" output_name="flow_velocity"/>
+				<secondary_variable type="static" internal_name="pressure" output_name="pressure"/>
             </secondary_variables>
         </process>
     </processes>
     <time_loop>
         <processes>
-            <process ref="PipeNetwork">
-                <nonlinear_solver>basic_picard</nonlinear_solver>
+            <process ref="pipeNetwork_testcase_0">
+                <nonlinear_solver>basic_newton</nonlinear_solver>
                 <convergence_criterion>
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
@@ -61,15 +63,15 @@
         </output>
     </time_loop>
     <parameters>
-        <parameter>
+		<parameter>
             <name>diameter</name>
-            <type>Constant</type>
-            <value>0.3048</value>
+            <type>MeshElement</type>
+            <field_name>diameter</field_name>
         </parameter>
-        <parameter>
+		<parameter>
             <name>roughness</name>
-            <type>Constant</type>
-            <value>100.0</value>
+            <type>MeshElement</type>
+            <field_name>roughness</field_name>
         </parameter>
         <parameter>
             <name>minorLoss_coef</name>
@@ -77,7 +79,7 @@
             <value>0</value>
         </parameter>
         <parameter>
-            <name>demand_juncID_3</name>
+            <name>demand</name>
             <type>Constant</type>
             <value>0.06</value>
         </parameter>
@@ -92,20 +94,10 @@
             <value>1</value>
         </parameter>
 		<parameter>
-            <name>pump_curve</name>
+            <name>pump_mat_group_0</name>
             <type>CurveScaled</type>
-            <curve>pump_curve_1</curve>
+            <curve>pump_curve_0</curve>
             <parameter>p_spatial</parameter>
-        </parameter>
-        <parameter>
-            <name>pump_curve_x-value</name>
-            <type>Constant</type>
-            <value>5</value>
-        </parameter>
-		<parameter>
-            <name>pump_curve_y-value</name>
-            <type>Constant</type>
-            <value>10</value>
         </parameter>
 		<parameter>
             <name>initial_pipeflow_and_head_random_value</name>
@@ -115,7 +107,7 @@
     </parameters>
 	<curves>
         <curve>
-            <name>pump_curve_1</name>
+            <name>pump_curve_0</name>
 			<coords>0	5</coords>
 			<values>
 			10	0
@@ -124,31 +116,37 @@
     </curves>
     <process_variables>
         <process_variable>
-            <name>flow_velocity</name>
+            <name>flow_rate</name>
+            <components>1</components>
+            <order>1</order>
+            <initial_condition>initial_pipeflow_and_head_random_value</initial_condition>
+			<source_terms>
+				<source_term>
+                    <geometrical_set>geometry</geometrical_set>
+                    <geometry>node_id_73</geometry>
+                    <type>Nodal</type>
+                    <parameter>demand</parameter>
+                </source_term>
+            </source_terms>
+        </process_variable>
+		<process_variable>
+            <name>head</name>
             <components>1</components>
             <order>1</order>
             <initial_condition>initial_pipeflow_and_head_random_value</initial_condition>
             <boundary_conditions>
                 <boundary_condition>
                     <geometrical_set>geometry</geometrical_set>
-                    <geometry>reser_juncID_1</geometry>
-                    <type>Constant</type>
+                    <geometry>node_id_1</geometry>
+                    <type>Dirichlet</type>
                     <parameter>reservior_head</parameter>
                 </boundary_condition>
             </boundary_conditions>
-			<source_terms>
-				<source_term>
-                    <geometrical_set>geometry</geometrical_set>
-                    <geometry>juncID_3</geometry>
-                    <type>Constant</type>
-                    <parameter>demand_juncID_3</parameter>
-                </source_term>
-            </source_terms>
         </process_variable>
     </process_variables>
     <nonlinear_solvers>
         <nonlinear_solver>
-            <name>basic_newton_raphson</name>
+            <name>basic_newton</name>
             <type>Newton</type>
             <max_iter>10</max_iter>
             <linear_solver>general_linear_solver</linear_solver>

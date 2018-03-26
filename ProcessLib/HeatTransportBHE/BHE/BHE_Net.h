@@ -11,12 +11,12 @@
 
 #include <map>
 #include "BHE_Net_ELE_Abstract.h"
-#include "BHE_Net_ELE_HeatPump.h"
 #include "BHE_Net_ELE_Pipe.h"
 #include "BHE_Net_ELE_Pipe_Inner_1U.h"
 #include "BHE_Net_ELE_Pipe_Inner_2U.h"
 #include "BHE_Net_ELE_Pipe_Inner_CXA.h"
 #include "BHE_Net_ELE_Pipe_Inner_CXC.h"
+#include "BHE_Net_ELE_HeatPump.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
