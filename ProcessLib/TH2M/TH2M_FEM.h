@@ -226,38 +226,39 @@ public:
 //         ********************************************************************
 //         ********************************************************************
 
-        auto Mgp =
-              local_M.template block<gas_pressure_size, gas_pressure_size>(
+          auto Mgpg = local_M.template block<gas_pressure_size, gas_pressure_size>(
                   gas_pressure_index, gas_pressure_index);
 
           auto Mgpc = local_M.template block<gas_pressure_size, cap_pressure_size>(
               gas_pressure_index, cap_pressure_index);
 
-          auto Mgu = local_M.template block<gas_pressure_size, displacement_size>(
+          auto Mgus = local_M.template block<gas_pressure_size, displacement_size>(
                         gas_pressure_index, displacement_index);
+
+          auto Mlpg = local_M.template block<cap_pressure_size, gas_pressure_size>(
+              cap_pressure_index, gas_pressure_index);
 
           auto Mlpc = local_M.template block<cap_pressure_size, cap_pressure_size>(
               cap_pressure_index, cap_pressure_index);
 
-          auto Mlu = local_M.template block<cap_pressure_size, displacement_size>(
+          auto Mlus = local_M.template block<cap_pressure_size, displacement_size>(
                                   cap_pressure_index, displacement_index);
 
-          typename ShapeMatricesTypePressure::NodalMatrixType laplace_operator =
+          typename ShapeMatricesTypePressure::NodalMatrixType Laplace =
               ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
                                                                gas_pressure_size);
 
-          auto Kgp =
-                  local_K.template block<gas_pressure_size, gas_pressure_size>(
+          auto Kgpg = local_K.template block<gas_pressure_size, gas_pressure_size>(
                           gas_pressure_index, gas_pressure_index);
 
-          auto Klp = local_K.template block<cap_pressure_size, gas_pressure_size>(
+          auto Klpg = local_K.template block<cap_pressure_size, gas_pressure_size>(
                   cap_pressure_index, gas_pressure_index);
 
           auto Klpc = local_K.template block<cap_pressure_size, cap_pressure_size>(
                   cap_pressure_index, cap_pressure_index);
 
-          auto KTT = local_K.template block<temperature_size, temperature_size>(
-                            temperature_index, temperature_index);
+//        auto KTT = local_K.template block<temperature_size, temperature_size>(
+//                          temperature_index, temperature_index);
 
           auto Kupg =
                   local_K.template block<displacement_size, gas_pressure_size>(
@@ -266,9 +267,9 @@ public:
                   local_K.template block<displacement_size, cap_pressure_size>(
                           displacement_index, cap_pressure_index);
 
-          auto Kuu =
-                  local_K.template block<displacement_size, displacement_size>(
-                          displacement_index, displacement_index);
+//        auto Kuu =
+//                local_K.template block<displacement_size, displacement_size>(
+//                        displacement_index, displacement_index);
 
           auto Bg = local_rhs.template segment<gas_pressure_size>(
               gas_pressure_index);
@@ -343,11 +344,16 @@ public:
 
             auto const permeability = _process_data.intrinsic_permeability(t, x_position)[0];
 
-            using permTensorType = Eigen::Matrix<double, DisplacementDim, DisplacementDim>;
-
-            permTensorType perm_tensor;
-
-            perm_tensor.template block<2,2>(0,0).setIdentity();
+//
+//            using permTensorType = Eigen::Matrix<double, DisplacementDim, DisplacementDim>;
+//
+//            permTensorType perm_tensor;
+//
+//            perm_tensor.template block<2,2>(0,0).setIdentity();
+//
+//
+            Eigen::Matrix<double, DisplacementDim, DisplacementDim> perm_tensor;
+            perm_tensor.setIdentity();
 
             auto permeability_tensor = permeability * perm_tensor;
 
@@ -369,7 +375,6 @@ public:
 
             auto const pc_int_pt = p_cap.dot(N_p);
             auto const pn_int_pt = p_GR.dot(N_p);
-
 
             _pressure_wet[ip] = pn_int_pt - pc_int_pt;
 
@@ -412,6 +417,56 @@ public:
             double const lambda_wet = k_rel_wet / mu_wet;
 
 
+            const double phi = porosity;
+            const double sl = Sw;
+            const double sg = 1.0 - sl;
+            const double dsldpc = dSw_dpc;
+            const double rho_GR = rho_nonwet;
+            const double rho_LR = rho_wet;
+
+            const double beta_p_GR = 1./rho_GR*drhononwet_dpn;
+            const double beta_p_SR = 0.000001;
+            const double beta_p_LR = 0.;
+
+            double alpha_B = alpha;
+            const double p_cap = pc_int_pt;
+            const auto m = identity2;
+
+            const double k_rel_GR = k_rel_nonwet;
+            const double k_rel_LR = k_rel_wet;
+
+            const double mu_GR = mu_nonwet;
+            const double mu_LR = mu_wet;
+
+            const double lambda_GR = k_rel_GR / mu_GR;
+            const double lambda_LR = k_rel_LR / mu_LR;
+
+           // alpha_B = 0;
+
+            Laplace.noalias() = dNdx_p.transpose() * permeability_tensor * dNdx_p * w;
+
+            Mgpg.noalias() += N_p.transpose()*rho_GR*(phi*sg*beta_p_GR+(alpha_B-phi)*beta_p_SR*sg)*N_p*w;
+            Mgpc.noalias() -= N_p.transpose()*rho_GR*((alpha_B-phi)*beta_p_SR*sl*sg+(phi+(alpha_B-phi)*beta_p_SR*sg*p_cap)*dsldpc)*N_p*w;
+            Mgus.noalias() += N_p.transpose()*rho_GR*alpha_B*sg*m.transpose()*B*w;
+
+            Mlpg.noalias() += N_p.transpose()*rho_LR*(phi*sl*beta_p_LR+(alpha_B-phi)*beta_p_SR*sl)*N_p*w;
+            Mlpc.noalias() += N_p.transpose()*rho_LR*((phi-(alpha_B-phi)*beta_p_SR*sl*p_cap)*dsldpc-(phi*sl*beta_p_LR+(alpha_B-phi)*beta_p_SR*sl*sl))*N_p*w;
+            Mlus.noalias() += N_p.transpose()*rho_LR*sl*alpha_B*m.transpose()*B*w;
+
+            Kgpg.noalias() += rho_GR*lambda_GR*Laplace;
+            Klpg.noalias() += rho_LR*lambda_LR*Laplace;
+            Klpc.noalias() -= rho_LR*lambda_LR*Laplace;
+            Kupg.noalias() += B.transpose()*alpha*m*N_p*w;
+            Kupc.noalias() -= B.transpose()*alpha*m*sl*N_p*w;
+
+            auto const gravity_operator = (dNdx_p.transpose() *
+                                permeability_tensor * b * w).eval();
+
+            Bg.noalias() += rho_GR*rho_GR*lambda_GR*gravity_operator;
+            Bl.noalias() += rho_LR*rho_LR*lambda_LR*gravity_operator;
+            Bu.noalias() += (B.transpose()*sigma_eff-N_u_op.transpose()*rho*b)*w;
+
+
             //
             //            Kpp.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
             //
@@ -426,55 +481,64 @@ public:
             //            // Kuu = 0
             //            fu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
-            // Assemble M matrix
-            // nonwetting
-
-            const double Sg = 1. - Sw;
-
-            Mgp.noalias() +=
-                    porosity * Sg * drhononwet_dpn * N_p.transpose() * N_p * w;
-            Mgpc.noalias() +=
-                    -porosity * rho_nonwet * dSw_dpc * N_p.transpose() * N_p * w;
-
-
-    //        Mgu.noalias() += N_p.transpose() * Sg * rho_nonwet * alpha * identity2.transpose() * B * w;
-
-            Mlpc.noalias() +=
-                    porosity * dSw_dpc * rho_wet * N_p.transpose() * N_p * w;
-
-
-    //        Mlu.noalias() += N_p.transpose() * Sw * rho_wet * alpha * identity2.transpose() * B * w;
-
-
-            laplace_operator.noalias() = dNdx_p.transpose() *
-                    permeability_tensor * dNdx_p *
-                    w;
-
-    //    KTT.noalias() += laplace_operator;
-
-          Kgp.noalias() += rho_nonwet * lambda_nonwet * laplace_operator;
-
-
- //         Kupg.noalias() -= B.transpose() * alpha * identity2 * N_p * w;
-
-          Klpc.noalias() += -rho_wet * lambda_wet * laplace_operator;
-
-  //        Kupc.noalias() += B.transpose() * alpha * identity2 * Sw * N_p * w;
-
-
-            auto const gravity_operator = (dNdx_p.transpose() *
-                    permeability_tensor * b * w).eval();
-
-            Bg.noalias() +=
-                          rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
-
-            Bl.noalias() += rho_wet * rho_wet * lambda_wet * gravity_operator;
-
-
-
-            Bu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
+//            // Assemble M matrix
+//            // nonwetting
+//
+//            const double Sg = 1. - Sw;
+//
+//            Mgp.noalias() +=
+//                    porosity * Sg * drhononwet_dpn * N_p.transpose() * N_p * w;
+//            Mgpc.noalias() +=
+//                    -porosity * rho_nonwet * dSw_dpc * N_p.transpose() * N_p * w;
+//
+//
+//    //        Mgu.noalias() += N_p.transpose() * Sg * rho_nonwet * alpha * identity2.transpose() * B * w;
+//
+//            Mlpc.noalias() +=
+//                    porosity * dSw_dpc * rho_wet * N_p.transpose() * N_p * w;
+//
+//
+//    //        Mlu.noalias() += N_p.transpose() * Sw * rho_wet * alpha * identity2.transpose() * B * w;
+//
+//
+//            laplace_operator.noalias() = dNdx_p.transpose() *
+//                    permeability_tensor * dNdx_p *
+//                    w;
+//
+//    //    KTT.noalias() += laplace_operator;
+//
+//          Kgp.noalias() += rho_nonwet * lambda_nonwet * laplace_operator;
+//
+//
+// //         Kupg.noalias() -= B.transpose() * alpha * identity2 * N_p * w;
+//
+//          Klpc.noalias() += -rho_wet * lambda_wet * laplace_operator;
+//
+//  //        Kupc.noalias() += B.transpose() * alpha * identity2 * Sw * N_p * w;
+//
+//
+//            auto const gravity_operator = (dNdx_p.transpose() *
+//                    permeability_tensor * b * w).eval();
+//
+//            Bg.noalias() += rho_nonwet * rho_nonwet * lambda_nonwet * gravity_operator;
+//            Bl.noalias() += rho_wet * rho_wet * lambda_wet * gravity_operator;
+//            Bu.noalias() -= (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
         }
+
+
+//        std::cout << "== Local M: ====\n";
+//        std::cout << local_M << "\n";
+//        std::cout << "================\n";
+//        std::cout << "== Local K: ====\n";
+//        std::cout << local_K << "\n";
+//        std::cout << "================\n";
+//        std::cout << "== Local f: ====\n";
+//        std::cout << local_rhs << "\n";
+//        std::cout << "================\n";
+//
+//        OGS_FATAL("Intended halt.");
+
     }
 
     void assembleWithJacobian(double const t,
