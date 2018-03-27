@@ -12,6 +12,8 @@
 #include <cassert>
 #include <functional>  // for std::reference_wrapper.
 
+#include <omp.h>
+
 #include "NumLib/DOF/DOFTableUtil.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "LocalAssemblerInterface.h"
@@ -25,6 +27,15 @@ VectorMatrixAssembler::VectorMatrixAssembler(
     std::unique_ptr<AbstractJacobianAssembler>&& jacobian_assembler)
     : _jacobian_assembler(std::move(jacobian_assembler))
 {
+    int omp_threads = 1;
+#pragma omp parallel
+    {
+        omp_threads = omp_get_num_threads();
+    }
+
+    _local_M_data.reserve(omp_threads);
+    _local_K_data.reserve(omp_threads);
+    _local_b_data.reserve(omp_threads);
 }
 
 void VectorMatrixAssembler::preAssemble(
@@ -44,7 +55,8 @@ void VectorMatrixAssembler::assemble(
         dof_tables,
     const double t, const GlobalVector& x, MatrixCoordinateStorage& M,
     MatrixCoordinateStorage& K, VectorCoordinateStorage& b,
-    CoupledSolutionsForStaggeredScheme const* const cpl_xs)
+    CoupledSolutionsForStaggeredScheme const* const cpl_xs,
+    int thread_number)
 {
     std::vector<std::vector<GlobalIndexType>> indices_of_processes;
     indices_of_processes.reserve(dof_tables.size());
@@ -59,10 +71,13 @@ void VectorMatrixAssembler::assemble(
                               : indices_of_processes[cpl_xs->process_id];
 
     // TODO(naumov) Reserve guesses?
-    std::vector<double> local_M_data;
-    std::vector<double> local_K_data;
-    std::vector<double> local_b_data;
+    std::vector<double> & local_M_data = _local_M_data[thread_number];
+    std::vector<double> & local_K_data = _local_K_data[thread_number];
+    std::vector<double> & local_b_data = _local_b_data[thread_number];
 
+    local_M_data.clear();
+    local_K_data.clear();
+    local_b_data.clear();
     if (cpl_xs == nullptr)
     {
         auto const local_x = x.get(indices);

@@ -114,7 +114,8 @@ public:
                   double const t, GlobalVector const& x,
                   MatrixCoordinateStorage& M, MatrixCoordinateStorage& K,
                   VectorCoordinateStorage& b,
-                  CoupledSolutionsForStaggeredScheme const* const cpl_xs);
+                  CoupledSolutionsForStaggeredScheme const* const cpl_xs,
+                  int thread = 0);
 
     //! Assembles \c M, \c K, \c b, and the Jacobian \c Jac of the residual.
     //! \note The Jacobian must be assembled.
@@ -130,6 +131,13 @@ public:
         CoupledSolutionsForStaggeredScheme const* const cpl_xs);
 
 private:
+    // temporary data only stored here in order to avoid frequent memory
+    // reallocations.
+    std::vector<std::vector<double>> _local_M_data;
+    std::vector<std::vector<double>> _local_K_data;
+    std::vector<std::vector<double>> _local_b_data;
+    std::vector<std::vector<double>> _local_Jac_data;
+
     //! Used to assemble the Jacobian.
     std::unique_ptr<AbstractJacobianAssembler> _jacobian_assembler;
 };

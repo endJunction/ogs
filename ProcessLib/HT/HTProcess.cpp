@@ -135,6 +135,7 @@ void HTProcess::assembleConcreteProcess(const double t,
         auto const size = _local_assemblers.size();
         //INFO("XXX %d of %d on cpu %d", omp_get_thread_num(),
         //     omp_get_num_threads(), sched_getcpu());
+        int const thread_number = omp_get_thread_num();
 #pragma omp for
         for (std::size_t i = 0; i < size; ++i)
         {
@@ -142,7 +143,7 @@ void HTProcess::assembleConcreteProcess(const double t,
             // omp_get_num_threads(), i);
             _global_assembler.assemble(i, *_local_assemblers[i], dof_tables, t,
                                        x, M_storage_p, K_storage_p, b_storage_p,
-                                       _coupled_solutions);
+                                       _coupled_solutions, thread_number);
         }
 
 #pragma omp critical
