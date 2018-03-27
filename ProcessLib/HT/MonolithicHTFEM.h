@@ -73,12 +73,16 @@ public:
         // matrices.
         assert(local_matrix_size == ShapeFunction::NPOINTS * NUM_NODAL_DOF);
 
+        INFO("ccc local_M_data (address: %x) %d, %d of %d", &local_M_data, local_matrix_size, omp_get_thread_num(), omp_get_num_threads());
         auto local_M = MathLib::createZeroedMatrix<LocalMatrixType>(
             local_M_data, local_matrix_size, local_matrix_size);
+        INFO("ccc %d of %d assemble: createZeroedMatrix local_K_data (address: %x) ...", &local_K_data, omp_get_thread_num(), omp_get_num_threads());
         auto local_K = MathLib::createZeroedMatrix<LocalMatrixType>(
             local_K_data, local_matrix_size, local_matrix_size);
+        INFO("ccc %d of %d assemble: createZeroedMatrix local_b_data (address: %x) ...", &local_b_data, omp_get_thread_num(), omp_get_num_threads());
         auto local_b = MathLib::createZeroedVector<LocalVectorType>(
             local_b_data, local_matrix_size);
+        INFO("ccc %d of %d assemble: createZeroedMatrix done", omp_get_thread_num(), omp_get_num_threads());
 
         auto const num_nodes = ShapeFunction::NPOINTS;
 

@@ -33,6 +33,7 @@ VectorMatrixAssembler::VectorMatrixAssembler(
         omp_threads = omp_get_num_threads();
     }
 
+    INFO("VectorMatrixAssembler creating %d caches.", omp_threads);
     _local_M_data.reserve(omp_threads);
     _local_K_data.reserve(omp_threads);
     _local_b_data.reserve(omp_threads);
@@ -75,9 +76,15 @@ void VectorMatrixAssembler::assemble(
     std::vector<double> & local_K_data = _local_K_data[thread_number];
     std::vector<double> & local_b_data = _local_b_data[thread_number];
 
+    INFO("bbb %d of %d; i = %d", thread_number, omp_get_num_threads(), mesh_item_id);
     local_M_data.clear();
     local_K_data.clear();
     local_b_data.clear();
+    INFO("bbb cleared cache %d of %d", thread_number, omp_get_num_threads());
+    INFO("bbb local_M_data (%x) %d of %d", &local_M_data, thread_number, omp_get_num_threads());
+    INFO("bbb local_K_data (%x) %d of %d", &local_K_data, thread_number, omp_get_num_threads());
+    INFO("bbb local_b_data (%x) %d of %d", &local_b_data, thread_number, omp_get_num_threads());
+
     if (cpl_xs == nullptr)
     {
         auto const local_x = x.get(indices);
@@ -103,10 +110,12 @@ void VectorMatrixAssembler::assemble(
     auto const r_c_indices =
         NumLib::LocalToGlobalIndexMap::RowColumnIndices(indices, indices);
 
+    INFO("bbb add caches %d of %d", thread_number, omp_get_num_threads());
     M.add(r_c_indices, local_M_data);
     K.add(r_c_indices, local_K_data);
     assert(local_b_data.size() == indices.size());
     b.add(indices, local_b_data);
+    INFO("bbb added caches %d of %d", thread_number, omp_get_num_threads());
 }
 
 void VectorMatrixAssembler::assembleWithJacobian(
