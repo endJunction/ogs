@@ -136,15 +136,15 @@ namespace BHE  // namespace of borehole heat exchanger
 
             double lambda_p;
             /**
-             * thermal conductivity of the inner pipe wall
-             * unit is kg m sec^-3 K^-1
-             */
+            * thermal conductivity of the inner pipe wall
+            * unit is kg m sec^-3 K^-1
+            */
             double lambda_p_i;
 
             /**
-             * thermal conductivity of the outer pipe wall
-             * unit is kg m sec^-3 K^-1
-             */
+            * thermal conductivity of the outer pipe wall
+            * unit is kg m sec^-3 K^-1
+            */
             double lambda_p_o;
         };
 
