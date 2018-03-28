@@ -43,8 +43,7 @@ namespace BHE
         const double bhe_grout_heat_capacity = bhe_conf.getConfigParameter<double>("bhe_grout_heat_capacity");
         const double bhe_pipe_wall_thermal_conductivity = bhe_conf.getConfigParameter<double>("bhe_pipe_wall_thermal_conductivity");
         const double bhe_grout_thermal_conductivity = bhe_conf.getConfigParameter<double>("bhe_grout_thermal_conductivity");
-        const double bhe_pipe_distance = bhe_conf.getConfigParameter<double>("bhe_pipe_distance");
-        
+
         auto const bhe_use_ext_therm_resis_conf = bhe_conf.getConfigParameterOptional<bool>("bhe_use_external_therm_resis");
 
         // optional parameters
@@ -177,7 +176,6 @@ namespace BHE
             { bhe_user_defined_therm_resis, 
               bhe_R_fig, bhe_R_fog, bhe_R_gg1, bhe_R_gg2, bhe_R_gs } /* If using customed thermal resistance values*/,
             bhe_refrigerant_flow_rate,
-            bhe_pipe_distance, 
             bhe_power_in_watt_val,
             bhe_delta_T_val, 
             bhe_if_use_flow_rate_curve,
