@@ -5,7 +5,7 @@
     <processes>
         <process>
             <name>pipeNetwork_testcase_0</name>
-            <type>PipeNetwork</type>
+            <type>PIPE_NETWORK</type>
             <integration_order>2</integration_order>
             <thermal_conductivity>lambda</thermal_conductivity>
             <heat_capacity>c_p</heat_capacity>
