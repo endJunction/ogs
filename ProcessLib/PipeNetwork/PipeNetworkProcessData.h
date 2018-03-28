@@ -1,54 +1,56 @@
 /**
- * \copyright
- * Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
- *            Distributed under a Modified BSD License.
- *              See accompanying file LICENSE.txt or
- *              http://www.opengeosys.org/project/license
- *
- */
+* \copyright
+* Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
+*            Distributed under a Modified BSD License.
+*              See accompanying file LICENSE.txt or
+*              http://www.opengeosys.org/project/license
+*
+*/
 
 #pragma once
 
 namespace ProcessLib
 {
-template <typename T>
-struct Parameter;
+    template <typename T>
+    struct Parameter;
 
-namespace PipeNetwork
-{
-struct PipeNetworkProcessData
-{
-    PipeNetworkProcessData(Parameter<double> const& thermal_conductivity_,
-                           Parameter<double> const& heat_capacity_,
-                           Parameter<double> const& density_)
-        : thermal_conductivity(thermal_conductivity_),
-          heat_capacity(heat_capacity_),
-          density(density_)
+    namespace PipeNetwork
     {
-    }
 
-    PipeNetworkProcessData(PipeNetworkProcessData&& other)
-        : thermal_conductivity(other.thermal_conductivity),
-          heat_capacity(other.heat_capacity),
-          density(other.density)
-    {
-    }
+        struct PipeNetworkProcessData
+        {
+            PipeNetworkProcessData(Parameter<double> const& thermal_conductivity_,
+                Parameter<double> const& heat_capacity_,
+                Parameter<double> const& density_)
+                : thermal_conductivity(thermal_conductivity_),
+                heat_capacity(heat_capacity_),
+                density(density_)
+            {
+            }
 
-    //! Copies are forbidden.
-    PipeNetworkProcessData(PipeNetworkProcessData const&) = delete;
+            PipeNetworkProcessData(PipeNetworkProcessData&& other)
+                : thermal_conductivity(other.thermal_conductivity),
+                heat_capacity(other.heat_capacity),
+                density(other.density)
+            {
+            }
 
-    //! Assignments are not needed.
-    void operator=(PipeNetworkProcessData const&) = delete;
+            //! Copies are forbidden.
+            PipeNetworkProcessData(PipeNetworkProcessData const&) = delete;
 
-    //! Assignments are not needed.
-    void operator=(PipeNetworkProcessData&&) = delete;
+            //! Assignments are not needed.
+            void operator=(PipeNetworkProcessData const&) = delete;
 
-    // TODO
-    // these 3 parameters need to be changed accordingly.
-    Parameter<double> const& thermal_conductivity;
-    Parameter<double> const& heat_capacity;
-    Parameter<double> const& density;
-};
+            //! Assignments are not needed.
+            void operator=(PipeNetworkProcessData&&) = delete;
 
-}  // namespace PipeNetwork
+            // TODO
+            // these 3 parameters need to be changed accordingly. 
+            Parameter<double> const& thermal_conductivity;
+            Parameter<double> const& heat_capacity;
+            Parameter<double> const& density;
+            
+        };
+
+    }  // namespace PipeNetwork
 }  // namespace ProcessLib
