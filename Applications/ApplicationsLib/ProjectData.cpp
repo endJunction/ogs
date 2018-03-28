@@ -53,6 +53,9 @@
 #ifdef OGS_BUILD_PROCESS_HEATCONDUCTION
 #include "ProcessLib/HeatConduction/CreateHeatConductionProcess.h"
 #endif
+#ifdef OGS_BUILD_PROCESS_HEAT_TRANSPORT_BHE
+#include "ProcessLib/HeatTransportBHE/CreateHeatTransportBHEProcess.h"
+#endif
 #ifdef OGS_BUILD_PROCESS_HYDROMECHANICS
 #include "ProcessLib/HydroMechanics/CreateHydroMechanicsProcess.h"
 #endif
@@ -365,6 +368,16 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
             if (type == "HEAT_CONDUCTION")
         {
             process = ProcessLib::HeatConduction::createHeatConductionProcess(
+                *_mesh_vec[0], std::move(jacobian_assembler),
+                _process_variables, _parameters, integration_order,
+                process_config);
+        }
+        else
+#endif
+#ifdef OGS_BUILD_PROCESS_HEAT_TRANSPORT_BHE
+            if (type == "HEAT_TRANSPORT_BHE")
+        {
+            process = ProcessLib::Heat_TRANSPORT_BHE::createHeatTransportBHEProcess(
                 *_mesh_vec[0], std::move(jacobian_assembler),
                 _process_variables, _parameters, integration_order,
                 process_config);
