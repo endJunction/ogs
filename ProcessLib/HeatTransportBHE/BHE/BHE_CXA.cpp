@@ -98,8 +98,8 @@ void BHE_CXA::calc_thermal_resistances()
 
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 66 in Diersch_2011_CG
-    _R_con_i1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_i);
-    _R_con_o1 = std::log((r_inner + b_out) / r_inner) / (2.0 * PI * lambda_p_o);
+    _R_con_i1 = std::log( (r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_i);
+    _R_con_o1 = std::log( (r_inner + b_out) / r_inner) / (2.0 * PI * lambda_p_o);
 
     // thermal resistance due to the grout transition
     d_i1 = 2.0 * (r_outer + b_out);
