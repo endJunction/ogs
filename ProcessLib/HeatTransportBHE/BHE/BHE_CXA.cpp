@@ -81,7 +81,8 @@ void BHE_CXA::calc_thermal_resistances()
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in; 
     double const& b_out = pipe_param.b_out;
-    double const& lambda_p = pipe_param.lambda_p; 
+    double const& lambda_p_i = pipe_param.lambda_p_i;
+    double const& lambda_p_o = pipe_param.lambda_p_o;
 
     Nu_in = _Nu(0);
     Nu_out = _Nu(1);
