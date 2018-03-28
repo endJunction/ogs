@@ -42,7 +42,7 @@ namespace ProcessLib
 
             DBUG("Create HeatTransportBHE Process.");
 
-            // Process variable.
+            // Process variable. 
 
             //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__process_variables}
             auto const pv_config = config.getConfigSubtree("process_variables");
