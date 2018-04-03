@@ -81,7 +81,8 @@ void BHE_CXC::calc_thermal_resistances()
     double const& b_out = pipe_param.b_out;
     double const& lambda_r = refrigerant_param.lambda_r; 
     double const& lambda_g = grout_param.lambda_g;
-    double const& lambda_p = pipe_param.lambda_p; 
+    double const& lambda_p_i = pipe_param.lambda_p_i;
+    double const& lambda_p_o = pipe_param.lambda_p_o;
 
     Nu_in = _Nu(0);
     Nu_out = _Nu(1);
@@ -97,8 +98,8 @@ void BHE_CXC::calc_thermal_resistances()
 
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 66 in Diersch_2011_CG
-    _R_con_i1 = std::log((r_inner + b_in) / r_inner) / (2.0 * PI * lambda_p);
-    _R_con_o1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p);
+    _R_con_i1 = std::log((r_inner + b_in) / r_inner) / (2.0 * PI * lambda_p_i);
+    _R_con_o1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_o);
 
     // thermal resistance due to the grout transition
     d_o1 = 2.0 * (r_outer + b_out);
