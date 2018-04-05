@@ -154,9 +154,9 @@ struct HydroMechanicsProcessData
     MeshLib::PropertyVector<double>* mesh_prop_nodal_b = nullptr;
     MeshLib::PropertyVector<double>* mesh_prop_nodal_p = nullptr;
 
-    MeshLib::PropertyVector<double>* mesh_prop_nodal_forces = nullptr;
-    MeshLib::PropertyVector<double>* mesh_prop_nodal_forces_jump = nullptr;
-    MeshLib::PropertyVector<double>* mesh_prop_hydraulic_flow = nullptr;
+    MeshLib::PropertyVector<double>* nodal_forces = nullptr;
+    MeshLib::PropertyVector<double>* nodal_forces_jump = nullptr;
+    MeshLib::PropertyVector<double>* hydraulic_flow = nullptr;
 
     double const reference_temperature;
 

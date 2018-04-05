@@ -399,26 +399,23 @@ void HydroMechanicsProcess<GlobalDim>::initializeConcreteProcess(
         mesh_prop_nodal_p->resize(mesh.getNumberOfNodes());
         _process_data.mesh_prop_nodal_p = mesh_prop_nodal_p;
 
-        _process_data.mesh_prop_nodal_forces =
-            MeshLib::getOrCreateMeshProperty<double>(
-                const_cast<MeshLib::Mesh&>(mesh), "NodalForces",
-                MeshLib::MeshItemType::Node, GlobalDim);
-        assert(_process_data.mesh_prop_nodal_forces->size() ==
+        _process_data.nodal_forces = MeshLib::getOrCreateMeshProperty<double>(
+            const_cast<MeshLib::Mesh&>(mesh), "NodalForces",
+            MeshLib::MeshItemType::Node, GlobalDim);
+        assert(_process_data.nodal_forces->size() ==
                GlobalDim * mesh.getNumberOfNodes());
 
-        _process_data.mesh_prop_nodal_forces_jump =
+        _process_data.nodal_forces_jump =
             MeshLib::getOrCreateMeshProperty<double>(
                 const_cast<MeshLib::Mesh&>(mesh), "NodalForcesJump",
                 MeshLib::MeshItemType::Node, GlobalDim);
-        assert(_process_data.mesh_prop_nodal_forces_jump->size() ==
+        assert(_process_data.nodal_forces_jump->size() ==
                GlobalDim * mesh.getNumberOfNodes());
 
-        _process_data.mesh_prop_hydraulic_flow =
-            MeshLib::getOrCreateMeshProperty<double>(
-                const_cast<MeshLib::Mesh&>(mesh), "HydraulicFlow",
-                MeshLib::MeshItemType::Node, 1);
-        assert(_process_data.mesh_prop_hydraulic_flow->size() ==
-               mesh.getNumberOfNodes());
+        _process_data.hydraulic_flow = MeshLib::getOrCreateMeshProperty<double>(
+            const_cast<MeshLib::Mesh&>(mesh), "HydraulicFlow",
+            MeshLib::MeshItemType::Node, 1);
+        assert(_process_data.hydraulic_flow->size() == mesh.getNumberOfNodes());
     }
 }
 
@@ -554,9 +551,9 @@ void HydroMechanicsProcess<GlobalDim>::assembleWithJacobianConcreteProcess(
                                           *_local_to_global_index_map,
                                           output_vector, std::negate<double>());
     };
-    copyRhs(0, *_process_data.mesh_prop_hydraulic_flow);
-    copyRhs(1, *_process_data.mesh_prop_nodal_forces);
-    copyRhs(2, *_process_data.mesh_prop_nodal_forces_jump);
+    copyRhs(0, *_process_data.hydraulic_flow);
+    copyRhs(1, *_process_data.nodal_forces);
+    copyRhs(2, *_process_data.nodal_forces_jump);
 }
 
 template <int GlobalDim>
