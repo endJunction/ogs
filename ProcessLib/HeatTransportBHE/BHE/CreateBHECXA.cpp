@@ -29,11 +29,26 @@ namespace BHE
         const std::string bhe_ply_name = bhe_conf.getConfigParameter<std::string>("bhe_polyline");
         const std::string bhe_bound_type_str = bhe_conf.getConfigParameter<std::string>("bhe_bound_type");
         const bool bhe_if_use_flow_rate_curve = false;
-        const double bhe_length = bhe_conf.getConfigParameter<double>("bhe_length");
-        const double bhe_diameter = bhe_conf.getConfigParameter<double>("bhe_diameter");
+        const double bhe_length_1 =
+            bhe_conf.getConfigParameter<double>("bhe_length_1");
+        const double bhe_length_2 =
+            bhe_conf.getConfigParameter<double>("bhe_length_2");
+        const double bhe_length_3 =
+            bhe_conf.getConfigParameter<double>("bhe_length_3");
+        const double bhe_diameter_1 =
+            bhe_conf.getConfigParameter<double>("bhe_diameter_1");
+        const double bhe_diameter_2 =
+            bhe_conf.getConfigParameter<double>("bhe_diameter_2");
+        const double bhe_diameter_3 =
+            bhe_conf.getConfigParameter<double>("bhe_diameter_3");
         const double bhe_refrigerant_flow_rate = bhe_conf.getConfigParameter<double>("bhe_refrigerant_flow_rate");
         const double bhe_pipe_inner_radius = bhe_conf.getConfigParameter<double>("bhe_pipe_inner_radius");
-        const double bhe_pipe_outer_radius = bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius");
+        const double bhe_pipe_outer_radius_1 =
+            bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_1");
+        const double bhe_pipe_outer_radius_2 =
+            bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_2");
+        const double bhe_pipe_outer_radius_3 =
+            bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_3");
         const double bhe_pipe_in_wall_thickness = bhe_conf.getConfigParameter<double>("bhe_pipe_in_wall_thickness");
         const double bhe_pipe_out_wall_thickness = bhe_conf.getConfigParameter<double>("bhe_pipe_out_wall_thickness");
         const std::size_t bhe_fluid_idx = bhe_conf.getConfigParameter<std::size_t>("bhe_fluid_idx");
@@ -159,27 +174,34 @@ namespace BHE
         vars[static_cast<int>(MaterialLib::Fluid::PropertyVariableType::T)] = 298.15;
         vars[static_cast<int>(MaterialLib::Fluid::PropertyVariableType::p)] = 101325.0;
 
-        BHE::BHE_CXA * m_bhe_CXA = m_bhe_CXA = new BHE::BHE_CXA(
-            bhe_ply_name, 
-            bhe_bound_type, 
-            curves, 
-            { bhe_length, bhe_diameter } /* Borehole Geometry */, 
-            { bhe_pipe_inner_radius, bhe_pipe_outer_radius, 
-              bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness, 
-              bhe_inner_pipe_wall_thermal_conductivity,
-              bhe_outer_pipe_wall_thermal_conductivity} /* Pipe Parameters */,
-            { bhe_refrigerant_viscosity->getValue(vars), bhe_refrigerant_density->getValue(vars),
-              bhe_regrigerant_heat_conductivity->getValue(vars), bhe_refrigerant_heat_capacity->getValue(vars),
-              bhe_fluid_longitudinal_dispsion_length } /* Refrigerant Parameters */,
-            { bhe_grout_density, bhe_grout_porosity,
-              bhe_grout_heat_capacity, bhe_grout_thermal_conductivity } /* Grout Parameters */,
-            { bhe_use_ext_therm_resis, 
-              bhe_intern_resistance, bhe_therm_resistance } /* If using given Ra Rb values*/, 
-            { bhe_user_defined_therm_resis, 
-              bhe_R_fig, bhe_R_fog, bhe_R_gg1, bhe_R_gg2, bhe_R_gs } /* If using customed thermal resistance values*/,
+        BHE::BHE_CXA* m_bhe_CXA = m_bhe_CXA = new BHE::BHE_CXA(
+            bhe_ply_name,
+            bhe_bound_type,
+            curves,
+            {bhe_length_1, bhe_length_2, bhe_length_3, bhe_diameter_1,
+             bhe_diameter_2, bhe_diameter_3} /* Borehole Geometry */,
+            {bhe_pipe_inner_radius, bhe_pipe_outer_radius_1,
+             bhe_pipe_outer_radius_2, bhe_pipe_outer_radius_3,
+             bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness,
+             bhe_inner_pipe_wall_thermal_conductivity,
+             bhe_outer_pipe_wall_thermal_conductivity} /* Pipe Parameters */,
+            {bhe_refrigerant_viscosity->getValue(vars),
+             bhe_refrigerant_density->getValue(vars),
+             bhe_regrigerant_heat_conductivity->getValue(vars),
+             bhe_refrigerant_heat_capacity->getValue(vars),
+             bhe_fluid_longitudinal_dispsion_length} /* Refrigerant Parameters
+                                                      */
+            ,
+            {bhe_grout_density, bhe_grout_porosity, bhe_grout_heat_capacity,
+             bhe_grout_thermal_conductivity} /* Grout Parameters */,
+            {bhe_use_ext_therm_resis, bhe_intern_resistance,
+             bhe_therm_resistance} /* If using given Ra Rb values*/,
+            {bhe_user_defined_therm_resis, bhe_R_fig, bhe_R_fog, bhe_R_gg1,
+             bhe_R_gg2,
+             bhe_R_gs} /* If using customed thermal resistance values*/,
             bhe_refrigerant_flow_rate,
             bhe_power_in_watt_val,
-            bhe_delta_T_val, 
+            bhe_delta_T_val,
             bhe_if_use_flow_rate_curve,
             bhe_switch_off_threshold);
 
