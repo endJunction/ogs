@@ -61,8 +61,8 @@ AddTest(
     TESTER vtkdiff
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     DIFF_DATA
-    GLOB single_fracture_constK_pcs_0_ts_*.vtu pressure pressure 1e-16 1e-16
-    GLOB single_fracture_constK_pcs_0_ts_*.vtu pressure_interpolated pressure_interpolated 1e-16 1e-16
+    GLOB single_fracture_constK_pcs_0_ts_*.vtu pressure pressure 1e-16 2e-14
+    GLOB single_fracture_constK_pcs_0_ts_*.vtu pressure_interpolated pressure_interpolated 1e-16 2e-14
     GLOB single_fracture_constK_pcs_0_ts_*.vtu displacement displacement 1e-16 0
     GLOB single_fracture_constK_pcs_0_ts_*.vtu displacement_jump1 displacement_jump1 1e-16 0
     GLOB single_fracture_constK_pcs_0_ts_*.vtu nodal_w nodal_w 1e-16 0
@@ -71,9 +71,9 @@ AddTest(
     GLOB single_fracture_constK_pcs_0_ts_*.vtu strain_yy strain_yy 1e-16 0
     GLOB single_fracture_constK_pcs_0_ts_*.vtu strain_xy strain_xy 1e-16 0
     GLOB single_fracture_constK_pcs_0_ts_*.vtu strain_zz strain_zz 1e-16 0
-    GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_xx stress_xx 1e-16 0
-    GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_yy stress_yy 1e-16 0
-    GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_xy stress_xy 1e-16 0
+    GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_xx stress_xx 1e-8 1e-14
+    GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_yy stress_yy 1e-8 5e-15
+    GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_xy stress_xy 5e-8 1e-15
     GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_zz stress_zz 1e-16 0
     GLOB single_fracture_constK_pcs_0_ts_*.vtu velocity velocity 1e-16 0
 )
