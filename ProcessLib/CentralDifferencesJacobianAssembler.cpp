@@ -39,13 +39,13 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     std::vector<double>& local_Jac_data)
 {
     // TODO do not check in every call.
-//    if (local_x_data.size() % _absolute_epsilons.size() != 0) {
-//        OGS_FATAL(
-//            "The number of specified epsilons (%u) and the number of local "
-//            "d.o.f.s (%u) do not match, i.e., the latter is not divisable by "
-//            "the former.",
-//            _absolute_epsilons.size(), local_x_data.size());
-//    }
+    if (local_x_data.size() % _absolute_epsilons.size() != 0) {
+        OGS_FATAL(
+            "The number of specified epsilons (%u) and the number of local "
+            "d.o.f.s (%u) do not match, i.e., the latter is not divisable by "
+            "the former.",
+            _absolute_epsilons.size(), local_x_data.size());
+    }
 
     auto const num_r_c =
         static_cast<Eigen::MatrixXd::Index>(local_x_data.size());
@@ -69,14 +69,16 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     //                  third index transposed.)
     // The loop computes the dM/dx, dK/dx and db/dx terms, the rest is computed
     // afterwards.
+
     for (Eigen::MatrixXd::Index i = 0; i < num_r_c; ++i)
     {
         // assume that local_x_data is ordered by component.
         auto const component = i / num_dofs_per_component;
-   //     auto const eps = _absolute_epsilons[component];
+  //    auto const eps = _absolute_epsilons[component];
 
-   // HACK!!!
-        auto const eps = 1.0e-7;
+        // Hack! size of _absolute_epsilons must equal the size of local_x_data!
+        auto const eps = _absolute_epsilons[i];
+
 
         _local_x_perturbed_data[i] += eps;
         local_assembler.assemble(t, _local_x_perturbed_data, local_M_data,
@@ -89,13 +91,6 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
 
         _local_x_perturbed_data[i] = local_x_data[i];
 
-
-//        if (i<8)
-//        {
-//            std::cout << " vor M:\n";
-//            std::cout << local_Jac << "\n";
-//        }
-
         if (!local_M_data.empty()) {
             auto const local_M_p =
                 MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
@@ -104,12 +99,6 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
             local_Jac.col(i).noalias() +=
                 // dM/dxi * x_dot
                 (local_M_p - local_M_m) * local_xdot / (2.0 * eps);
-
-//            if (i<8)
-//            {
-//                std::cout << "nach M:\n";
-//                std::cout << local_Jac << "\n";
-//            }
 
             local_M_data.clear();
             _local_M_data.clear();
@@ -123,12 +112,6 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
                 // dK/dxi * x
                 (local_K_p - local_K_m) * local_x / (2.0 * eps);
 
-//            if (i<8)
-//            {
-//                std::cout << "nach K:\n";
-//                std::cout << local_Jac << "\n";
-//            }
-
             local_K_data.clear();
             _local_K_data.clear();
         }
@@ -141,16 +124,12 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
                 // db/dxi
                 (local_b_p - local_b_m) / (2.0 * eps);
 
-//            if (i<8)
-//            {
-//                std::cout << "nach b:\n";
-//                std::cout << local_Jac << "\n";
-//            }
-
             local_b_data.clear();
             _local_b_data.clear();
         }
     }
+
+
 
     // Assemble with unperturbed local x.
     local_assembler.assemble(t, local_x_data, local_M_data, local_K_data,
@@ -161,10 +140,12 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         auto local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_M * dxdot_dx;
     }
+
     if (dx_dx != 0.0 && !local_K_data.empty()) {
         auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_K * dx_dx;
     }
+
 
     if (num_r_c > 16) // in case of th2m
     {
@@ -187,9 +168,7 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
 //        std::cout << "\n";
 //    }
 //
-//    std::cout << "done.\n";
 //    OGS_FATAL("Intended halt.");
-
 
 }
 
