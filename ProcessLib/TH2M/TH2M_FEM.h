@@ -361,8 +361,7 @@ public:
             auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
             auto const rho_sr = _process_data.solid_density(t, x_position)[0];
             auto const rho_fr = _process_data.fluid_density(t, x_position)[0];
-            // auto const porosity = _process_data.porosity(t, x_position)[0];
-            double const porosity = 0.2975;
+            auto const porosity = _process_data.porosity(t, x_position)[0];
 
             auto const& b = _process_data.specific_body_force;
 
@@ -432,8 +431,8 @@ public:
             const double p_cap = pc_int_pt;
             const auto m = identity2;
 
-            const double k_rel_GR = k_rel_nonwet;
-            const double k_rel_LR = k_rel_wet;
+            const double k_rel_GR = 1.0;
+            const double k_rel_LR = 1.0;
 
             const double mu_GR = mu_nonwet;
             const double mu_LR = mu_wet;
@@ -442,6 +441,18 @@ public:
             const double lambda_LR = k_rel_LR / mu_LR;
 
            // alpha_B = 0;
+
+//            std::cout << "central difference assembly of Jacobian:\n\n";
+//
+//            std::cout << "displacement_index : " << displacement_index << "\n";
+//            std::cout << "gas_pressure_index : " << gas_pressure_index << "\n";
+//            std::cout << "cap_pressure_index : " << cap_pressure_index << "\n";
+//            std::cout << "\n";
+//            std::cout << "displacement_size : " << displacement_size << "\n";
+//            std::cout << "gas_pressure_size : " << gas_pressure_size << "\n";
+//            std::cout << "cap_pressure_size : " << cap_pressure_size << "\n";
+//            std::cout << "\n";
+
 
             Laplace.noalias() = dNdx_p.transpose() * permeability_tensor * dNdx_p * w;
 
@@ -464,8 +475,29 @@ public:
 
             Bg.noalias() += rho_GR*rho_GR*lambda_GR*gravity_operator;
             Bl.noalias() += rho_LR*rho_LR*lambda_LR*gravity_operator;
-            Bu.noalias() += (B.transpose()*sigma_eff-N_u_op.transpose()*rho*b)*w;
+            Bu.noalias() -= (B.transpose()*sigma_eff-N_u_op.transpose()*rho*b)*w;
 
+//            std::cout   <<  "    Mgpg   :\n" <<  Mgpg   <<   "\n\n";
+//            std::cout   <<  "    Mgpc   :\n" <<  Mgpc   <<   "\n\n";
+//            std::cout   <<  "    Mgus   :\n" <<  Mgus   <<   "\n\n";
+//
+//            std::cout   <<  "    Mlpg   :\n" <<  Mlpg   <<   "\n\n";
+//            std::cout   <<  "    Mlpc   :\n" <<  Mlpc   <<   "\n\n";
+//            std::cout   <<  "    Mlus   :\n" <<  Mlus   <<   "\n\n";
+//
+//            std::cout   <<  "    Kgpg   :\n" <<  Kgpg   <<   "\n\n";
+//            std::cout   <<  "    Klpg   :\n" <<  Klpg   <<   "\n\n";
+//            std::cout   <<  "    Klpc   :\n" <<  Klpc   <<   "\n\n";
+//            std::cout   <<  "    Kupg   :\n" <<  Kupg   <<   "\n\n";
+//            std::cout   <<  "    Kupc   :\n" <<  Kupc   <<   "\n\n";
+//
+//            std::cout   <<  "    Bg     :\n" <<  Bg     <<   "\n\n";
+//            std::cout   <<  "    Bl     :\n" <<  Bl     <<   "\n\n";
+//            std::cout   <<  "    Bu     :\n" <<  Bu     <<   "\n\n";
+//
+//            std::cout   <<  "    Sigma  :\n" <<  sigma_eff  <<   "\n\n";
+//
+//            std::cout   <<  "   ________________________________\n\n\n";
 
             //
             //            Kpp.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
@@ -605,21 +637,109 @@ public:
         auto local_rhs = MathLib::createZeroedVector<
             typename ShapeMatricesTypeDisplacement::template VectorType<
             matrix_size>>(
-            local_rhs_data, matrix_size);
+                    local_rhs_data, matrix_size);
 
         typename ShapeMatricesTypePressure::NodalMatrixType laplace_p =
-            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
-                    gas_pressure_size);
+                ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
+                        gas_pressure_size);
 
         typename ShapeMatricesTypePressure::NodalMatrixType storage_p =
-            ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
-                    gas_pressure_size);
+                ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
+                        gas_pressure_size);
 
-        typename ShapeMatricesTypeDisplacement::template MatrixType<
-        Nu_intPoints, Np_intPoints>
-            Kup = ShapeMatricesTypeDisplacement::template MatrixType<
+
+        typename ShapeMatricesTypePressure::template MatrixType<
+        Nu_intPoints, Np_intPoints> Kup = ShapeMatricesTypePressure::template MatrixType<
                 displacement_size, gas_pressure_size>::Zero(displacement_size,
                                                         gas_pressure_size);
+
+
+        typename ShapeMatricesTypePressure::template MatrixType<displacement_size, gas_pressure_size>
+        test_up = ShapeMatricesTypePressure::template  MatrixType
+        <displacement_size, gas_pressure_size>::Zero(displacement_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<displacement_size, displacement_size>
+        test_uu = ShapeMatricesTypePressure::template  MatrixType
+        <displacement_size, displacement_size>::Zero(displacement_size, displacement_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, displacement_size>
+        test_pu = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, displacement_size>::Zero(gas_pressure_size, displacement_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        test_pp = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template VectorType<gas_pressure_size>
+        test_p = ShapeMatricesTypePressure::template  VectorType
+        <gas_pressure_size>::Zero(gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template VectorType<displacement_size>
+        test_u = ShapeMatricesTypePressure::template  VectorType
+        <displacement_size>::Zero(displacement_size);
+
+
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        Mgpg = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        Mgpc = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        Mlpg = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        Mlpc = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        Kgpg = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        Klpg = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, gas_pressure_size>
+        Klpc = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, gas_pressure_size>::Zero(gas_pressure_size, gas_pressure_size);
+
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, displacement_size>
+        Mgus = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, displacement_size>::Zero(gas_pressure_size, displacement_size);
+
+
+        typename ShapeMatricesTypePressure::template MatrixType<gas_pressure_size, displacement_size>
+        Mlus = ShapeMatricesTypePressure::template  MatrixType
+        <gas_pressure_size, displacement_size>::Zero(gas_pressure_size, displacement_size);
+
+
+        typename ShapeMatricesTypePressure::template MatrixType<displacement_size, gas_pressure_size>
+        Kupg = ShapeMatricesTypePressure::template  MatrixType
+        <displacement_size, gas_pressure_size>::Zero(displacement_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template MatrixType<displacement_size, gas_pressure_size>
+        Kupc = ShapeMatricesTypePressure::template  MatrixType
+        <displacement_size, gas_pressure_size>::Zero(displacement_size, gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template VectorType<gas_pressure_size>
+        Bg = ShapeMatricesTypePressure::template  VectorType
+        <gas_pressure_size>::Zero(gas_pressure_size);
+
+        typename ShapeMatricesTypePressure::template VectorType<gas_pressure_size>
+        Bl = ShapeMatricesTypePressure::template  VectorType
+        <gas_pressure_size>::Zero(gas_pressure_size);
+
+
+        typename ShapeMatricesTypePressure::template VectorType<displacement_size>
+        Bu = ShapeMatricesTypePressure::template  VectorType
+        <displacement_size>::Zero(displacement_size);
+
 
         double const& dt = _process_data.dt;
 
@@ -665,9 +785,117 @@ public:
             auto const& identity2 = MathLib::KelvinVector::Invariants<
                     MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value>::identity2;
 
+            auto const permeability = _process_data.intrinsic_permeability(t, x_position)[0];
+
+
+//            std::cout << "analytical assembly of Jacobian:\n\n";
+//            std::cout << "displacement_index : " << displacement_index << "\n";
+//            std::cout << "gas_pressure_index : " << gas_pressure_index << "\n";
+//            std::cout << "cap_pressure_index : " << cap_pressure_index << "\n";
+//            std::cout << "\n";
+//            std::cout << "displacement_size : " << displacement_size << "\n";
+//            std::cout << "gas_pressure_size : " << gas_pressure_size << "\n";
+//            std::cout << "cap_pressure_size : " << cap_pressure_size << "\n";
+//            std::cout << "\n";
+
+
+            const double temperature = 293.15;
+            const double molar_mass  = 0.02896;
+            const double gas_constant = 8.3144621;
+
+            auto const pc_int_pt = p_cap.dot(N_p);
+            auto const pn_int_pt = p_GR.dot(N_p);
+
+            double const rho_GR = molar_mass * pn_int_pt / gas_constant / temperature;
+            double const rho_LR = 1000.;
+            double phi = porosity;
+
+            const double m_sw =-1.00623E-05;
+            const double n_sw = 1.0;
+
+            double const Sw = m_sw * pc_int_pt + n_sw;
+
+            const double sl = Sw;
+            const double sg = 1.0 - sl;
+            const double dsldpc = m_sw;
+
+            double const drhononwet_dpn = molar_mass / gas_constant / temperature;
+
+            auto const rho = rho_sr * (1 - porosity) + porosity *
+                    (Sw * rho_LR + (1. - Sw)* rho_GR);
+
+              const double beta_p_GR = 1./rho_GR*drhononwet_dpn;
+              const double beta_p_SR = 0.000001;
+              const double beta_p_LR = 0.;
+
+              double alpha_B = alpha;
+              const double p_cap = pc_int_pt;
+              const auto m = identity2;
+
+              const double k_rel_GR = 1.0;
+              const double k_rel_LR = 1.0;
+
+              double const mu_GR = 1.8e-5;
+              double const mu_LR = 1.0e-3;
+
+              const double lambda_GR = k_rel_GR / mu_GR;
+              const double lambda_LR = k_rel_LR / mu_LR;
+
+              Eigen::Matrix<double, DisplacementDim, DisplacementDim> perm_tensor;
+              perm_tensor.setIdentity();
+
+              auto permeability_tensor = permeability * perm_tensor;
+
+              auto const Laplace = (dNdx_p.transpose() * permeability_tensor * dNdx_p * w).eval();
+
+              Mgpg.noalias() += N_p.transpose()*rho_GR*(phi*sg*beta_p_GR+(alpha_B-phi)*beta_p_SR*sg)*N_p*w;
+              Mgpc.noalias() -= N_p.transpose()*rho_GR*((alpha_B-phi)*beta_p_SR*sl*sg+(phi+(alpha_B-phi)*beta_p_SR*sg*p_cap)*dsldpc)*N_p*w;
+              Mgus.noalias() += N_p.transpose()*rho_GR*alpha_B*sg*m.transpose()*B*w;
+
+              Mlpg.noalias() += N_p.transpose()*rho_LR*(phi*sl*beta_p_LR+(alpha_B-phi)*beta_p_SR*sl)*N_p*w;
+              Mlpc.noalias() += N_p.transpose()*rho_LR*((phi-(alpha_B-phi)*beta_p_SR*sl*p_cap)*dsldpc-(phi*sl*beta_p_LR+(alpha_B-phi)*beta_p_SR*sl*sl))*N_p*w;
+              Mlus.noalias() += N_p.transpose()*rho_LR*sl*alpha_B*m.transpose()*B*w;
+
+              Kgpg.noalias() += rho_GR*lambda_GR*Laplace;
+              Klpg.noalias() += rho_LR*lambda_LR*Laplace;
+              Klpc.noalias() -= rho_LR*lambda_LR*Laplace;
+
+              Kupg.noalias() += B.transpose()*alpha*m*N_p*w;
+              Kupc.noalias() -= B.transpose()*alpha*m*sl*N_p*w;
+
+              auto const gravity_operator = (dNdx_p.transpose() *
+                                  permeability_tensor * b * w).eval();
+
+              Bg.noalias() += rho_GR*rho_GR*lambda_GR*gravity_operator;
+              Bl.noalias() += rho_LR*rho_LR*lambda_LR*gravity_operator;
+              Bu.noalias() -= (B.transpose()*sigma_eff-N_u_op.transpose()*rho*b)*w;
+
+
+//            std::cout   <<  "    Mgpg   :\n" <<  Mgpg   <<   "\n\n";
+//            std::cout   <<  "    Mgpc   :\n" <<  Mgpc   <<   "\n\n";
+//            std::cout   <<  "    Mgus   :\n" <<  Mgus   <<   "\n\n";
+//
+//            std::cout   <<  "    Mlpg   :\n" <<  Mlpg   <<   "\n\n";
+//            std::cout   <<  "    Mlpc   :\n" <<  Mlpc   <<   "\n\n";
+//            std::cout   <<  "    Mlus   :\n" <<  Mlus   <<   "\n\n";
+//
+//            std::cout   <<  "    Kgpg   :\n" <<  Kgpg   <<   "\n\n";
+//            std::cout   <<  "    Klpg   :\n" <<  Klpg   <<   "\n\n";
+//            std::cout   <<  "    Klpc   :\n" <<  Klpc   <<   "\n\n";
+//            std::cout   <<  "    Kupg   :\n" <<  Kupg   <<   "\n\n";
+//            std::cout   <<  "    Kupc   :\n" <<  Kupc   <<   "\n\n";
+//
+//            std::cout   <<  "    Bg     :\n" <<  Bg     <<   "\n\n";
+//            std::cout   <<  "    Bl     :\n" <<  Bl     <<   "\n\n";
+//            std::cout   <<  "    Bu     :\n" <<  Bu     <<   "\n\n";
+//
+//            std::cout   <<  "    Sigma  :\n" <<  sigma_eff  <<   "\n\n";
+//
+//            std::cout   <<  "   ________________________________\n\n\n";
             //
             // displacement equation, displacement part
             //
+
             eps.noalias() = B * u;
 
             auto C =
@@ -678,63 +906,128 @@ public:
                     displacement_index, displacement_index)
                 .noalias() += B.transpose() * C * B * w;
 
-            double const rho = rho_sr * (1 - porosity) + porosity * rho_fr;
-            local_rhs.template segment<displacement_size>(displacement_index)
-                .noalias() -=
-                (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
+
+//            local_rhs.template segment<displacement_size>(displacement_index)
+//                .noalias() -=
+//                (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
 
             //
             // displacement equation, pressure part
             //
-            Kup.noalias() += B.transpose() * alpha * identity2 * N_p * w;
+//            Kup.noalias() += B.transpose() * alpha * identity2 * N_p * w;
 
             //
             // pressure equation, pressure part.
             //
-            laplace_p.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
-
-            storage_p.noalias() += N_p.transpose() * S * N_p * w;
-
-            local_rhs.template segment<gas_pressure_size>(gas_pressure_index)
-                .noalias() += dNdx_p.transpose() * rho_fr * K_over_mu * b * w;
+//            laplace_p.noalias() += dNdx_p.transpose() * K_over_mu * dNdx_p * w;
+//
+//            storage_p.noalias() += N_p.transpose() * S * N_p * w;
+//
+//            local_rhs.template segment<gas_pressure_size>(gas_pressure_index)
+//                .noalias() += dNdx_p.transpose() * rho_fr * K_over_mu * b * w;
 
             //
             // pressure equation, displacement part.
             //
             // Reusing Kup.transpose().
         }
-        // displacement equation, pressure part
+
+
+
+        // gas phase equation, gas pressure part:
+        local_Jac
+            .template block<gas_pressure_size, gas_pressure_size>(
+                gas_pressure_index, gas_pressure_index)
+            .noalias() = Mgpg/dt+Kgpg;
+
+        // gas phase equation, capillary pressure part:
+        local_Jac
+            .template block<gas_pressure_size, cap_pressure_size>(
+                gas_pressure_index, cap_pressure_index)
+            .noalias() = Mgpc/dt;
+
+        // gas phase equation, displacement part:
+        local_Jac
+            .template block<gas_pressure_size, displacement_size>(
+                gas_pressure_index, displacement_index)
+            .noalias() = Mgus/dt;
+
+
+        // liquid phase equation, gas pressure part:
+        local_Jac
+            .template block<cap_pressure_size, gas_pressure_size>(
+                cap_pressure_index, gas_pressure_index)
+            .noalias() = Mlpg/dt+Klpg;
+
+        // liquid phase equation, capillary pressure part:
+        local_Jac
+            .template block<cap_pressure_size, cap_pressure_size>(
+                cap_pressure_index, cap_pressure_index)
+            .noalias() = Mlpc/dt+Klpc;
+
+        // liquid phase equation, displacement part:
+        local_Jac
+            .template block<cap_pressure_size, displacement_size>(
+                cap_pressure_index, displacement_index)
+            .noalias() = Mlus/dt;
+
+
+        // displacement equation, gas pressure part:
         local_Jac
             .template block<displacement_size, gas_pressure_size>(
                 displacement_index, gas_pressure_index)
-            .noalias() = -Kup;
+            .noalias() = Kupg;
 
-        // pressure equation, pressure part.
+        // displacement equation, capillary pressure part:
         local_Jac
-            .template block<gas_pressure_size, gas_pressure_size>(gas_pressure_index,
-                    gas_pressure_index)
-            .noalias() = laplace_p + storage_p / dt;
+            .template block<displacement_size, cap_pressure_size>(
+                displacement_index, cap_pressure_index)
+            .noalias() = Kupc;
 
-        // pressure equation, displacement part.
-        local_Jac
-            .template block<gas_pressure_size, displacement_size>(
-                    gas_pressure_index, displacement_index)
-            .noalias() = Kup.transpose() / dt;
+        local_Jac.template block<temperature_size,
+        temperature_size>(temperature_index, temperature_index).setIdentity();
 
-        // pressure equation
-        local_rhs.template segment<gas_pressure_size>(gas_pressure_index).noalias() -=
-            laplace_p * p_GR + storage_p * p_GR_dot + Kup.transpose() * u_dot;
+        // residuum, gas phase equation
 
-        // displacement equation
+        local_rhs.template segment<gas_pressure_size>(gas_pressure_index)
+                 .noalias() = Bg;
+
+        // residuum, liquid phase equation
+        local_rhs.template segment<gas_pressure_size>(gas_pressure_index)
+                 .noalias() = Bl;
+
+        // rediduum, displacement equation
         local_rhs.template segment<displacement_size>(displacement_index)
-            .noalias() += Kup * p_GR;
+                 .noalias() = Bu;
 
 
+//        auto const rows = local_Jac.rows();
+//        auto const cols = local_Jac.cols();
+//
+//        std::cout << "Jacobi-Matrix:\n";
+//
+//        for (int r = 0; r < rows; r++)
+//        {
+//            for (int c = 0; c < cols; c++)
+//            {
+//                std::cout << local_Jac(r,c) << " ";
+//            }
+//            std::cout << "\n";
+//        }
+//
+//        std::cout << "Residuum:\n";
+//
+//        for (int r = 0; r < rows; r++)
+//        {
+//            std::cout << local_rhs(r) << " ";
+//        }
+//
+//        std::cout << "\n";
+//
+//        std::cout << "Analytical J.\n";
+//        OGS_FATAL("Intended halt.");
 
-        local_Jac.template block<cap_pressure_size+temperature_size,
-        cap_pressure_size+temperature_size>(cap_pressure_index, cap_pressure_index).setIdentity();
 
-   //     local_rhs.template segment<cap_pressure_size+temperature_size>(cap_pressure_index).setOnes();
 
     }
 
