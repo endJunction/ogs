@@ -49,10 +49,10 @@ struct IntegrationPointData final
     typename ShapeMatrixTypeDisplacement::template MatrixType<
         DisplacementDim, NPoints * DisplacementDim>
         N_u_op;
-    typename BMatricesType::KelvinVectorType sigma, sigma_eff, sigma_eff_prev;
+    typename BMatricesType::KelvinVectorType sigma_eff, sigma_eff_prev;
     typename BMatricesType::KelvinVectorType eps, eps_prev;
 
-   // typename BMatricesType::KelvinVectorType sigma, sigma_prev;
+   // typename BMatricesType::KelvinVectorType sigma_prev;
 
     typename ShapeMatrixTypeDisplacement::NodalRowVectorType N_u;
     typename ShapeMatrixTypeDisplacement::GlobalDimNodalMatrixType dNdx_u;
@@ -778,9 +778,9 @@ public:
 
         for (unsigned ip = 0; ip < num_intpts; ++ip)
         {
-            auto const& sigma = _ip_data[ip].sigma;
+            auto const& sigma_eff = _ip_data[ip].sigma_eff;
             cache_mat.col(ip) =
-                MathLib::KelvinVector::kelvinVectorToSymmetricTensor(sigma);
+                MathLib::KelvinVector::kelvinVectorToSymmetricTensor(sigma_eff);
         }
 
         return cache;

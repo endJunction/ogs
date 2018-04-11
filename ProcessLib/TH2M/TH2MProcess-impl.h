@@ -118,7 +118,7 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
         _process_data);
 
     Base::_secondary_variables.addSecondaryVariable(
-        "sigma",
+        "sigma_eff",
         makeExtrapolator(MathLib::KelvinVector::KelvinVectorType<
                              DisplacementDim>::RowsAtCompileTime,
                          getExtrapolator(), _local_assemblers,
