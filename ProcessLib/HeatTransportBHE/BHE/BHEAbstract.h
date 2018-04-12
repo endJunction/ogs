@@ -98,21 +98,21 @@ namespace BHE  // namespace of borehole heat exchanger
             double L;
 
             /**
-             * length_1/depth_1 of the BHE
-             * unit is m
-             */
+            * length_1/depth_1 of the BHE
+            * unit is m
+            */
             double L_1;
 
             /**
-             * length_2/depth_2 of the BHE
-             * unit is m
-             */
+            * length_2/depth_2 of the BHE
+            * unit is m
+            */
             double L_2;
 
             /**
-             * length_1/depth_1 of the BHE
-             * unit is m
-             */
+            * length_1/depth_1 of the BHE
+            * unit is m
+            */
             double L_3;
 
             /**
@@ -122,22 +122,23 @@ namespace BHE  // namespace of borehole heat exchanger
             double D;
 
             /**
-             * first diameter of the BHE
-             * unit is m
-             */
+            * first diameter of the BHE
+            * unit is m
+            */
             double D_1;
 
             /**
-             * second diameter of the BHE
-             * unit is m
-             */
+            * second diameter of the BHE
+            * unit is m
+            */
             double D_2;
 
             /**
-             * third diameter of the BHE
-             * unit is m
-             */
+            * third diameter of the BHE
+            * unit is m
+            */
             double D_3;
+
         };
 
         struct Pipe_Parameters {
@@ -154,21 +155,21 @@ namespace BHE  // namespace of borehole heat exchanger
             double r_outer;
 
             /**
-             * radius of the first pipline outer side
-             * unit is m
-             */
+            * radius of the first pipline outer side
+            * unit is m
+            */
             double r_outer_1;
 
             /**
-             * radius of the second pipline outer side
-             * unit is m
-             */
+            * radius of the second pipline outer side
+            * unit is m
+            */
             double r_outer_2;
 
             /**
-             * radius of the third pipline outer side
-             * unit is m
-             */
+            * radius of the third pipline outer side
+            * unit is m
+            */
             double r_outer_3;
 
             /**

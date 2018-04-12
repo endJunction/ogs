@@ -29,26 +29,23 @@ namespace BHE
         const std::string bhe_ply_name = bhe_conf.getConfigParameter<std::string>("bhe_polyline");
         const std::string bhe_bound_type_str = bhe_conf.getConfigParameter<std::string>("bhe_bound_type");
         const bool bhe_if_use_flow_rate_curve = false;
-        const double bhe_length_1 =
-            bhe_conf.getConfigParameter<double>("bhe_length_1");
-        const double bhe_length_2 =
-            bhe_conf.getConfigParameter<double>("bhe_length_2");
-        const double bhe_length_3 =
-            bhe_conf.getConfigParameter<double>("bhe_length_3");
-        const double bhe_diameter_1 =
-            bhe_conf.getConfigParameter<double>("bhe_diameter_1");
-        const double bhe_diameter_2 =
-            bhe_conf.getConfigParameter<double>("bhe_diameter_2");
-        const double bhe_diameter_3 =
-            bhe_conf.getConfigParameter<double>("bhe_diameter_3");
+        const double bhe_length =
+            bhe_conf.getConfigParameter<double>("bhe_length");
+        const double bhe_length_1 = bhe_conf.getConfigParameter<double>("bhe_length_1");
+        const double bhe_length_2 = bhe_conf.getConfigParameter<double>("bhe_length_2");
+        const double bhe_length_3 = bhe_conf.getConfigParameter<double>("bhe_length_3");
+        const double bhe_diameter =
+            bhe_conf.getConfigParameter<double>("bhe_diameter");
+        const double bhe_diameter_1 = bhe_conf.getConfigParameter<double>("bhe_diameter_1");
+        const double bhe_diameter_2 = bhe_conf.getConfigParameter<double>("bhe_diameter_2");
+        const double bhe_diameter_3 = bhe_conf.getConfigParameter<double>("bhe_diameter_3");
         const double bhe_refrigerant_flow_rate = bhe_conf.getConfigParameter<double>("bhe_refrigerant_flow_rate");
         const double bhe_pipe_inner_radius = bhe_conf.getConfigParameter<double>("bhe_pipe_inner_radius");
-        const double bhe_pipe_outer_radius_1 =
-            bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_1");
-        const double bhe_pipe_outer_radius_2 =
-            bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_2");
-        const double bhe_pipe_outer_radius_3 =
-            bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_3");
+        const double bhe_pipe_outer_radius =
+            bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius");
+        const double bhe_pipe_outer_radius_1 = bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_1");
+        const double bhe_pipe_outer_radius_2 = bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_2");
+        const double bhe_pipe_outer_radius_3 = bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius_3");
         const double bhe_pipe_in_wall_thickness = bhe_conf.getConfigParameter<double>("bhe_pipe_in_wall_thickness");
         const double bhe_pipe_out_wall_thickness = bhe_conf.getConfigParameter<double>("bhe_pipe_out_wall_thickness");
         const std::size_t bhe_fluid_idx = bhe_conf.getConfigParameter<std::size_t>("bhe_fluid_idx");
@@ -178,11 +175,13 @@ namespace BHE
             bhe_ply_name,
             bhe_bound_type,
             curves,
-            {bhe_length_1, bhe_length_2, bhe_length_3, bhe_diameter_1,
-             bhe_diameter_2, bhe_diameter_3} /* Borehole Geometry */,
-            {bhe_pipe_inner_radius, bhe_pipe_outer_radius_1,
-             bhe_pipe_outer_radius_2, bhe_pipe_outer_radius_3,
-             bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness,
+            {bhe_length, bhe_length_1, bhe_length_2, bhe_length_3, bhe_diameter,
+             bhe_diameter_1, bhe_diameter_2,
+             bhe_diameter_3} /* Borehole Geometry */,
+            {bhe_pipe_inner_radius, bhe_pipe_outer_radius,
+             bhe_pipe_outer_radius_1, bhe_pipe_outer_radius_2,
+             bhe_pipe_outer_radius_3, bhe_pipe_in_wall_thickness,
+             bhe_pipe_out_wall_thickness,
              bhe_inner_pipe_wall_thermal_conductivity,
              bhe_outer_pipe_wall_thermal_conductivity} /* Pipe Parameters */,
             {bhe_refrigerant_viscosity->getValue(vars),
