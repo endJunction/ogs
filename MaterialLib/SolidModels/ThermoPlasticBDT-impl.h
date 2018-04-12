@@ -40,7 +40,7 @@ namespace MaterialLib
 {
 namespace Solids
 {
-namespace Ehlers
+namespace ThermoPlasticBDT
 {
 /// Special product of \c v with itself: \f$v \odot v\f$.
 /// The tensor \c v is given in Kelvin mapping.
@@ -109,10 +109,12 @@ double plasticFlowVolumetricPart(
 }
 
 template <int DisplacementDim>
-typename SolidEhlers<DisplacementDim>::KelvinVector plasticFlowDeviatoricPart(
+typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector
+plasticFlowDeviatoricPart(
     PhysicalStressWithInvariants<DisplacementDim> const& s,
     OnePlusGamma_pTheta const& one_gt, double const sqrtPhi,
-    typename SolidEhlers<DisplacementDim>::KelvinVector const& dtheta_dsigma,
+    typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector const&
+        dtheta_dsigma,
     double const gamma_p, double const m_p)
 {
     return (one_gt.pow_m_p *
@@ -138,7 +140,7 @@ double yieldFunction(MaterialProperties const& mp,
 }
 
 template <int DisplacementDim>
-typename SolidEhlers<DisplacementDim>::ResidualVectorType
+typename SolidThermoPlasticBDT<DisplacementDim>::ResidualVectorType
 calculatePlasticResidual(
     MathLib::KelvinVector::KelvinVectorType<DisplacementDim> const& eps_D,
     double const eps_V,
@@ -163,7 +165,8 @@ calculatePlasticResidual(
 
     double const theta = s.J_3 / (s.J_2 * std::sqrt(s.J_2));
 
-    typename SolidEhlers<DisplacementDim>::ResidualVectorType residual;
+    typename SolidThermoPlasticBDT<DisplacementDim>::ResidualVectorType
+        residual;
     // calculate stress residual
     residual.template segment<KelvinVectorSize>(0).noalias() =
         s.value / mp.G - 2 * (eps_D - eps_p_D) -
@@ -204,11 +207,11 @@ calculatePlasticResidual(
 }
 
 template <int DisplacementDim>
-typename SolidEhlers<DisplacementDim>::JacobianMatrix calculatePlasticJacobian(
-    double const dt,
-    PhysicalStressWithInvariants<DisplacementDim> const& s,
-    double const lambda,
-    MaterialProperties const& mp)
+typename SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix
+calculatePlasticJacobian(double const dt,
+                         PhysicalStressWithInvariants<DisplacementDim> const& s,
+                         double const lambda,
+                         MaterialProperties const& mp)
 {
     static int const KelvinVectorSize =
         MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
@@ -244,8 +247,8 @@ typename SolidEhlers<DisplacementDim>::JacobianMatrix calculatePlasticJacobian(
         s, one_gt, sqrtPhi, dtheta_dsigma, mp.gamma_p, mp.m_p);
     KelvinVector const lambda_flow_D = lambda * flow_D;
 
-    typename SolidEhlers<DisplacementDim>::JacobianMatrix jacobian =
-        SolidEhlers<DisplacementDim>::JacobianMatrix::Zero();
+    typename SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix jacobian =
+        SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix::Zero();
 
     // G_11
     jacobian.template block<KelvinVectorSize, KelvinVectorSize>(0, 0)
@@ -424,11 +427,13 @@ inline double calculateIsotropicHardening(double const kappa,
 }
 
 template <int DisplacementDim>
-typename SolidEhlers<DisplacementDim>::KelvinVector predict_sigma(
+typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector predict_sigma(
     double const G, double const K,
-    typename SolidEhlers<DisplacementDim>::KelvinVector const& sigma_prev,
-    typename SolidEhlers<DisplacementDim>::KelvinVector const& eps,
-    typename SolidEhlers<DisplacementDim>::KelvinVector const& eps_prev,
+    typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector const&
+        sigma_prev,
+    typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector const& eps,
+    typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector const&
+        eps_prev,
     double const eps_V)
 {
     static int const KelvinVectorSize =
@@ -443,11 +448,11 @@ typename SolidEhlers<DisplacementDim>::KelvinVector predict_sigma(
     // dimensioness hydrostatic stress increment
     double const pressure = pressure_prev - K / G * (eps_V - e_prev);
     // dimensionless deviatoric initial stress
-    typename SolidEhlers<DisplacementDim>::KelvinVector const sigma_D_prev =
-        P_dev * sigma_prev / G;
+    typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector const
+        sigma_D_prev = P_dev * sigma_prev / G;
     // dimensionless deviatoric stress
-    typename SolidEhlers<DisplacementDim>::KelvinVector const sigma_D =
-        sigma_D_prev + 2 * P_dev * (eps - eps_prev);
+    typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector const
+        sigma_D = sigma_D_prev + 2 * P_dev * (eps - eps_prev);
     return sigma_D - pressure * Invariants::identity2;
 }
 
@@ -466,11 +471,12 @@ splitSolutionVector(ResidualVector const& solution)
 }
 
 template <int DisplacementDim>
-boost::optional<std::tuple<typename SolidEhlers<DisplacementDim>::KelvinVector,
-                           std::unique_ptr<typename MechanicsBase<
-                               DisplacementDim>::MaterialStateVariables>,
-                           typename SolidEhlers<DisplacementDim>::KelvinMatrix>>
-SolidEhlers<DisplacementDim>::integrateStress(
+boost::optional<
+    std::tuple<typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector,
+               std::unique_ptr<typename MechanicsBase<
+                   DisplacementDim>::MaterialStateVariables>,
+               typename SolidThermoPlasticBDT<DisplacementDim>::KelvinMatrix>>
+SolidThermoPlasticBDT<DisplacementDim>::integrateStress(
     double const t,
     ProcessLib::SpatialPosition const& x,
     double const dt,
@@ -636,7 +642,7 @@ SolidEhlers<DisplacementDim>::integrateStress(
 
 template <int DisplacementDim>
 std::vector<typename MechanicsBase<DisplacementDim>::InternalVariable>
-SolidEhlers<DisplacementDim>::getInternalVariables() const
+SolidThermoPlasticBDT<DisplacementDim>::getInternalVariables() const
 {
     return {{"damage.kappa_d", 1,
              [](typename MechanicsBase<
@@ -644,11 +650,11 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& ehlers_state =
+                 auto const& thermoplasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = ehlers_state.damage.kappa_d();
+                 cache.front() = thermoplasticBDT_state.damage.kappa_d();
                  return cache;
              }},
             {"damage.value", 1,
@@ -657,11 +663,11 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& ehlers_state =
+                 auto const& thermoplasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = ehlers_state.damage.value();
+                 cache.front() = thermoplasticBDT_state.damage.value();
                  return cache;
              }},
             {"eps_p.D", KelvinVector::RowsAtCompileTime,
@@ -670,14 +676,14 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& ehlers_state =
+                 auto const& thermoplasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(KelvinVector::RowsAtCompileTime);
                  MathLib::toVector<KelvinVector>(
                      cache, KelvinVector::RowsAtCompileTime) =
                      MathLib::KelvinVector::kelvinVectorToSymmetricTensor(
-                         ehlers_state.eps_p.D);
+                         thermoplasticBDT_state.eps_p.D);
 
                  return cache;
              }},
@@ -687,11 +693,11 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& ehlers_state =
+                 auto const& thermoplasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = ehlers_state.eps_p.V;
+                 cache.front() = thermoplasticBDT_state.eps_p.V;
                  return cache;
              }},
             {"eps_p.eff", 1,
@@ -700,15 +706,15 @@ SolidEhlers<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& ehlers_state =
+                 auto const& thermoplasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = ehlers_state.eps_p.eff;
+                 cache.front() = thermoplasticBDT_state.eps_p.eff;
                  return cache;
              }}};
 }
 
-}  // namespace Ehlers
+}  // namespace ThermoPlasticBDT
 }  // namespace Solids
 }  // namespace MaterialLib
