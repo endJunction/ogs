@@ -7,17 +7,17 @@
  *
  */
 
-#include "Ehlers-impl.h"
-#include "Ehlers.h"
+#include "ThermoplasticBDT.h"
+#include "ThermoplasticBDT-impl.h"
 
 namespace MaterialLib
 {
 namespace Solids
 {
-namespace Ehlers
+namespace ThermoplasticBDT
 {
-template class SolidEhlers<2>;
-template class SolidEhlers<3>;
+template class SolidThermoplasticBDT<2>;
+template class SolidThermoplasticBDT<3>;
 
 template <>
 MathLib::KelvinVector::KelvinMatrixType<3> sOdotS<3>(
@@ -80,6 +80,6 @@ MathLib::KelvinVector::KelvinMatrixType<2> sOdotS<2>(
     return result;
 }
 
-}  // namespace Ehlers
+}  // namespace ThermoplasticBDT
 }  // namespace Solids
 }  // namespace MaterialLib

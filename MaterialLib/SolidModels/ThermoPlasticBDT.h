@@ -7,9 +7,9 @@
  *              http://www.opengeosys.org/project/license
  *
  *
- * Implementation of Ehler's single-surface model.
- * see Ehler's paper "A single-surface yield function for geomaterials" for more
- * details. \cite Ehlers1995
+ * Implementation of ThermoplasticBDT plastic model.
+ * see Parisio et al. 2018 "Early signs of volcanic eruption from the
+ * brittle-ductile transition of rocks" for more details.
  *
  * Refer to "Single-surface benchmark of OpenGeoSys documentation
  * (https://docs.opengeosys.org/docs/benchmarks/small-deformations/mechanics-plasticity-single-surface)"
@@ -33,62 +33,36 @@ namespace MaterialLib
 {
 namespace Solids
 {
-namespace Ehlers
+namespace ThermoplasticBDT
 {
-/// material parameters in relation to Ehler's single-surface model see Ehler's
-/// paper "A single-surface yield function for geomaterials" for more details
-/// \cite Ehlers1995.
+/// material parameters in relation to Parisio et al. plastic model
 struct MaterialPropertiesParameters
 {
     using P = ProcessLib::Parameter<double>;
 
-    MaterialPropertiesParameters(P const& G_, P const& K_, P const& alpha_,
-                                 P const& beta_, P const& gamma_,
-                                 P const& delta_, P const& epsilon_,
-                                 P const& m_, P const& alpha_p_,
-                                 P const& beta_p_, P const& gamma_p_,
-                                 P const& delta_p_, P const& epsilon_p_,
-                                 P const& m_p_, P const& kappa_,
-                                 P const& hardening_coefficient_)
+    MaterialPropertiesParameters(P const& G_, P const& K_, P const& fc_,
+                                 P const& m_, P const& qp0_, P const& alpha_,
+                                 P const& n_, P const& T0_)
         : G(G_),
           K(K_),
-          alpha(alpha_),
-          beta(beta_),
-          gamma(gamma_),
-          delta(delta_),
-          epsilon(epsilon_),
+          fc(fc_),
           m(m_),
-          alpha_p(alpha_p_),
-          beta_p(beta_p_),
-          gamma_p(gamma_p_),
-          delta_p(delta_p_),
-          epsilon_p(epsilon_p_),
-          m_p(m_p_),
-          kappa(kappa_),
-          hardening_coefficient(hardening_coefficient_)
+          qp0(qp0_),
+          alpha(alpha_),
+          n(n_),
+          T0(T0_),
     {
     }
     // basic material parameters
     P const& G;  ///< shear modulus
     P const& K;  ///< bulk modulus
 
-    P const& alpha;    ///< material dependent parameter in relation to Ehlers
-                       ///< model, refer to \cite Ehlers1995 .
-    P const& beta;     ///< \copydoc alpha
-    P const& gamma;    ///< \copydoc alpha
-    P const& delta;    ///< \copydoc alpha
-    P const& epsilon;  ///< \copydoc alpha
-    P const& m;        ///< \copydoc alpha
-
-    P const& alpha_p;    ///< \copydoc alpha
-    P const& beta_p;     ///< \copydoc alpha
-    P const& gamma_p;    ///< \copydoc alpha
-    P const& delta_p;    ///< \copydoc alpha
-    P const& epsilon_p;  ///< \copydoc alpha
-    P const& m_p;        ///< \copydoc alpha
-
-    P const& kappa;  ///< hardening parameter
-    P const& hardening_coefficient;
+    P const& fc;
+    P const& m;
+    P const& qp0;
+    P const& alpha;
+    P const& n;
+    P const& T0;
 };
 
 struct DamagePropertiesParameters
@@ -108,41 +82,23 @@ struct MaterialProperties final
                        MaterialPropertiesParameters const& mp)
         : G(mp.G(t, x)[0]),
           K(mp.K(t, x)[0]),
-          alpha(mp.alpha(t, x)[0]),
-          beta(mp.beta(t, x)[0]),
-          gamma(mp.gamma(t, x)[0]),
-          delta(mp.delta(t, x)[0]),
-          epsilon(mp.epsilon(t, x)[0]),
+          fc(mp.fc(t, x)[0]),
           m(mp.m(t, x)[0]),
-          alpha_p(mp.alpha_p(t, x)[0]),
-          beta_p(mp.beta_p(t, x)[0]),
-          gamma_p(mp.gamma_p(t, x)[0]),
-          delta_p(mp.delta_p(t, x)[0]),
-          epsilon_p(mp.epsilon_p(t, x)[0]),
-          m_p(mp.m_p(t, x)[0]),
-          kappa(mp.kappa(t, x)[0]),
-          hardening_coefficient(mp.hardening_coefficient(t, x)[0])
+          qp0(mp.qp0(t, x)[0]),
+          alpha(mp.alpha(t, x)[0]),
+          n(mp.n(t, x)[0]),
+          T0(mp.T0(t, x)[0]),
     {
     }
     double const G;
     double const K;
 
-    double const alpha;
-    double const beta;
-    double const gamma;
-    double const delta;
-    double const epsilon;
+    double const fc;
     double const m;
-
-    double const alpha_p;
-    double const beta_p;
-    double const gamma_p;
-    double const delta_p;
-    double const epsilon_p;
-    double const m_p;
-
-    double const kappa;
-    double const hardening_coefficient;
+    double const qp0;
+    double const alpha;
+    double const n;
+    double const T0;
 };
 
 /// Evaluated DamagePropertiesParameters container, see its documentation for
@@ -253,7 +209,7 @@ struct StateVariables
 };
 
 template <int DisplacementDim>
-class SolidEhlers final : public MechanicsBase<DisplacementDim>
+class SolidThermoPlasticBDT final : public MechanicsBase<DisplacementDim>
 {
 public:
     static int const KelvinVectorSize =
@@ -282,7 +238,7 @@ public:
         MathLib::KelvinVector::KelvinMatrixType<DisplacementDim>;
 
 public:
-    explicit SolidEhlers(
+    explicit SolidThermoPlasticBDT(
         NumLib::NewtonRaphsonSolverParameters nonlinear_solver_parameters,
         MaterialPropertiesParameters material_properties,
         std::unique_ptr<DamagePropertiesParameters>&& damage_properties)
@@ -348,8 +304,8 @@ private:
     std::unique_ptr<DamagePropertiesParameters> _damage_properties;
 };
 
-extern template class SolidEhlers<2>;
-extern template class SolidEhlers<3>;
-}  // namespace Ehlers
+extern template class SolidThermoPlasticBDT<2>;
+extern template class SolidThermoPlasticBDT<3>;
+}  // namespace ThermoplasticBDT
 }  // namespace Solids
 }  // namespace MaterialLib
