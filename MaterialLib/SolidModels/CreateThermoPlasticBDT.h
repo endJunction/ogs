@@ -114,25 +114,31 @@ std::unique_ptr<SolidThermoPlasticBDT<DisplacementDim>> createThermoPlasticBDT(
 
     DBUG("Use \'%s\' as n.", n.name.c_str());
 
-    //! \ogs_file_param_special{material__solid__constitutive_relation__ThermoPlasticBDT__T0}
-    auto& T0 = ProcessLib::findParameter<double>(config, "T0", parameters, 1);
+    //! \ogs_file_param_special{material__solid__constitutive_relation__ThermoPlasticBDT__t0}
+    auto& t0 = ProcessLib::findParameter<double>(config, "t0", parameters, 1);
 
-    DBUG("Use \'%s\' as T0.", T0.name.c_str());
+    DBUG("Use \'%s\' as t0.", t0.name.c_str());
 
-    MaterialPropertiesParameters mp{shear_modulus, bulk_modulus, fc, m,
-                                    qp0,           alpha,        n,  T0};
+    //! \ogs_file_param_special{material__solid__constitutive_relation__ThermoPlasticBDT__temp}
+    auto& temp =
+        ProcessLib::findParameter<double>(config, "temp", parameters, 1);
+
+    DBUG("Use \'%s\' as temp.", temp.name.c_str());
+
+    MaterialPropertiesParameters mp{
+        shear_modulus, bulk_modulus, fc, m, qp0, alpha, n, t0, temp};
 
     // Damage properties.
     std::unique_ptr<DamagePropertiesParameters>
-        thermoplasticBDT_damage_properties;
+        ThermoPlasticBDT_damage_properties;
 
-    auto const& thermoplasticBDT_damage_config =
+    auto const& ThermoPlasticBDT_damage_config =
         //! \ogs_file_param{material__solid__constitutive_relation__ThermoPlasticBDT__damage_properties}
         config.getConfigSubtreeOptional("damage_properties");
-    if (thermoplasticBDT_damage_config)
+    if (ThermoPlasticBDT_damage_config)
     {
-        thermoplasticBDT_damage_properties =
-            createDamageProperties(parameters, *thermoplasticBDT_damage_config);
+        ThermoPlasticBDT_damage_properties =
+            createDamageProperties(parameters, *ThermoPlasticBDT_damage_config);
     }
 
     auto const& nonlinear_solver_config =
@@ -144,7 +150,7 @@ std::unique_ptr<SolidThermoPlasticBDT<DisplacementDim>> createThermoPlasticBDT(
     return std::make_unique<SolidThermoPlasticBDT<DisplacementDim>>(
         nonlinear_solver_parameters,
         mp,
-        std::move(thermoplasticBDT_damage_properties));
+        std::move(ThermoPlasticBDT_damage_properties));
 }
 
 }  // namespace ThermoPlasticBDT

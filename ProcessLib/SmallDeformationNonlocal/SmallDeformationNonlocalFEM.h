@@ -18,6 +18,7 @@
 #include "MaterialLib/SolidModels/Ehlers.h"
 #include "MaterialLib/SolidModels/LinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/Lubby2.h"
+#include "MaterialLib/SolidModels/ThermoPlasticBDT.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
 #include "MeshLib/findElementsWithinRadius.h"
 #include "NumLib/Fem/FiniteElement/TemplateIsoparametric.h"

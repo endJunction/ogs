@@ -32,6 +32,7 @@
  */
 #pragma once
 
+#include <math.h>
 #include <boost/math/special_functions/pow.hpp>
 
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
@@ -79,47 +80,47 @@ struct PhysicalStressWithInvariants final
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
-/// Holds powers of 1 + gamma_p*theta to base 0, m_p, and m_p-1.
-struct OnePlusGamma_pTheta final
-{
-    OnePlusGamma_pTheta(double const gamma_p, double const theta,
-                        double const m_p)
-        : value{1 + gamma_p * theta},
-          pow_m_p{std::pow(value, m_p)},
-          pow_m_p1{pow_m_p / value}
-    {
-    }
-
-    double const value;
-    double const pow_m_p;
-    double const pow_m_p1;
-};
-
 template <int DisplacementDim>
 double plasticFlowVolumetricPart(
     PhysicalStressWithInvariants<DisplacementDim> const& s,
-    double const sqrtPhi, double const alpha_p, double const beta_p,
-    double const delta_p, double const epsilon_p)
+    MaterialProperties const& mp)
 {
-    return 3 *
-               (alpha_p * s.I_1 +
-                4 * boost::math::pow<2>(delta_p) * boost::math::pow<3>(s.I_1)) /
-               (2 * sqrtPhi) +
-           3 * beta_p + 6 * epsilon_p * s.I_1;
+    double const qh =
+        mp.qp0 /
+        pow(1. - 1. / mp.n, 1. + pow(mp.n, mp.alpha * (mp.temp - mp.t0)));
+    double const qh_squared = pow(2, qh);
+    double const aux_1 = std::sqrt(3. * s.J_2) + s.I_1;
+    double const aux_1_squared = boost::math::pow<2>(aux_1);
+
+    return 3 * (qh_squared * mp.m / 3. / mp.fc +
+                (4. * (1. - qh) * aux_1 *
+                 ((1. - qh) * aux_1_squared / 9. / boost::math::pow<2>(mp.fc) +
+                  std::sqrt(3. * s.J_2) / mp.fc)) /
+                    9. / boost::math::pow<2>(mp.fc));
 }
 
 template <int DisplacementDim>
 typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector
 plasticFlowDeviatoricPart(
     PhysicalStressWithInvariants<DisplacementDim> const& s,
-    OnePlusGamma_pTheta const& one_gt, double const sqrtPhi,
-    typename SolidThermoPlasticBDT<DisplacementDim>::KelvinVector const&
-        dtheta_dsigma,
-    double const gamma_p, double const m_p)
+    MaterialProperties const& mp)
 {
-    return (one_gt.pow_m_p *
-            (s.D + s.J_2 * m_p * gamma_p * dtheta_dsigma / one_gt.value)) /
-           (2 * sqrtPhi);
+    double const qh =
+        mp.qp0 /
+        pow(1. - 1. / mp.n, 1. + pow(mp.n, mp.alpha * (mp.temp - mp.t0)));
+    double const qh_squared = pow(2, qh);
+    double const aux_1 = std::sqrt(3. * s.J_2) + s.I_1;
+    double const aux_1_squared = boost::math::pow<2>(aux_1);
+
+    double const dgp_dj2 =
+        qh_squared * mp.m / 2. / mp.fc / std::sqrt(3. * s.J_2) +
+        2. *
+            ((1. - qh) * aux_1 / 3. / boost::math::pow<2>(mp.fc) /
+                 std::sqrt(3. * s.J_2) +
+             std::sqrt(3.) / 2. / mp.fc / std::sqrt(s.J_2)) *
+            ((1. - qh) * aux_1_squared / 9. / boost::math::pow<2>(mp.fc) +
+             std::sqrt(3. * s.J_2) / mp.fc);
+    return dgp_dj2 * s.D;
 }
 
 template <int DisplacementDim>
@@ -127,16 +128,15 @@ double yieldFunction(MaterialProperties const& mp,
                      PhysicalStressWithInvariants<DisplacementDim> const& s,
                      double const k)
 {
-    double const I_1_squared = boost::math::pow<2>(s.I_1);
-    assert(s.J_2 != 0);
+    double const aux_1 = (std::sqrt(3. * s.J_2) + s.I_1) / (3. * mp.fc);
+    double const aux_1_squared = boost::math::pow<2>(aux_1);
+    double const qh =
+        mp.qp0 /
+        pow(1. - 1. / mp.n, 1. + pow(mp.n, mp.alpha * (mp.temp - mp.t0)));
 
-    return std::sqrt(s.J_2 * std::pow(1 + mp.gamma * s.J_3 /
-                                              (s.J_2 * std::sqrt(s.J_2)),
-                                      mp.m) +
-                     mp.alpha / 2. * I_1_squared +
-                     boost::math::pow<2>(mp.delta) *
-                         boost::math::pow<2>(I_1_squared)) +
-           mp.beta * s.I_1 + mp.epsilon * I_1_squared - k;
+    return boost::math::pow<2>((1. - qh) * aux_1_squared +
+                               std::sqrt(3. * s.J_2) / mp.fc) +
+           mp.m * boost::math::pow<2>(qh) * aux_1 - boost::math::pow<2>(qh);
 }
 
 template <int DisplacementDim>
@@ -160,10 +160,9 @@ calculatePlasticResidual(
     using KelvinVector =
         MathLib::KelvinVector::KelvinVectorType<DisplacementDim>;
 
-    auto const& P_dev = Invariants::deviatoric_projection;
     auto const& identity2 = Invariants::identity2;
 
-    double const theta = s.J_3 / (s.J_2 * std::sqrt(s.J_2));
+    // double const theta = s.J_3 / (s.J_2 * std::sqrt(s.J_2));
 
     typename SolidThermoPlasticBDT<DisplacementDim>::ResidualVectorType
         residual;
@@ -173,28 +172,20 @@ calculatePlasticResidual(
         mp.K / mp.G * (eps_V - eps_p_V) * identity2;
 
     // deviatoric plastic strain
-    KelvinVector const sigma_D_inverse_D =
-        P_dev * MathLib::KelvinVector::inverse(s.D);
-    KelvinVector const dtheta_dsigma =
-        theta * sigma_D_inverse_D - 3. / 2. * theta / s.J_2 * s.D;
+    // KelvinVector const sigma_D_inverse_D =
+    //    P_dev * MathLib::KelvinVector::inverse(s.D);
+    // KelvinVector const dtheta_dsigma =
+    //    theta * sigma_D_inverse_D - 3. / 2. * theta / s.J_2 * s.D;
 
-    OnePlusGamma_pTheta const one_gt{mp.gamma_p, theta, mp.m_p};
-    double const sqrtPhi = std::sqrt(
-        s.J_2 * one_gt.pow_m_p + mp.alpha_p / 2. * boost::math::pow<2>(s.I_1) +
-        boost::math::pow<2>(mp.delta_p) * boost::math::pow<4>(s.I_1));
-    KelvinVector const flow_D = plasticFlowDeviatoricPart(
-        s, one_gt, sqrtPhi, dtheta_dsigma, mp.gamma_p, mp.m_p);
+    // plastic deviatoric strain
+    KelvinVector const flow_D = plasticFlowDeviatoricPart(s, mp);
     KelvinVector const lambda_flow_D = lambda * flow_D;
-
     residual.template segment<KelvinVectorSize>(KelvinVectorSize).noalias() =
         eps_p_D_dot - lambda_flow_D;
 
     // plastic volume strain
-    {
-        double const flow_V = plasticFlowVolumetricPart<DisplacementDim>(
-            s, sqrtPhi, mp.alpha_p, mp.beta_p, mp.delta_p, mp.epsilon_p);
-        residual(2 * KelvinVectorSize, 0) = eps_p_V_dot - lambda * flow_V;
-    }
+    double const flow_V = plasticFlowVolumetricPart<DisplacementDim>(s, mp);
+    residual(2 * KelvinVectorSize, 0) = eps_p_V_dot - lambda * flow_V;
 
     // evolution of plastic equivalent strain
     residual(2 * KelvinVectorSize + 1) =
@@ -213,192 +204,193 @@ calculatePlasticJacobian(double const dt,
                          double const lambda,
                          MaterialProperties const& mp)
 {
-    static int const KelvinVectorSize =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
-    using Invariants = MathLib::KelvinVector::Invariants<KelvinVectorSize>;
-    using KelvinVector =
-        MathLib::KelvinVector::KelvinVectorType<DisplacementDim>;
-    using KelvinMatrix =
-        MathLib::KelvinVector::KelvinMatrixType<DisplacementDim>;
+    /*
+      static int const KelvinVectorSize =
+          MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+      using Invariants = MathLib::KelvinVector::Invariants<KelvinVectorSize>;
+      using KelvinVector =
+          MathLib::KelvinVector::KelvinVectorType<DisplacementDim>;
+      using KelvinMatrix =
+          MathLib::KelvinVector::KelvinMatrixType<DisplacementDim>;
 
-    auto const& P_dev = Invariants::deviatoric_projection;
-    auto const& identity2 = Invariants::identity2;
+      auto const& P_dev = Invariants::deviatoric_projection;
+      auto const& identity2 = Invariants::identity2;
 
-    double const theta = s.J_3 / (s.J_2 * std::sqrt(s.J_2));
-    OnePlusGamma_pTheta const one_gt{mp.gamma_p, theta, mp.m_p};
+      double const theta = s.J_3 / (s.J_2 * std::sqrt(s.J_2));
+      OnePlusGamma_pTheta const one_gt{mp.gamma_p, theta, mp.m_p};
 
-    // inverse of deviatoric stress tensor
-    if (Invariants::determinant(s.D) == 0)
-    {
-        OGS_FATAL("Determinant is zero. Matrix is non-invertable.");
-    }
-    // inverse of sigma_D
-    KelvinVector const sigma_D_inverse = MathLib::KelvinVector::inverse(s.D);
-    KelvinVector const sigma_D_inverse_D = P_dev * sigma_D_inverse;
+      // inverse of deviatoric stress tensor
+      if (Invariants::determinant(s.D) == 0)
+      {
+          OGS_FATAL("Determinant is zero. Matrix is non-invertable.");
+      }
+      // inverse of sigma_D
+      KelvinVector const sigma_D_inverse = MathLib::KelvinVector::inverse(s.D);
+      KelvinVector const sigma_D_inverse_D = P_dev * sigma_D_inverse;
 
-    KelvinVector const dtheta_dsigma =
-        theta * sigma_D_inverse_D - 3. / 2. * theta / s.J_2 * s.D;
+      KelvinVector const dtheta_dsigma =
+          theta * sigma_D_inverse_D - 3. / 2. * theta / s.J_2 * s.D;
 
-    // deviatoric flow
-    double const sqrtPhi = std::sqrt(
-        s.J_2 * one_gt.pow_m_p + mp.alpha_p / 2. * boost::math::pow<2>(s.I_1) +
-        boost::math::pow<2>(mp.delta_p) * boost::math::pow<4>(s.I_1));
-    KelvinVector const flow_D = plasticFlowDeviatoricPart(
-        s, one_gt, sqrtPhi, dtheta_dsigma, mp.gamma_p, mp.m_p);
-    KelvinVector const lambda_flow_D = lambda * flow_D;
+      // deviatoric flow
+      double const sqrtPhi = std::sqrt(
+          s.J_2 * one_gt.pow_m_p + mp.alpha_p / 2. * boost::math::pow<2>(s.I_1)
+      + boost::math::pow<2>(mp.delta_p) * boost::math::pow<4>(s.I_1));
+      KelvinVector const flow_D = plasticFlowDeviatoricPart(
+          s, one_gt, sqrtPhi, dtheta_dsigma, mp.gamma_p, mp.m_p);
+      KelvinVector const lambda_flow_D = lambda * flow_D;
 
-    typename SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix jacobian =
-        SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix::Zero();
+      typename SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix jacobian =
+          SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix::Zero();
 
-    // G_11
-    jacobian.template block<KelvinVectorSize, KelvinVectorSize>(0, 0)
-        .noalias() = KelvinMatrix::Identity();
+      // G_11
+      jacobian.template block<KelvinVectorSize, KelvinVectorSize>(0, 0)
+          .noalias() = KelvinMatrix::Identity();
 
-    // G_12
-    jacobian
-        .template block<KelvinVectorSize, KelvinVectorSize>(0, KelvinVectorSize)
-        .noalias() = 2 * KelvinMatrix::Identity();
+      // G_12
+      jacobian
+          .template block<KelvinVectorSize, KelvinVectorSize>(0,
+      KelvinVectorSize) .noalias() = 2 * KelvinMatrix::Identity();
 
-    // G_13
-    jacobian.template block<KelvinVectorSize, 1>(0, 2 * KelvinVectorSize)
-        .noalias() = mp.K / mp.G * identity2;
+      // G_13
+      jacobian.template block<KelvinVectorSize, 1>(0, 2 * KelvinVectorSize)
+          .noalias() = mp.K / mp.G * identity2;
 
-    // G_14 and G_15 are zero
+      // G_14 and G_15 are zero
 
-    // G_21 -- derivative of deviatoric flow
+      // G_21 -- derivative of deviatoric flow
 
-    double const gm_p = mp.gamma_p * mp.m_p;
-    // intermediate variable for derivative of deviatoric flow
-    KelvinVector const M0 = s.J_2 / one_gt.value * dtheta_dsigma;
-    // derivative of Phi w.r.t. sigma
-    KelvinVector const dPhi_dsigma =
-        one_gt.pow_m_p * (s.D + gm_p * M0) +
-        (mp.alpha_p * s.I_1 +
-         4 * boost::math::pow<2>(mp.delta_p) * boost::math::pow<3>(s.I_1)) *
-            identity2;
+      double const gm_p = mp.gamma_p * mp.m_p;
+      // intermediate variable for derivative of deviatoric flow
+      KelvinVector const M0 = s.J_2 / one_gt.value * dtheta_dsigma;
+      // derivative of Phi w.r.t. sigma
+      KelvinVector const dPhi_dsigma =
+          one_gt.pow_m_p * (s.D + gm_p * M0) +
+          (mp.alpha_p * s.I_1 +
+           4 * boost::math::pow<2>(mp.delta_p) * boost::math::pow<3>(s.I_1)) *
+              identity2;
 
-    // intermediate variable for derivative of deviatoric flow
-    KelvinMatrix const M1 =
-        one_gt.pow_m_p *
-        (s.D * dPhi_dsigma.transpose() + gm_p * M0 * dPhi_dsigma.transpose());
-    // intermediate variable for derivative of deviatoric flow
-    KelvinMatrix const M2 =
-        one_gt.pow_m_p * (P_dev + s.D * gm_p * M0.transpose());
-    // second derivative of theta
-    KelvinMatrix const d2theta_dsigma2 =
-        theta * P_dev * sOdotS<DisplacementDim>(sigma_D_inverse) * P_dev +
-        sigma_D_inverse_D * dtheta_dsigma.transpose() -
-        3. / 2. * theta / s.J_2 * P_dev -
-        3. / 2. * dtheta_dsigma / s.J_2 * s.D.transpose() +
-        3. / 2. * theta / boost::math::pow<2>(s.J_2) * s.D * s.D.transpose();
+      // intermediate variable for derivative of deviatoric flow
+      KelvinMatrix const M1 =
+          one_gt.pow_m_p *
+          (s.D * dPhi_dsigma.transpose() + gm_p * M0 * dPhi_dsigma.transpose());
+      // intermediate variable for derivative of deviatoric flow
+      KelvinMatrix const M2 =
+          one_gt.pow_m_p * (P_dev + s.D * gm_p * M0.transpose());
+      // second derivative of theta
+      KelvinMatrix const d2theta_dsigma2 =
+          theta * P_dev * sOdotS<DisplacementDim>(sigma_D_inverse) * P_dev +
+          sigma_D_inverse_D * dtheta_dsigma.transpose() -
+          3. / 2. * theta / s.J_2 * P_dev -
+          3. / 2. * dtheta_dsigma / s.J_2 * s.D.transpose() +
+          3. / 2. * theta / boost::math::pow<2>(s.J_2) * s.D * s.D.transpose();
 
-    // intermediate variable for derivative of deviatoric flow
-    KelvinMatrix const M3 =
-        gm_p * one_gt.pow_m_p1 *
-        ((s.D + (gm_p - mp.gamma_p) * M0) * dtheta_dsigma.transpose() +
-         s.J_2 * d2theta_dsigma2);
+      // intermediate variable for derivative of deviatoric flow
+      KelvinMatrix const M3 =
+          gm_p * one_gt.pow_m_p1 *
+          ((s.D + (gm_p - mp.gamma_p) * M0) * dtheta_dsigma.transpose() +
+           s.J_2 * d2theta_dsigma2);
 
-    // derivative of flow_D w.r.t. sigma
-    KelvinMatrix const dflow_D_dsigma =
-        (-M1 / (4 * boost::math::pow<3>(sqrtPhi)) + (M2 + M3) / (2 * sqrtPhi)) *
-        mp.G;
-    jacobian
-        .template block<KelvinVectorSize, KelvinVectorSize>(KelvinVectorSize, 0)
-        .noalias() = -lambda * dflow_D_dsigma;
+      // derivative of flow_D w.r.t. sigma
+      KelvinMatrix const dflow_D_dsigma =
+          (-M1 / (4 * boost::math::pow<3>(sqrtPhi)) + (M2 + M3) / (2 * sqrtPhi))
+      * mp.G; jacobian .template block<KelvinVectorSize,
+      KelvinVectorSize>(KelvinVectorSize, 0) .noalias() = -lambda *
+      dflow_D_dsigma;
 
-    // G_22
-    jacobian
-        .template block<KelvinVectorSize, KelvinVectorSize>(KelvinVectorSize,
-                                                            KelvinVectorSize)
-        .noalias() = KelvinMatrix::Identity() / dt;
+      // G_22
+      jacobian
+          .template block<KelvinVectorSize, KelvinVectorSize>(KelvinVectorSize,
+                                                              KelvinVectorSize)
+          .noalias() = KelvinMatrix::Identity() / dt;
 
-    // G_23 and G_24 are zero
+      // G_23 and G_24 are zero
 
-    // G_25
-    jacobian
-        .template block<KelvinVectorSize, 1>(KelvinVectorSize,
-                                             2 * KelvinVectorSize + 2)
-        .noalias() = -flow_D;
+      // G_25
+      jacobian
+          .template block<KelvinVectorSize, 1>(KelvinVectorSize,
+                                               2 * KelvinVectorSize + 2)
+          .noalias() = -flow_D;
 
-    // G_31
-    {
-        // derivative of flow_V w.r.t. sigma
-        KelvinVector const dflow_V_dsigma =
-            3 * mp.G *
-            (-(mp.alpha_p * s.I_1 + 4 * boost::math::pow<2>(mp.delta_p) *
-                                        boost::math::pow<3>(s.I_1)) /
-                 (4 * boost::math::pow<3>(sqrtPhi)) * dPhi_dsigma +
-             (mp.alpha_p * identity2 +
-              12 * boost::math::pow<2>(mp.delta_p * s.I_1) * identity2) /
-                 (2 * sqrtPhi) +
-             2 * mp.epsilon_p * identity2);
+      // G_31
+      {
+          // derivative of flow_V w.r.t. sigma
+          KelvinVector const dflow_V_dsigma =
+              3 * mp.G *
+              (-(mp.alpha_p * s.I_1 +
+                 4 * boost::math::pow<2>(mp.delta_p) *
+                     boost::math::pow<3>(s.I_1)) /
+                   (4 * boost::math::pow<3>(sqrtPhi)) * dPhi_dsigma +
+               (mp.alpha_p * identity2 +
+                12 * boost::math::pow<2>(mp.delta_p * s.I_1) * identity2) /
+                   (2 * sqrtPhi) +
+               2 * mp.epsilon_p * identity2);
 
-        jacobian.template block<1, KelvinVectorSize>(2 * KelvinVectorSize, 0)
-            .noalias() = -lambda * dflow_V_dsigma.transpose();
-    }
+          jacobian.template block<1, KelvinVectorSize>(2 * KelvinVectorSize, 0)
+              .noalias() = -lambda * dflow_V_dsigma.transpose();
+      }
 
-    // G_32 is zero
+      // G_32 is zero
 
-    // G_33
-    jacobian(2 * KelvinVectorSize, 2 * KelvinVectorSize) = 1. / dt;
+      // G_33
+      jacobian(2 * KelvinVectorSize, 2 * KelvinVectorSize) = 1. / dt;
 
-    // G_34 is zero
+      // G_34 is zero
 
-    // G_35
-    {
-        double const flow_V = plasticFlowVolumetricPart<DisplacementDim>(
-            s, sqrtPhi, mp.alpha_p, mp.beta_p, mp.delta_p, mp.epsilon_p);
-        jacobian(2 * KelvinVectorSize, 2 * KelvinVectorSize + 2) = -flow_V;
-    }
+      // G_35
+      {
+          double const flow_V = plasticFlowVolumetricPart<DisplacementDim>(
+              s, sqrtPhi, mp.alpha_p, mp.beta_p, mp.delta_p, mp.epsilon_p);
+          jacobian(2 * KelvinVectorSize, 2 * KelvinVectorSize + 2) = -flow_V;
+      }
 
-    // increment of effectiv plastic strain
-    double const eff_flow =
-        std::sqrt(2. / 3. * lambda_flow_D.transpose() * lambda_flow_D);
+      // increment of effectiv plastic strain
+      double const eff_flow =
+          std::sqrt(2. / 3. * lambda_flow_D.transpose() * lambda_flow_D);
 
-    if (eff_flow > 0)
-    {
-        // intermediate variable for derivative of plastic jacobian
-        KelvinVector const eff_flow23_lambda_flow_D =
-            -2 / 3. / eff_flow * lambda_flow_D;
-        // G_41
-        jacobian
-            .template block<1, KelvinVectorSize>(2 * KelvinVectorSize + 1, 0)
-            .noalias() = lambda * dflow_D_dsigma * eff_flow23_lambda_flow_D;
-        // G_45
-        jacobian(2 * KelvinVectorSize + 1, 2 * KelvinVectorSize + 2) =
-            eff_flow23_lambda_flow_D.transpose() * flow_D;
-    }
+      if (eff_flow > 0)
+      {
+          // intermediate variable for derivative of plastic jacobian
+          KelvinVector const eff_flow23_lambda_flow_D =
+              -2 / 3. / eff_flow * lambda_flow_D;
+          // G_41
+          jacobian
+              .template block<1, KelvinVectorSize>(2 * KelvinVectorSize + 1, 0)
+              .noalias() = lambda * dflow_D_dsigma * eff_flow23_lambda_flow_D;
+          // G_45
+          jacobian(2 * KelvinVectorSize + 1, 2 * KelvinVectorSize + 2) =
+              eff_flow23_lambda_flow_D.transpose() * flow_D;
+      }
 
-    // G_42 and G_43 are zero
+      // G_42 and G_43 are zero
 
-    // G_44
-    jacobian(2 * KelvinVectorSize + 1, 2 * KelvinVectorSize + 1) = 1. / dt;
+      // G_44
+      jacobian(2 * KelvinVectorSize + 1, 2 * KelvinVectorSize + 1) = 1. / dt;
 
-    // G_51
-    {
-        double const one_gt_pow_m = std::pow(one_gt.value, mp.m);
-        double const gm = mp.gamma * mp.m;
-        // derivative of yield function w.r.t. sigma
-        KelvinVector const dF_dsigma =
-            mp.G *
-                (one_gt_pow_m * (s.D + gm * M0) +
-                 (mp.alpha * s.I_1 + 4 * boost::math::pow<2>(mp.delta) *
-                                         boost::math::pow<3>(s.I_1)) *
-                     identity2) /
-                (2. * sqrtPhi) +
-            mp.G * (mp.beta + 2 * mp.epsilon_p * s.I_1) * identity2;
+      // G_51
+      {
+          double const one_gt_pow_m = std::pow(one_gt.value, mp.m);
+          double const gm = mp.gamma * mp.m;
+          // derivative of yield function w.r.t. sigma
+          KelvinVector const dF_dsigma =
+              mp.G * (one_gt_pow_m * (s.D + gm * M0) +
+                      (mp.alpha * s.I_1 +
+                       4 * boost::math::pow<2>(mp.delta) *
+                           boost::math::pow<3>(s.I_1)) *
+                          identity2) /
+                  (2. * sqrtPhi) +
+              mp.G * (mp.beta + 2 * mp.epsilon_p * s.I_1) * identity2;
 
-        jacobian
-            .template block<1, KelvinVectorSize>(2 * KelvinVectorSize + 2, 0)
-            .noalias() = dF_dsigma.transpose() / mp.G;
-    }
+          jacobian
+              .template block<1, KelvinVectorSize>(2 * KelvinVectorSize + 2, 0)
+              .noalias() = dF_dsigma.transpose() / mp.G;
+      }
 
-    // G_54
-    jacobian(2 * KelvinVectorSize + 2, 2 * KelvinVectorSize + 1) =
-        -mp.kappa * mp.hardening_coefficient / mp.G;
+      // G_54
+      jacobian(2 * KelvinVectorSize + 2, 2 * KelvinVectorSize + 1) =
+          -mp.kappa * mp.hardening_coefficient / mp.G;
 
-    // G_52, G_53, G_55 are zero
-    return jacobian;
+      // G_52, G_53, G_55 are zero
+      return jacobian;*/
 }
 
 /// Calculates the derivative of the residuals with respect to total
@@ -419,11 +411,10 @@ MathLib::KelvinVector::KelvinMatrixType<DisplacementDim> calculateDResidualDEps(
     return -2. * I * P_dev - 3. * K / G * I * P_sph;
 }
 
-inline double calculateIsotropicHardening(double const kappa,
-                                          double const hardening_coefficient,
+inline double calculateIsotropicHardening(double const m0,
                                           double const eps_p_eff)
 {
-    return kappa * (1. + eps_p_eff * hardening_coefficient);
+    return m0 * (1. + eps_p_eff * 0.);
 }
 
 template <int DisplacementDim>
@@ -515,10 +506,8 @@ SolidThermoPlasticBDT<DisplacementDim>::integrateStress(
     // Quit early if sigma is zero (nothing to do) or if we are still in elastic
     // zone.
     if ((sigma.squaredNorm() == 0 ||
-         yieldFunction(
-             mp, s,
-             calculateIsotropicHardening(mp.kappa, mp.hardening_coefficient,
-                                         state.eps_p.eff)) < 0))
+         yieldFunction(mp, s,
+                       calculateIsotropicHardening(mp.m, state.eps_p.eff)) < 0))
     {
         tangentStiffness.setZero();
         tangentStiffness.template topLeftCorner<3, 3>().setConstant(
@@ -568,8 +557,7 @@ SolidThermoPlasticBDT<DisplacementDim>::integrateStress(
                     (eps_p_eff - state.eps_p_prev.eff) / dt;
 
                 double const k_hardening = calculateIsotropicHardening(
-                    mp.kappa, mp.hardening_coefficient,
-                    solution[KelvinVectorSize * 2 + 1]);
+                    mp.m, solution[KelvinVectorSize * 2 + 1]);
                 residual = calculatePlasticResidual<DisplacementDim>(
                     eps_D, eps_V, s,
                     solution.template segment<KelvinVectorSize>(
@@ -584,9 +572,16 @@ SolidThermoPlasticBDT<DisplacementDim>::integrateStress(
                     dt, s, solution[KelvinVectorSize * 2 + 2], mp);
             };
 
+            auto const update_solution =
+                [&](ResidualVectorType const& increment) {
+                    solution += increment;
+                    s = PhysicalStressWithInvariants<DisplacementDim>{
+                        mp.G * solution.template segment<KelvinVectorSize>(0)};
+                };
+
             // std::cout << "analytical J:\n" << jacobian << "\n";
 
-            /*{   // Central differences
+            {  // Central differences
                 ResidualVectorType solution_org = solution;
 
                 double const pert = 1e-8;
@@ -615,19 +610,13 @@ SolidThermoPlasticBDT<DisplacementDim>::integrateStress(
                     jacobian_num.col(i) =
                         (residual_plus - residual_minus) / (2. * pert);
                 }
-                //std::cout << "numerical  J:\n" << jacobian_num << "\n";
+                // std::cout << "numerical  J:\n" << jacobian_num << "\n";
                 solution = solution_org;  // Reset to original
+                jacobian = jacobian_num;
 
-                //std::cout << "difference  J:\n" << jacobian_num - jacobian <<
-            "\n";
-            }*/
-
-            auto const update_solution =
-                [&](ResidualVectorType const& increment) {
-                    solution += increment;
-                    s = PhysicalStressWithInvariants<DisplacementDim>{
-                        mp.G * solution.template segment<KelvinVectorSize>(0)};
-                };
+                // std::cout << "difference  J:\n" << jacobian_num - jacobian <<
+                // "\n";
+            }
 
             auto newton_solver = NumLib::NewtonRaphson<
                 decltype(linear_solver), JacobianMatrix,
@@ -688,11 +677,11 @@ SolidThermoPlasticBDT<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& thermoplasticBDT_state =
+                 auto const& ThermoPlasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = thermoplasticBDT_state.damage.kappa_d();
+                 cache.front() = ThermoPlasticBDT_state.damage.kappa_d();
                  return cache;
              }},
             {"damage.value", 1,
@@ -701,11 +690,11 @@ SolidThermoPlasticBDT<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& thermoplasticBDT_state =
+                 auto const& ThermoPlasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = thermoplasticBDT_state.damage.value();
+                 cache.front() = ThermoPlasticBDT_state.damage.value();
                  return cache;
              }},
             {"eps_p.D", KelvinVector::RowsAtCompileTime,
@@ -714,14 +703,14 @@ SolidThermoPlasticBDT<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& thermoplasticBDT_state =
+                 auto const& ThermoPlasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(KelvinVector::RowsAtCompileTime);
                  MathLib::toVector<KelvinVector>(
                      cache, KelvinVector::RowsAtCompileTime) =
                      MathLib::KelvinVector::kelvinVectorToSymmetricTensor(
-                         thermoplasticBDT_state.eps_p.D);
+                         ThermoPlasticBDT_state.eps_p.D);
 
                  return cache;
              }},
@@ -731,11 +720,11 @@ SolidThermoPlasticBDT<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& thermoplasticBDT_state =
+                 auto const& ThermoPlasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = thermoplasticBDT_state.eps_p.V;
+                 cache.front() = ThermoPlasticBDT_state.eps_p.V;
                  return cache;
              }},
             {"eps_p.eff", 1,
@@ -744,11 +733,11 @@ SolidThermoPlasticBDT<DisplacementDim>::getInternalVariables() const
                 std::vector<double>& cache) -> std::vector<double> const& {
                  assert(dynamic_cast<StateVariables<DisplacementDim> const*>(
                             &state) != nullptr);
-                 auto const& thermoplasticBDT_state =
+                 auto const& ThermoPlasticBDT_state =
                      static_cast<StateVariables<DisplacementDim> const&>(state);
 
                  cache.resize(1);
-                 cache.front() = thermoplasticBDT_state.eps_p.eff;
+                 cache.front() = ThermoPlasticBDT_state.eps_p.eff;
                  return cache;
              }}};
 }

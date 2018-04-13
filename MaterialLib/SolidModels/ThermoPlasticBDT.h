@@ -33,7 +33,7 @@ namespace MaterialLib
 {
 namespace Solids
 {
-namespace ThermoplasticBDT
+namespace ThermoPlasticBDT
 {
 /// material parameters in relation to Parisio et al. plastic model
 struct MaterialPropertiesParameters
@@ -42,7 +42,7 @@ struct MaterialPropertiesParameters
 
     MaterialPropertiesParameters(P const& G_, P const& K_, P const& fc_,
                                  P const& m_, P const& qp0_, P const& alpha_,
-                                 P const& n_, P const& T0_)
+                                 P const& n_, P const& t0_, P const& temp_)
         : G(G_),
           K(K_),
           fc(fc_),
@@ -50,7 +50,8 @@ struct MaterialPropertiesParameters
           qp0(qp0_),
           alpha(alpha_),
           n(n_),
-          T0(T0_),
+          t0(t0_),
+          temp(temp_)
     {
     }
     // basic material parameters
@@ -62,7 +63,8 @@ struct MaterialPropertiesParameters
     P const& qp0;
     P const& alpha;
     P const& n;
-    P const& T0;
+    P const& t0;
+    P const& temp;
 };
 
 struct DamagePropertiesParameters
@@ -87,7 +89,8 @@ struct MaterialProperties final
           qp0(mp.qp0(t, x)[0]),
           alpha(mp.alpha(t, x)[0]),
           n(mp.n(t, x)[0]),
-          T0(mp.T0(t, x)[0]),
+          t0(mp.t0(t, x)[0]),
+          temp(mp.temp(t, x)[0])
     {
     }
     double const G;
@@ -98,12 +101,13 @@ struct MaterialProperties final
     double const qp0;
     double const alpha;
     double const n;
-    double const T0;
+    double const t0;
+    double const temp;
 };
 
 /// Evaluated DamagePropertiesParameters container, see its documentation for
 /// details.
-struct DamageProperties
+struct DamageProperties final
 {
     DamageProperties(double const t,
                      ProcessLib::SpatialPosition const& x,

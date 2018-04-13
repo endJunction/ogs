@@ -7,17 +7,17 @@
  *
  */
 
-#include "ThermoplasticBDT.h"
-#include "ThermoplasticBDT-impl.h"
+#include "ThermoPlasticBDT.h"
+#include "ThermoPlasticBDT-impl.h"
 
 namespace MaterialLib
 {
 namespace Solids
 {
-namespace ThermoplasticBDT
+namespace ThermoPlasticBDT
 {
-template class SolidThermoplasticBDT<2>;
-template class SolidThermoplasticBDT<3>;
+template class SolidThermoPlasticBDT<2>;
+template class SolidThermoPlasticBDT<3>;
 
 template <>
 MathLib::KelvinVector::KelvinMatrixType<3> sOdotS<3>(

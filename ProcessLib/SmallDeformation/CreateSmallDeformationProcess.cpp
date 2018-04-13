@@ -14,6 +14,7 @@
 #include "MaterialLib/SolidModels/CreateEhlers.h"
 #include "MaterialLib/SolidModels/CreateLinearElasticIsotropic.h"
 #include "MaterialLib/SolidModels/CreateLubby2.h"
+#include "MaterialLib/SolidModels/CreateThermoPlasticBDT.h"
 #include "ProcessLib/Output/CreateSecondaryVariables.h"
 
 #include "SmallDeformationProcess.h"
@@ -92,6 +93,12 @@ createSmallDeformationProcess(
     {
         material = MaterialLib::Solids::Lubby2::createLubby2<DisplacementDim>(
             parameters, constitutive_relation_config);
+    }
+    else if (type == "ThermoPlasticBDT")
+    {
+        material =
+            MaterialLib::Solids::ThermoPlasticBDT::createThermoPlasticBDT<
+                DisplacementDim>(parameters, constitutive_relation_config);
     }
     else
     {
