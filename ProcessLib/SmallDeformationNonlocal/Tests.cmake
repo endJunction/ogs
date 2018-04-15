@@ -91,7 +91,7 @@ AddTest(
 
     out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu displacement displacement 2e-11 1e-13
     out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu damage damage 2e-11 0
-    out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu sigma sigma 8e-7 0
+    out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu sigma sigma 9e-7 0
     out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu out_bar_veryfine_ED_pcs_0_ts_70_t_0.700000.vtu epsilon epsilon 2e-11 0
 )
 
@@ -283,7 +283,7 @@ AddTest(
     DIFF_DATA
     out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu displacement displacement 2e-11 1e-13
     out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu damage damage 2e-11 0
-    out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu sigma sigma 6e-7 0
+    out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu sigma sigma 7e-7 0
     out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu out_beam_fine_ED_pcs_0_ts_40_t_0.400000.vtu epsilon epsilon 2e-11 0
 
     out_beam_fine_ED_pcs_0_ts_60_t_0.600000.vtu out_beam_fine_ED_pcs_0_ts_60_t_0.600000.vtu displacement displacement 2e-11 1e-13
