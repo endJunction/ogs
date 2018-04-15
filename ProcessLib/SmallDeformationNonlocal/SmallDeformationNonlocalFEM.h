@@ -547,7 +547,7 @@ public:
             */
 
             {
-                double test_alpha = 0;  // Integration of one-function.
+                // double test_alpha = 0;  // Integration of one-function.
                 // double nonlocal_kappa_d_dot = 0;
 
                 // double& nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d;
@@ -573,13 +573,15 @@ public:
 
                     auto const& w_l = la_l._ip_data[l].integration_weight;
 
-                    test_alpha += a_kl * w_l;
+                    //test_alpha += a_kl * w_l;
                     nonlocal_kappa_d += a_kl * kappa_d_l * w_l;
                 }
+                /* For testing only.
                 if (std::abs(test_alpha - 1) >= 1e-6)
                     OGS_FATAL(
                         "One-function integration failed. v: %f, diff: %f",
                         test_alpha, test_alpha - 1);
+                */
 
                 auto const& ehlers_material =
                     static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
