@@ -555,23 +555,29 @@ public:
 
                 for (auto const& tuple : _ip_data[ip].non_local_assemblers)
                 {
-                    auto const& la_l =
-                        *static_cast<SmallDeformationNonlocalLocalAssembler<
-                            ShapeFunction, IntegrationMethod,
-                            DisplacementDim> const* const>(std::get<0>(tuple));
-                    // Get damage from the local assembler and its corresponding
-                    // integration point l.
-                    int const& l = std::get<1>(tuple);
+                    // If the neighbour element is different the following
+                    // static cast will not be correct.
+                    /*
+                    assert(dynamic_cast<SmallDeformationNonlocalLocalAssembler<
+                               ShapeFunction, IntegrationMethod,
+                               DisplacementDim> const* const>(
+                               std::get<0>(tuple)) == nullptr);
+                               */
 
-                    // double const kappa_d_dot =
-                    //    la_l._ip_data[l].getLocalRateKappaD();
-                    double const kappa_d_l =
-                        la_l._ip_data[l].getLocalVariable();
+                    // Get integration point data for the integration point l.
+                    auto const& ip_l =
+                        static_cast<SmallDeformationNonlocalLocalAssembler<
+                            ShapeFunction, IntegrationMethod,
+                            DisplacementDim> const* const>(std::get<0>(tuple))
+                            ->_ip_data[std::get<1>(tuple)];
+
+                    // double const kappa_d_dot = ip_l.getLocalRateKappaD();
+                    double const kappa_d_l = ip_l.getLocalVariable();
 
                     // std::cerr << kappa_d_l << "\n";
                     double const a_kl = std::get<3>(tuple);
 
-                    auto const& w_l = la_l._ip_data[l].integration_weight;
+                    auto const& w_l = ip_l.integration_weight;
 
                     //test_alpha += a_kl * w_l;
                     nonlocal_kappa_d += a_kl * kappa_d_l * w_l;
