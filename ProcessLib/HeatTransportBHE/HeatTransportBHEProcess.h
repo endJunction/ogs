@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include "ProcessLib/Process.h"
-#include "HeatTransportBHEProcessAssembler.h"
 #include "HeatTransportBHEProcessData.h"
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHEProcessAssemblerInterface.h"
+#include "ProcessLib/Process.h"
 
 namespace ProcessLib
 {

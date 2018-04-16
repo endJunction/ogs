@@ -11,8 +11,12 @@
 
 #include <cassert>
 
-#include "ProcessLib/Utils/CreateLocalAssemblers.h"
 #include "ProcessLib/HeatTransportBHE/BHE/MeshUtils.h"
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/CreateLocalAssemblers.h"
+
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerBHE.h"
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerSoil.h"
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerSoilNearBHE.h"
 
 namespace ProcessLib
 {
@@ -107,11 +111,17 @@ namespace ProcessLib
         {
             const int process_id = 0;
             ProcessLib::ProcessVariable const& pv = getProcessVariables(process_id)[0];
-            ProcessLib::createLocalAssemblers<LocalAssemblerData>(
-                mesh.getDimension(), mesh.getElements(), dof_table,
-                pv.getShapeFunctionOrder(), _local_assemblers,
+
+            // this process can only run with 3-dimensional mesh
+            ProcessLib::HeatTransportBHE::createLocalAssemblers<
+                3, /*mesh.getDimension(),*/
+                HeatTransportBHELocalAssemblerSoil,
+                HeatTransportBHELocalAssemblerSoilNearBHE,
+                HeatTransportBHELocalAssemblerBHE>(
+                mesh.getElements(), dof_table, _local_assemblers,
                 mesh.isAxiallySymmetric(), integration_order, _process_data);
 
+            /*
             _secondary_variables.addSecondaryVariable(
                 "heat_flux_x", makeExtrapolator(
                     1, getExtrapolator(), _local_assemblers,
@@ -131,6 +141,7 @@ namespace ProcessLib
                     1, getExtrapolator(), _local_assemblers,
                         &HeatTransportBHELocalAssemblerInterface::getIntPtHeatFluxZ));
             }
+            */
         }
 
         void HeatTransportBHEProcess::assembleConcreteProcess(const double t,
@@ -139,7 +150,7 @@ namespace ProcessLib
             GlobalMatrix& K,
             GlobalVector& b)
         {
-            DBUG("Assemble HeatConductionProcess.");
+            DBUG("Assemble HeatTransportBHE process.");
 
             std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>>
                 dof_table = { std::ref(*_local_to_global_index_map) };
@@ -154,7 +165,7 @@ namespace ProcessLib
             const double dxdot_dx, const double dx_dx, GlobalMatrix& M, GlobalMatrix& K,
             GlobalVector& b, GlobalMatrix& Jac)
         {
-            DBUG("AssembleWithJacobian HeatConductionProcess.");
+            DBUG("AssembleWithJacobian HeatTransportBHE process.");
 
             std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>>
                 dof_table = { std::ref(*_local_to_global_index_map) };
@@ -168,7 +179,7 @@ namespace ProcessLib
         void HeatTransportBHEProcess::computeSecondaryVariableConcrete(const double t,
             GlobalVector const& x)
         {
-            DBUG("Compute heat flux for HeatConductionProcess.");
+            DBUG("Compute heat flux for HeatTransportBHE process.");
             GlobalExecutor::executeMemberOnDereferenced(
                 &HeatTransportBHELocalAssemblerInterface::computeSecondaryVariable,
                 _local_assemblers, *_local_to_global_index_map, t, x, _coupled_solutions);

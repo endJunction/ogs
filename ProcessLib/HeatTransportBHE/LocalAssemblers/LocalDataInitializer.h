@@ -131,8 +131,8 @@ public:
         NumLib::LocalToGlobalIndexMap const& dof_table)
         : _dof_table(dof_table)
     {
-        // REMARKS: At the moment, only a 3D mesh (soil) with 1D elements (BHE)
-        // are supported.
+        // REMARKS: At the moment, only a 3D mesh (soil) with 1D elements (BHE) are
+        // supported.
 
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_QUAD) != 0 && \
     OGS_MAX_ELEMENT_DIM >= 2 && OGS_MAX_ELEMENT_ORDER >= 1
@@ -303,7 +303,7 @@ private:
         typename ShapeFunction::MeshElement>::IntegrationMethod;
 
     template <typename ShapeFunction>
-    using LADataMatrix =
+    using LADataSoil =
         LocalAssemblerDataSoil<ShapeFunction, IntegrationMethod<ShapeFunction>,
                                GlobalDim>;
 
@@ -324,11 +324,11 @@ private:
     NumLib::LocalToGlobalIndexMap const& _dof_table;
 
     template <typename ShapeFunction>
-    using LADataMatrixNearFracture = LocalAssemblerDataSoilNearBHE<
+    using LADataSoilNearBHE = LocalAssemblerDataSoilNearBHE<
         ShapeFunction, IntegrationMethod<ShapeFunction>, GlobalDim>;
 
     template <typename ShapeFunction>
-    using LABHEData =
+    using LADataBHE =
         LocalAssemblerDataBHE<ShapeFunction, IntegrationMethod<ShapeFunction>,
                               GlobalDim>;
 
@@ -351,18 +351,16 @@ private:
             {
                 if (dofIndex_to_localIndex.empty())
                 {
-                    return LADataIntfPtr{new LADataMatrix<ShapeFunction>{
+                    return LADataIntfPtr{new LADataSoil<ShapeFunction>{
                         e, local_matrix_size,
                         std::forward<ConstructorArgs>(args)...}};
                 }
 
-                return LADataIntfPtr{
-                    new LADataMatrixNearFracture<ShapeFunction>{
-                        e, n_variables, local_matrix_size,
-                        dofIndex_to_localIndex,
-                        std::forward<ConstructorArgs>(args)...}};
+                return LADataIntfPtr{new LADataSoilNearBHE<ShapeFunction>{
+                    e, n_variables, local_matrix_size, dofIndex_to_localIndex,
+                    std::forward<ConstructorArgs>(args)...}};
             }
-            return LADataIntfPtr{new LABHEData<ShapeFunction>{
+            return LADataIntfPtr{new LADataBHE<ShapeFunction>{
                 e, local_matrix_size, dofIndex_to_localIndex,
                 std::forward<ConstructorArgs>(args)...}};
         };

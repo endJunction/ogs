@@ -22,13 +22,14 @@ namespace HeatTransportBHE
 {
 namespace detail
 {
-template <
-    int GlobalDim,
-    template <typename, typename, int> class LocalAssemblerSoilImplementation,
-    template <typename, typename, int>
-    class LocalAssemblerSoilNearBHEImplementation,
-    template <typename, typename, int> class LocalAssemblerBHEImplementation,
-    typename LocalAssemblerInterface, typename... ExtraCtorArgs>
+template <int GlobalDim,
+          template <typename, typename, int>
+          class LocalAssemblerSoilImplementation,
+          template <typename, typename, int>
+          class LocalAssemblerSoilNearBHEImplementation,
+          template <typename, typename, int>
+          class LocalAssemblerBHEImplementation,
+          typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
     NumLib::LocalToGlobalIndexMap const& dof_table,
     std::vector<MeshLib::Element*> const& mesh_elements,
@@ -39,7 +40,7 @@ void createLocalAssemblers(
     using LocalDataInitializer = LocalDataInitializer<
         LocalAssemblerInterface, LocalAssemblerSoilImplementation,
         LocalAssemblerSoilNearBHEImplementation,
-        LocalAssemblerBHEImplementation, GlobalDim, ExtraCtorArgs...>;
+        LocalAssemblerBHEImplementation, 3, ExtraCtorArgs...>;
 
     DBUG("Create local assemblers for the HeatTransportBHE process.");
     // Populate the vector of local assemblers.
@@ -66,13 +67,14 @@ void createLocalAssemblers(
  * The first two template parameters cannot be deduced from the arguments.
  * Therefore they always have to be provided manually.
  */
-template <
-    int GlobalDim,
-    template <typename, typename, int> class LocalAssemblerSoilImplementation,
-    template <typename, typename, int>
-    class LocalAssemblerSoilNearBHEImplementation,
-    template <typename, typename, int> class LocalAssemblerBHEImplementation,
-    typename LocalAssemblerInterface, typename... ExtraCtorArgs>
+template <int GlobalDim,
+          template <typename, typename, int>
+          class LocalAssemblerSoilImplementation,
+          template <typename, typename, int>
+          class LocalAssemblerSoilNearBHEImplementation,
+          template <typename, typename, int>
+          class LocalAssemblerBHEImplementation,
+          typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
     std::vector<MeshLib::Element*> const& mesh_elements,
     NumLib::LocalToGlobalIndexMap const& dof_table,
@@ -81,10 +83,9 @@ void createLocalAssemblers(
 {
     DBUG("Create local assemblers for the HeatTransportBHE process.");
 
-    detail::createLocalAssemblers<
-        GlobalDim, LocalAssemblerMatrixImplementation,
-        LocalAssemblerMatrixNearFractureImplementation,
-        LocalAssemblerFractureImplementation>(
+    detail::createLocalAssemblers<GlobalDim, LocalAssemblerSoilImplementation,
+                                  LocalAssemblerSoilNearBHEImplementation,
+                                  LocalAssemblerBHEImplementation>(
         dof_table, mesh_elements, local_assemblers,
         std::forward<ExtraCtorArgs>(extra_ctor_args)...);
 }
