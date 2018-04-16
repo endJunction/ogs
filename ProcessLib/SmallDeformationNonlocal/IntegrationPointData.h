@@ -95,8 +95,7 @@ struct IntegrationPointData final
 
     std::vector<std::tuple<
         // element's local assembler
-        SmallDeformationNonlocalLocalAssemblerInterface<
-            DisplacementDim> const* const,
+        SmallDeformationNonlocalLocalAssemblerInterface<DisplacementDim>* const,
         int,     // integration point id,
         double,  // squared distance to current integration point
         double   // alpha_kl
@@ -108,6 +107,8 @@ struct IntegrationPointData final
     typename ShapeMatricesType::GlobalDimVectorType material_force;
     */
     Eigen::Vector3d coordinates;
+    bool active_self = false;
+    bool activated = false;
 };
 
 }  // namespace SmallDeformationNonlocal

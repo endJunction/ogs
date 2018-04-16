@@ -435,6 +435,28 @@ public:
                 _ip_data[ip].kappa_d = calculateDamageKappaD<DisplacementDim>(
                     eps_p_eff_diff, sigma, _ip_data[ip].kappa_d_prev,
                     damage_properties, material_properties);
+
+                if (!_ip_data[ip].active_self)
+                {
+                    _ip_data[ip].active_self |= _ip_data[ip].kappa_d > 0;
+                    if (_ip_data[ip].active_self)
+                    {
+                        for (auto const& tuple :
+                             _ip_data[ip].non_local_assemblers)
+                        {
+                            // Get integration point data for the integration
+                            // point l.
+                            auto& ip_l =
+                                static_cast<
+                                    SmallDeformationNonlocalLocalAssembler<
+                                        ShapeFunction, IntegrationMethod,
+                                        DisplacementDim>* const>(
+                                    std::get<0>(tuple))
+                                    ->_ip_data[std::get<1>(tuple)];
+                            ip_l.activated = true;
+                        }
+                    }
+                }
             }
         }
 
@@ -555,34 +577,39 @@ public:
                 // double& nonlocal_kappa_d = _ip_data[ip].nonlocal_kappa_d;
                 double nonlocal_kappa_d = 0;
 
-                for (auto const& tuple : _ip_data[ip].non_local_assemblers)
+                if (_ip_data[ip].active_self || _ip_data[ip].activated)
                 {
-                    // If the neighbour element is different the following
-                    // static cast will not be correct.
-                    /*
-                    assert(dynamic_cast<SmallDeformationNonlocalLocalAssembler<
-                               ShapeFunction, IntegrationMethod,
-                               DisplacementDim> const* const>(
-                               std::get<0>(tuple)) == nullptr);
-                               */
+                    for (auto const& tuple : _ip_data[ip].non_local_assemblers)
+                    {
+                        // If the neighbour element is different the following
+                        // static cast will not be correct.
+                        /*
+                        assert(dynamic_cast<SmallDeformationNonlocalLocalAssembler<
+                                   ShapeFunction, IntegrationMethod,
+                                   DisplacementDim> const* const>(
+                                   std::get<0>(tuple)) == nullptr);
+                                   */
 
-                    // Get integration point data for the integration point l.
-                    auto const& ip_l =
-                        static_cast<SmallDeformationNonlocalLocalAssembler<
-                            ShapeFunction, IntegrationMethod,
-                            DisplacementDim> const* const>(std::get<0>(tuple))
-                            ->_ip_data[std::get<1>(tuple)];
+                        // Get integration point data for the integration point
+                        // l.
+                        auto const& ip_l =
+                            static_cast<SmallDeformationNonlocalLocalAssembler<
+                                ShapeFunction, IntegrationMethod,
+                                DisplacementDim> const* const>(
+                                std::get<0>(tuple))
+                                ->_ip_data[std::get<1>(tuple)];
 
-                    // double const kappa_d_dot = ip_l.getLocalRateKappaD();
-                    double const kappa_d_l = ip_l.getLocalVariable();
+                        // double const kappa_d_dot = ip_l.getLocalRateKappaD();
+                        double const kappa_d_l = ip_l.getLocalVariable();
 
-                    // std::cerr << kappa_d_l << "\n";
-                    double const a_kl = std::get<3>(tuple);
+                        // std::cerr << kappa_d_l << "\n";
+                        double const a_kl = std::get<3>(tuple);
 
-                    auto const& w_l = ip_l.integration_weight;
+                        auto const& w_l = ip_l.integration_weight;
 
-                    //test_alpha += a_kl * w_l;
-                    nonlocal_kappa_d += a_kl * kappa_d_l * w_l;
+                        // test_alpha += a_kl * w_l;
+                        nonlocal_kappa_d += a_kl * kappa_d_l * w_l;
+                    }
                 }
                 /* For testing only.
                 if (std::abs(test_alpha - 1) >= 1e-6)
