@@ -31,20 +31,17 @@
                     <bhe_type>BHE_TYPE_CXA</bhe_type>
                     <bhe_bound_type>POWER_IN_WATT_CURVE_FIXED_DT</bhe_bound_type>
                     <bhe_use_external_therm_resis>false</bhe_use_external_therm_resis>
-                    <bhe_length>54.6</bhe_length>
                     <bhe_length_1>18.3</bhe_length_1>
                     <bhe_length_2>18.2</bhe_length_2>
                     <bhe_length_3>18.1</bhe_length_3>
-                    <bhe_diameter>0.1255</bhe_diameter>
                     <bhe_diameter_1>0.126</bhe_diameter_1>
                     <bhe_diameter_2>0.125</bhe_diameter_2>
                     <bhe_diameter_3>0.124</bhe_diameter_3>
                     <bhe_refrigerant_flow_rate>1.97e-4</bhe_refrigerant_flow_rate>
                     <bhe_pipe_inner_radius>0.013665</bhe_pipe_inner_radius>
-                    <bhe_pipe_outer_radius>0.088888</bhe_pipe_outer_radius>
-                    <bhe_pipe_outer_radius_1>0.088889</bhe_pipe_outer_radius_1>
-                    <bhe_pipe_outer_radius_2>0.088888</bhe_pipe_outer_radius_2>
-                    <bhe_pipe_outer_radius_3>0.088887</bhe_pipe_outer_radius_3>
+                    <bhe_pipe_outer_radius_1>0.0167</bhe_pipe_outer_radius_1>
+                    <bhe_pipe_outer_radius_2>0.0166</bhe_pipe_outer_radius_2>
+                    <bhe_pipe_outer_radius_3>0.0165</bhe_pipe_outer_radius_3>
                     <bhe_pipe_in_wall_thickness>0.00305</bhe_pipe_in_wall_thickness>
                     <bhe_pipe_out_wall_thickness>0.00305</bhe_pipe_out_wall_thickness>
                     <bhe_fluid_idx>0</bhe_fluid_idx>
@@ -53,7 +50,7 @@
                     <bhe_grout_porosity>0.2</bhe_grout_porosity>
                     <bhe_grout_heat_capacity>1000.0</bhe_grout_heat_capacity>
                     <bhe_inner_pipe_wall_thermal_conductivity>0.39</bhe_inner_pipe_wall_thermal_conductivity>
-                    <bhe_outer_pipe_wall_thermal_conductivity>0.19</bhe_outer_pipe_wall_thermal_conductivity>
+                    <bhe_outer_pipe_wall_thermal_conductivity>0.39</bhe_outer_pipe_wall_thermal_conductivity>
                     <bhe_grout_thermal_conductivity>0.73</bhe_grout_thermal_conductivity>
                     <bhe_switch_off_threshold>0.001</bhe_switch_off_threshold>
                 </borehole_heat_exchanger>
