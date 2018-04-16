@@ -441,6 +441,7 @@ public:
         // Compute material forces, needed in the non-local assembly, storing
         // them locally and interpolating them to integration points.
         getMaterialForces(local_x, _material_forces);
+        /* TODO_MATERIAL_FORCES Currently the interpolation is not needed.
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
@@ -454,6 +455,7 @@ public:
                 NumLib::shapeFunctionInterpolate(_material_forces, N, g[0],
                                                  g[1], g[2]);
         }
+        */
     }
 
     void assembleWithJacobian(double const t,
@@ -479,13 +481,13 @@ public:
         SpatialPosition x_position;
         x_position.setElementID(_element.getID());
 
+        /* TODO_MATERIAL_FORCES
         // Compute the non-local internal length depending on the material
         // forces and directions dir := x_ip - \xi:
         // length(x_ip) := 1/Vol \int_{Vol} <g(\xi), dir> / scaling * beta d\xi,
         // where:
         // beta(x_ip, \xi) := exp(-|dir|) * (1 - exp(-|g(\xi)|)),
         // scaling(x_ip, \xi) := |<g(\xi), dir>|
-        /*
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             auto const& N = _ip_data[ip].N;

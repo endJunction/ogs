@@ -33,7 +33,9 @@ struct IntegrationPointData final
             eps_p_D_xx = &(msv->eps_p.D[0]);
         }
 
+        /* TODO_MATERIAL_FORCES
         material_force.setZero(DisplacementDim);
+        */
     }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -102,7 +104,9 @@ struct IntegrationPointData final
         non_local_assemblers;
 
     double nonlocal_internal_length;
+    /* TODO_MATERIAL_FORCES
     typename ShapeMatricesType::GlobalDimVectorType material_force;
+    */
     Eigen::Vector3d coordinates;
 };
 
