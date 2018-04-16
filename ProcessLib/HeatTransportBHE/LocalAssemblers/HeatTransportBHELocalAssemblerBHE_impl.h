@@ -32,7 +32,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, GlobalDim>::
         bool const is_axially_symmetric,
         unsigned const integration_order,
         HeatTransportBHEProcessData& process_data)
-    : HeatTransportBHEProcessAssemblerInterface(
+    : HeatTransportBHELocalAssemblerInterface(
           ShapeFunction::NPOINTS * GlobalDim,  // no intersection
           dofIndex_to_localIndex),
       _process_data(process_data),

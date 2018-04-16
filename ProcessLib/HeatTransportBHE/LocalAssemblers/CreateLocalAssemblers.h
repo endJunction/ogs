@@ -83,9 +83,11 @@ void createLocalAssemblers(
 {
     DBUG("Create local assemblers for the HeatTransportBHE process.");
 
-    detail::createLocalAssemblers<GlobalDim, LocalAssemblerSoilImplementation,
-                                  LocalAssemblerSoilNearBHEImplementation,
-                                  LocalAssemblerBHEImplementation>(
+    detail::createLocalAssemblers<
+        GlobalDim, 
+        LocalAssemblerSoilImplementation,
+        LocalAssemblerSoilNearBHEImplementation,
+        LocalAssemblerBHEImplementation>(
         dof_table, mesh_elements, local_assemblers,
         std::forward<ExtraCtorArgs>(extra_ctor_args)...);
 }

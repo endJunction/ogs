@@ -52,8 +52,8 @@ HeatTransportBHELocalAssemblerSoilNearBHE<ShapeFunction,
         bool const is_axially_symmetric,
         unsigned const integration_order,
         HeatTransportBHEProcessData& process_data)
-    : HeatTransportBHEProcessAssemblerInterface(
-          n_variables * ShapeFunction::NPOINTS * DisplacementDim,
+    : HeatTransportBHELocalAssemblerInterface(
+          n_variables * ShapeFunction::NPOINTS * GlobalDim,
           dofIndex_to_localIndex),
       _process_data(process_data),
       _integration_method(integration_order),

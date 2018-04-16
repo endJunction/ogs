@@ -304,8 +304,8 @@ private:
 
     template <typename ShapeFunction>
     using LADataSoil =
-        LocalAssemblerDataSoil<ShapeFunction, IntegrationMethod<ShapeFunction>,
-                               GlobalDim>;
+        LocalAssemblerDataSoil<ShapeFunction,
+                                 IntegrationMethod<ShapeFunction>, GlobalDim>;
 
     /// A helper forwarding to the correct version of makeLocalAssemblerBuilder
     /// depending whether the global dimension is less than the shape function's
@@ -329,8 +329,8 @@ private:
 
     template <typename ShapeFunction>
     using LADataBHE =
-        LocalAssemblerDataBHE<ShapeFunction, IntegrationMethod<ShapeFunction>,
-                              GlobalDim>;
+        LocalAssemblerDataBHE<ShapeFunction,
+                                   IntegrationMethod<ShapeFunction>, GlobalDim>;
 
     // local assembler builder implementations.
 private:
@@ -356,9 +356,11 @@ private:
                         std::forward<ConstructorArgs>(args)...}};
                 }
 
-                return LADataIntfPtr{new LADataSoilNearBHE<ShapeFunction>{
-                    e, n_variables, local_matrix_size, dofIndex_to_localIndex,
-                    std::forward<ConstructorArgs>(args)...}};
+                return LADataIntfPtr{
+                    new LADataSoilNearBHE<ShapeFunction>{
+                        e, n_variables, local_matrix_size,
+                        dofIndex_to_localIndex,
+                        std::forward<ConstructorArgs>(args)...}};
             }
             return LADataIntfPtr{new LADataBHE<ShapeFunction>{
                 e, local_matrix_size, dofIndex_to_localIndex,

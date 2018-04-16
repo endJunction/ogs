@@ -11,12 +11,12 @@
 
 #include <cassert>
 
-#include "ProcessLib/HeatTransportBHE/BHE/MeshUtils.h"
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/CreateLocalAssemblers.h"
+#include "ProcessLib/HeatTransportBHE/BHE/MeshUtils.h"
 
-#include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerBHE.h"
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerSoil.h"
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerSoilNearBHE.h"
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerBHE.h"
 
 namespace ProcessLib
 {
@@ -114,12 +114,12 @@ namespace ProcessLib
 
             // this process can only run with 3-dimensional mesh
             ProcessLib::HeatTransportBHE::createLocalAssemblers<
-                3, /*mesh.getDimension(),*/
+                3, /*mesh.getDimension(),*/ 
                 HeatTransportBHELocalAssemblerSoil,
                 HeatTransportBHELocalAssemblerSoilNearBHE,
                 HeatTransportBHELocalAssemblerBHE>(
-                mesh.getElements(), dof_table, _local_assemblers,
-                mesh.isAxiallySymmetric(), integration_order, _process_data);
+                    mesh.getElements(), dof_table, _local_assemblers,
+                    mesh.isAxiallySymmetric(), integration_order, _process_data);
 
             /*
             _secondary_variables.addSecondaryVariable(
