@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "LocalAssemblerInterface.h"
+#include "IntegrationPointDataNonlocalInterface.h"
 
 namespace ProcessLib
 {
@@ -17,7 +17,7 @@ namespace SmallDeformationNonlocal
 {
 template <typename BMatricesType, typename ShapeMatricesType,
           int DisplacementDim>
-struct IntegrationPointData final
+struct IntegrationPointData final : public IntegrationPointDataNonlocalInterface
 {
     explicit IntegrationPointData(
         MaterialLib::Solids::MechanicsBase<DisplacementDim>& solid_material)
@@ -72,7 +72,6 @@ struct IntegrationPointData final
         material_state_variables;
 
     typename BMatricesType::KelvinMatrixType C;
-    double integration_weight;
     typename ShapeMatricesType::NodalRowVectorType N;
     typename ShapeMatricesType::GlobalDimNodalMatrixType dNdx;
 
@@ -89,26 +88,9 @@ struct IntegrationPointData final
         material_state_variables->pushBackState();
     }
 
-    double getLocalVariable() const { return kappa_d; }
+    double getLocalVariable() const override { return kappa_d; }
 
     // Unused double getLocalRateKappaD() const { return kappa_d - kappa_d_prev; }
-
-    std::vector<std::tuple<
-        // element's local assembler
-        SmallDeformationNonlocalLocalAssemblerInterface<DisplacementDim>* const,
-        int,     // integration point id,
-        double,  // squared distance to current integration point
-        double   // alpha_kl
-        >>
-        non_local_assemblers;
-
-    double nonlocal_internal_length;
-    /* TODO_MATERIAL_FORCES
-    typename ShapeMatricesType::GlobalDimVectorType material_force;
-    */
-    Eigen::Vector3d coordinates;
-    bool active_self = false;
-    bool activated = false;
 };
 
 }  // namespace SmallDeformationNonlocal

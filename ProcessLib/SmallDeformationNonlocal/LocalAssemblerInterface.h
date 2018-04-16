@@ -17,6 +17,8 @@
 #include "ProcessLib/Deformation/MaterialForces.h"
 #include "ProcessLib/LocalAssemblerInterface.h"
 
+#include "IntegrationPointDataNonlocalInterface.h"
+
 namespace ProcessLib
 {
 namespace SmallDeformationNonlocal
@@ -94,6 +96,9 @@ struct SmallDeformationNonlocalLocalAssemblerInterface
     virtual void getIntegrationPointCoordinates(
         Eigen::Vector3d const& coords,
         std::vector<double>& distances) const = 0;
+
+    virtual IntegrationPointDataNonlocalInterface* getIPDataPtr(
+        int const ip) = 0;
 };
 
 }  // namespace SmallDeformationNonlocal

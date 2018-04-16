@@ -227,7 +227,8 @@ public:
                         continue;
                     // save into current ip_k
                     _ip_data[k].non_local_assemblers.push_back(std::make_tuple(
-                        la.get(), ip, distances[ip],
+                        la->getIPDataPtr(ip),
+                        distances[ip],
                         std::numeric_limits<double>::quiet_NaN()));
                 }
             }
@@ -239,15 +240,9 @@ public:
             double a_k_sum_m = 0;
             for (auto const& tuple : _ip_data[k].non_local_assemblers)
             {
-                auto const& la_m =
-                    *static_cast<SmallDeformationNonlocalLocalAssembler<
-                        ShapeFunction, IntegrationMethod,
-                        DisplacementDim> const* const>(std::get<0>(tuple));
+                double const distance2_m = std::get<1>(tuple);
 
-                int const m = std::get<1>(tuple);
-                double const distance2_m = std::get<2>(tuple);
-
-                auto const& w_m = la_m._ip_data[m].integration_weight;
+                auto const& w_m = std::get<0>(tuple)->integration_weight;
 
                 a_k_sum_m += w_m * alpha_0(distance2_m);
 
@@ -271,7 +266,7 @@ public:
                 //        ShapeFunction, IntegrationMethod,
                 //        DisplacementDim> const* const>(std::get<0>(tuple));
 
-                double const distance2_l = std::get<2>(tuple);
+                double const distance2_l = std::get<1>(tuple);
 
                 // int const l_ele = la_l._element.getID();
                 // int const l = std::get<1>(tuple);
@@ -283,7 +278,7 @@ public:
                 // std::cout << "alpha_0(d^2_l) = " << alpha_0(distance2_l)
                 //          << "\n";
                 // std::cout << "alpha_kl = " << a_kl << "done\n";
-                std::get<3>(tuple) = a_kl;
+                std::get<2>(tuple) = a_kl;
             }
         }
     }
@@ -444,16 +439,8 @@ public:
                         for (auto const& tuple :
                              _ip_data[ip].non_local_assemblers)
                         {
-                            // Get integration point data for the integration
-                            // point l.
-                            auto& ip_l =
-                                static_cast<
-                                    SmallDeformationNonlocalLocalAssembler<
-                                        ShapeFunction, IntegrationMethod,
-                                        DisplacementDim>* const>(
-                                    std::get<0>(tuple))
-                                    ->_ip_data[std::get<1>(tuple)];
-                            ip_l.activated = true;
+                            // Activate the integration point.
+                            std::get<0>(tuple)->activated = true;
                         }
                     }
                 }
@@ -592,18 +579,15 @@ public:
 
                         // Get integration point data for the integration point
                         // l.
-                        auto const& ip_l =
-                            static_cast<SmallDeformationNonlocalLocalAssembler<
-                                ShapeFunction, IntegrationMethod,
-                                DisplacementDim> const* const>(
-                                std::get<0>(tuple))
-                                ->_ip_data[std::get<1>(tuple)];
+                        auto const& ip_l = *static_cast<IntegrationPointData<
+                            BMatricesType, ShapeMatricesType,
+                            DisplacementDim> const* const>(std::get<0>(tuple));
 
                         // double const kappa_d_dot = ip_l.getLocalRateKappaD();
                         double const kappa_d_l = ip_l.getLocalVariable();
 
                         // std::cerr << kappa_d_l << "\n";
-                        double const a_kl = std::get<3>(tuple);
+                        double const a_kl = std::get<2>(tuple);
 
                         auto const& w_l = ip_l.integration_weight;
 
@@ -1034,6 +1018,13 @@ private:
         return cache;
     }
 
+    IntegrationPointDataNonlocalInterface*
+    getIPDataPtr(int const ip) override
+    {
+        return &_ip_data[ip];
+    }
+
+private:
     SmallDeformationNonlocalProcessData<DisplacementDim>& _process_data;
 
     std::vector<
