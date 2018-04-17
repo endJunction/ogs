@@ -584,7 +584,8 @@ public:
                             DisplacementDim> const* const>(std::get<0>(tuple));
 
                         // double const kappa_d_dot = ip_l.getLocalRateKappaD();
-                        double const kappa_d_l = ip_l.getLocalVariable();
+                        // Get local variable for the integration point l.
+                        double const kappa_d_l = std::get<0>(tuple)->kappa_d;
 
                         // std::cerr << kappa_d_l << "\n";
                         double const a_kl = std::get<2>(tuple);
@@ -615,7 +616,7 @@ public:
                         ehlers_material.evaluatedDamageProperties(t, x_position)
                             .m_d;
                     nonlocal_kappa_d = (1. - gamma_nonlocal) *
-                                           _ip_data[ip].getLocalVariable() +
+                                           _ip_data[ip].kappa_d +
                                        gamma_nonlocal * nonlocal_kappa_d;
                 }
 

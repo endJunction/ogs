@@ -61,7 +61,6 @@ struct IntegrationPointData final : public IntegrationPointDataNonlocalInterface
     double free_energy_density = 0;
     double damage = 0;       ///< isotropic damage
     double damage_prev = 0;  ///< \copydoc damage
-    double kappa_d = 0;      ///< damage driving variable.
     double kappa_d_prev = 0;  ///< \copydoc kappa_d
     // double nonlocal_kappa_d = 0;
     // double nonlocal_kappa_d_prev = 0;
@@ -87,8 +86,6 @@ struct IntegrationPointData final : public IntegrationPointDataNonlocalInterface
         // nonlocal_kappa_d_prev = nonlocal_kappa_d;
         material_state_variables->pushBackState();
     }
-
-    double getLocalVariable() const override { return kappa_d; }
 
     // Unused double getLocalRateKappaD() const { return kappa_d - kappa_d_prev; }
 };

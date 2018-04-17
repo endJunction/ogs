@@ -17,8 +17,6 @@ struct IntegrationPointDataNonlocalInterface
 {
     virtual ~IntegrationPointDataNonlocalInterface() = default;
 
-    virtual double getLocalVariable() const = 0;
-
     std::vector<std::tuple<
         // element's local assembler
         IntegrationPointDataNonlocalInterface* const,
@@ -27,6 +25,7 @@ struct IntegrationPointDataNonlocalInterface
         >>
         non_local_assemblers;
 
+    double kappa_d = 0;      ///< damage driving variable.
     double integration_weight;
     double nonlocal_internal_length;
     /* TODO_MATERIAL_FORCES
