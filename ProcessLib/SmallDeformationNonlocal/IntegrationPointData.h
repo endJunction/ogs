@@ -91,7 +91,7 @@ struct IntegrationPointData final
 
     double getLocalVariable() const { return kappa_d; }
 
-    double getLocalRateKappaD() const { return kappa_d - kappa_d_prev; }
+    // Unused double getLocalRateKappaD() const { return kappa_d - kappa_d_prev; }
 
     std::vector<std::tuple<
         // element's local assembler
