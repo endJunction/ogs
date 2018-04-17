@@ -57,7 +57,7 @@
 #include "ProcessLib/HeatTransportBHE/CreateHeatTransportBHEProcess.h"
 #endif
 #ifdef OGS_BUILD_PROCESS_PIPENETWORK
-#include "ProcessLib/PipeNetwork/createPipeNetworkProcess.h"
+#include "ProcessLib/PipeNetwork/CreatePipeNetworkProcess.h"
 #endif
 #ifdef OGS_BUILD_PROCESS_HYDROMECHANICS
 #include "ProcessLib/HydroMechanics/CreateHydroMechanicsProcess.h"

@@ -18,9 +18,9 @@
 
 #include "ProcessLib/HeatTransportBHE/HeatTransportBHEProcessData.h"
 
-#include "HeatTransportBHEProcessAssemblerInterface.h"
 #include "IntegrationPointDataSoil.h"
 #include "SecondaryData.h"
+#include "HeatTransportBHEProcessAssemblerInterface.h"
 
 namespace ProcessLib
 {
@@ -104,12 +104,12 @@ namespace ProcessLib
             
             HeatTransportBHEProcessData& _process_data;
 
-            std::vector<IntegrationPointDataSoil<ShapeMatricesType,
-                                                 BMatricesType, GlobalDim>,
-                        Eigen::aligned_allocator<IntegrationPointDataSoil<
-                            ShapeMatricesType, BMatricesType, GlobalDim>>>
+            std::vector<IntegrationPointDataSoil<ShapeMatricesType, BMatricesType,
+                GlobalDim>,
+                Eigen::aligned_allocator<IntegrationPointDataSoil<
+                ShapeMatricesType, BMatricesType, GlobalDim>>>
                 _ip_data;
-
+            
             IntegrationMethod _integration_method;
             MeshLib::Element const& _element;
             bool const _is_axially_symmetric;
