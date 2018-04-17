@@ -278,7 +278,11 @@ public:
                 // std::cout << "alpha_0(d^2_l) = " << alpha_0(distance2_l)
                 //          << "\n";
                 // std::cout << "alpha_kl = " << a_kl << "done\n";
-                std::get<2>(tuple) = a_kl;
+
+                // Store the a_kl already multiplied with the integration
+                // weight of that l integration point.
+                auto const w_l = std::get<0>(tuple)->integration_weight;
+                std::get<2>(tuple) = a_kl * w_l;
             }
         }
     }
@@ -590,10 +594,8 @@ public:
                         // std::cerr << kappa_d_l << "\n";
                         double const a_kl = std::get<2>(tuple);
 
-                        auto const& w_l = ip_l.integration_weight;
-
-                        // test_alpha += a_kl * w_l;
-                        nonlocal_kappa_d += a_kl * kappa_d_l * w_l;
+                        // test_alpha += a_kl;
+                        nonlocal_kappa_d += a_kl * kappa_d_l;
                     }
                 }
                 /* For testing only.

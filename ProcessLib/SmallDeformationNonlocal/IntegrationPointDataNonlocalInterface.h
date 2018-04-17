@@ -21,7 +21,7 @@ struct IntegrationPointDataNonlocalInterface
         // element's local assembler
         IntegrationPointDataNonlocalInterface* const,
         double,  // squared distance to current integration point
-        double   // alpha_kl
+        double   // alpha_kl * w_l
         >>
         non_local_assemblers;
 
