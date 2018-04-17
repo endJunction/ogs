@@ -42,6 +42,60 @@ namespace ProcessLib
                 _vec_BHE_mat_IDs,
                 _vec_BHE_elements,
                 _vec_BHE_nodes);
+
+            if (_vec_BHE_mat_IDs.size() !=
+                _process_data._vec_BHE_property.size())
+            {
+                OGS_FATAL(
+                    "The number of the given BHE properties (%d) are not "
+                    "consistent"
+                    " with the number of BHE groups in a mesh (%d).",
+                    _process_data._vec_BHE_property.size(),
+                    _vec_BHE_mat_IDs.size());
+            }
+
+            // create a map from a material ID to a BHE ID
+            auto max_BHE_mat_id = std::max_element(_vec_BHE_mat_IDs.begin(),
+                                                   _vec_BHE_mat_IDs.end());
+            _process_data._map_materialID_to_BHE_ID.resize(*max_BHE_mat_id + 1);
+            for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+            {
+                _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] =
+                    i;
+            }
+
+            // create a table of connected BHE IDs for each element
+            _process_data._vec_ele_connected_BHE_IDs.resize(
+                mesh.getNumberOfElements());
+            for (unsigned i = 0; i < _vec_BHE_soil_elements.size(); i++)
+            {
+                for (auto e : _vec_BHE_soil_elements[i])
+                {
+                    _process_data._vec_ele_connected_BHE_IDs[e->getID()]
+                        .push_back(i);
+                }
+            }
+
+            /*
+            // need to use a custom Neumann BC assembler for displacement jumps
+            int pv_disp_jump_id = 0;
+            const int process_id = 0;
+            for (ProcessVariable& pv : getProcessVariables(process_id))
+            {
+                if (pv.getName().find("displacement_jump") == std::string::npos)
+                {
+                    continue;
+                }
+                pv.setBoundaryConditionBuilder(
+                    std::make_unique<BoundaryConditionBuilder>(
+                        *_process_data._vec_BHE_property[pv_disp_jump_id].get()));
+                pv_disp_jump_id++;
+            }
+            */
+
+            MeshLib::PropertyVector<int> const* material_ids(
+                mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
+            _process_data._mesh_prop_materialIDs = material_ids;
         }
 
 		void HeatTransportBHEProcess::constructDofTable()

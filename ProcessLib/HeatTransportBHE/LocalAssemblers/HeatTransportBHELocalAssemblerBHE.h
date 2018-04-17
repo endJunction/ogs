@@ -15,9 +15,9 @@
 
 #include "ProcessLib/HeatTransportBHE/HeatTransportBHEProcessData.h"
 
-// #include "IntegrationPointDataFracture.h"
-#include "SecondaryData.h"
 #include "HeatTransportBHEProcessAssemblerInterface.h"
+#include "IntegrationPointDataBHE.h"
+#include "SecondaryData.h"
 
 namespace ProcessLib
 {
@@ -93,12 +93,9 @@ namespace ProcessLib
             HeatTransportBHEProcessData& _process_data;
             // FractureProperty const* _fracture_property = nullptr;
 
-            /*
-            std::vector<IntegrationPointDataFracture<HMatricesType, DisplacementDim>,
-                Eigen::aligned_allocator<IntegrationPointDataFracture<
-                HMatricesType, DisplacementDim>>>
+            std::vector<IntegrationPointDataBHE,
+                        Eigen::aligned_allocator<IntegrationPointDataBHE>>
                 _ip_data;
-            */
 
             IntegrationMethod _integration_method;
             std::vector<ShapeMatrices, Eigen::aligned_allocator<
