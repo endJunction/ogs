@@ -581,12 +581,6 @@ public:
                                    std::get<0>(tuple)) == nullptr);
                                    */
 
-                        // Get integration point data for the integration point
-                        // l.
-                        auto const& ip_l = *static_cast<IntegrationPointData<
-                            BMatricesType, ShapeMatricesType,
-                            DisplacementDim> const* const>(std::get<0>(tuple));
-
                         // double const kappa_d_dot = ip_l.getLocalRateKappaD();
                         // Get local variable for the integration point l.
                         double const kappa_d_l = std::get<0>(tuple)->kappa_d;
