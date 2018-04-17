@@ -23,90 +23,85 @@ namespace ProcessLib
 {
     namespace HeatTransportBHE
     {
-    template <typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
-    HeatTransportBHELocalAssemblerBHE<ShapeFunction,
-                                      IntegrationMethod,
-                                      BHE_Dim>::
-        HeatTransportBHELocalAssemblerBHE(
-            MeshLib::Element const& e,
-            std::size_t const /*local_matrix_size*/,
-            std::vector<unsigned> const& dofIndex_to_localIndex,
-            bool const is_axially_symmetric,
-            unsigned const integration_order,
-            HeatTransportBHEProcessData& process_data)
-        : HeatTransportBHELocalAssemblerInterface(
-              ShapeFunction::NPOINTS * BHE_Dim,  // no intersection
-              dofIndex_to_localIndex),
-          _process_data(process_data),
-          _integration_method(integration_order),
-          _shape_matrices(initShapeMatrices<ShapeFunction,
-                                            ShapeMatricesType,
-                                            IntegrationMethod,
-                                            BHE_Dim>(
-              e, is_axially_symmetric, _integration_method)),
-          _element(e)
-    {
-        /*
-        assert(_element.getDimension() == DisplacementDim - 1);
-
-        unsigned const n_integration_points =
-            _integration_method.getNumberOfPoints();
-
-        _ip_data.reserve(n_integration_points);
-        _secondary_data.N.resize(n_integration_points);
-
-        auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
-        auto frac_id = _process_data._map_materialID_to_fractureID[mat_id];
-        _fracture_property =
-        _process_data._vec_fracture_property[frac_id].get();
-
-        SpatialPosition x_position;
-        x_position.setElementID(_element.getID());
-        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        template <typename ShapeFunction, typename IntegrationMethod,
+            int BHE_Dim>
+            HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
+            BHE_Dim>::
+            HeatTransportBHELocalAssemblerBHE(
+                MeshLib::Element const& e,
+                std::size_t const /*local_matrix_size*/,
+                std::vector<unsigned> const& dofIndex_to_localIndex,
+                bool const is_axially_symmetric,
+                unsigned const integration_order,
+                HeatTransportBHEProcessData& process_data)
+            : HeatTransportBHELocalAssemblerInterface(
+                ShapeFunction::NPOINTS * BHE_Dim,  // no intersection
+                dofIndex_to_localIndex),
+            _process_data(process_data),
+            _integration_method(integration_order),
+            _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
+                IntegrationMethod, BHE_Dim>(
+                    e, is_axially_symmetric, _integration_method)),
+            _element(e)
         {
-            x_position.setIntegrationPoint(ip);
+            /*
+            assert(_element.getDimension() == DisplacementDim - 1);
 
-            _ip_data.emplace_back(*_process_data._fracture_model);
-            auto const& sm = _shape_matrices[ip];
-            auto& ip_data = _ip_data[ip];
-            ip_data.integration_weight =
-                _integration_method.getWeightedPoint(ip).getWeight() *
-                sm.integralMeasure * sm.detJ;
-            ip_data._h_matrices.setZero(DisplacementDim,
-                ShapeFunction::NPOINTS * DisplacementDim);
+            unsigned const n_integration_points =
+                _integration_method.getNumberOfPoints();
 
-            computeHMatrix<DisplacementDim, ShapeFunction::NPOINTS,
-                typename ShapeMatricesType::NodalRowVectorType,
-                HMatrixType>(sm.N, ip_data._h_matrices);
+            _ip_data.reserve(n_integration_points);
+            _secondary_data.N.resize(n_integration_points);
 
-            // Initialize current time step values
-            ip_data._w.setZero(DisplacementDim);
-            ip_data._sigma.setZero(DisplacementDim);
+            auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
+            auto frac_id = _process_data._map_materialID_to_fractureID[mat_id];
+            _fracture_property = _process_data._vec_fracture_property[frac_id].get();
 
-            // Previous time step values are not initialized and are set later.
-            ip_data._sigma_prev.resize(DisplacementDim);
-            ip_data._w_prev.resize(DisplacementDim);
+            SpatialPosition x_position;
+            x_position.setElementID(_element.getID());
+            for (unsigned ip = 0; ip < n_integration_points; ip++)
+            {
+                x_position.setIntegrationPoint(ip);
 
-            ip_data._C.resize(DisplacementDim, DisplacementDim);
+                _ip_data.emplace_back(*_process_data._fracture_model);
+                auto const& sm = _shape_matrices[ip];
+                auto& ip_data = _ip_data[ip];
+                ip_data.integration_weight =
+                    _integration_method.getWeightedPoint(ip).getWeight() *
+                    sm.integralMeasure * sm.detJ;
+                ip_data._h_matrices.setZero(DisplacementDim,
+                    ShapeFunction::NPOINTS * DisplacementDim);
 
-            ip_data._aperture0 = (*_fracture_property->aperture0)(0,
-        x_position)[0]; ip_data._aperture_prev = ip_data._aperture0;
+                computeHMatrix<DisplacementDim, ShapeFunction::NPOINTS,
+                    typename ShapeMatricesType::NodalRowVectorType,
+                    HMatrixType>(sm.N, ip_data._h_matrices);
 
-            _secondary_data.N[ip] = sm.N;
+                // Initialize current time step values
+                ip_data._w.setZero(DisplacementDim);
+                ip_data._sigma.setZero(DisplacementDim);
+
+                // Previous time step values are not initialized and are set later.
+                ip_data._sigma_prev.resize(DisplacementDim);
+                ip_data._w_prev.resize(DisplacementDim);
+
+                ip_data._C.resize(DisplacementDim, DisplacementDim);
+
+                ip_data._aperture0 = (*_fracture_property->aperture0)(0, x_position)[0];
+                ip_data._aperture_prev = ip_data._aperture0;
+
+                _secondary_data.N[ip] = sm.N;
+            }
+            */
         }
-        */
-        }
 
-        template <typename ShapeFunction,
-                  typename IntegrationMethod,
-                  int BHE_Dim>
-        void HeatTransportBHELocalAssemblerBHE<
-            ShapeFunction,
-            IntegrationMethod,
+        template <typename ShapeFunction, typename IntegrationMethod,
+            int BHE_Dim>
+            void HeatTransportBHELocalAssemblerBHE<
+            ShapeFunction, IntegrationMethod,
             BHE_Dim>::assembleWithJacobian(double const t,
-                                           Eigen::VectorXd const& local_u,
-                                           Eigen::VectorXd& local_b,
-                                           Eigen::MatrixXd& local_J)
+                Eigen::VectorXd const& local_u,
+                Eigen::VectorXd& local_b,
+                Eigen::MatrixXd& local_J)
         {
             /*
             auto const& nodal_jump = local_u;
@@ -164,12 +159,10 @@ namespace ProcessLib
             */
         }
 
-        template <typename ShapeFunction,
-                  typename IntegrationMethod,
-                  int BHE_Dim>
-        void HeatTransportBHELocalAssemblerBHE<ShapeFunction,
-                                               IntegrationMethod,
-                                               BHE_Dim>::
+        template <typename ShapeFunction, typename IntegrationMethod,
+            int BHE_Dim>
+            void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
+            BHE_Dim>::
             postTimestepConcrete(std::vector<double> const& /*local_x*/)
         {
             /*
