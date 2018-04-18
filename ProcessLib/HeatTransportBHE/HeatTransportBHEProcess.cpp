@@ -38,11 +38,11 @@ namespace ProcessLib
             _process_data(std::move(process_data))
         {
             getBHEDataInMesh(mesh,
-                             _vec_soil_elements,
-                             _vec_BHE_mat_IDs,
-                             _vec_BHE_elements,
-                             _vec_BHE_nodes,
-                             _vec_BHE_soil_elements);
+                _vec_soil_elements, 
+                _vec_BHE_mat_IDs,
+                _vec_BHE_elements,
+                _vec_BHE_nodes,
+                _vec_BHE_soil_elements);
 
             if (_vec_BHE_mat_IDs.size() !=
                 _process_data._vec_BHE_property.size())
@@ -61,10 +61,9 @@ namespace ProcessLib
             _process_data._map_materialID_to_BHE_ID.resize(*max_BHE_mat_id + 1);
             for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
             {
-                // by default, it is assumed that the soil compartment takes
-                // material ID 0 and the BHE take the successive material group.
-                _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] =
-                    i;
+                // by default, it is assumed that the soil compartment takes material ID 0
+                // and the BHE take the successive material group. 
+                _process_data._map_materialID_to_BHE_ID[ _vec_BHE_mat_IDs[i] ] = i;
             }
 
             // create a table of connected BHE IDs for each element

@@ -31,9 +31,9 @@ namespace ProcessLib
                 std::size_t n_local_size, std::vector<unsigned> dofIndex_to_localIndex)
                 : _dofIndex_to_localIndex(std::move(dofIndex_to_localIndex))
             {
-                _local_u.resize(n_local_size);
-                _local_b.resize(_local_u.size());
-                _local_J.resize(_local_u.size(), _local_u.size());
+                _local_T.resize(n_local_size);
+                _local_b.resize(_local_T.size());
+                _local_A.resize(_local_T.size(), _local_T.size());
             }
 
             void assembleWithJacobian(double const t,
@@ -77,23 +77,25 @@ namespace ProcessLib
             }
 
             virtual void assembleWithJacobian(double const t,
-                Eigen::VectorXd const& local_u,
-                Eigen::VectorXd& local_b,
-                Eigen::MatrixXd& local_J)
+                                              Eigen::VectorXd const& local_T,
+                                              Eigen::VectorXd& local_b,
+                                              Eigen::MatrixXd& local_A)
             {
                 (void)t;
-                (void)local_u;
+                (void)local_T;
                 (void)local_b;
-                (void)local_J;
+                (void)local_A;
                 OGS_FATAL(
-                    "SmallDeformationLocalAssemblerInterface::assembleWithJacobian() "
+                    "HeatTransportBHELocalAssemblerInterface::"
+                    "assembleWithJacobian() "
                     "is not implemented");
             }
 
         private:
-            Eigen::VectorXd _local_u;
+            Eigen::VectorXd _local_T;
             Eigen::VectorXd _local_b;
-            Eigen::MatrixXd _local_J;
+            Eigen::MatrixXd _local_A;
+
             std::vector<unsigned> const _dofIndex_to_localIndex;
         };
 

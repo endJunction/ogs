@@ -56,6 +56,7 @@ namespace ProcessLib
             auto BHE_id = _process_data._map_materialID_to_BHE_ID[mat_id];
             // _BHE_instance = _process_data._vec_BHE_property[BHE_id].get();
 
+            
             SpatialPosition x_position;
             x_position.setElementID(_element.getID());
             for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -79,6 +80,7 @@ namespace ProcessLib
 
                 _secondary_data.N[ip] = sm.N;
             }
+            
         }
 
         template <typename ShapeFunction, typename IntegrationMethod,
