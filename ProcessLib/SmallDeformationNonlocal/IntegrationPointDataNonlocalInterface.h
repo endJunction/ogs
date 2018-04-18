@@ -13,17 +13,20 @@ namespace ProcessLib
 {
 namespace SmallDeformationNonlocal
 {
+struct IntegrationPointDataNonlocalInterface;
+
+struct NonlocalIP final
+{
+    IntegrationPointDataNonlocalInterface* const ip_l_pointer;
+    double alpha_kl_times_w_l;
+    double distance2;  ///< Squared distance to current integration point.
+};
+
 struct IntegrationPointDataNonlocalInterface
 {
     virtual ~IntegrationPointDataNonlocalInterface() = default;
 
-    std::vector<std::tuple<
-        // element's local assembler
-        IntegrationPointDataNonlocalInterface* const,
-        double,  // squared distance to current integration point
-        double   // alpha_kl * w_l
-        >>
-        non_local_assemblers;
+    std::vector<NonlocalIP> non_local_assemblers;
 
     double kappa_d = 0;      ///< damage driving variable.
     double integration_weight;

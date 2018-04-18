@@ -226,10 +226,10 @@ public:
                     if (distances[ip] >= _process_data.internal_length_squared)
                         continue;
                     // save into current ip_k
-                    _ip_data[k].non_local_assemblers.push_back(std::make_tuple(
-                        la->getIPDataPtr(ip),
-                        distances[ip],
-                        std::numeric_limits<double>::quiet_NaN()));
+                    _ip_data[k].non_local_assemblers.push_back(
+                        {la->getIPDataPtr(ip),
+                         std::numeric_limits<double>::quiet_NaN(),
+                         distances[ip]});
                 }
             }
             if (_ip_data[k].non_local_assemblers.size() == 0)
@@ -240,9 +240,9 @@ public:
             double a_k_sum_m = 0;
             for (auto const& tuple : _ip_data[k].non_local_assemblers)
             {
-                double const distance2_m = std::get<1>(tuple);
+                double const distance2_m = tuple.distance2;
 
-                auto const& w_m = std::get<0>(tuple)->integration_weight;
+                auto const& w_m = tuple.ip_l_pointer->integration_weight;
 
                 a_k_sum_m += w_m * alpha_0(distance2_m);
 
@@ -266,7 +266,7 @@ public:
                 //        ShapeFunction, IntegrationMethod,
                 //        DisplacementDim> const* const>(std::get<0>(tuple));
 
-                double const distance2_l = std::get<1>(tuple);
+                double const distance2_l = tuple.distance2;
 
                 // int const l_ele = la_l._element.getID();
                 // int const l = std::get<1>(tuple);
@@ -281,8 +281,8 @@ public:
 
                 // Store the a_kl already multiplied with the integration
                 // weight of that l integration point.
-                auto const w_l = std::get<0>(tuple)->integration_weight;
-                std::get<2>(tuple) = a_kl * w_l;
+                auto const w_l = tuple.ip_l_pointer->integration_weight;
+                tuple.alpha_kl_times_w_l = a_kl * w_l;
             }
         }
     }
@@ -444,7 +444,7 @@ public:
                              _ip_data[ip].non_local_assemblers)
                         {
                             // Activate the integration point.
-                            std::get<0>(tuple)->activated = true;
+                            tuple.ip_l_pointer->activated = true;
                         }
                     }
                 }
@@ -583,13 +583,13 @@ public:
 
                         // double const kappa_d_dot = ip_l.getLocalRateKappaD();
                         // Get local variable for the integration point l.
-                        double const kappa_d_l = std::get<0>(tuple)->kappa_d;
+                        double const kappa_d_l = tuple.ip_l_pointer->kappa_d;
 
                         // std::cerr << kappa_d_l << "\n";
-                        double const a_kl = std::get<2>(tuple);
+                        double const a_kl_times_w_l = tuple.alpha_kl_times_w_l;
 
                         // test_alpha += a_kl;
-                        nonlocal_kappa_d += a_kl * kappa_d_l;
+                        nonlocal_kappa_d += a_kl_times_w_l * kappa_d_l;
                     }
                 }
                 /* For testing only.
