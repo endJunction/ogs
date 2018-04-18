@@ -54,44 +54,31 @@ namespace ProcessLib
 
             auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
             auto BHE_id = _process_data._map_materialID_to_BHE_ID[mat_id];
-            // _BHE_instance = _process_data._vec_fracture_property[BHE_id].get();
+            // _BHE_instance = _process_data._vec_BHE_property[BHE_id].get();
 
-            /*
             SpatialPosition x_position;
             x_position.setElementID(_element.getID());
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
                 x_position.setIntegrationPoint(ip);
 
-                _ip_data.emplace_back(*_process_data._fracture_model);
+                // _ip_data.emplace_back(*_process_data._fracture_model);
                 auto const& sm = _shape_matrices[ip];
                 auto& ip_data = _ip_data[ip];
                 ip_data.integration_weight =
                     _integration_method.getWeightedPoint(ip).getWeight() *
                     sm.integralMeasure * sm.detJ;
-                ip_data._h_matrices.setZero(DisplacementDim,
-                    ShapeFunction::NPOINTS * DisplacementDim);
+                /*
+                // ip_data._h_matrices.setZero(DisplacementDim,
+                //     ShapeFunction::NPOINTS * DisplacementDim);
 
                 computeHMatrix<DisplacementDim, ShapeFunction::NPOINTS,
                     typename ShapeMatricesType::NodalRowVectorType,
                     HMatrixType>(sm.N, ip_data._h_matrices);
-
-                // Initialize current time step values
-                ip_data._w.setZero(DisplacementDim);
-                ip_data._sigma.setZero(DisplacementDim);
-
-                // Previous time step values are not initialized and are set later.
-                ip_data._sigma_prev.resize(DisplacementDim);
-                ip_data._w_prev.resize(DisplacementDim);
-
-                ip_data._C.resize(DisplacementDim, DisplacementDim);
-
-                ip_data._aperture0 = (*_fracture_property->aperture0)(0, x_position)[0];
-                ip_data._aperture_prev = ip_data._aperture0;
+                */
 
                 _secondary_data.N[ip] = sm.N;
             }
-            */
         }
 
         template <typename ShapeFunction, typename IntegrationMethod,
