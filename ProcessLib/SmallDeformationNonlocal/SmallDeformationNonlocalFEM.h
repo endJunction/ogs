@@ -31,7 +31,6 @@
 #include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
 
-#include "Damage.h"
 #include "IntegrationPointData.h"
 #include "LocalAssemblerInterface.h"
 #include "SmallDeformationNonlocalProcessData.h"
@@ -415,13 +414,9 @@ public:
 
             /// Compute only the local kappa_d.
             {
-                auto const& ehlers_material =
-                    static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
+                auto const& material =
+                    static_cast<MaterialLib::Solids::SolidWithDamageBase<
                         DisplacementDim> const&>(_ip_data[ip].solid_material);
-                auto const damage_properties =
-                    ehlers_material.evaluatedDamageProperties(t, x_position);
-                auto const material_properties =
-                    ehlers_material.evaluatedMaterialProperties(t, x_position);
 
                 // Ehlers material state variables
                 auto& state_vars =
@@ -432,9 +427,9 @@ public:
                 double const eps_p_eff_diff =
                     state_vars.eps_p.eff - state_vars.eps_p_prev.eff;
 
-                _ip_data[ip].kappa_d = calculateDamageKappaD<DisplacementDim>(
-                    eps_p_eff_diff, sigma, _ip_data[ip].kappa_d_prev,
-                    damage_properties, material_properties);
+                _ip_data[ip].kappa_d = material.calculateDamageKappaD(
+                    t, x_position, eps_p_eff_diff, sigma,
+                    _ip_data[ip].kappa_d_prev);
 
                 if (!_ip_data[ip].active_self)
                 {
@@ -600,8 +595,8 @@ public:
                         test_alpha, test_alpha - 1);
                 */
 
-                auto const& ehlers_material =
-                    static_cast<MaterialLib::Solids::Ehlers::SolidEhlers<
+                auto const& material =
+                    static_cast<MaterialLib::Solids::SolidWithDamageBase<
                         DisplacementDim> const&>(_ip_data[ip].solid_material);
 
                 // === Overnonlocal formulation ===
@@ -610,8 +605,7 @@ public:
                 // nonlocal integral part.
                 {
                     double const gamma_nonlocal =
-                        ehlers_material.evaluatedDamageProperties(t, x_position)
-                            .m_d;
+                        material.getOvernonlocalGammaFactor(t, x_position);
                     nonlocal_kappa_d = (1. - gamma_nonlocal) *
                                            _ip_data[ip].kappa_d +
                                        gamma_nonlocal * nonlocal_kappa_d;
@@ -621,12 +615,8 @@ public:
 
                 // Update damage based on nonlocal kappa_d
                 {
-                    auto const damage_properties =
-                        ehlers_material.evaluatedDamageProperties(t,
-                                                                  x_position);
-                    damage = calculateDamage(nonlocal_kappa_d,
-                                             damage_properties.alpha_d,
-                                             damage_properties.beta_d);
+                    damage = material.calculateDamage(t, x_position,
+                                                      nonlocal_kappa_d);
                     damage = std::max(0., damage);
                 }
                 sigma = sigma * (1. - damage);
