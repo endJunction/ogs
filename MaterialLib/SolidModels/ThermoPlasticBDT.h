@@ -27,7 +27,7 @@
 #include "NumLib/NewtonRaphson.h"
 #include "ProcessLib/Parameter/Parameter.h"
 
-#include "MechanicsBase.h"
+#include "SolidWithDamageBase.h"
 
 namespace MaterialLib
 {
@@ -213,7 +213,7 @@ struct StateVariables
 };
 
 template <int DisplacementDim>
-class SolidThermoPlasticBDT final : public MechanicsBase<DisplacementDim>
+class SolidThermoPlasticBDT final : public SolidWithDamageBase<DisplacementDim>
 {
 public:
     static int const KelvinVectorSize =
@@ -300,6 +300,20 @@ public:
     {
         return DamageProperties(t, x, *_damage_properties);
     }
+
+    double getOvernonlocalGammaFactor(
+        double const t,
+        ProcessLib::SpatialPosition const& x_position) const override;
+
+    double calculateDamageKappaD(double const t,
+                                 ProcessLib::SpatialPosition const& x_position,
+                                 double const eps_p_eff_diff,
+                                 KelvinVector const& sigma,
+                                 double const kappa_d_prev) const override;
+
+    double calculateDamage(double const t,
+                           ProcessLib::SpatialPosition const& x_position,
+                           double const kappa_d) const override;
 
 private:
     NumLib::NewtonRaphsonSolverParameters const _nonlinear_solver_parameters;
