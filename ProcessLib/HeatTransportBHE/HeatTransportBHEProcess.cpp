@@ -60,8 +60,7 @@ namespace ProcessLib
             _process_data._map_materialID_to_BHE_ID.resize(*max_BHE_mat_id + 1);
             for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
             {
-                _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] =
-                    i;
+                _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] = i;
             }
 
             // create a table of connected BHE IDs for each element
@@ -71,8 +70,8 @@ namespace ProcessLib
             {
                 for (auto e : _vec_BHE_soil_elements[i])
                 {
-                    _process_data._vec_ele_connected_BHE_IDs[e->getID()]
-                        .push_back(i);
+                    _process_data._vec_ele_connected_BHE_IDs[e->getID()].push_back(
+                        i);
                 }
             }
 
