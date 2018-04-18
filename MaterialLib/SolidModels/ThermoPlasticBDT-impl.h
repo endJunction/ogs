@@ -238,10 +238,12 @@ calculatePlasticJacobian(double const dt,
       KelvinVector const flow_D = plasticFlowDeviatoricPart(
           s, one_gt, sqrtPhi, dtheta_dsigma, mp.gamma_p, mp.m_p);
       KelvinVector const lambda_flow_D = lambda * flow_D;
+      */
 
-      typename SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix jacobian =
-          SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix::Zero();
+    typename SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix jacobian =
+        SolidThermoPlasticBDT<DisplacementDim>::JacobianMatrix::Zero();
 
+    /*
       // G_11
       jacobian.template block<KelvinVectorSize, KelvinVectorSize>(0, 0)
           .noalias() = KelvinMatrix::Identity();
@@ -390,7 +392,8 @@ calculatePlasticJacobian(double const dt,
           -mp.kappa * mp.hardening_coefficient / mp.G;
 
       // G_52, G_53, G_55 are zero
-      return jacobian;*/
+    */
+    return jacobian;
 }
 
 /// Calculates the derivative of the residuals with respect to total
