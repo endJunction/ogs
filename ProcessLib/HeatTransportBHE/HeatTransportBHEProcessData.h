@@ -28,40 +28,40 @@ namespace ProcessLib
 
         struct HeatTransportBHEProcessData
         {
-            HeatTransportBHEProcessData(
-                Parameter<double> const& thermal_conductivity_solid_,
+            HeatTransportBHEProcessData(Parameter<double> const& thermal_conductivity_solid_, 
                 Parameter<double> const& thermal_conductivity_fluid_,
                 Parameter<double> const& thermal_conductivity_gas_,
                 Parameter<double> const& heat_capacity_solid_,
-                Parameter<double> const& heat_capacity_fluid_,
-                Parameter<double> const& heat_capacity_gas_,
-                Parameter<double> const& density_solid_,
-                Parameter<double> const& density_fluid_,
+                Parameter<double> const& heat_capacity_fluid_, 
+                Parameter<double> const& heat_capacity_gas_, 
+                Parameter<double> const& density_solid_, 
+                Parameter<double> const& density_fluid_, 
                 Parameter<double> const& density_gas_,
                 std::vector<std::unique_ptr<BHEAbstract>>&& vec_BHEs_)
-                : thermal_conductivity_solid(thermal_conductivity_solid_),
-                  thermal_conductivity_fluid(thermal_conductivity_fluid_),
-                  thermal_conductivity_gas(thermal_conductivity_gas_),
-                  heat_capacity_solid(heat_capacity_solid_),
-                  heat_capacity_fluid(heat_capacity_fluid_),
-                  heat_capacity_gas(heat_capacity_gas_),
-                  density_solid(density_solid_),
-                  density_fluid(density_fluid_),
-                  density_gas(density_gas_),
-                  _vec_BHE_property(std::move(vec_BHEs_))
+                : thermal_conductivity_solid(thermal_conductivity_solid_), 
+                thermal_conductivity_fluid(thermal_conductivity_fluid_),
+                thermal_conductivity_gas(thermal_conductivity_gas_),
+                heat_capacity_solid(heat_capacity_solid_),
+                heat_capacity_fluid(heat_capacity_fluid_),
+                heat_capacity_gas(heat_capacity_gas_),
+                density_solid(density_solid_),
+                density_fluid(density_fluid_),
+                density_gas(density_gas_),
+                _vec_BHE_property(std::move(vec_BHEs_))
             {
             }
 
             HeatTransportBHEProcessData(HeatTransportBHEProcessData&& other)
                 : thermal_conductivity_solid(other.thermal_conductivity_solid),
-                thermal_conductivity_fluid(other.thermal_conductivity_fluid),
-                thermal_conductivity_gas(other.thermal_conductivity_gas),
-                heat_capacity_solid(other.heat_capacity_solid),
-                heat_capacity_fluid(other.heat_capacity_fluid),
-                heat_capacity_gas(other.heat_capacity_gas),
-                density_solid(other.density_solid), 
-                density_fluid(other.density_fluid),
-                density_gas(other.density_gas)
+                  thermal_conductivity_fluid(other.thermal_conductivity_fluid),
+                  thermal_conductivity_gas(other.thermal_conductivity_gas),
+                  heat_capacity_solid(other.heat_capacity_solid),
+                  heat_capacity_fluid(other.heat_capacity_fluid),
+                  heat_capacity_gas(other.heat_capacity_gas),
+                  density_solid(other.density_solid),
+                  density_fluid(other.density_fluid),
+                  density_gas(other.density_gas),
+                  _vec_BHE_property(std::move(other._vec_BHE_property))
             {
             }
 
