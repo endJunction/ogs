@@ -132,22 +132,40 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
                          &LocalAssemblerInterface::getIntPtEpsilon));
 
     Base::_secondary_variables.addSecondaryVariable(
-        "saturation",
-        makeExtrapolator(
-            1, getExtrapolator(), _local_assemblers,
-            &LocalAssemblerInterface::getIntPtSaturation));
+            "saturation",
+            makeExtrapolator(
+                    1, getExtrapolator(), _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtSaturation));
 
     Base::_secondary_variables.addSecondaryVariable(
-        "pressure_wet",
-        makeExtrapolator(
-            1, getExtrapolator(), _local_assemblers,
-            &LocalAssemblerInterface::getIntPtWetPressure));
+            "pressure_wet",
+            makeExtrapolator(
+                    1, getExtrapolator(), _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtWetPressure));
 
     Base::_secondary_variables.addSecondaryVariable(
-        "velocity",
-        makeExtrapolator(mesh.getDimension(), getExtrapolator(),
-                         _local_assemblers,
-                         &LocalAssemblerInterface::getIntPtDarcyVelocity));
+            "density_gas",
+            makeExtrapolator(
+                    1, getExtrapolator(), _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtDensityGas));
+
+    Base::_secondary_variables.addSecondaryVariable(
+            "density_liquid",
+            makeExtrapolator(
+                    1, getExtrapolator(), _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtDensityLiquid));
+
+    Base::_secondary_variables.addSecondaryVariable(
+            "velocity_gas",
+            makeExtrapolator(mesh.getDimension(), getExtrapolator(),
+                    _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtDarcyVelocityGas));
+
+    Base::_secondary_variables.addSecondaryVariable(
+            "velocity_liquid",
+            makeExtrapolator(mesh.getDimension(), getExtrapolator(),
+                    _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtDarcyVelocityLiquid));
 }
 
 template <int DisplacementDim>

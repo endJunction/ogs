@@ -8,6 +8,7 @@
  */
 
 #include "NonlinearSolver.h"
+#include <iostream>
 
 #include <logog/include/logog.hpp>
 
@@ -217,6 +218,75 @@ bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
         sys.assemble(x);
         sys.getResidual(x, res);
         sys.getJacobian(J);
+
+
+//        std::cout << std::showpos << std::scientific;
+//        std::cout.precision(5);
+//
+//        auto x_vector = x.getRawVector();
+//
+//        std::cout << "~> ===================\n";
+//        std::cout << "~> Iteration: " << iteration << "\n\n";
+//
+//        std::cout << "~> x: \n";
+//        std::cout << "~> -------------------\n";
+//
+//        for (std::size_t i=0; i<x_vector.size(); i++)
+//        {
+//            std::cout << "~> x:[" << i << "]: " << x_vector[i] << "\n";
+//        }
+//
+//        auto res_vector = res.getRawVector();
+//        std::cout << "~> \n";
+//        std::cout << "~> res: \n";
+//        std::cout << "~> -------------------\n";
+//
+//        for (std::size_t i=0; i<res_vector.size(); i++)
+//        {
+//            std::cout << "~> res[" << i << "]: " << res_vector[i] << "\n";
+//        }
+//
+//        std::cout << "~> \n";
+//        std::cout << "~> J: \n";
+//
+//        std::cout << "~> -------------------\n";
+////
+////        for (std::size_t r=0; r<J.getNumberOfRows(); r++)
+////        {
+////            std::cout << "~> ";
+////            for (std::size_t c=0; c<J.getNumberOfColumns(); c++)
+////            {
+////                const double j_c_r = J.get(r,c);
+////                std::cout <<  j_c_r << " ";
+////            }
+////            std::cout << "\n";
+////        }
+//
+//
+//        for (std::size_t r=0; r<J.getNumberOfRows(); r++)
+//             for (std::size_t c=0; c<J.getNumberOfColumns(); c++)
+//            {
+//                const double j_c_r = J.get(r,c);
+//                std::cout << "~> J["<< r << "," << c << "]: " <<  j_c_r << "\n";
+//            }
+//
+//         std::cout << "~> \n\n";
+//
+
+
+
+//          std::cout << "=== x: ===\n\n";
+//          std::cout << x.getRawVector() << "\n\n";
+//          std::cout << "==========\n\n";
+//        std::cout << "=== Jacobian: ===\n\n";
+//        std::cout << J.getRawMatrix() << "\n\n";
+
+//        std::cout << "=== Residuum: ===\n\n";
+//        std::cout << res.getRawVector() << "\n\n";
+
+//        OGS_FATAL("Halt.");
+
+
         INFO("[time] Assembly took %g s.", time_assembly.elapsed());
 
         minus_delta_x.setZero();
