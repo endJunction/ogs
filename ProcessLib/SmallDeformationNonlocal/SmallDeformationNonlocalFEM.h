@@ -527,6 +527,7 @@ public:
         */
 
         // Non-local integration.
+#pragma omp parallel for
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
@@ -636,9 +637,12 @@ public:
                 // sigma_r.template topLeftCorner<3, 1>() -=
                 //     Eigen::Matrix<double, 3, 1>::Constant(pressure);
             }
-
-            local_b.noalias() -= B.transpose() * sigma_r * w;
-            local_Jac.noalias() += B.transpose() * C * (1. - damage) * B * w;
+#pragma omp critical
+            {
+                local_b.noalias() -= B.transpose() * sigma_r * w;
+                local_Jac.noalias() +=
+                    B.transpose() * C * (1. - damage) * B * w;
+            }
         }
     }
 
