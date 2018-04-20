@@ -48,20 +48,22 @@ namespace ProcessLib
                 unsigned const integration_order,
                 HeatTransportBHEProcessData& process_data);
 
-            void assemble(double const /*t*/, std::vector<double> const& /*local_x*/,
-                std::vector<double>& /*local_M_data*/,
-                std::vector<double>& /*local_K_data*/,
-                std::vector<double>& /*local_b_data*/) override
-            {
-                OGS_FATAL(
-                    "SmallDeformationLocalAssembler: assembly without jacobian is not "
-                    "implemented.");
-            }
+            void assemble(double const /*t*/,
+                          std::vector<double> const& /*local_x*/,
+                          std::vector<double>& /*local_M_data*/,
+                          std::vector<double>& /*local_K_data*/,
+                          std::vector<double>& /*local_b_data*/) override;
 
             void assembleWithJacobian(double const t,
-                Eigen::VectorXd const& local_u,
-                Eigen::VectorXd& local_b,
-                Eigen::MatrixXd& local_J) override;
+                                      Eigen::VectorXd const& local_u,
+                                      Eigen::VectorXd& local_b,
+                                      Eigen::MatrixXd& local_J) override
+            {
+                OGS_FATAL(
+                    "HeatTransportBHELocalAssembler: assembly with jacobian is "
+                    "not "
+                    "implemented.");
+            }
 
             void preTimestepConcrete(std::vector<double> const& /*local_x*/,
                 double const /*t*/,

@@ -85,13 +85,14 @@ namespace ProcessLib
         }
 
         template <typename ShapeFunction, typename IntegrationMethod,
-            int BHE_Dim>
-            void HeatTransportBHELocalAssemblerBHE<
+                  int BHE_Dim>
+        void HeatTransportBHELocalAssemblerBHE<
             ShapeFunction, IntegrationMethod,
-            BHE_Dim>::assembleWithJacobian(double const t,
-                Eigen::VectorXd const& local_u,
-                Eigen::VectorXd& local_b,
-                Eigen::MatrixXd& local_J)
+            BHE_Dim>::assemble(double const t,
+                               std::vector<double> const& local_x,
+                               std::vector<double>& local_M_data,
+                               std::vector<double>& local_K_data,
+                               std::vector<double>& local_b_data)
         {
             /*
             auto const& nodal_jump = local_u;
@@ -103,48 +104,48 @@ namespace ProcessLib
             int const index_normal = DisplacementDim - 1;
 
             unsigned const n_integration_points =
-                _integration_method.getNumberOfPoints();
+            _integration_method.getNumberOfPoints();
 
             SpatialPosition x_position;
             x_position.setElementID(_element.getID());
 
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
-                x_position.setIntegrationPoint(ip);
+            x_position.setIntegrationPoint(ip);
 
-                auto& ip_data = _ip_data[ip];
-                auto const& integration_weight = ip_data.integration_weight;
-                auto const& H = ip_data._h_matrices;
-                auto& mat = ip_data._fracture_material;
-                auto& sigma = ip_data._sigma;
-                auto const& sigma_prev = ip_data._sigma_prev;
-                auto& w = ip_data._w;
-                auto const& w_prev = ip_data._w_prev;
-                auto& C = ip_data._C;
-                auto& state = *ip_data._material_state_variables;
+            auto& ip_data = _ip_data[ip];
+            auto const& integration_weight = ip_data.integration_weight;
+            auto const& H = ip_data._h_matrices;
+            auto& mat = ip_data._fracture_material;
+            auto& sigma = ip_data._sigma;
+            auto const& sigma_prev = ip_data._sigma_prev;
+            auto& w = ip_data._w;
+            auto const& w_prev = ip_data._w_prev;
+            auto& C = ip_data._C;
+            auto& state = *ip_data._material_state_variables;
 
-                // displacement jumps
-                w.noalias() = R * H * nodal_jump;
+            // displacement jumps
+            w.noalias() = R * H * nodal_jump;
 
-                // total aperture
-                ip_data._aperture = ip_data._aperture0 + w[index_normal];
+            // total aperture
+            ip_data._aperture = ip_data._aperture0 + w[index_normal];
 
-                // local C, local stress
-                mat.computeConstitutiveRelation(
-                    t, x_position, ip_data._aperture0,
-                    Eigen::Matrix<double, DisplacementDim, 1>::Zero(),  // TODO (naumov)
-                                                                        // Replace with
-                                                                        // initial
-                                                                        // stress values
-                    w_prev, w, sigma_prev, sigma, C, state);
+            // local C, local stress
+            mat.computeConstitutiveRelation(
+            t, x_position, ip_data._aperture0,
+            Eigen::Matrix<double, DisplacementDim, 1>::Zero(),  // TODO (naumov)
+            // Replace with
+            // initial
+            // stress values
+            w_prev, w, sigma_prev, sigma, C, state);
 
-                // r_[u] += H^T*Stress
-                local_b.noalias() -=
-                    H.transpose() * R.transpose() * sigma * integration_weight;
+            // r_[u] += H^T*Stress
+            local_b.noalias() -=
+            H.transpose() * R.transpose() * sigma * integration_weight;
 
-                // J_[u][u] += H^T*C*H
-                local_J.noalias() +=
-                    H.transpose() * R.transpose() * C * R * H * integration_weight;
+            // J_[u][u] += H^T*C*H
+            local_J.noalias() +=
+            H.transpose() * R.transpose() * C * R * H * integration_weight;
             }
             */
         }
