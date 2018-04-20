@@ -15,17 +15,12 @@ namespace SmallDeformationNonlocal
 {
 struct IntegrationPointDataNonlocalInterface;
 
-struct NonlocalIP final
-{
-    IntegrationPointDataNonlocalInterface* const ip_l_pointer;
-    double alpha_kl_times_w_l;
-};
-
 struct IntegrationPointDataNonlocalInterface
 {
     virtual ~IntegrationPointDataNonlocalInterface() = default;
 
-    std::vector<NonlocalIP> non_local_assemblers;
+    std::vector<IntegrationPointDataNonlocalInterface*> ip_l_pointer;
+    std::vector<double> alpha_kl_times_w_l;
 
     double kappa_d = 0;      ///< damage driving variable.
     double integration_weight;
