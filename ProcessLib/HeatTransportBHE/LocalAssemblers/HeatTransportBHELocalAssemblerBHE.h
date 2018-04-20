@@ -106,6 +106,7 @@ namespace ProcessLib
             MeshLib::Element const& _element;
 
             SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
+
         };
     }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

@@ -76,8 +76,7 @@ namespace ProcessLib
                 */
 
                 OGS_FATAL(
-                    "HeatTransportBHELocalAssemblerInterface::"
-                    "assembleWithJacobian() "
+                    "HeatTransportBHELocalAssemblerInterface::assembleWithJacobian() "
                     "is not implemented");
             }
 

@@ -63,8 +63,7 @@ namespace ProcessLib
             {
                 x_position.setIntegrationPoint(ip);
 
-                IntegrationPointDataBHE int_Point_Data_BHE(
-                    *(_process_data._vec_BHE_property[BHE_id]));
+                IntegrationPointDataBHE int_Point_Data_BHE(*(_process_data._vec_BHE_property[BHE_id]));
                 _ip_data.emplace_back(int_Point_Data_BHE);
                 auto const& sm = _shape_matrices[ip];
                 auto& ip_data = _ip_data[ip];
