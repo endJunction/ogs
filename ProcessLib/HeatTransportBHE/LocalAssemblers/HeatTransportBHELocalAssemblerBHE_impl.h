@@ -17,7 +17,7 @@
 
 #include "ProcessLib/Utils/InitShapeMatrices.h"
 
-#include "ProcessLib/LIE/Common/LevelSetFunction.h"
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/IntegrationPointDataBHE.h"
 
 namespace ProcessLib
 {
@@ -63,7 +63,9 @@ namespace ProcessLib
             {
                 x_position.setIntegrationPoint(ip);
 
-                // _ip_data.emplace_back(*_process_data._fracture_model);
+                IntegrationPointDataBHE int_Point_Data_BHE(
+                    *(_process_data._vec_BHE_property[BHE_id]));
+                _ip_data.emplace_back(int_Point_Data_BHE);
                 auto const& sm = _shape_matrices[ip];
                 auto& ip_data = _ip_data[ip];
                 ip_data.integration_weight =

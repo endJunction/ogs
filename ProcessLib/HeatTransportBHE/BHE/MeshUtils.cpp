@@ -28,7 +28,7 @@ namespace HeatTransportBHE
     {
         // IsCrackTip isCrackTip(mesh);
 
-        // get vectors of matrix elements and fracture elements
+        // get vectors of matrix elements and BHE elements
         vec_soil_elements.reserve(mesh.getNumberOfElements());
         std::vector<MeshLib::Element*> all_BHE_elements;
         for (MeshLib::Element* e : mesh.getElements())

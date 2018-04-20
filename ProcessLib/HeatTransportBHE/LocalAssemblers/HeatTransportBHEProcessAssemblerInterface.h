@@ -74,20 +74,24 @@ namespace ProcessLib
                     }
                 }
                 */
+
+                OGS_FATAL(
+                    "HeatTransportBHELocalAssemblerInterface::"
+                    "assembleWithJacobian() "
+                    "is not implemented");
             }
 
             virtual void assembleWithJacobian(double const t,
-                                              Eigen::VectorXd const& local_T,
-                                              Eigen::VectorXd& local_b,
-                                              Eigen::MatrixXd& local_A)
+                Eigen::VectorXd const& local_T,
+                Eigen::VectorXd& local_b,
+                Eigen::MatrixXd& local_A)
             {
                 (void)t;
                 (void)local_T;
                 (void)local_b;
                 (void)local_A;
                 OGS_FATAL(
-                    "HeatTransportBHELocalAssemblerInterface::"
-                    "assembleWithJacobian() "
+                    "HeatTransportBHELocalAssemblerInterface::assembleWithJacobian() "
                     "is not implemented");
             }
 
