@@ -87,15 +87,15 @@ namespace ProcessLib
             
         }
 
-        template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
-            void HeatTransportBHELocalAssemblerSoil<ShapeFunction, IntegrationMethod, GlobalDim>::
-            assembleWithJacobian(double const t, std::vector<double> const& local_x,
-                std::vector<double> const& /*local_xdot*/,
-                const double /*dxdot_dx*/, const double /*dx_dx*/,
-                std::vector<double>& /*local_M_data*/,
-                std::vector<double>& /*local_K_data*/,
-                std::vector<double>& local_b_data,
-                std::vector<double>& local_Jac_data)
+        template <typename ShapeFunction, typename IntegrationMethod,
+                  int GlobalDim>
+        void HeatTransportBHELocalAssemblerSoil<
+            ShapeFunction, IntegrationMethod,
+            GlobalDim>::assemble(double const t,
+                                 std::vector<double> const& local_x,
+                                 std::vector<double>& local_M_data,
+                                 std::vector<double>& local_K_data,
+                                 std::vector<double>& local_b_data)
         {
             assert(_element.getDimension() == GlobalDim);
 
@@ -103,57 +103,58 @@ namespace ProcessLib
             auto const local_matrix_size = local_x.size();
 
             auto local_Jac = MathLib::createZeroedMatrix<StiffnessMatrixType>(
-                local_Jac_data, local_matrix_size, local_matrix_size);
+            local_Jac_data, local_matrix_size, local_matrix_size);
 
-            auto local_b = MathLib::createZeroedVector<NodalDisplacementVectorType>(
-                local_b_data, local_matrix_size);
+            auto local_b =
+            MathLib::createZeroedVector<NodalDisplacementVectorType>(
+            local_b_data, local_matrix_size);
 
             unsigned const n_integration_points =
-                _integration_method.getNumberOfPoints();
+            _integration_method.getNumberOfPoints();
 
             SpatialPosition x_position;
             x_position.setElementID(_element.getID());
 
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
-                x_position.setIntegrationPoint(ip);
-                auto const& w = _ip_data[ip].integration_weight;
+            x_position.setIntegrationPoint(ip);
+            auto const& w = _ip_data[ip].integration_weight;
 
-                auto const& N = _ip_data[ip].N;
-                auto const& dNdx = _ip_data[ip].dNdx;
-                auto const x_coord =
-                    interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(_element,
-                        N);
-                auto const B =
-                    LinearBMatrix::computeBMatrix<DisplacementDim,
-                    ShapeFunction::NPOINTS,
-                    typename BMatricesType::BMatrixType>(
-                        dNdx, N, x_coord, _is_axially_symmetric);
+            auto const& N = _ip_data[ip].N;
+            auto const& dNdx = _ip_data[ip].dNdx;
+            auto const x_coord =
+            interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(_element,
+            N);
+            auto const B =
+            LinearBMatrix::computeBMatrix<DisplacementDim,
+            ShapeFunction::NPOINTS,
+            typename BMatricesType::BMatrixType>(
+            dNdx, N, x_coord, _is_axially_symmetric);
 
-                auto const& eps_prev = _ip_data[ip]._eps_prev;
-                auto const& sigma_prev = _ip_data[ip]._sigma_prev;
+            auto const& eps_prev = _ip_data[ip]._eps_prev;
+            auto const& sigma_prev = _ip_data[ip]._sigma_prev;
 
-                auto& eps = _ip_data[ip]._eps;
-                auto& sigma = _ip_data[ip]._sigma;
-                auto& state = _ip_data[ip]._material_state_variables;
+            auto& eps = _ip_data[ip]._eps;
+            auto& sigma = _ip_data[ip]._sigma;
+            auto& state = _ip_data[ip]._material_state_variables;
 
-                eps.noalias() =
-                    B * Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
-                        local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
+            eps.noalias() =
+            B * Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
+            local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
 
-                auto&& solution = _ip_data[ip]._solid_material.integrateStress(
-                    t, x_position, _process_data.dt, eps_prev, eps, sigma_prev, *state);
+            auto&& solution = _ip_data[ip]._solid_material.integrateStress(
+            t, x_position, _process_data.dt, eps_prev, eps, sigma_prev, *state);
 
-                if (!solution)
-                {
-                    OGS_FATAL("Computation of local constitutive relation failed.");
-                }
+            if (!solution)
+            {
+            OGS_FATAL("Computation of local constitutive relation failed.");
+            }
 
-                MathLib::KelvinVector::KelvinMatrixType<DisplacementDim> C;
-                std::tie(sigma, state, C) = std::move(*solution);
+            MathLib::KelvinVector::KelvinMatrixType<DisplacementDim> C;
+            std::tie(sigma, state, C) = std::move(*solution);
 
-                local_b.noalias() -= B.transpose() * sigma * w;
-                local_Jac.noalias() += B.transpose() * C * B * w;
+            local_b.noalias() -= B.transpose() * sigma * w;
+            local_Jac.noalias() += B.transpose() * C * B * w;
             }
             */
         }
