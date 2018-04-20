@@ -78,6 +78,8 @@ struct IntegrationPointData final : public IntegrationPointDataNonlocalInterface
     double const* eps_p_D_xx;
 
     Eigen::Vector3d coordinates;
+    std::vector<double> distances2;  ///< Squared distances to the corresponding
+                                     ///< integration point.
     void pushBackState()
     {
         eps_prev = eps;

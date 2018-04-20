@@ -19,7 +19,6 @@ struct NonlocalIP final
 {
     IntegrationPointDataNonlocalInterface* const ip_l_pointer;
     double alpha_kl_times_w_l;
-    double distance2;  ///< Squared distance to current integration point.
 };
 
 struct IntegrationPointDataNonlocalInterface

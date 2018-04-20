@@ -228,8 +228,8 @@ public:
                     // save into current ip_k
                     _ip_data[k].non_local_assemblers.push_back(
                         {la->getIPDataPtr(ip),
-                         std::numeric_limits<double>::quiet_NaN(),
-                         distances[ip]});
+                         std::numeric_limits<double>::quiet_NaN()});
+                    _ip_data[k].distances2.push_back(distances[ip]);
                 }
             }
             if (_ip_data[k].non_local_assemblers.size() == 0)
@@ -238,9 +238,12 @@ public:
             }
 
             double a_k_sum_m = 0;
-            for (auto const& tuple : _ip_data[k].non_local_assemblers)
+            auto const non_local_assemblers_size =
+                _ip_data[k].non_local_assemblers.size();
+            for (std::size_t i = 0; i < non_local_assemblers_size; ++i)
             {
-                double const distance2_m = tuple.distance2;
+                auto const& tuple = _ip_data[k].non_local_assemblers[i];
+                double const distance2_m = _ip_data[k].distances2[i];
 
                 auto const& w_m = tuple.ip_l_pointer->integration_weight;
 
@@ -259,14 +262,14 @@ public:
             // Calculate alpha_kl =
             //       alpha_0(|x_k - x_l|) / int_{m \in ip} alpha_0(|x_k - x_m|)
             //
-            for (auto& tuple : _ip_data[k].non_local_assemblers)
+            for (std::size_t i = 0; i < non_local_assemblers_size; ++i)
             {
+                auto& tuple = _ip_data[k].non_local_assemblers[i];
                 // auto const& la_l =
                 //    *static_cast<SmallDeformationNonlocalLocalAssembler<
                 //        ShapeFunction, IntegrationMethod,
                 //        DisplacementDim> const* const>(std::get<0>(tuple));
-
-                double const distance2_l = tuple.distance2;
+                double const distance2_l = _ip_data[k].distances2[i];
 
                 // int const l_ele = la_l._element.getID();
                 // int const l = std::get<1>(tuple);
