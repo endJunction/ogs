@@ -84,16 +84,19 @@ namespace ProcessLib
             
         }
 
-        template <typename ShapeFunction, typename IntegrationMethod,
-                  int BHE_Dim>
-        void HeatTransportBHELocalAssemblerBHE<
-            ShapeFunction, IntegrationMethod,
-            BHE_Dim>::assemble(double const t,
-                               std::vector<double> const& local_x,
-                               std::vector<double>& local_M_data,
-                               std::vector<double>& local_K_data,
-                               std::vector<double>& local_b_data)
+        template<typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
+            void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
+                assemble(double const t, std::vector<double> const& local_x,
+                         std::vector<double>& local_M_data,
+                         std::vector<double>& local_K_data,
+                         std::vector<double>& local_b_data)
         {
+            unsigned const n_integration_points =
+                _integration_method.getNumberOfPoints();
+
+            SpatialPosition x_position;
+            x_position.setElementID(_element.getID());
+
             /*
             auto const& nodal_jump = local_u;
 
@@ -103,11 +106,7 @@ namespace ProcessLib
             // in a displacement vector
             int const index_normal = DisplacementDim - 1;
 
-            unsigned const n_integration_points =
-            _integration_method.getNumberOfPoints();
-
-            SpatialPosition x_position;
-            x_position.setElementID(_element.getID());
+            
 
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
