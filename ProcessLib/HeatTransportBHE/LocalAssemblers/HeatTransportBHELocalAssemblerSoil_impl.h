@@ -48,7 +48,7 @@ namespace ProcessLib
                                             ShapeMatricesType,
                                             IntegrationMethod,
                                             GlobalDim>(
-              _element, is_axially_symmetric, _integration_method)),
+              e, is_axially_symmetric, _integration_method)),
           _is_axially_symmetric(is_axially_symmetric)
     {
         unsigned const n_integration_points =
@@ -57,9 +57,10 @@ namespace ProcessLib
         _ip_data.reserve(n_integration_points);
         _secondary_data.N.resize(n_integration_points);
 
+        /*
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            /*
+            
             _ip_data.emplace_back(*_process_data._material);
             auto& ip_data = _ip_data[ip];
             auto const& sm = shape_matrices[ip];
@@ -83,9 +84,9 @@ namespace ProcessLib
             ip_data._C.resize(kelvin_vector_size, kelvin_vector_size);
 
             _secondary_data.N[ip] = sm.N;
-            */
+            
         }
-            
+        */
         }
 
         template<typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
@@ -100,8 +101,7 @@ namespace ProcessLib
 
             auto const local_matrix_size = local_x.size();
 
-            assert(local_matrix_size ==
-                   ShapeFunction::NPOINTS * NUM_NODAL_DOF_SOIL);
+            assert(local_matrix_size == ShapeFunction::NPOINTS * NUM_NODAL_DOF_SOIL);
 
             auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
                 local_M_data, local_matrix_size, local_matrix_size);
@@ -120,33 +120,28 @@ namespace ProcessLib
                 auto const& sm = _shape_matrices[ip];
                 auto const& wp = _integration_method.getWeightedPoint(ip);
 
-                auto const k_f =
-                    _process_data.thermal_conductivity_fluid(t, pos)[0];
-                auto const k_g =
-                    _process_data.thermal_conductivity_gas(t, pos)[0];
-                auto const k_s =
-                    _process_data.thermal_conductivity_solid(t, pos)[0];
+                auto const k_f = _process_data.thermal_conductivity_fluid(t, pos)[0];
+                auto const k_g = _process_data.thermal_conductivity_gas(t, pos)[0];
+                auto const k_s = _process_data.thermal_conductivity_solid(t, pos)[0];
 
-                auto const heat_capacity_f =
-                    _process_data.heat_capacity_fluid(t, pos)[0];
-                auto const heat_capacity_g =
-                    _process_data.heat_capacity_gas(t, pos)[0];
-                auto const heat_capacity_s =
-                    _process_data.heat_capacity_solid(t, pos)[0];
+                auto const heat_capacity_f = _process_data.heat_capacity_fluid(t, pos)[0];
+                auto const heat_capacity_g = _process_data.heat_capacity_gas(t, pos)[0];
+                auto const heat_capacity_s = _process_data.heat_capacity_solid(t, pos)[0];
 
                 auto const density_f = _process_data.density_fluid(t, pos)[0];
                 auto const density_g = _process_data.density_gas(t, pos)[0];
                 auto const density_s = _process_data.density_solid(t, pos)[0];
 
+                // for now only using the solid phase parameters
+
                 // assemble Conductance matrix
-                local_K.noalias() += sm.dNdx.transpose() * k_s * sm.dNdx *
-                                     sm.detJ * wp.getWeight() *
-                                     sm.integralMeasure;
+                local_K.noalias() += sm.dNdx.transpose() * k_s * sm.dNdx * sm.detJ *
+                    wp.getWeight() * sm.integralMeasure;
 
                 // assemble Mass matrix
-                local_M.noalias() += sm.N.transpose() * density_s *
-                                     heat_capacity_s * sm.N * sm.detJ *
-                                     wp.getWeight() * sm.integralMeasure;
+                local_M.noalias() += sm.N.transpose() * density_s * heat_capacity_s *
+                    sm.N * sm.detJ * wp.getWeight() *
+                    sm.integralMeasure;
             }
         }
 
@@ -157,5 +152,5 @@ namespace ProcessLib
 
         }
 
-        }  // namespace HeatTransportBHE
+    }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
