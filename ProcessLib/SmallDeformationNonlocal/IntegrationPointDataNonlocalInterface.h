@@ -30,8 +30,8 @@ struct IntegrationPointDataNonlocalInterface
 
     double kappa_d = 0;      ///< damage driving variable.
     double integration_weight;
-    double nonlocal_internal_length;
     /* TODO_MATERIAL_FORCES
+    double nonlocal_internal_length;
     typename ShapeMatricesType::GlobalDimVectorType material_force;
     */
     Eigen::Vector3d coordinates;
