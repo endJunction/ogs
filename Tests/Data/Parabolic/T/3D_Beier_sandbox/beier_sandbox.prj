@@ -90,10 +90,8 @@
                 <time_discretization><type>BackwardEuler</type></time_discretization>
                 <output>
                     <variables>
-                        <variable> temperature_soil </variable>
-                        <variable> heat_flux_x </variable>
-                        <variable> heat_flux_y </variable>
-                        <variable> heat_flux_z </variable>
+                        <variable>temperature_soil</variable>
+                        <variable>temperature_BHE1</variable>
                     </variables>
                 </output>
                 <time_stepping>
@@ -196,7 +194,7 @@
                 </boundary_condition>
            </boundary_conditions>
         </process_variable>
-                <process_variable>
+        <process_variable>
             <name>temperature_BHE1</name>
             <components>4</components>
             <order>1</order>
