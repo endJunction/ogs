@@ -77,6 +77,7 @@ struct IntegrationPointData final : public IntegrationPointDataNonlocalInterface
     double const* eps_p_V;
     double const* eps_p_D_xx;
 
+    Eigen::Vector3d coordinates;
     void pushBackState()
     {
         eps_prev = eps;

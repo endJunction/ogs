@@ -34,7 +34,6 @@ struct IntegrationPointDataNonlocalInterface
     double nonlocal_internal_length;
     typename ShapeMatricesType::GlobalDimVectorType material_force;
     */
-    Eigen::Vector3d coordinates;
     bool active_self = false;
     bool activated = false;
 };
