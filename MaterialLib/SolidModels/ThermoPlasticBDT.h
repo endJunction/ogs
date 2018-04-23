@@ -42,7 +42,8 @@ struct MaterialPropertiesParameters
 
     MaterialPropertiesParameters(P const& G_, P const& K_, P const& fc_,
                                  P const& m_, P const& qp0_, P const& alpha_,
-                                 P const& n_, P const& t0_, P const& temp_)
+                                 P const& n_, P const& t0_, P const& temp_,
+                                 int const tangent_type_)
         : G(G_),
           K(K_),
           fc(fc_),
@@ -51,7 +52,8 @@ struct MaterialPropertiesParameters
           alpha(alpha_),
           n(n_),
           t0(t0_),
-          temp(temp_)
+          temp(temp_),
+          tangent_type(tangent_type_)
     {
     }
     // basic material parameters
@@ -65,6 +67,7 @@ struct MaterialPropertiesParameters
     P const& n;
     P const& t0;
     P const& temp;
+    int const tangent_type;
 };
 
 struct DamagePropertiesParameters
@@ -90,7 +93,8 @@ struct MaterialProperties final
           alpha(mp.alpha(t, x)[0]),
           n(mp.n(t, x)[0]),
           t0(mp.t0(t, x)[0]),
-          temp(mp.temp(t, x)[0])
+          temp(mp.temp(t, x)[0]),
+          tangent_type(mp.tangent_type)
     {
     }
     double const G;
@@ -103,6 +107,7 @@ struct MaterialProperties final
     double const n;
     double const t0;
     double const temp;
+    int const tangent_type;
 };
 
 /// Evaluated DamagePropertiesParameters container, see its documentation for
