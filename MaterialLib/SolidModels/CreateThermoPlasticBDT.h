@@ -125,8 +125,11 @@ std::unique_ptr<SolidThermoPlasticBDT<DisplacementDim>> createThermoPlasticBDT(
 
     DBUG("Use \'%s\' as temp.", temp.name.c_str());
 
+    //! \ogs_file_param{material__solid__constitutive_relation__Ehlers__tangent_type}
+    auto const tangent_type = config.getConfigParameter<int>("tangent_type");
+
     MaterialPropertiesParameters mp{
-        shear_modulus, bulk_modulus, fc, m, qp0, alpha, n, t0, temp};
+        shear_modulus, bulk_modulus, fc, m, qp0, alpha, n, t0, temp, tangent_type};
 
     // Damage properties.
     std::unique_ptr<DamagePropertiesParameters>
