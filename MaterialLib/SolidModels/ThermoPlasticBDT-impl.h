@@ -87,8 +87,9 @@ double plasticFlowVolumetricPart(
 {
     double const qh =
         mp.qp0 /
-        pow(1. - 1. / mp.n, 1. + pow(mp.n, mp.alpha * (mp.temp - mp.t0)));
-    double const qh_squared = pow(2, qh);
+        std::pow(1. + std::pow(mp.alpha * (mp.temp - mp.t0), mp.n),
+                 1. - 1. / mp.n);
+    double const qh_squared = boost::math::pow<2>(qh);
     double const aux_1 = std::sqrt(3. * s.J_2) + s.I_1;
     double const aux_1_squared = boost::math::pow<2>(aux_1);
 
@@ -107,8 +108,9 @@ plasticFlowDeviatoricPart(
 {
     double const qh =
         mp.qp0 /
-        pow(1. - 1. / mp.n, 1. + pow(mp.n, mp.alpha * (mp.temp - mp.t0)));
-    double const qh_squared = pow(2, qh);
+        std::pow(1. + std::pow(mp.alpha * (mp.temp - mp.t0), mp.n),
+                 1. - 1. / mp.n);
+    double const qh_squared = boost::math::pow<2>(qh);
     double const aux_1 = std::sqrt(3. * s.J_2) + s.I_1;
     double const aux_1_squared = boost::math::pow<2>(aux_1);
 
@@ -132,7 +134,8 @@ double yieldFunction(MaterialProperties const& mp,
     double const aux_1_squared = boost::math::pow<2>(aux_1);
     double const qh =
         mp.qp0 /
-        pow(1. - 1. / mp.n, 1. + pow(mp.n, mp.alpha * (mp.temp - mp.t0)));
+        std::pow(1. + std::pow(mp.alpha * (mp.temp - mp.t0), mp.n),
+                 1. - 1. / mp.n);
 
     return boost::math::pow<2>((1. - qh) * aux_1_squared +
                                std::sqrt(3. * s.J_2) / mp.fc) +
