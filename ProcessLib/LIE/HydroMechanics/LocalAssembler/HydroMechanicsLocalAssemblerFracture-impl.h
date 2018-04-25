@@ -23,6 +23,16 @@ namespace LIE
 {
 namespace HydroMechanics
 {
+template <int GlobalDim, typename RotationMatrix>
+Eigen::Matrix<double, GlobalDim, GlobalDim> createRotatedTensor(
+    RotationMatrix const& R, double const value)
+{
+    using M = Eigen::Matrix<double, GlobalDim, GlobalDim>;
+    M tensor = M::Zero();
+    tensor.diagonal().head(GlobalDim - 1).setConstant(value);
+    return (R.transpose() * tensor * R).eval();
+}
+
 template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
           typename IntegrationMethod, int GlobalDim>
 HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
@@ -187,7 +197,6 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
 
     using GlobalDimMatrix = Eigen::Matrix<double, GlobalDim, GlobalDim>;
     using GlobalDimVector = Eigen::Matrix<double, GlobalDim, 1>;
-    GlobalDimMatrix local_dk_db_tensor = GlobalDimMatrix::Zero();
 
     auto const& gravity_vec = _process_data.specific_body_force;
 
@@ -263,19 +272,16 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         auto& permeability = ip_data.permeability;
         permeability = frac_prop.permeability_model->permeability(
             ip_data.permeability_state.get(), ip_data.aperture0, b_m);
-        GlobalDimVector local_k_tensor = GlobalDimVector::Zero();
-        local_k_tensor.head(GlobalDim - 1).setConstant(permeability);
+
         GlobalDimMatrix const k =
-            R.transpose() * local_k_tensor.asDiagonal() * R;
+            createRotatedTensor<GlobalDim>(R, permeability);
 
         // derivative of permeability respect to aperture
         double const local_dk_db =
             frac_prop.permeability_model->dpermeability_daperture(
                 ip_data.permeability_state.get(), ip_data.aperture0, b_m);
-        local_dk_db_tensor.diagonal()
-            .head(GlobalDim - 1)
-            .setConstant(local_dk_db);
-        GlobalDimMatrix const dk_db = R.transpose() * local_dk_db_tensor * R;
+        GlobalDimMatrix const dk_db =
+            createRotatedTensor<GlobalDim>(R, local_dk_db);
 
         //
         // displacement equation, displacement jump part
