@@ -227,10 +227,13 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         // aperture
         b_m = ip_data.aperture0 + w[index_normal];
         if (b_m < 0.0)
-            OGS_FATAL(
+        {
+            DBUG(
                 "Element %d, gp %d: Fracture aperture is %g, but it must be "
-                "non-negative.",
+                "non-negative. Setting it to zero.",
                 _element.getID(), ip, b_m);
+            b_m = 0;
+        }
 
         auto const initial_effective_stress =
             _process_data.initial_fracture_effective_stress(0, x_position);
