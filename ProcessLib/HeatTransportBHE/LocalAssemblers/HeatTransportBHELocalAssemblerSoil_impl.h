@@ -140,6 +140,12 @@ namespace ProcessLib
                     sm.N * sm.detJ * wp.getWeight() *
                     sm.integralMeasure;
             }
+
+            // debugging
+            // std::string sep = "\n----------------------------------------\n";
+            // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+            // std::cout << local_K.format(CleanFmt) << sep;
+            // std::cout << local_M.format(CleanFmt) << sep;
         }
 
         template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>

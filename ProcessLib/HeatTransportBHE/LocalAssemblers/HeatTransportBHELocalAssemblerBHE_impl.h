@@ -106,7 +106,7 @@ namespace ProcessLib
             // in a displacement vector
             int const index_normal = DisplacementDim - 1;
 
-            
+            
 
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
@@ -155,17 +155,15 @@ namespace ProcessLib
             BHE_Dim>::
             postTimestepConcrete(std::vector<double> const& /*local_x*/)
         {
-            /*
-            double ele_b = 0;
+            // double ele_b = 0;
             unsigned const n_integration_points =
                 _integration_method.getNumberOfPoints();
             for (unsigned ip = 0; ip < n_integration_points; ip++)
             {
-                ele_b += _ip_data[ip]._aperture;
+                // ele_b += _ip_data[ip]._aperture;
             }
-            ele_b /= n_integration_points;
-            (*_process_data._mesh_prop_b)[_element.getID()] = ele_b;
-            */
+            // ele_b /= n_integration_points;
+            // (*_process_data._mesh_prop_b)[_element.getID()] = ele_b;
         }
 
     }  // namespace HeatTransportBHE
