@@ -298,8 +298,9 @@ template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
 void HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
                                         ShapeFunctionPressure,
                                         IntegrationMethod, GlobalDim>::
-    computeSecondaryVariableConcreteWithVector(double const t,
-                                               Eigen::VectorXd const& local_x)
+    computeSecondaryVariableConcreteWithVector(
+        double const t, Eigen::VectorXd const& local_x,
+        std::vector<GlobalIndexType> const& indices)
 {
     auto p = const_cast<Eigen::VectorXd&>(local_x).segment(pressure_index,
                                                            pressure_size);
@@ -307,7 +308,7 @@ void HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
         setPressureOfInactiveNodes(t, p);
     auto u = local_x.segment(displacement_index, displacement_size);
 
-    computeSecondaryVariableConcreteWithBlockVectors(t, p, u);
+    computeSecondaryVariableConcreteWithBlockVectors(t, p, u, indices);
 }
 
 template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
@@ -316,9 +317,9 @@ void HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
                                         ShapeFunctionPressure,
                                         IntegrationMethod, GlobalDim>::
     computeSecondaryVariableConcreteWithBlockVectors(
-        double const t,
-        Eigen::Ref<const Eigen::VectorXd> const& p,
-        Eigen::Ref<const Eigen::VectorXd> const& u)
+        double const t, Eigen::Ref<const Eigen::VectorXd> const& p,
+        Eigen::Ref<const Eigen::VectorXd> const& u,
+        std::vector<GlobalIndexType> const& indices)
 {
     SpatialPosition x_position;
     x_position.setElementID(_element.getID());

@@ -286,6 +286,12 @@ void HydroMechanicsProcess<GlobalDim>::initializeConcreteProcess(
     mesh_prop_velocity->resize(mesh.getNumberOfElements() * 3);
     _process_data.mesh_prop_velocity = mesh_prop_velocity;
 
+    auto mesh_prop_flow = MeshLib::getOrCreateMeshProperty<double>(
+        const_cast<MeshLib::Mesh&>(mesh), "flow", MeshLib::MeshItemType::Node,
+        1);
+    mesh_prop_flow->resize(mesh.getNumberOfNodes());
+    _process_data.mesh_prop_flow = mesh_prop_flow;
+
     if (!_vec_fracture_elements.empty())
     {
         auto mesh_prop_levelset = MeshLib::getOrCreateMeshProperty<double>(

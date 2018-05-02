@@ -57,7 +57,9 @@ private:
                                       Eigen::MatrixXd& local_J) override;
 
     void computeSecondaryVariableConcreteWithVector(
-        double const t, Eigen::VectorXd const& local_x) override;
+        double const t,
+        Eigen::VectorXd const& local_x,
+        std::vector<GlobalIndexType> const& indices) override;
 
     using Base::_element;
     using Base::_ip_data;

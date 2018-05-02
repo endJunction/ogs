@@ -91,12 +91,14 @@ protected:
             J_up);
 
     void computeSecondaryVariableConcreteWithVector(
-        double const t, Eigen::VectorXd const& local_x) override;
+        double const t,
+        Eigen::VectorXd const& local_x,
+        std::vector<GlobalIndexType> const& indices) override;
 
     void computeSecondaryVariableConcreteWithBlockVectors(
-        double const t,
-        Eigen::Ref<const Eigen::VectorXd> const& p,
-        Eigen::Ref<const Eigen::VectorXd> const& u);
+        double const t, Eigen::Ref<const Eigen::VectorXd> const& p,
+        Eigen::Ref<const Eigen::VectorXd> const& u,
+        std::vector<GlobalIndexType> const& indices);
 
     void setPressureOfInactiveNodes(
         double const t, Eigen::Ref<Eigen::VectorXd> p);

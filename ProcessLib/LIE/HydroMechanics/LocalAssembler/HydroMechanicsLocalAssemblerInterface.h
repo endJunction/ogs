@@ -93,12 +93,13 @@ public:
         const double t, std::vector<double> const& local_x_) override
     {
         auto const local_dof_size = local_x_.size();
+        auto const indices = NumLib::getIndices(mesh_item_id, dof_table);
 
         _local_u.setZero();
         for (unsigned i = 0; i < local_dof_size; i++)
             _local_u[_dofIndex_to_localIndex[i]] = local_x_[i];
 
-        computeSecondaryVariableConcreteWithVector(t, _local_u);
+        computeSecondaryVariableConcreteWithVector(t, _local_u, indices);
     }
 
 protected:
@@ -109,7 +110,8 @@ protected:
                                               Eigen::MatrixXd& local_J) = 0;
 
     virtual void computeSecondaryVariableConcreteWithVector(
-        double const t, Eigen::VectorXd const& local_u) = 0;
+        double const t, Eigen::VectorXd const& local_u,
+        std::vector<GlobalIndexType> const& indices) = 0;
 
     MeshLib::Element const& _element;
     bool const _is_axially_symmetric;

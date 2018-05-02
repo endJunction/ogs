@@ -344,10 +344,13 @@ template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
 void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
                                           ShapeFunctionPressure,
                                           IntegrationMethod, GlobalDim>::
-    computeSecondaryVariableConcreteWithVector(const double t,
-                                               Eigen::VectorXd const& local_x)
+    computeSecondaryVariableConcreteWithVector(
+        const double t,
+        Eigen::VectorXd const& local_x,
+        std::vector<GlobalIndexType> const& indices)
 {
     auto const nodal_g = local_x.segment(displacement_index, displacement_size);
+    auto const nodal_p = local_x.segment(pressure_index, pressure_size);
 
     auto const& frac_prop = *_process_data.fracture_property;
     auto const& R = frac_prop.R;
@@ -358,12 +361,18 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
     SpatialPosition x_position;
     x_position.setElementID(_element.getID());
 
+    typename ShapeMatricesTypePressure::NodalMatrixType laplace_p =
+        ShapeMatricesTypePressure::NodalMatrixType::Zero(pressure_size,
+                                                         pressure_size);
+
     unsigned const n_integration_points = _ip_data.size();
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
         x_position.setIntegrationPoint(ip);
 
         auto& ip_data = _ip_data[ip];
+        auto const& dNdx_p = ip_data.dNdx_p;
+        auto const& ip_w = ip_data.integration_weight;
         auto const& H_g = ip_data.H_u;
         auto& mat = ip_data.fracture_material;
         auto& effective_stress = ip_data.sigma_eff;
@@ -373,6 +382,12 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         auto& C = ip_data.C;
         auto& state = *ip_data.material_state_variables;
         auto& b_m = ip_data.aperture;
+
+        auto& permeability = ip_data.permeability;
+        permeability = frac_prop.permeability_model->permeability(
+            ip_data.permeability_state.get(), ip_data.aperture0, b_m);
+
+        double const mu = _process_data.fluid_viscosity(t, x_position)[0];
 
         // displacement jumps in local coordinates
         w.noalias() = R * H_g * nodal_g;
@@ -395,6 +410,20 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         mat.computeConstitutiveRelation(
             t, x_position, ip_data.aperture0, stress0, w_prev, w,
             effective_stress_prev, effective_stress, C, state);
+
+        using GlobalDimMatrix = Eigen::Matrix<double, GlobalDim, GlobalDim>;
+        GlobalDimMatrix const R = _process_data.fracture_property->R;
+        GlobalDimMatrix const k =
+            createRotatedTensor<GlobalDim>(R, permeability);
+        laplace_p.noalias() +=
+            dNdx_p.transpose() * b_m * k / mu * dNdx_p * ip_w;
+    }
+    auto const local_flow = (laplace_p * nodal_p).eval();
+    auto const num_r_c = indices.size();
+    assert(local_flow.size() == num_r_c);
+    for (int i = 0; i < num_r_c; ++i)
+    {
+        (*_process_data.mesh_prop_b)[indices[i]] += local_flow[i];
     }
 
     double ele_b = 0;
