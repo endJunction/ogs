@@ -119,32 +119,32 @@
         <parameter>
             <name>K_s</name>
             <type>Constant</type>
-            <value>3.2</value>
+            <value>2.78018</value>
         </parameter>
         <parameter>
             <name>Cp_s</name>
             <type>Constant</type>
-            <value>1000</value>
+            <value>1280</value>
         </parameter>
         <parameter>
             <name>rho_s</name>
             <type>Constant</type>
-            <value>2500</value>
+            <value>1120</value>
         </parameter>
                 <parameter>
             <name>K_f</name>
             <type>Constant</type>
-            <value>3.2</value>
+            <value>0.62863</value>
         </parameter>
         <parameter>
             <name>Cp_f</name>
             <type>Constant</type>
-            <value>1000</value>
+            <value>4068</value>
         </parameter>
         <parameter>
             <name>rho_f</name>
             <type>Constant</type>
-            <value>2500</value>
+            <value>992.92</value>
         </parameter>
                 <parameter>
             <name>K_g</name>

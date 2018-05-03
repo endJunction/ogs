@@ -155,6 +155,7 @@ namespace ProcessLib
             BHE_Dim>::
             postTimestepConcrete(std::vector<double> const& /*local_x*/)
         {
+            
             // double ele_b = 0;
             unsigned const n_integration_points =
                 _integration_method.getNumberOfPoints();
@@ -164,6 +165,7 @@ namespace ProcessLib
             }
             // ele_b /= n_integration_points;
             // (*_process_data._mesh_prop_b)[_element.getID()] = ele_b;
+            
         }
 
     }  // namespace HeatTransportBHE
