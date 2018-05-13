@@ -21,9 +21,12 @@ namespace ProcessLib
 
         struct IntegrationPointDataBHE final
         {
-            explicit IntegrationPointDataBHE(BHE::BHEAbstract& bhe_instance)
+            explicit IntegrationPointDataBHE(BHEAbstract& bhe_instance)
                 : _bhe_instance(bhe_instance)
             {
+                // depending on the type of BHE
+                // switch (_bhe_instance.)
+                // _BHE_element_prop.lambda_g = _bhe_instance.
             }
 
             // typename HMatricesType::HMatrixType _h_matrices;
@@ -33,7 +36,8 @@ namespace ProcessLib
             // double _aperture_prev = 0.0;
             // double _aperture0 = 0.0;
 
-            BHE::BHEAbstract& _bhe_instance;
+            BHEAbstract& _bhe_instance;
+
             /*
             std::unique_ptr<typename MaterialLib::Fracture::FractureModelBase<
                 DisplacementDim>::MaterialStateVariables>
@@ -42,6 +46,30 @@ namespace ProcessLib
 
             // Eigen::MatrixXd _C;
             double integration_weight;
+
+            // product of refrigerant density and heat capacity
+            double rho_r_cp_r;
+
+            // hydrothermal dispersion cofficient of refrigerant
+            double Lambda;
+
+            // product of grout density and heat capacity
+            double rho_g_cp_g;
+
+            // grout thermla conductivity
+            double lambda_g;
+
+            // vector of refrigerant flow velocity in the downward pipe
+            Eigen::Vector3d vec_flow_velocity_in_1;
+
+            // vector of refrigerant flow velocity in the upward pipe
+            Eigen::Vector3d vec_flow_velocity_out_1;
+
+            // vector of refrigerant flow velocity in the downward pipe
+            Eigen::Vector3d vec_flow_velocity_in_2;
+
+            // vector of refrigerant flow velocity in the upward pipe
+            Eigen::Vector3d vec_flow_velocity_out_2;
 
             void pushBackState()
             {

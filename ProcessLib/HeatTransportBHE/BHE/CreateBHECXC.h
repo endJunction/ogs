@@ -13,17 +13,17 @@
 #include "BHE_CXC.h"
 namespace ProcessLib
 {
-namespace HeatTransportBHE
-{
-namespace BHE  // namespace of borehole heat exchanger
-{
-BHE::BHE_CXC* CreateBHECXC(
-    BaseLib::ConfigTree const& config,
-    BaseLib::ConfigTree const& bhe_conf,
-    std::map<std::string,
-             std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
-        curves);
+	namespace HeatTransportBHE
+	{
+		namespace BHE  // namespace of borehole heat exchanger
+		{
+			BHE::BHE_CXC *
+				CreateBHECXC(BaseLib::ConfigTree const& config,
+					BaseLib::ConfigTree const& bhe_conf,
+					std::map<std::string,
+					std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const& curves);
 
-}  // namespace BHE
-}  // namespace HeatTransportBHE
-}  // namespace ProcessLib
+
+		}  // end of namespace
+	}
+}

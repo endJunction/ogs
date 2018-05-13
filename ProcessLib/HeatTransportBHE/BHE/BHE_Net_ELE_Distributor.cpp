@@ -21,5 +21,5 @@ BHE_Net_ELE_Distributor::BHE_Net_ELE_Distributor(std::string & name, Eigen::Vect
 
 double BHE_Net_ELE_Distributor::get_RHS_value()
 {
-    return 0;
+    return 0; 
 }

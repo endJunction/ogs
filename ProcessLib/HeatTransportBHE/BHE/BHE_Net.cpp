@@ -10,7 +10,7 @@
 #include <iostream>
 #include "BHE_Net.h"
 
-using namespace ProcessLib::HeatTransportBHE::BHE;
+using namespace ProcessLib::HeatTransportBHE::BHE; 
 
 BHE_Net::BHE_Net()
 {

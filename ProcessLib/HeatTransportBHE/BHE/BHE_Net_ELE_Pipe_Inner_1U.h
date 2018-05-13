@@ -15,46 +15,46 @@
 
 namespace ProcessLib
 {
-namespace HeatTransportBHE
-{
-namespace BHE  // namespace of borehole heat exchanger
-{
-class BHE_Net_ELE_Pipe_Inner_1U : public BHE_Net_ELE_Pipe
-{
-public:
-    /**
-     * constructor
-     */
-    BHE_Net_ELE_Pipe_Inner_1U(std::string& name, BHE::BHEAbstract* m_BHE);
+	namespace HeatTransportBHE
+	{
+		namespace BHE  // namespace of borehole heat exchanger
+		{
+			class BHE_Net_ELE_Pipe_Inner_1U : public BHE_Net_ELE_Pipe {
 
-protected:
-    /**
-     * obtain the global index at the pipeline inlet
-     */
-    std::size_t get_global_idx_in();
+			public:
+				/**
+				* constructor
+				*/
+				BHE_Net_ELE_Pipe_Inner_1U(std::string & name, BHE::BHEAbstract * m_BHE);
 
-    /**
-     * obtain the global index at the pipeline outlet
-     */
-    std::size_t get_global_idx_out();
+			protected:
+				/**
+				  * obtain the global index at the pipeline inlet
+				  */
+				std::size_t get_global_idx_in();
 
-private:
-    /**
-     * the global index at the pipeline inlet
-     */
-    std::size_t _global_idx_in;
+				/**
+				  * obtain the global index at the pipeline outlet
+				  */
+				std::size_t get_global_idx_out();
 
-    /**
-     * the global index at the pipeline outlet
-     */
-    std::size_t _global_idx_out;
+			private:
+				/**
+				  * the global index at the pipeline inlet
+				  */
+				std::size_t _global_idx_in;
 
-    /**
-     * the BHE which this pipeline is applied on
-     */
-    const BHE::BHEAbstract* _m_BHE;
-};
+				/**
+				  * the global index at the pipeline outlet
+				  */
+				std::size_t _global_idx_out;
 
-}  // namespace BHE
-}  // namespace HeatTransportBHE
-}  // namespace ProcessLib
+				/**
+				  * the BHE which this pipeline is applied on
+				  */
+				const BHE::BHEAbstract * _m_BHE;
+			};
+
+		}
+	}
+}

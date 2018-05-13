@@ -13,26 +13,32 @@
 
 namespace ProcessLib
 {
-namespace HeatTransportBHE
-{
-namespace BHE  // namespace of borehole heat exchanger
-{
-class BHE_Net_ELE_Pipe : public BHE_Net_ELE_Abstract
-{
-public:
-    /**
-     * constructor
-     */
-    BHE_Net_ELE_Pipe(std::string& name,
-                     BHE_NET_ELE::type type = BHE_NET_ELE::BHE_NET_PIPE);
+	namespace HeatTransportBHE
+	{
+		namespace BHE  // namespace of borehole heat exchanger
+		{
+			class BHE_Net_ELE_Pipe : public BHE_Net_ELE_Abstract {
 
-    double get_RHS_value();
+			public:
+				/**
+				  * constructor
+				  */
+				BHE_Net_ELE_Pipe(std::string & name, BHE_NET_ELE::type type = BHE_NET_ELE::BHE_NET_PIPE);
 
-    double set_BC(double T_in, double current_time) { return 0; }
+				double get_RHS_value();
 
-    double get_flowrate() { return 0; }
-};
+				double set_BC(double T_in, double current_time)
+				{
+					return 0;
+				}
 
-}  // namespace BHE
-}  // namespace HeatTransportBHE
-}  // namespace ProcessLib
+				double get_flowrate()
+				{
+					return 0;
+				}
+
+			};
+
+		}
+	}
+}
