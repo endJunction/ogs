@@ -9,7 +9,7 @@
 
 #include "BHE_CXA.h"
 
-using namespace BHE;
+using namespace ProcessLib::HeatTransportBHE::BHE;
 /**
 * return the thermal resistance for the inlet pipline
 * idx is the index, when 2U case,
@@ -50,7 +50,7 @@ void BHE_CXA::set_T_in_out_global_idx(std::size_t start_idx)
     this->set_T_out_global_index(start_idx + 1);
 }
 
-void BHE::BHE_CXA::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
+void BHE_CXA::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
 {
     std::size_t start_idx;
     std::size_t global_idx_T_in_bottom;
@@ -401,15 +401,15 @@ double BHE_CXA::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
     return exchange_coeff;
 }
 
-int BHE_CXA::get_loc_shift_by_pv(BHE::BHE_PRIMARY_VARS pv_name)
+int BHE_CXA::get_loc_shift_by_pv(BHE_PRIMARY_VARS pv_name)
 {
     int idx(0);
 
-    if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
+    if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
         idx = 0;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
         idx = 1;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_G_1)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_1)
         idx = 2;
 
     return idx;

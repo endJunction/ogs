@@ -10,7 +10,7 @@
 #include "BHE_Net_ELE_HeatPump.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
 
-using namespace BHE;
+using namespace ProcessLib::HeatTransportBHE::BHE;
 
 BHE_Net_ELE_HeatPump::BHE_Net_ELE_HeatPump(std::string & name)
     : BHE_Net_ELE_Abstract(name, BHE_NET_ELE::BHE_NET_HEATPUMP, 1, 1)

@@ -91,7 +91,7 @@ namespace ProcessLib
         private:
 
             HeatTransportBHEProcessData& _process_data;
-            // FractureProperty const* _fracture_property = nullptr;
+            // BHEElementProperty const* _BHE_element_property = nullptr;
 
             std::vector<IntegrationPointDataBHE,
                 Eigen::aligned_allocator<IntegrationPointDataBHE>>

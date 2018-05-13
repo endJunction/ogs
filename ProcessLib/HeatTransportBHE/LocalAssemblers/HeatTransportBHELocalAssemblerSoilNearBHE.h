@@ -16,8 +16,6 @@
 #include "ProcessLib/Deformation/BMatrixPolicy.h"
 #include "ProcessLib/Deformation/LinearBMatrix.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
-
-#include "ProcessLib/LIE/Common/FractureProperty.h"
 #include "ProcessLib/HeatTransportBHE/HeatTransportBHEProcessData.h"
 
 // #include "IntegrationPointDataMatrix.h"
@@ -105,7 +103,7 @@ namespace ProcessLib
         private:
 
             HeatTransportBHEProcessData& _process_data;
-            // std::vector<FractureProperty*> _fracture_props;
+            // std::vector<BHEElementProperty*> _BHE_element_props;
 
             /*
             std::vector<IntegrationPointDataMatrix<ShapeMatricesType, BMatricesType,

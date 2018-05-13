@@ -11,14 +11,19 @@
 
 #include "ProcessLib/Process.h"
 #include "BHE_2U.h"
-
+namespace ProcessLib
+{
+namespace HeatTransportBHE
+{
 namespace BHE  // namespace of borehole heat exchanger
 {
-    BHE::BHE_2U *
-        CreateBHE2U(BaseLib::ConfigTree const& config,
-                    BaseLib::ConfigTree const& bhe_conf, 
-                    std::map<std::string,
-                    std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const& curves);
+BHE::BHE_2U* CreateBHE2U(
+    BaseLib::ConfigTree const& config,
+    BaseLib::ConfigTree const& bhe_conf,
+    std::map<std::string,
+             std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
+        curves);
 
-
-}  // end of namespace
+}  // namespace BHE
+}  // namespace HeatTransportBHE
+}  // namespace ProcessLib

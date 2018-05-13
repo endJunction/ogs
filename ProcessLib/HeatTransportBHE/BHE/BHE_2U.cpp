@@ -9,7 +9,7 @@
 
 #include "BHE_2U.h"
 
-using namespace BHE; 
+using namespace ProcessLib::HeatTransportBHE::BHE;
 
 /**
   * return the thermal resistance for the inlet pipline
@@ -56,7 +56,7 @@ void BHE_2U::set_T_in_out_global_idx(std::size_t start_idx)
     this->set_T_out_global_index(start_idx + 3, 1); // TO CHECK
 }
 
-void BHE::BHE_2U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
+void BHE_2U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
 {
     std::size_t start_idx;
     std::size_t global_idx_T_in_bottom;
@@ -515,25 +515,25 @@ double BHE_2U::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
     return exchange_coeff;
 }
 
-int BHE_2U::get_loc_shift_by_pv(BHE::BHE_PRIMARY_VARS pv_name)
+int BHE_2U::get_loc_shift_by_pv(BHE_PRIMARY_VARS pv_name)
 {
     int idx(0);
 
-    if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
+    if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
         idx = 0;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_IN_2)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_IN_2)
         idx = 1;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
         idx = 2;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
         idx = 3;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_G_1)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_1)
         idx = 4;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_G_2)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_2)
         idx = 5;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_G_3)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_3)
         idx = 6;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_G_4)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_4)
         idx = 7;
 
     return idx;

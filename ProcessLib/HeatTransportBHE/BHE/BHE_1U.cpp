@@ -1,15 +1,15 @@
-﻿/**
-* \copyright
-* Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
-*            Distributed under a Modified BSD License.
-*              See accompanying file LICENSE.txt or
-*              http://www.opengeosys.org/project/license
-*
-*/
+/**
+ * \copyright
+ * Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
+ *            Distributed under a Modified BSD License.
+ *              See accompanying file LICENSE.txt or
+ *              http://www.opengeosys.org/project/license
+ *
+ */
 
 #include "BHE_1U.h"
 
-using namespace BHE;
+using namespace ProcessLib::HeatTransportBHE::BHE;
 
 /**
 * return  the thermal resistance for the inlet pipline
@@ -71,7 +71,7 @@ void BHE_1U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
 /**
 * calculate thermal resistance
 */
-void BHE::BHE_1U::calc_thermal_resistances()
+void BHE_1U::calc_thermal_resistances()
 {
     // thermal resistance due to the grout transition
     double chi;
@@ -422,17 +422,17 @@ double BHE_1U::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
     return exchange_coeff;
 }
 
-int BHE_1U::get_loc_shift_by_pv(BHE::BHE_PRIMARY_VARS pv_name)
+int BHE_1U::get_loc_shift_by_pv(BHE_PRIMARY_VARS pv_name)
 {
     int idx(0);
 
-    if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
+    if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
         idx = 0;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
         idx = 1;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_G_1)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_1)
         idx = 2;
-    else if (pv_name == BHE::BHE_PRIMARY_VARS::BHE_TEMP_G_2)
+    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_2)
         idx = 3; 
     
     return idx;
