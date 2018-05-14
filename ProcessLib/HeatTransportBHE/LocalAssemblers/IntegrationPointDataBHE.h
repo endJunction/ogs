@@ -30,7 +30,7 @@ namespace ProcessLib
                 _vec_mass_coefficients.resize(unknown_size);
                 for (int i = 0; i < unknown_size; i++)
                 {
-                    Eigen::MatrixXd mat_laplace(3, 3);
+                    Eigen::MatrixXd mat_laplace(3,3);
                     mat_laplace.setZero();
                     _vec_mat_Laplace.push_back(mat_laplace);
                     Eigen::VectorXd vec_advection(3);
@@ -46,9 +46,9 @@ namespace ProcessLib
                     // laplace matrix
                     _bhe_instance.get_laplace_matrix(j, _vec_mat_Laplace[j]);
                     // advection vector
-                    _bhe_instance.get_advection_vector(
-                        j, _vec_Advection_vectors[j]);
+                    _bhe_instance.get_advection_vector(j, _vec_Advection_vectors[j]);
                 }
+
             }
 
             BHEAbstract& _bhe_instance;
@@ -63,7 +63,7 @@ namespace ProcessLib
             std::vector<Eigen::MatrixXd> _vec_mat_Laplace;
 
             // Advection vectors
-            std::vector<Eigen::VectorXd> _vec_Advection_vectors;
+            std::vector<Eigen::VectorXd> _vec_Advection_vectors; 
 
             void pushBackState()
             {
