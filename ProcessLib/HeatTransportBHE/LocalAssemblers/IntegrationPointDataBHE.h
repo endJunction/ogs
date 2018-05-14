@@ -25,51 +25,45 @@ namespace ProcessLib
                 : _bhe_instance(bhe_instance)
             {
                 // depending on the type of BHE
-                // switch (_bhe_instance.)
-                // _BHE_element_prop.lambda_g = _bhe_instance.
+                const int unknown_size = _bhe_instance.get_n_unknowns();
+                // initialization
+                _vec_mass_coefficients.resize(unknown_size);
+                for (int i = 0; i < unknown_size; i++)
+                {
+                    Eigen::MatrixXd mat_laplace(3, 3);
+                    mat_laplace.setZero();
+                    _vec_mat_Laplace.push_back(mat_laplace);
+                    Eigen::VectorXd vec_advection(3);
+                    vec_advection.setZero();
+                    _vec_Advection_vectors.push_back(vec_advection);
+                }
+
+                // set parameter values
+                for (int j = 0; j < unknown_size; j++)
+                {
+                    // mass matrix coefficients
+                    _vec_mass_coefficients[j] = _bhe_instance.get_mass_coeff(j);
+                    // laplace matrix
+                    _bhe_instance.get_laplace_matrix(j, _vec_mat_Laplace[j]);
+                    // advection vector
+                    _bhe_instance.get_advection_vector(
+                        j, _vec_Advection_vectors[j]);
+                }
             }
 
-            // typename HMatricesType::HMatrixType _h_matrices;
-            // typename HMatricesType::ForceVectorType _sigma, _sigma_prev;
-            // typename HMatricesType::ForceVectorType _w, _w_prev;
-            // double _aperture = 0.0;
-            // double _aperture_prev = 0.0;
-            // double _aperture0 = 0.0;
-
             BHEAbstract& _bhe_instance;
-
-            /*
-            std::unique_ptr<typename MaterialLib::Fracture::FractureModelBase<
-                DisplacementDim>::MaterialStateVariables>
-                _material_state_variables;
-            */
 
             // Eigen::MatrixXd _C;
             double integration_weight;
 
-            // product of refrigerant density and heat capacity
-            double rho_r_cp_r;
+            // mass coefficients, length depending on the type of BHE
+            std::vector<double> _vec_mass_coefficients;
 
-            // hydrothermal dispersion cofficient of refrigerant
-            double Lambda;
+            // Laplace matrices
+            std::vector<Eigen::MatrixXd> _vec_mat_Laplace;
 
-            // product of grout density and heat capacity
-            double rho_g_cp_g;
-
-            // grout thermla conductivity
-            double lambda_g;
-
-            // vector of refrigerant flow velocity in the downward pipe
-            Eigen::Vector3d vec_flow_velocity_in_1;
-
-            // vector of refrigerant flow velocity in the upward pipe
-            Eigen::Vector3d vec_flow_velocity_out_1;
-
-            // vector of refrigerant flow velocity in the downward pipe
-            Eigen::Vector3d vec_flow_velocity_in_2;
-
-            // vector of refrigerant flow velocity in the upward pipe
-            Eigen::Vector3d vec_flow_velocity_out_2;
+            // Advection vectors
+            std::vector<Eigen::VectorXd> _vec_Advection_vectors;
 
             void pushBackState()
             {
