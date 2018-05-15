@@ -11,6 +11,8 @@
 
 #include "Parameter.h"
 
+#include "BaseLib/Error.h"
+
 namespace MeshLib
 {
 template <typename T>
