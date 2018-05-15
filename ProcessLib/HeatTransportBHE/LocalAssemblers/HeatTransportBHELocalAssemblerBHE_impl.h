@@ -91,73 +91,66 @@ namespace ProcessLib
                          std::vector<double>& local_K_data,
                          std::vector<double>& local_b_data)
         {
-            // BHE must be assembled with one dimentional element
-            assert(_element.getDimension() == 1);
-            auto const local_matrix_size = local_x.size();
-            const int BHE_n_unknowns =
-                _ip_data[0]._bhe_instance.get_n_unknowns();
-            assert(local_matrix_size ==
-                   ShapeFunction::NPOINTS * BHE_n_unknowns);
-            const int nnodes = _element.getNumberOfNodes();
+                // BHE must be assembled with one dimentional element
+                assert(_element.getDimension() == 1);
+                auto const local_matrix_size = local_x.size();
+                const int BHE_n_unknowns = _ip_data[0]._bhe_instance.get_n_unknowns();
+                assert(local_matrix_size == ShapeFunction::NPOINTS * BHE_n_unknowns);
+                const int nnodes = _element.getNumberOfNodes();
 
-            auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
-                local_M_data, local_matrix_size, local_matrix_size);
-            auto local_K = MathLib::createZeroedMatrix<NodalMatrixType>(
-                local_K_data, local_matrix_size, local_matrix_size);
+                auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
+                    local_M_data, local_matrix_size, local_matrix_size);
+                auto local_K = MathLib::createZeroedMatrix<NodalMatrixType>(
+                    local_K_data, local_matrix_size, local_matrix_size);
 
-            unsigned const n_integration_points =
-                _integration_method.getNumberOfPoints();
+                unsigned const n_integration_points =
+                    _integration_method.getNumberOfPoints();
 
-            SpatialPosition x_position;
-            x_position.setElementID(_element.getID());
+                SpatialPosition x_position;
+                x_position.setElementID(_element.getID());
+                
+                int shift = 0; 
 
-            int shift = 0;
-
-            for (unsigned ip = 0; ip < n_integration_points; ip++)
-            {
-                x_position.setIntegrationPoint(ip);
-                auto& ip_data = _ip_data[ip];
-
-                auto const& integration_weight = ip_data.integration_weight;
-                auto const& sm = _shape_matrices[ip];
-                auto const& wp = _integration_method.getWeightedPoint(ip);
-
-                // looping over all unknowns.
-                for (int idx_bhe_unknowns = 0;
-                     idx_bhe_unknowns < BHE_n_unknowns; idx_bhe_unknowns++)
+                for (unsigned ip = 0; ip < n_integration_points; ip++)
                 {
-                    // get coefficient of mass from corresponding BHE.
-                    auto& mass_coeff =
-                        ip_data._vec_mass_coefficients[idx_bhe_unknowns];
-                    auto& laplace_mat =
-                        ip_data._vec_mat_Laplace[idx_bhe_unknowns];
-                    auto& advection_vec =
-                        ip_data._vec_Advection_vectors[idx_bhe_unknowns];
+                    x_position.setIntegrationPoint(ip);
+                    auto& ip_data = _ip_data[ip];
 
-                    // calculate shift.
-                    shift = nnodes * idx_bhe_unknowns;
-                    // local M
-                    local_M.block(shift, shift, nnodes, nnodes).noalias() +=
-                        sm.N.transpose() * mass_coeff * sm.N * sm.detJ *
-                        wp.getWeight() * sm.integralMeasure;
+                    auto const& integration_weight = ip_data.integration_weight;
+                    auto const& sm = _shape_matrices[ip];
+                    auto const& wp = _integration_method.getWeightedPoint(ip);
 
-                    // local K
-                    // laplace part
-                    local_K.block(shift, shift, nnodes, nnodes).noalias() +=
-                        sm.dNdx.transpose() * laplace_mat * sm.dNdx * sm.detJ *
-                        wp.getWeight() * sm.integralMeasure;
-                    // advection part
-                    local_K.block(shift, shift, nnodes, nnodes).noalias() +=
-                        sm.N.transpose() * advection_vec.transpose() * sm.dNdx *
-                        sm.detJ * wp.getWeight() * sm.integralMeasure;
+                    // looping over all unknowns. 
+                    for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < BHE_n_unknowns; idx_bhe_unknowns++)
+                    {
+                        // get coefficient of mass from corresponding BHE. 
+                        auto& mass_coeff = ip_data._vec_mass_coefficients[idx_bhe_unknowns];
+                        auto& laplace_mat = ip_data._vec_mat_Laplace[idx_bhe_unknowns];
+                        auto& advection_vec = ip_data._vec_Advection_vectors[idx_bhe_unknowns];
+
+                        // calculate shift. 
+                        shift = nnodes * idx_bhe_unknowns;
+                        // local M
+                        local_M.block(shift, shift, nnodes, nnodes).noalias() += sm.N.transpose() * mass_coeff *
+                            sm.N * sm.detJ * wp.getWeight() * sm.integralMeasure;
+
+                        // local K
+                        // laplace part
+                        local_K.block(shift, shift, nnodes, nnodes).noalias() += sm.dNdx.transpose() * laplace_mat * sm.dNdx * sm.detJ *
+                            wp.getWeight() * sm.integralMeasure;
+                        // advection part
+                        local_K.block(shift, shift, nnodes, nnodes).noalias() += sm.N.transpose() * advection_vec.transpose() * sm.dNdx * sm.detJ *
+                            wp.getWeight() * sm.integralMeasure;
+
+                    }
+
                 }
-            }
 
-            // debugging
-            std::string sep = "\n----------------------------------------\n";
-            Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-            std::cout << local_K.format(CleanFmt) << sep;
-            std::cout << local_M.format(CleanFmt) << sep;
+                // debugging
+                std::string sep = "\n----------------------------------------\n";
+                Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+                std::cout << local_K.format(CleanFmt) << sep;
+                std::cout << local_M.format(CleanFmt) << sep;
         }
 
         template <typename ShapeFunction, typename IntegrationMethod,

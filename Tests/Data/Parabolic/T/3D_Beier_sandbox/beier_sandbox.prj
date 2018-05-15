@@ -31,20 +31,20 @@
                     <bhe_type>BHE_TYPE_1U</bhe_type>
                     <bhe_bound_type>POWER_IN_WATT_CURVE_FIXED_DT</bhe_bound_type>
                     <bhe_use_external_therm_resis>false</bhe_use_external_therm_resis>
-                    <bhe_length>18.3</bhe_length>
-                    <bhe_diameter>0.126</bhe_diameter>
-                    <bhe_refrigerant_flow_rate>1.97e-4</bhe_refrigerant_flow_rate>
+                    <bhe_length>18.0</bhe_length>
+                    <bhe_diameter>0.13</bhe_diameter>
+                    <bhe_refrigerant_flow_rate>2.0e-4</bhe_refrigerant_flow_rate>
                     <bhe_pipe_inner_radius>0.013665</bhe_pipe_inner_radius>
                     <bhe_pipe_outer_radius>0.0167</bhe_pipe_outer_radius>
-                    <bhe_pipe_in_wall_thickness>0.00305</bhe_pipe_in_wall_thickness>
-                    <bhe_pipe_out_wall_thickness>0.00305</bhe_pipe_out_wall_thickness>
+                    <bhe_pipe_in_wall_thickness>0.003035</bhe_pipe_in_wall_thickness>
+                    <bhe_pipe_out_wall_thickness>0.003035</bhe_pipe_out_wall_thickness>
                     <bhe_fluid_idx>0</bhe_fluid_idx>
                     <bhe_fluid_longitudinal_dispsion_length>1.0e-4</bhe_fluid_longitudinal_dispsion_length>
                     <bhe_grout_density>2190.0</bhe_grout_density>
-                    <bhe_grout_porosity>0.2</bhe_grout_porosity>
-                    <bhe_grout_heat_capacity>1000.0</bhe_grout_heat_capacity>
+                    <bhe_grout_porosity>0.0</bhe_grout_porosity>
+                    <bhe_grout_heat_capacity>1735.160</bhe_grout_heat_capacity>
                     <bhe_pipe_wall_thermal_conductivity>0.39</bhe_pipe_wall_thermal_conductivity>
-                    <bhe_grout_thermal_conductivity>0.73</bhe_grout_thermal_conductivity>
+                    <bhe_grout_thermal_conductivity>0.806</bhe_grout_thermal_conductivity>
                     <bhe_pipe_distance>0.053</bhe_pipe_distance>
                     <bhe_switch_off_threshold>0.001</bhe_switch_off_threshold>
                 </borehole_heat_exchanger>
@@ -59,19 +59,19 @@
             <fluid>
                 <refrigerant_density>
                     <type>Constant</type>
-                    <value> 1.e3 </value>
+                    <value> 992.92 </value>
                 </refrigerant_density>
                 <refrigerant_viscosity>
                     <type>Constant</type>
-                    <value> 1.e-3 </value>
+                    <value> 0.00067418 </value>
                 </refrigerant_viscosity>
                 <refrigerant_specific_heat_capacity>
                     <type>Constant</type>
-                    <value> 4200 </value>
+                    <value> 4068 </value>
                 </refrigerant_specific_heat_capacity>
                 <refrigerant_thermal_conductivity>
                     <type>Constant</type>
-                    <value> 2.5 </value>
+                    <value> 0.62863 </value>
                 </refrigerant_thermal_conductivity>
             </fluid>
 
@@ -134,7 +134,7 @@
                 <parameter>
             <name>K_f</name>
             <type>Constant</type>
-            <value>0.62863</value>
+            <value>0.1</value>
         </parameter>
         <parameter>
             <name>Cp_f</name>
