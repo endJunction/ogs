@@ -63,7 +63,12 @@ namespace ProcessLib
             std::vector<Eigen::MatrixXd> _vec_mat_Laplace;
 
             // Advection vectors
-            std::vector<Eigen::VectorXd> _vec_Advection_vectors; 
+            std::vector<Eigen::VectorXd> _vec_Advection_vectors;
+
+            //
+            // std::vector<Eigen::MatrixXd>  _R_matrix;
+            // std::vector<Eigen::MatrixXd>  R_s_matrix;
+            // std::vector<Eigen::MatrixXd>  R_pi_s_matrix;
 
             void pushBackState()
             {

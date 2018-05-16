@@ -303,6 +303,12 @@ namespace ProcessLib
                 virtual std::size_t get_n_unknowns() = 0;
 
                 /**
+                 * return the type of this BHE
+                 * abstract function, need to be realized.
+                 */
+                virtual BHE_TYPE get_type() = 0;
+
+                /**
                   * return the number of boundary heat exchange terms for this BHE
                   * abstract function, need to be realized.
                   */
