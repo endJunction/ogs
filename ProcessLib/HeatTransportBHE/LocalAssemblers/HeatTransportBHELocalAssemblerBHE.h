@@ -88,6 +88,12 @@ namespace ProcessLib
                 return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
             }
 
+            Eigen::MatrixXd& get_R_matrix() { return _R_matrix; }
+
+            Eigen::MatrixXd& R_s_matrix() { return _R_s_matrix; }
+
+            Eigen::MatrixXd& R_pi_s_matrix() { return _R_pi_s_matrix; }
+
         private:
 
             HeatTransportBHEProcessData& _process_data;
@@ -107,12 +113,11 @@ namespace ProcessLib
 
             SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 
-            Eigen::MatrixXd R_matrix;
+            Eigen::MatrixXd _R_matrix;
 
-            Eigen::MatrixXd R_s_matrix;
+            Eigen::MatrixXd _R_s_matrix;
 
-            Eigen::MatrixXd R_pi_s_matrix;
-
+            Eigen::MatrixXd _R_pi_s_matrix;
         };
     }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
