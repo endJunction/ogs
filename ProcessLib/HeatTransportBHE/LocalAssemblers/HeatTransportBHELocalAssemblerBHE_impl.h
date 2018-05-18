@@ -263,14 +263,14 @@ namespace ProcessLib
             }  // end of loop over BHE unknowns
 
             // debugging
-            std::string sep = "\n----------------------------------------\n";
-            Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-            std::cout << "R_matrix: \n" << sep; 
-            std::cout << R_matrix.format(CleanFmt) << sep;
-            std::cout << "R_s_matrix: \n" << sep;
-            std::cout << R_s_matrix.format(CleanFmt) << sep;
-            std::cout << "R_pi_s_matrix: \n" << sep;
-            std::cout << R_pi_s_matrix.format(CleanFmt) << sep;
+            // std::string sep = "\n----------------------------------------\n";
+            // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+            // std::cout << "R_matrix: \n" << sep;
+            // std::cout << R_matrix.format(CleanFmt) << sep;
+            // std::cout << "R_s_matrix: \n" << sep;
+            // std::cout << R_s_matrix.format(CleanFmt) << sep;
+            // std::cout << "R_pi_s_matrix: \n" << sep;
+            // std::cout << R_pi_s_matrix.format(CleanFmt) << sep;
         }
 
         template<typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
@@ -337,13 +337,14 @@ namespace ProcessLib
                 }
 
                 // add the R matrix to local_K 
-                local_K += R_matrix; 
+                local_K += R_matrix;
 
                 // debugging
-                std::string sep = "\n----------------------------------------\n";
-                Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-                std::cout << local_K.format(CleanFmt) << sep;
-                std::cout << local_M.format(CleanFmt) << sep;
+                // std::string sep =
+                // "\n----------------------------------------\n";
+                // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+                // std::cout << local_K.format(CleanFmt) << sep;
+                // std::cout << local_M.format(CleanFmt) << sep;
         }
 
         template <typename ShapeFunction, typename IntegrationMethod,
