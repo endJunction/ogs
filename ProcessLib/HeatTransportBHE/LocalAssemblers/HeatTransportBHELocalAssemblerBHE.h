@@ -112,6 +112,7 @@ namespace ProcessLib
             Eigen::MatrixXd R_s_matrix;
 
             Eigen::MatrixXd R_pi_s_matrix;
+
         };
     }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

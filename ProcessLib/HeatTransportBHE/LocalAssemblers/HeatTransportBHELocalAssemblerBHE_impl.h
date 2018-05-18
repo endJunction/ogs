@@ -135,10 +135,8 @@ namespace ProcessLib
                     case 3:  // PHI_gs
                         R_s_matrix += 1.0 * matBHE_loc_R;
 
-                        R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
-                        R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                         R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_ig
                         R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_og
                         break;
@@ -196,14 +194,10 @@ namespace ProcessLib
                     case 4:  // R s
                         R_s_matrix += 1.0 * matBHE_loc_R;
 
-                        R_pi_s_matrix.block(4 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
-                        R_pi_s_matrix.block(5 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
-                        R_pi_s_matrix.block(6 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
-                        R_pi_s_matrix.block(7 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(4 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(5 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(6 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(7 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
                         R_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_gs
                         R_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_gs
@@ -232,8 +226,7 @@ namespace ProcessLib
                     case 2:  // R s
                         R_s_matrix += matBHE_loc_R;
 
-                        R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
                         R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_gs
                         break;
@@ -259,8 +252,7 @@ namespace ProcessLib
                     case 2:  // R s
                         R_s_matrix += matBHE_loc_R;
 
-                        R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
+                        R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
                         R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_gs
                         break;
@@ -273,7 +265,7 @@ namespace ProcessLib
             // debugging
             std::string sep = "\n----------------------------------------\n";
             Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-            std::cout << "R_matrix: \n" << sep;
+            std::cout << "R_matrix: \n" << sep; 
             std::cout << R_matrix.format(CleanFmt) << sep;
             std::cout << "R_s_matrix: \n" << sep;
             std::cout << R_s_matrix.format(CleanFmt) << sep;

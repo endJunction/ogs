@@ -39,7 +39,7 @@
                     <bhe_pipe_in_wall_thickness>0.003035</bhe_pipe_in_wall_thickness>
                     <bhe_pipe_out_wall_thickness>0.003035</bhe_pipe_out_wall_thickness>
                     <bhe_fluid_idx>0</bhe_fluid_idx>
-                    <bhe_fluid_longitudinal_dispsion_length>1.0e-4</bhe_fluid_longitudinal_dispsion_length>
+                    <bhe_fluid_longitudinal_dispsion_length>0.0</bhe_fluid_longitudinal_dispsion_length>
                     <bhe_grout_density>2190.0</bhe_grout_density>
                     <bhe_grout_porosity>0.0</bhe_grout_porosity>
                     <bhe_grout_heat_capacity>1735.160</bhe_grout_heat_capacity>
