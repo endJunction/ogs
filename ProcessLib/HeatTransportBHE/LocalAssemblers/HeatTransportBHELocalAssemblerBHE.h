@@ -108,6 +108,10 @@ namespace ProcessLib
             SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 
             Eigen::MatrixXd R_matrix;
+
+            Eigen::MatrixXd R_s_matrix;
+
+            Eigen::MatrixXd R_pi_s_matrix;
         };
     }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

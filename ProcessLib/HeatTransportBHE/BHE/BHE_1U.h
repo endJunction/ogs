@@ -126,11 +126,11 @@ namespace ProcessLib
 				std::size_t get_n_unknowns() { return 4; }
 
                 /**
-                 * return the type of this BHE
-                 */
+                * return the type of this BHE
+                */
                 BHE_TYPE get_type() { return BHE_TYPE::TYPE_1U; }
 
-                /**
+				/**
 				* return the number of boundary heat exchange terms for this BHE
 				* abstract function, need to be realized.
 				*/
