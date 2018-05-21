@@ -29,13 +29,24 @@ struct CurveScaledParameter final : public Parameter<T> {
     }
 
     bool isTimeDependent() const override { return true; }
+
+    void setParameter(ParameterBase const* parameter)
+    {
+        if (dynamic_cast<Parameter<double> const*>(parameter) == nullptr)
+        {
+            OGS_FATAL(
+                "Parameters other then for double type are not supported.");
+        }
+        _parameter = static_cast<Parameter<double> const*>(parameter);
+        _cache.resize(_parameter->getNumberOfComponents());
+    }
+
     void initialize(
         std::vector<std::unique_ptr<ProcessLib::ParameterBase>> const&
             parameters) override
     {
-        _parameter =
-            &findParameter<T>(_referenced_parameter_name, parameters, 0);
-        _cache.resize(_parameter->getNumberOfComponents());
+        setParameter(
+            &findParameter<T>(_referenced_parameter_name, parameters, 0));
     }
 
     int getNumberOfComponents() const override
