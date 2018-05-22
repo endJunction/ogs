@@ -32,12 +32,14 @@ struct CurveScaledParameter final : public Parameter<T> {
 
     void setParameter(ParameterBase const* parameter)
     {
-        if (dynamic_cast<Parameter<double> const*>(parameter) == nullptr)
+        if (dynamic_cast<Parameter<T> const*>(parameter) == nullptr)
         {
             OGS_FATAL(
-                "Parameters other then for double type are not supported.");
+                "Could not convert the ParameterBase type to Parameter<T>; "
+                "input parameter of type %s, Parameter<T> type is %s.",
+                typeid(*parameter).name(), typeid(*_parameter).name());
         }
-        _parameter = static_cast<Parameter<double> const*>(parameter);
+        _parameter = static_cast<Parameter<T> const*>(parameter);
         _cache.resize(_parameter->getNumberOfComponents());
     }
 
