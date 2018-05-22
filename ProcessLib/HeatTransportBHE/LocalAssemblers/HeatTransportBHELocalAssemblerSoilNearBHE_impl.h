@@ -68,9 +68,9 @@ namespace ProcessLib
             /*
             std::vector<
                 ShapeMatrices,
-                Eigen::aligned_allocator<typename
-            ShapeMatricesType::ShapeMatrices>> shape_matrices =
-            initShapeMatrices<ShapeFunction, ShapeMatricesType,
+                Eigen::aligned_allocator<typename ShapeMatricesType::ShapeMatrices>>
+                shape_matrices = initShapeMatrices<ShapeFunction,
+                ShapeMatricesType,
                 IntegrationMethod,
                 DisplacementDim>(
                     e, is_axially_symmetric, _integration_method);
@@ -98,8 +98,8 @@ namespace ProcessLib
                 ip_data._sigma.setZero(kelvin_vector_size);
                 ip_data._eps.setZero(kelvin_vector_size);
 
-                // Previous time step values are not initialized and are set
-            later. ip_data._sigma_prev.resize(kelvin_vector_size);
+                // Previous time step values are not initialized and are set later.
+                ip_data._sigma_prev.resize(kelvin_vector_size);
                 ip_data._eps_prev.resize(kelvin_vector_size);
 
                 ip_data._C.resize(kelvin_vector_size, kelvin_vector_size);
@@ -107,8 +107,7 @@ namespace ProcessLib
                 _secondary_data.N[ip] = sm.N;
             }
 
-            for (auto fid :
-            process_data._vec_ele_connected_fractureIDs[e.getID()])
+            for (auto fid : process_data._vec_ele_connected_fractureIDs[e.getID()])
             {
                 _fracture_props.push_back(
                     _process_data._vec_fracture_property[fid].get());
@@ -132,10 +131,9 @@ namespace ProcessLib
             auto const n_fractures = _fracture_props.size();
 
             using BlockVectorType =
-                typename
-            Eigen::VectorXd::FixedSegmentReturnType<N_DOF_PER_VAR>::Type; using
-            BlockMatrixType = Eigen::Block<Eigen::MatrixXd, N_DOF_PER_VAR,
-            N_DOF_PER_VAR>;
+                typename Eigen::VectorXd::FixedSegmentReturnType<N_DOF_PER_VAR>::Type;
+            using BlockMatrixType =
+                Eigen::Block<Eigen::MatrixXd, N_DOF_PER_VAR, N_DOF_PER_VAR>;
 
             //--------------------------------------------------------------------------------------
             // prepare sub vectors, matrices for regular displacement (u) and
@@ -161,9 +159,8 @@ namespace ProcessLib
             auto local_J_uu = local_J.block<N_DOF_PER_VAR, N_DOF_PER_VAR>(0, 0);
             std::vector<BlockMatrixType> vec_local_J_ug;
             std::vector<BlockMatrixType> vec_local_J_gu;
-            std::vector<std::vector<BlockMatrixType>>
-            vec_local_J_gg(n_fractures); for (unsigned i = 0; i < n_fractures;
-            i++)
+            std::vector<std::vector<BlockMatrixType>> vec_local_J_gg(n_fractures);
+            for (unsigned i = 0; i < n_fractures; i++)
             {
                 auto sub_ug = local_J.block<N_DOF_PER_VAR, N_DOF_PER_VAR>(
                     0, N_DOF_PER_VAR * (i + 1));
@@ -185,8 +182,7 @@ namespace ProcessLib
             std::vector<BlockVectorType> vec_nodal_g;
             for (unsigned i = 0; i < n_fractures; i++)
             {
-                auto sub =
-            const_cast<Eigen::VectorXd&>(local_u).segment<N_DOF_PER_VAR>(
+                auto sub = const_cast<Eigen::VectorXd&>(local_u).segment<N_DOF_PER_VAR>(
                     N_DOF_PER_VAR * (i + 1));
                 vec_nodal_g.push_back(sub);
             }
@@ -211,9 +207,9 @@ namespace ProcessLib
                 auto const& dNdx = ip_data.dNdx;
 
                 // levelset functions
-                auto const ip_physical_coords =
-            computePhysicalCoordinates(_element, N); std::vector<double>
-            levelsets(n_fractures); for (unsigned i = 0; i < n_fractures; i++)
+                auto const ip_physical_coords = computePhysicalCoordinates(_element, N);
+                std::vector<double> levelsets(n_fractures);
+                for (unsigned i = 0; i < n_fractures; i++)
                 {
                     levelsets[i] = calculateLevelSetFunction(
                         *_fracture_props[i], ip_physical_coords.getCoords());
@@ -227,8 +223,9 @@ namespace ProcessLib
                 }
 
                 auto const x_coord =
-                    interpolateXCoordinate<ShapeFunction,
-            ShapeMatricesType>(_element, N); auto const B =
+                    interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(_element,
+                        N);
+                auto const B =
                     LinearBMatrix::computeBMatrix<DisplacementDim,
                     ShapeFunction::NPOINTS,
                     typename BMatricesType::BMatrixType>(
@@ -245,13 +242,11 @@ namespace ProcessLib
                 eps.noalias() = B * nodal_total_u;
 
                 auto&& solution = _ip_data[ip]._solid_material.integrateStress(
-                    t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
-            *state);
+                    t, x_position, _process_data.dt, eps_prev, eps, sigma_prev, *state);
 
                 if (!solution)
                 {
-                    OGS_FATAL("Computation of local constitutive relation
-            failed.");
+                    OGS_FATAL("Computation of local constitutive relation failed.");
                 }
 
                 MathLib::KelvinVector::KelvinMatrixType<DisplacementDim> C;
@@ -283,8 +278,7 @@ namespace ProcessLib
                     {
                         // J_[u][u] += (levelset * B)^T * C * (levelset * B)
                         vec_local_J_gg[i][j].noalias() +=
-                            (levelsets[i] * B.transpose()) * C * (levelsets[j] *
-            B) * w;
+                            (levelsets[i] * B.transpose()) * C * (levelsets[j] * B) * w;
                     }
                 }
             }

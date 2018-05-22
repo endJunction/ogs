@@ -22,18 +22,18 @@ namespace HeatTransportBHE
 {
 namespace detail
 {
-template <int GlobalDim,
-          template <typename, typename, int>
-          class LocalAssemblerSoilImplementation,
-          template <typename, typename, int>
-          class LocalAssemblerSoilNearBHEImplementation,
-          template <typename, typename, int>
-          class LocalAssemblerBHEImplementation,
-          typename LocalAssemblerInterface, typename... ExtraCtorArgs>
+template <
+    int GlobalDim,
+    template <typename, typename, int> class LocalAssemblerSoilImplementation,
+    template <typename, typename, int>
+    class LocalAssemblerSoilNearBHEImplementation,
+    template <typename, typename, int> class LocalAssemblerBHEImplementation,
+    typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
     NumLib::LocalToGlobalIndexMap const& dof_table,
     std::vector<MeshLib::Element*> const& mesh_elements,
     std::vector<std::unique_ptr<LocalAssemblerInterface>>& local_assemblers,
+    const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
     ExtraCtorArgs&&... extra_ctor_args)
 {
     // Shape matrices initializer
@@ -50,7 +50,7 @@ void createLocalAssemblers(
 
     DBUG("Calling local assembler builder for all mesh elements.");
     GlobalExecutor::transformDereferenced(
-        initializer, mesh_elements, local_assemblers,
+        initializer, mesh_elements, local_assemblers, vec_ele_connected_BHE_IDs,
         std::forward<ExtraCtorArgs>(extra_ctor_args)...);
 }
 

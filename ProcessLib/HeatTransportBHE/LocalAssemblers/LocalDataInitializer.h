@@ -231,10 +231,12 @@ public:
     /// \attention
     /// The index \c id is not necessarily the mesh item's id. Especially when
     /// having multiple meshes it will differ from the latter.
-    void operator()(std::size_t const id,
-                    MeshLib::Element const& mesh_item,
-                    LADataIntfPtr& data_ptr,
-                    ConstructorArgs&&... args) const
+    void operator()(
+        std::size_t const id,
+        MeshLib::Element const& mesh_item,
+        LADataIntfPtr& data_ptr,
+        const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
+        ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
         auto const it = _builder.find(type_idx);
@@ -255,9 +257,10 @@ public:
         auto const varIDs = _dof_table.getElementVariableIDs(id);
 
         std::vector<unsigned> dofIndex_to_localIndex;
-        if (mesh_item.getDimension() < GlobalDim ||
-            n_global_components > GlobalDim)
+        if (mesh_item.getDimension() <
+            GlobalDim)  // || n_global_components >= GlobalDim
         {
+            // this is a BHE element
             dofIndex_to_localIndex.resize(n_local_dof);
             unsigned dof_id = 0;
             unsigned local_id = 0;
@@ -283,6 +286,23 @@ public:
                     }
                 }
             }
+        }
+        else if (mesh_item.getDimension() == GlobalDim &&
+                 vec_ele_connected_BHE_IDs[id].size() > 0)
+        {
+            // this is a soil element connected with a BHE
+
+            const int id_BHE = vec_ele_connected_BHE_IDs[id][0];
+
+            /*
+            if (._process_data._vec_ele_connected_BHE_IDs[id].size() > 0)
+            {
+                // this is a element connected with BHE
+                auto id_connected_BHE =
+            args._process_data._vec_ele_connected_BHE_IDs[id][0];
+
+            }
+            */
         }
 
         data_ptr = it->second(mesh_item, varIDs.size(), n_local_dof,

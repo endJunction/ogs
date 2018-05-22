@@ -88,11 +88,20 @@ namespace ProcessLib
                 return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
             }
 
-            Eigen::MatrixXd& get_R_matrix() { return _R_matrix; }
+            Eigen::MatrixXd& get_R_matrix()
+            {
+                return _R_matrix;
+            }
 
-            Eigen::MatrixXd& R_s_matrix() { return _R_s_matrix; }
+            Eigen::MatrixXd& R_s_matrix()
+            {
+                return _R_s_matrix;
+            }
 
-            Eigen::MatrixXd& R_pi_s_matrix() { return _R_pi_s_matrix; }
+            Eigen::MatrixXd& R_pi_s_matrix()
+            {
+                return _R_pi_s_matrix;
+            }
 
         private:
 
@@ -118,6 +127,7 @@ namespace ProcessLib
             Eigen::MatrixXd _R_s_matrix;
 
             Eigen::MatrixXd _R_pi_s_matrix;
+
         };
     }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
