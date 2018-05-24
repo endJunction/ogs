@@ -96,6 +96,10 @@
                     <each_steps>1</each_steps>
                 </pair>
             </timesteps>
+            <points>
+                <point>0 0 0</point>
+                <point>3.0844640771 6.6585298581 0</point>
+            </points>
         </output>
     </time_loop>
     <parameters>

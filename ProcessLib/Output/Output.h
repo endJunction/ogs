@@ -43,7 +43,8 @@ public:
            bool const compress_output, std::string const& data_mode,
            bool const output_nonlinear_iteration_results,
            std::vector<PairRepeatEachSteps> repeats_each_steps,
-           std::vector<double>&& fixed_output_times);
+           std::vector<double>&& fixed_output_times,
+           std::vector<MathLib::Point3d>&& timeseries_output_points);
 
     //! TODO doc. Opens a PVD file for each process.
     void addProcess(ProcessLib::Process const& process, const int process_id);
@@ -81,6 +82,12 @@ public:
     std::vector<double> getFixedOutputTimes() {return _fixed_output_times;}
 
 private:
+    void writeTimeseriesData(GlobalVector const& x,
+                             double const t,
+                             NumLib::LocalToGlobalIndexMap const& dof_table,
+                             MeshLib::Mesh const& mesh);
+
+private:
     struct ProcessData
     {
         ProcessData(std::string const& filename) : pvd_file(filename) {}
@@ -105,6 +112,11 @@ private:
 
     //! Given times that steps have to reach.
     std::vector<double> _fixed_output_times;
+
+    //! Additional points for time series output.
+    std::vector<MathLib::Point3d> _timeseries_output_points;
+    std::vector<std::size_t> _timeseries_output_node_ids;
+    std::ofstream _timeseries_output_stream;
 
     std::multimap<Process const*, ProcessData> _process_to_process_data;
 

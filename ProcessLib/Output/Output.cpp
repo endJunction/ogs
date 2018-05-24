@@ -18,6 +18,7 @@
 #include "Applications/InSituLib/Adaptor.h"
 #include "BaseLib/FileTools.h"
 #include "BaseLib/RunTime.h"
+#include "MeshGeoToolsLib/MeshNodeSearcher.h"
 #include "ProcessLib/Process.h"
 
 namespace
@@ -85,15 +86,27 @@ Output::Output(std::string output_directory, std::string prefix,
                bool const compress_output, std::string const& data_mode,
                bool const output_nonlinear_iteration_results,
                std::vector<PairRepeatEachSteps> repeats_each_steps,
-               std::vector<double>&& fixed_output_times)
+               std::vector<double>&& fixed_output_times,
+               std::vector<MathLib::Point3d>&& timeseries_output_points)
     : _output_directory(std::move(output_directory)),
       _output_file_prefix(std::move(prefix)),
       _output_file_compression(compress_output),
       _output_file_data_mode(convertVtkDataMode(data_mode)),
       _output_nonlinear_iteration_results(output_nonlinear_iteration_results),
       _repeats_each_steps(std::move(repeats_each_steps)),
-      _fixed_output_times(std::move(fixed_output_times))
+      _fixed_output_times(std::move(fixed_output_times)),
+      _timeseries_output_points(std::move(timeseries_output_points))
 {
+    if (!_timeseries_output_points.empty())
+    {
+        // Create output file.
+        auto const filename =
+            BaseLib::joinPaths(_output_directory, _output_file_prefix + ".csv");
+        _timeseries_output_stream.open(filename.c_str(),
+                                       std::ios_base::out);
+        _timeseries_output_stream.precision(
+            std::numeric_limits<double>::digits10);
+    }
 }
 
 void Output::addProcess(ProcessLib::Process const& process,
@@ -133,6 +146,74 @@ Output::ProcessData* Output::findProcessData(Process const& process,
     return process_data;
 }
 
+void Output::writeTimeseriesData(
+    GlobalVector const& x,
+    double const t,
+    NumLib::LocalToGlobalIndexMap const& dof_table,
+    MeshLib::Mesh const& mesh)
+{
+    if (t == 0)
+    {
+        //
+        // Find points in the mesh to get node_ids
+        //
+        _timeseries_output_node_ids.reserve(_timeseries_output_points.size());
+        {
+            auto search_length_algorithm =
+                std::make_unique<MeshGeoToolsLib::SearchLength>(1e-8);
+
+            MeshGeoToolsLib::MeshNodeSearcher const& mesh_node_searcher =
+                MeshGeoToolsLib::MeshNodeSearcher::getMeshNodeSearcher(
+                    mesh, std::move(search_length_algorithm));
+
+            std::vector<GeoLib::Point> search_points;
+            search_points.reserve(_timeseries_output_points.size());
+            std::transform(begin(_timeseries_output_points),
+                           end(_timeseries_output_points),
+                           std::back_inserter(search_points),
+                           [](MathLib::Point3d const& p) {
+                               return GeoLib::Point{
+                                   p, std::numeric_limits<std::size_t>::max()};
+                           });
+
+            for (auto const& p : search_points)
+            {
+                std::vector<std::size_t> id =
+                    mesh_node_searcher.getMeshNodeIDsForPoint(p);
+                if (id.empty())
+                    OGS_FATAL("Output point not found in the mesh.");
+                if (id.size() > 1)
+                    OGS_FATAL(
+                        "Multiple output points found in the mesh but only one "
+                        "is allowed.");
+                DBUG("Found node %d for point %g, %g, %g.", id[0], p[0], p[1],
+                     p[2]);
+                _timeseries_output_node_ids.push_back(id[0]);
+            }
+        }
+    }
+    _timeseries_output_stream << t << "; ";
+
+    //
+    // Extract primary variables from the solution vector
+    //
+    {
+        for (auto const& node_id : _timeseries_output_node_ids)
+        {
+            _timeseries_output_stream << node_id << " ";
+            MeshLib::Location const l(mesh.getID(), MeshLib::MeshItemType::Node,
+                                      node_id);
+            auto global_indices = dof_table.getGlobalIndices(l);
+            for (auto const& i : global_indices)
+            {
+                _timeseries_output_stream << x.get(i) << " ";
+            }
+            _timeseries_output_stream << ";";
+        }
+        _timeseries_output_stream << "\n";
+    }
+}
+
 void Output::doOutputAlways(Process const& process,
                             const int process_id,
                             ProcessOutput const& process_output,
@@ -156,6 +237,9 @@ void Output::doOutputAlways(Process const& process,
     if (!(process_id == static_cast<int>(_process_to_process_data.size()) - 1 ||
           process.isMonolithicSchemeUsed()))
         return;
+
+    writeTimeseriesData(x, t, process.getDOFTable(process_id),
+                        process.getMesh());
 
     std::string const output_file_name =
         _output_file_prefix + "_pcs_" + std::to_string(process_id) + "_ts_" +

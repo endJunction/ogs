@@ -85,14 +85,30 @@ std::unique_ptr<Output> createOutput(const BaseLib::ConfigTree& config,
         BaseLib::makeVectorUnique(fixed_output_times, std::greater<double>());
     }
 
+    std::vector<MathLib::Point3d> timeseries_output_points;
+    auto const points_output_config =
+        //! \ogs_file_param{prj__time_loop__output__points}
+        config.getConfigSubtree("points");
+
+    for (auto point_config :
+         //! \ogs_file_param{prj__time_loop__output__points__point}
+         points_output_config.getConfigParameterList("point"))
+    {
+        std::istringstream sstr{point_config.getValue<std::string>()};
+        std::array<double, 3> coordinates;
+        sstr >> coordinates[0] >> coordinates[1] >> coordinates[2];
+
+        timeseries_output_points.emplace_back(coordinates);
+    }
+
     bool const output_iteration_results =
         //! \ogs_file_param{prj__time_loop__output__output_iteration_results}
         config.getConfigParameter<bool>("output_iteration_results", false);
 
-    return std::make_unique<Output>(output_directory, prefix, compress_output,
-                                    data_mode, output_iteration_results,
-                                    std::move(repeats_each_steps),
-                                    std::move(fixed_output_times));
+    return std::make_unique<Output>(
+        output_directory, prefix, compress_output, data_mode,
+        output_iteration_results, std::move(repeats_each_steps),
+        std::move(fixed_output_times), std::move(timeseries_output_points));
 }
 
 }  // namespace ProcessLib
