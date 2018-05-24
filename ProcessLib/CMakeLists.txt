@@ -33,7 +33,7 @@ if(TARGET Boost)
     add_dependencies(ProcessLib Boost)
 endif()
 if(OGS_INSITU)
-    target_link_libraries(ProcessLib InSituLib)
+    target_link_libraries(ProcessLib PRIVATE InSituLib)
 endif()
 
 if(OGS_USE_PCH)
