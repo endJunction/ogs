@@ -101,20 +101,17 @@ namespace ProcessLib
             }
 
         private:
-
             HeatTransportBHEProcessData& _process_data;
-            // std::vector<BHEElementProperty*> _BHE_element_props;
 
-            /*
-            std::vector<IntegrationPointDataMatrix<ShapeMatricesType, BMatricesType,
-                GlobalDim>,
-                Eigen::aligned_allocator<IntegrationPointDataMatrix<
-                ShapeMatricesType, BMatricesType, GlobalDim>>>
+            std::vector<IntegrationPointDataSoil<ShapeMatricesType,
+                                                 BMatricesType, GlobalDim>,
+                        Eigen::aligned_allocator<IntegrationPointDataSoil<
+                            ShapeMatricesType, BMatricesType, GlobalDim>>>
                 _ip_data;
-            */
 
-            IntegrationMethod _integration_method;
-
+            IntegrationMethod const _integration_method;
+            std::vector<ShapeMatrices, Eigen::aligned_allocator<ShapeMatrices>>
+                _shape_matrices;
             MeshLib::Element const& _element;
             bool const _is_axially_symmetric;
             SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;

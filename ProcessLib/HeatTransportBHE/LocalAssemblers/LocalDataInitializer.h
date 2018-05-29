@@ -231,13 +231,12 @@ public:
     /// \attention
     /// The index \c id is not necessarily the mesh item's id. Especially when
     /// having multiple meshes it will differ from the latter.
-    void operator()(
-        std::size_t const id,
-        MeshLib::Element const& mesh_item,
-        LADataIntfPtr& data_ptr,
-        const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
-        const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property,
-        ConstructorArgs&&... args) const
+    void operator()(std::size_t const id,
+                    MeshLib::Element const& mesh_item,
+                    LADataIntfPtr& data_ptr,
+                    const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
+                    const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property, 
+                    ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
         auto const it = _builder.find(type_idx);
@@ -292,19 +291,18 @@ public:
         {
             // this is a soil element connected with a BHE
             const int id_BHE = vec_ele_connected_BHE_IDs[id][0];
-            const int n_unknowns_connected_BHE =
-                vec_BHE_property[id_BHE]->get_n_unknowns();
-            auto n_global_components = _dof_table.getNumberOfElementComponents(
-                id);  // only the soil parts
-            n_global_components += n_unknowns_connected_BHE;
+            const int n_unknowns_connected_BHE = vec_BHE_property[id_BHE]->get_n_unknowns(); 
+            auto n_global_components =
+                _dof_table.getNumberOfElementComponents(id); // only the soil parts
+            n_global_components += n_unknowns_connected_BHE; 
 
             // the size of n_local_dof should include the unknowns
             // on the connected BHE elements
-            n_local_dof += n_unknowns_connected_BHE * 2;  // TODO
+            n_local_dof += n_unknowns_connected_BHE * 2; // TODO
 
             // the second varID is the temperature on BHE
             // varIDs = varIDs + 1;
-
+            
             // this is a soil element near a BHE
             dofIndex_to_localIndex.resize(n_local_dof);
             unsigned dof_id = 0;
@@ -312,7 +310,7 @@ public:
             for (auto i : varIDs)
             {
                 for (int j = 0; j < _dof_table.getNumberOfVariableComponents(i);
-                     j++)
+                    j++)
                 {
                     auto& mss = _dof_table.getMeshSubsets(i, j);
                     assert(mss.size() == 1);
@@ -320,8 +318,8 @@ public:
                     for (unsigned k = 0; k < mesh_item.getNumberOfNodes(); k++)
                     {
                         MeshLib::Location l(mesh_id,
-                                            MeshLib::MeshItemType::Node,
-                                            mesh_item.getNodeIndex(k));
+                            MeshLib::MeshItemType::Node,
+                            mesh_item.getNodeIndex(k));
                         auto global_index = _dof_table.getGlobalIndex(l, i, j);
                         if (global_index != NumLib::MeshComponentMap::nop)
                         {

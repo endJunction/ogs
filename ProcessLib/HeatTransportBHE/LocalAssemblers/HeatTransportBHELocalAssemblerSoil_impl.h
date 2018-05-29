@@ -47,43 +47,11 @@ namespace ProcessLib
                         e, is_axially_symmetric, _integration_method)),
             _is_axially_symmetric(is_axially_symmetric)
         {
-            
             unsigned const n_integration_points =
                 _integration_method.getNumberOfPoints();
 
             _ip_data.reserve(n_integration_points);
             _secondary_data.N.resize(n_integration_points);
-
-            /*
-            for (unsigned ip = 0; ip < n_integration_points; ip++)
-            {
-                
-                _ip_data.emplace_back(*_process_data._material);
-                auto& ip_data = _ip_data[ip];
-                auto const& sm = shape_matrices[ip];
-                ip_data.N = sm.N;
-                ip_data.dNdx = sm.dNdx;
-                ip_data.integration_weight =
-                    _integration_method.getWeightedPoint(ip).getWeight() *
-                    sm.integralMeasure * sm.detJ;
-                
-                // Initialize current time step values
-                static const int kelvin_vector_size =
-                    MathLib::KelvinVector::KelvinVectorDimensions<
-                    DisplacementDim>::value;
-                ip_data._sigma.setZero(kelvin_vector_size);
-                ip_data._eps.setZero(kelvin_vector_size);
-
-                // Previous time step values are not initialized and are set later.
-                ip_data._sigma_prev.resize(kelvin_vector_size);
-                ip_data._eps_prev.resize(kelvin_vector_size);
-
-                ip_data._C.resize(kelvin_vector_size, kelvin_vector_size);
-
-                _secondary_data.N[ip] = sm.N;
-                
-            }
-            */
         }
 
         template<typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
