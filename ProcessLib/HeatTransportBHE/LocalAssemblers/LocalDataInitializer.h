@@ -19,6 +19,7 @@
 #include "MeshLib/Elements/Elements.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/Fem/Integration/GaussLegendreIntegrationPolicy.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 
 #ifndef OGS_MAX_ELEMENT_DIM
 static_assert(false, "The macro OGS_MAX_ELEMENT_DIM is undefined.");
@@ -118,8 +119,7 @@ namespace HeatTransportBHE
 /// NumLib::ShapeQuad4 is created.
 template <typename LocalAssemblerInterface,
           template <typename, typename, int> class LocalAssemblerDataSoil,
-          template <typename, typename, int>
-          class LocalAssemblerDataSoilNearBHE,
+          template <typename, typename, int> class LocalAssemblerDataSoilNearBHE,
           template <typename, typename, int> class LocalAssemblerDataBHE,
           int GlobalDim, typename... ConstructorArgs>
 class LocalDataInitializer final
@@ -236,6 +236,7 @@ public:
         MeshLib::Element const& mesh_item,
         LADataIntfPtr& data_ptr,
         const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
+        const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property,
         ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
@@ -251,16 +252,16 @@ public:
                 type_idx.name());
         }
 
-        auto const n_local_dof = _dof_table.getNumberOfElementDOF(id);
-        auto const n_global_components =
-            _dof_table.getNumberOfElementComponents(id);
-        auto const varIDs = _dof_table.getElementVariableIDs(id);
-
+        auto varIDs = _dof_table.getElementVariableIDs(id);
+        auto n_local_dof = _dof_table.getNumberOfElementDOF(id);
         std::vector<unsigned> dofIndex_to_localIndex;
-        if (mesh_item.getDimension() <
-            GlobalDim)  // || n_global_components >= GlobalDim
+
+        if (mesh_item.getDimension() < GlobalDim ) // || n_global_components >= GlobalDim
         {
             // this is a BHE element
+            auto const n_global_components =
+                _dof_table.getNumberOfElementComponents(id);
+
             dofIndex_to_localIndex.resize(n_local_dof);
             unsigned dof_id = 0;
             unsigned local_id = 0;
@@ -287,22 +288,49 @@ public:
                 }
             }
         }
-        else if (mesh_item.getDimension() == GlobalDim &&
-                 vec_ele_connected_BHE_IDs[id].size() > 0)
+        else if (mesh_item.getDimension() == GlobalDim && vec_ele_connected_BHE_IDs[id].size() >0 )
         {
             // this is a soil element connected with a BHE
-
             const int id_BHE = vec_ele_connected_BHE_IDs[id][0];
+            const int n_unknowns_connected_BHE =
+                vec_BHE_property[id_BHE]->get_n_unknowns();
+            auto n_global_components = _dof_table.getNumberOfElementComponents(
+                id);  // only the soil parts
+            n_global_components += n_unknowns_connected_BHE;
 
-            /*
-            if (._process_data._vec_ele_connected_BHE_IDs[id].size() > 0)
+            // the size of n_local_dof should include the unknowns
+            // on the connected BHE elements
+            n_local_dof += n_unknowns_connected_BHE * 2;  // TODO
+
+            // the second varID is the temperature on BHE
+            // varIDs = varIDs + 1;
+
+            // this is a soil element near a BHE
+            dofIndex_to_localIndex.resize(n_local_dof);
+            unsigned dof_id = 0;
+            unsigned local_id = 0;
+            for (auto i : varIDs)
             {
-                // this is a element connected with BHE
-                auto id_connected_BHE =
-            args._process_data._vec_ele_connected_BHE_IDs[id][0];
-
+                for (int j = 0; j < _dof_table.getNumberOfVariableComponents(i);
+                     j++)
+                {
+                    auto& mss = _dof_table.getMeshSubsets(i, j);
+                    assert(mss.size() == 1);
+                    auto mesh_id = mss.getMeshSubset(0).getMeshID();
+                    for (unsigned k = 0; k < mesh_item.getNumberOfNodes(); k++)
+                    {
+                        MeshLib::Location l(mesh_id,
+                                            MeshLib::MeshItemType::Node,
+                                            mesh_item.getNodeIndex(k));
+                        auto global_index = _dof_table.getGlobalIndex(l, i, j);
+                        if (global_index != NumLib::MeshComponentMap::nop)
+                        {
+                            dofIndex_to_localIndex[dof_id++] = local_id;
+                        }
+                        local_id++;
+                    }
+                }
             }
-            */
         }
 
         data_ptr = it->second(mesh_item, varIDs.size(), n_local_dof,

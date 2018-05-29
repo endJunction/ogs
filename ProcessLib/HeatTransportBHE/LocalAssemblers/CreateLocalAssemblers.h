@@ -34,6 +34,7 @@ void createLocalAssemblers(
     std::vector<MeshLib::Element*> const& mesh_elements,
     std::vector<std::unique_ptr<LocalAssemblerInterface>>& local_assemblers,
     const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
+    const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property,
     ExtraCtorArgs&&... extra_ctor_args)
 {
     // Shape matrices initializer
@@ -51,7 +52,7 @@ void createLocalAssemblers(
     DBUG("Calling local assembler builder for all mesh elements.");
     GlobalExecutor::transformDereferenced(
         initializer, mesh_elements, local_assemblers, vec_ele_connected_BHE_IDs,
-        std::forward<ExtraCtorArgs>(extra_ctor_args)...);
+        vec_BHE_property, std::forward<ExtraCtorArgs>(extra_ctor_args)...);
 }
 
 }  // namespace detail

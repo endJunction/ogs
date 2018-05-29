@@ -176,7 +176,8 @@ namespace ProcessLib
                 HeatTransportBHELocalAssemblerBHE>(
                 mesh.getElements(), dof_table, _local_assemblers,
                 _process_data._vec_ele_connected_BHE_IDs,
-                mesh.isAxiallySymmetric(), integration_order, _process_data);
+                _process_data._vec_BHE_property, mesh.isAxiallySymmetric(),
+                integration_order, _process_data);
 
             /*
             _secondary_variables.addSecondaryVariable(
