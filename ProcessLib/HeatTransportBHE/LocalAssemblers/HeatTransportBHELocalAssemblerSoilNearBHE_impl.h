@@ -80,8 +80,7 @@ namespace ProcessLib
 
                 auto const local_matrix_size = local_x.size();
 
-                assert(local_matrix_size ==
-                       ShapeFunction::NPOINTS * NUM_NODAL_DOF_SOIL);
+                assert(local_matrix_size == ShapeFunction::NPOINTS * NUM_NODAL_DOF_SOIL);
 
                 auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
                     local_M_data, local_matrix_size, local_matrix_size);
@@ -100,42 +99,32 @@ namespace ProcessLib
                     auto const& sm = _shape_matrices[ip];
                     auto const& wp = _integration_method.getWeightedPoint(ip);
 
-                    auto const k_f =
-                        _process_data.thermal_conductivity_fluid(t, pos)[0];
-                    auto const k_g =
-                        _process_data.thermal_conductivity_gas(t, pos)[0];
-                    auto const k_s =
-                        _process_data.thermal_conductivity_solid(t, pos)[0];
+                    auto const k_f = _process_data.thermal_conductivity_fluid(t, pos)[0];
+                    auto const k_g = _process_data.thermal_conductivity_gas(t, pos)[0];
+                    auto const k_s = _process_data.thermal_conductivity_solid(t, pos)[0];
 
-                    auto const heat_capacity_f =
-                        _process_data.heat_capacity_fluid(t, pos)[0];
-                    auto const heat_capacity_g =
-                        _process_data.heat_capacity_gas(t, pos)[0];
-                    auto const heat_capacity_s =
-                        _process_data.heat_capacity_solid(t, pos)[0];
+                    auto const heat_capacity_f = _process_data.heat_capacity_fluid(t, pos)[0];
+                    auto const heat_capacity_g = _process_data.heat_capacity_gas(t, pos)[0];
+                    auto const heat_capacity_s = _process_data.heat_capacity_solid(t, pos)[0];
 
-                    auto const density_f =
-                        _process_data.density_fluid(t, pos)[0];
+                    auto const density_f = _process_data.density_fluid(t, pos)[0];
                     auto const density_g = _process_data.density_gas(t, pos)[0];
-                    auto const density_s =
-                        _process_data.density_solid(t, pos)[0];
+                    auto const density_s = _process_data.density_solid(t, pos)[0];
 
                     // for now only using the solid phase parameters
 
                     // assemble Conductance matrix
-                    local_K.noalias() += sm.dNdx.transpose() * k_s * sm.dNdx *
-                                         sm.detJ * wp.getWeight() *
-                                         sm.integralMeasure;
+                    local_K.noalias() += sm.dNdx.transpose() * k_s * sm.dNdx * sm.detJ *
+                        wp.getWeight() * sm.integralMeasure;
 
                     // assemble Mass matrix
-                    local_M.noalias() += sm.N.transpose() * density_s *
-                                         heat_capacity_s * sm.N * sm.detJ *
-                                         wp.getWeight() * sm.integralMeasure;
+                    local_M.noalias() += sm.N.transpose() * density_s * heat_capacity_s *
+                        sm.N * sm.detJ * wp.getWeight() *
+                        sm.integralMeasure;
                 }
 
                 // debugging
-                // std::string sep =
-                // "\n----------------------------------------\n";
+                // std::string sep = "\n----------------------------------------\n";
                 // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
                 // std::cout << local_K.format(CleanFmt) << sep;
                 // std::cout << local_M.format(CleanFmt) << sep;

@@ -121,17 +121,16 @@ namespace ProcessLib
             }
        
             // Collect the mesh subsets in a vector.
-            std::vector<MeshLib::MeshSubsets> all_mesh_subsets;
-            std::generate_n(
-                std::back_inserter(all_mesh_subsets), 1, [&]() {
-                return MeshLib::MeshSubsets{ _mesh_subset_soil_nodes.get() };
-            });
+            std::vector<MeshLib::MeshSubset> all_mesh_subsets{
+                *_mesh_subset_soil_nodes};
 
             for (auto& ms : _mesh_subset_BHE_nodes)
             {
                 std::generate_n(std::back_inserter(all_mesh_subsets),
-                    4 /*TODO: The number "4" needs to be changed according to BHE type*/,
-                    [&]() { return MeshLib::MeshSubsets{ ms.get() }; });
+                                4 /*TODO: The number "4" needs to be changed
+                                     according to BHE type*/
+                                ,
+                                [&]() { return *ms; });
             }
 
             std::vector<int> vec_n_components;

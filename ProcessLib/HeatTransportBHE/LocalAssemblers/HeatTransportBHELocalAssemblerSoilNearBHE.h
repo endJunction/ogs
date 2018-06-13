@@ -101,12 +101,13 @@ namespace ProcessLib
             }
 
         private:
-            HeatTransportBHEProcessData& _process_data;
 
-            std::vector<IntegrationPointDataSoil<ShapeMatricesType,
-                                                 BMatricesType, GlobalDim>,
-                        Eigen::aligned_allocator<IntegrationPointDataSoil<
-                            ShapeMatricesType, BMatricesType, GlobalDim>>>
+            HeatTransportBHEProcessData & _process_data;
+
+            std::vector<IntegrationPointDataSoil<ShapeMatricesType, BMatricesType,
+                GlobalDim>,
+                Eigen::aligned_allocator<IntegrationPointDataSoil<
+                ShapeMatricesType, BMatricesType, GlobalDim>>>
                 _ip_data;
 
             IntegrationMethod const _integration_method;
