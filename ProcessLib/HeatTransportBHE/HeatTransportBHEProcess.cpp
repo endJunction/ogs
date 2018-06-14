@@ -107,30 +107,28 @@ namespace ProcessLib
             //------------------------------------------------------------
             // for extrapolation
             _mesh_subset_all_nodes =
-                std::make_unique<MeshLib::MeshSubset>(_mesh, &_mesh.getNodes());
+                std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
 
             // actually all the nodes in the mesh belongs to the soil compartment
             _mesh_subset_soil_nodes =
-                std::make_unique<MeshLib::MeshSubset>(_mesh, &_mesh.getNodes());
+                std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
             // the BHE nodes need to be cherry-picked from the vector
             for (unsigned i = 0; i < _vec_BHE_nodes.size(); i++)
             {
                 _mesh_subset_BHE_nodes.push_back(
                     std::make_unique<MeshLib::MeshSubset const>(
-                        _mesh, &_vec_BHE_nodes[i]));
+                        _mesh, _vec_BHE_nodes[i]));
             }
        
             // Collect the mesh subsets in a vector.
-            std::vector<MeshLib::MeshSubset> all_mesh_subsets{
-                *_mesh_subset_soil_nodes};
+            std::vector<MeshLib::MeshSubset> all_mesh_subsets{*_mesh_subset_soil_nodes};
+            
 
             for (auto& ms : _mesh_subset_BHE_nodes)
             {
                 std::generate_n(std::back_inserter(all_mesh_subsets),
-                                4 /*TODO: The number "4" needs to be changed
-                                     according to BHE type*/
-                                ,
-                                [&]() { return *ms; });
+                    4 /*TODO: The number "4" needs to be changed according to BHE type*/,
+                    [&]() { return *ms; });
             }
 
             std::vector<int> vec_n_components;
