@@ -68,6 +68,30 @@ void TwoPhaseFlowWithPPProcess::initializeConcreteProcess(
         makeExtrapolator(
             1, getExtrapolator(), _local_assemblers,
             &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtWetPressure));
+
+    _secondary_variables.addSecondaryVariable(
+        "density_gas",
+        makeExtrapolator(
+            1, getExtrapolator(), _local_assemblers,
+            &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtDensityGas));
+
+    _secondary_variables.addSecondaryVariable(
+        "density_liquid",
+        makeExtrapolator(
+            1, getExtrapolator(), _local_assemblers,
+            &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtDensityLiquid));
+
+    _secondary_variables.addSecondaryVariable(
+        "velocity_gas",
+        makeExtrapolator(
+                mesh.getDimension(), getExtrapolator(), _local_assemblers,
+            &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtVelocityGas));
+
+    _secondary_variables.addSecondaryVariable(
+        "velocity_liquid",
+        makeExtrapolator(
+                mesh.getDimension(), getExtrapolator(), _local_assemblers,
+            &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtVelocityLiquid));
 }
 
 void TwoPhaseFlowWithPPProcess::assembleConcreteProcess(const double t,

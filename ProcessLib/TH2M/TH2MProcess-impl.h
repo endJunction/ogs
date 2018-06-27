@@ -157,6 +157,18 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
                     &LocalAssemblerInterface::getIntPtDensityLiquid));
 
     Base::_secondary_variables.addSecondaryVariable(
+            "pressure_gas_linear",
+            makeExtrapolator(
+                    1, getExtrapolator(), _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtPressureGas));
+
+    Base::_secondary_variables.addSecondaryVariable(
+            "pressure_cap_linear",
+            makeExtrapolator(
+                    1, getExtrapolator(), _local_assemblers,
+                    &LocalAssemblerInterface::getIntPtPressureCap));
+
+    Base::_secondary_variables.addSecondaryVariable(
             "velocity_gas",
             makeExtrapolator(mesh.getDimension(), getExtrapolator(),
                     _local_assemblers,

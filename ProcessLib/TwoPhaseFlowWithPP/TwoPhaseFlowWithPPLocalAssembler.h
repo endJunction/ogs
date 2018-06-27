@@ -69,6 +69,31 @@ public:
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& /*cache*/) const = 0;
+
+    virtual std::vector<double> const& getIntPtDensityGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
+    virtual std::vector<double> const& getIntPtDensityLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
+    virtual std::vector<double> const& getIntPtVelocityGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
+    virtual std::vector<double> const& getIntPtVelocityLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
 };
 
 template <typename ShapeFunction, typename IntegrationMethod,
@@ -105,7 +130,15 @@ public:
           _saturation(
               std::vector<double>(_integration_method.getNumberOfPoints())),
           _pressure_wet(
-              std::vector<double>(_integration_method.getNumberOfPoints()))
+              std::vector<double>(_integration_method.getNumberOfPoints())),
+          _density_gas(
+                  std::vector<double>(_integration_method.getNumberOfPoints())),
+          _density_liquid(
+                  std::vector<double>(_integration_method.getNumberOfPoints())),
+          _velocity_gas(
+                  std::vector<double>(GlobalDim*_integration_method.getNumberOfPoints())),
+          _velocity_liquid(
+                  std::vector<double>(GlobalDim*_integration_method.getNumberOfPoints()))
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -160,6 +193,47 @@ public:
         return _pressure_wet;
     }
 
+    std::vector<double> const& getIntPtDensityGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_density_gas.empty());
+        return _density_gas;
+    }
+
+    std::vector<double> const& getIntPtDensityLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_density_liquid.empty());
+        return _density_liquid;
+    }
+
+    std::vector<double> const& getIntPtVelocityGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_velocity_gas.empty());
+        return _velocity_gas;
+    }
+
+
+    std::vector<double> const& getIntPtVelocityLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_velocity_liquid.empty());
+        return _velocity_liquid;
+    }
+
 private:
     MeshLib::Element const& _element;
 
@@ -176,6 +250,11 @@ private:
     // output vector for wetting phase saturation with
     // respect to each integration point
     std::vector<double> _saturation;
+    std::vector<double> _density_gas;
+    std::vector<double> _density_liquid;
+    std::vector<double> _velocity_gas;
+    std::vector<double> _velocity_liquid;
+
     // output vector for wetting phase pressure with respect
     // to each integration point
     std::vector<double> _pressure_wet;
