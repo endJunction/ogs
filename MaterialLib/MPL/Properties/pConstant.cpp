@@ -25,4 +25,4 @@ Constant::Constant(PropertyDataType const& v)
     _value = v;
 };
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

@@ -16,12 +16,14 @@
 
 namespace MaterialPropertyLib
 {
-ViscosityCO2Fenghour::ViscosityCO2Fenghour(Medium*) : _component(nullptr)
+ViscosityCO2Fenghour::ViscosityCO2Fenghour(Medium* /*unused*/)
+    : _component(nullptr)
 {
     notImplemented("ViscosityCO2Fenghour", "Medium");
 };
 
-ViscosityCO2Fenghour::ViscosityCO2Fenghour(Phase*) : _component(nullptr)
+ViscosityCO2Fenghour::ViscosityCO2Fenghour(Phase* /*unused*/)
+    : _component(nullptr)
 {
     notImplemented("ViscosityCO2Fenghour", "Phase");
 };
@@ -40,7 +42,9 @@ static constexpr std::array<double, 5> d = {{0.4071119e-02, 0.7198037e-04,
 PropertyDataType ViscosityCO2Fenghour::value(VariableArray const& vars)
 {
     if (isUpdated())
+    {
         return _value;
+    }
 
     const double temperature = getScalar(vars[T]);
     const double epsilon_k = 251.196;  // I think it might be ok to hard-code
@@ -57,8 +61,10 @@ PropertyDataType ViscosityCO2Fenghour::value(VariableArray const& vars)
 
     double psi = a.back();
 
-    for (int i = a.size()-2; i >= 0; i--)
-            psi = a[i] + log_T_red * psi;
+    for (int i = a.size() - 2; i >= 0; i--)
+    {
+        psi = a[i] + log_T_red * psi;
+    }
 
     const double eta_0 = 1.00697 * std::sqrt(T_red) / std::exp(psi);
     const double eta_d = d[0] * rho + d[1] * rho_pow_2 +
@@ -70,4 +76,4 @@ PropertyDataType ViscosityCO2Fenghour::value(VariableArray const& vars)
     return eta;
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

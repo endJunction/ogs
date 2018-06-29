@@ -33,11 +33,11 @@ private:
 
 public:
     /// Constructor that passes a pointer to the medium.
-    LinearTemperature(Medium*);
+    LinearTemperature(Medium* /*unused*/);
     /// Constructor that passes a pointer to the phase.
-    LinearTemperature(Phase*);
+    LinearTemperature(Phase* /*unused*/);
     /// Constructor that passes a pointer to the component.
-    LinearTemperature(Component*);
+    LinearTemperature(Component* /*c*/);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.

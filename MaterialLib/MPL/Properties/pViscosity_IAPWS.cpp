@@ -17,12 +17,14 @@
 
 namespace MaterialPropertyLib
 {
-ViscosityWaterIAPWS::ViscosityWaterIAPWS(Medium*) : _component(nullptr)
+ViscosityWaterIAPWS::ViscosityWaterIAPWS(Medium* /*unused*/)
+    : _component(nullptr)
 {
     notImplemented("Viscosity_IAPWS", "Medium");
 }
 
-ViscosityWaterIAPWS::ViscosityWaterIAPWS(Phase*) : _component(nullptr)
+ViscosityWaterIAPWS::ViscosityWaterIAPWS(Phase* /*unused*/)
+    : _component(nullptr)
 {
     notImplemented("Viscosity_IAPWS", "Phase");
 }
@@ -45,7 +47,9 @@ static constexpr std::array<std::array<double, 7>, 6> h = {
 PropertyDataType ViscosityWaterIAPWS::value(VariableArray const& vars)
 {
     if (isUpdated())
+    {
         return _value;
+    }
 
     const double T_crit = getScalar(_component->property(critical_temperature));
     const double T_red = getScalar(vars[T]) / T_crit;
@@ -55,8 +59,10 @@ PropertyDataType ViscosityWaterIAPWS::value(VariableArray const& vars)
 
     double eta_0 = H.back();
 
-    for (int i = H.size()-2; i >= 0; --i)
-        eta_0 = eta_0/T_red + H[i];
+    for (int i = H.size() - 2; i >= 0; --i)
+    {
+        eta_0 = eta_0 / T_red + H[i];
+    }
 
     eta_0 = 100.*std::sqrt(T_red)/eta_0;
 
@@ -71,8 +77,10 @@ PropertyDataType ViscosityWaterIAPWS::value(VariableArray const& vars)
     for (int j=hj_max; j>=0; j--)
     {
         double a = h[hi_max][j];
-        for (int i=hi_max-1; i>=0; i--)
-            a = h[i][j] + A*a;
+        for (int i = hi_max - 1; i >= 0; i--)
+        {
+            a = h[i][j] + A * a;
+        }
         eta_1 = a + B*eta_1;
     }
 
@@ -84,4 +92,4 @@ PropertyDataType ViscosityWaterIAPWS::value(VariableArray const& vars)
     return eta;
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

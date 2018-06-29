@@ -15,14 +15,15 @@
 
 namespace MaterialPropertyLib
 {
-AverageMoleFraction::AverageMoleFraction(Medium*) : _phase(nullptr)
+AverageMoleFraction::AverageMoleFraction(Medium* /*unused*/) : _phase(nullptr)
 {
     notImplemented("AverageMoleFraction", "Medium");
 }
 
 AverageMoleFraction::AverageMoleFraction(Phase* p) : _phase(p){};
 
-AverageMoleFraction::AverageMoleFraction(Component*) : _phase(nullptr)
+AverageMoleFraction::AverageMoleFraction(Component* /*unused*/)
+    : _phase(nullptr)
 {
     notImplemented("AverageMoleFraction", "Component");
 }
@@ -32,12 +33,14 @@ AverageMoleFraction::AverageMoleFraction(Component*) : _phase(nullptr)
  * where \f$\xi\f$ is an arbitrary property, \f$\alpha\f$ is the phase,
  * \f$x_{n\zeta}^\alpha\f$ is the mole fraction of the component \f$\zeta\f$.
  */
-PropertyDataType AverageMoleFraction::value(VariableArray const&)
+PropertyDataType AverageMoleFraction::value(VariableArray const& /*unused*/)
 {
     if (isUpdated())
+    {
         return _value;
+    }
 
     /// \todo: implementation of AverageMoleFraction.
     return _value;
 }
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

@@ -31,9 +31,9 @@ private:
     Component* _component;
 
 public:
-    ViscosityWaterIAPWS(Medium*);
-    ViscosityWaterIAPWS(Phase*);
-    ViscosityWaterIAPWS(Component*);
+    ViscosityWaterIAPWS(Medium* /*unused*/);
+    ViscosityWaterIAPWS(Phase* /*unused*/);
+    ViscosityWaterIAPWS(Component* /*c*/);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.

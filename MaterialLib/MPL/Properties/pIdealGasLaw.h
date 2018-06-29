@@ -31,14 +31,14 @@ private:
 
 public:
     /// Constructor passing a pointer to the medium.
-    IdealGasLaw(Medium*);
+    IdealGasLaw(Medium* /*unused*/);
     /// Constructor passing a pointer to the phase.
-    IdealGasLaw(Phase*);
+    IdealGasLaw(Phase* /*p*/);
     /// Constructor passing a pointer to the component.
-    IdealGasLaw(Component*);
+    IdealGasLaw(Component* /*c*/);
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
-    PropertyDataType value(VariableArray const&) override;
+    PropertyDataType value(VariableArray const& /*unused*/) override;
 };
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

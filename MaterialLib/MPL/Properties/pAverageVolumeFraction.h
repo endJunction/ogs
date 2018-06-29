@@ -34,11 +34,11 @@ private:
 
 public:
     /// Constructor passing a pointer to the medium.
-    AverageVolumeFraction(Medium*);
+    AverageVolumeFraction(Medium* /*m*/);
     /// Constructor passing a pointer to a phase.
-    AverageVolumeFraction(Phase*);
+    AverageVolumeFraction(Phase* /*unused*/);
     /// Constructor passing a pointer to a component.
-    AverageVolumeFraction(Component*);
+    AverageVolumeFraction(Component* /*unused*/);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.

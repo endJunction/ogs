@@ -23,7 +23,8 @@ namespace MaterialPropertyLib
 {
 /// This constructor throws an error, since the property is not
 /// implemented on the medium scale.
-PengRobinson::PengRobinson(Medium*) : _phase(nullptr), _component(nullptr)
+PengRobinson::PengRobinson(Medium* /*unused*/)
+    : _phase(nullptr), _component(nullptr)
 {
     notImplemented("PengRobinson", "Medium");
 }
@@ -40,7 +41,9 @@ PengRobinson::PengRobinson(Component* c) : _phase(nullptr), _component(c){};
 PropertyDataType PengRobinson::value(VariableArray const& v)
 {
     if (isUpdated())
+    {
         return _value;
+    }
 
     double M(0);
     double k_ij(0);
@@ -54,7 +57,7 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
     // property).
     std::vector<Component*> temp_components;
 
-    if (_phase)
+    if (_phase != nullptr)
     {
         // Implementation as phase property: EOS for binary mixtures or
         // for single fluids. If more than two components are defined, only
@@ -65,7 +68,9 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
         // The number of relevant components is now narrowed down to
         // one or two components.
         for (int c = 0; c < nComponents; ++c)
+        {
             temp_components.push_back(&_phase->component(c));
+        }
 
         M = getScalar(_phase->property(molar_mass));
         k_ij = getScalar(_phase->property(binary_interaction_coefficient));
@@ -111,11 +116,13 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
     }
 
     for (std::size_t i = 0; i < nComponents; ++i)
+    {
         for (std::size_t j = 0; j < nComponents; ++j)
         {
             am += x_n[i] * x_n[j] * (1 - k_ij) * sqrt_a[i] * sqrt_a[j];
             bm += x_n[i] * b[i];
         }
+    }
 
     const double pressure = getScalar(v[p_GR]);
     const double RT = gasConstant * temperature;
@@ -171,4 +178,4 @@ double coVolume(const double Tc, const double pc)
     return 0.077796074 * R * Tc / pc;
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

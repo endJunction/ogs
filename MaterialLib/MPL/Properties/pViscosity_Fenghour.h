@@ -33,9 +33,9 @@ private:
     Component* _component;
 
 public:
-    ViscosityCO2Fenghour(Medium*);
-    ViscosityCO2Fenghour(Phase*);
-    ViscosityCO2Fenghour(Component*);
+    ViscosityCO2Fenghour(Medium* /*unused*/);
+    ViscosityCO2Fenghour(Phase* /*unused*/);
+    ViscosityCO2Fenghour(Component* /*c*/);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.

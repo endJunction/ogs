@@ -40,11 +40,11 @@ private:
 
 public:
     /// Constructor passing a pointer to the medium.
-    PengRobinson(Medium*);
+    PengRobinson(Medium* /*unused*/);
     /// Constructor passing a pointer to a phase.
-    PengRobinson(Phase*);
+    PengRobinson(Phase* /*p*/);
     /// Constructor passing a pointer to a component.
-    PengRobinson(Component*);
+    PengRobinson(Component* /*c*/);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
@@ -52,9 +52,9 @@ public:
 };
 
 /// characteristic constant kappa as function of acentric factor omega
-double kappa(double);
+double kappa(double /*omega*/);
 /// dimensionless function alpha of reduced temperature
-double alpha(double, double, double);
+double alpha(double /*T*/, double /*T_c*/, double /*omega*/);
 double cohesionPressure(double Tc, double pc);
 double coVolume(double Tc, double pc);
 

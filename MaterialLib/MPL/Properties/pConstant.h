@@ -24,7 +24,7 @@ namespace MaterialPropertyLib
 class Constant final : public Property
 {
 public:
-    explicit Constant(PropertyDataType const&);
+    explicit Constant(PropertyDataType const& /*v*/);
 };
 
 }  // namespace MaterialPropertyLib

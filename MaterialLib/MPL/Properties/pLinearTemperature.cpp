@@ -19,14 +19,14 @@ namespace MaterialPropertyLib
 {
 /// This constructor throws an error since it was used for a medium
 /// property while it is a component property.
-LinearTemperature::LinearTemperature(Medium*) : _component(nullptr)
+LinearTemperature::LinearTemperature(Medium* /*unused*/) : _component(nullptr)
 {
     notImplemented("LinearTemperature", "Medium");
 };
 
 /// This constructor throws an error since it was used for a phase
 /// property while it is a component property.
-LinearTemperature::LinearTemperature(Phase*) : _component(nullptr)
+LinearTemperature::LinearTemperature(Phase* /*unused*/) : _component(nullptr)
 {
     notImplemented("LinearTemperature", "Phase");
 };
@@ -42,7 +42,9 @@ LinearTemperature::LinearTemperature(Component* c) : _component(c){};
 PropertyDataType LinearTemperature::value(VariableArray const& v)
 {
     if (isUpdated())
+    {
         return _value;
+    }
 
     const double rho_0 = getScalar(_component->property(reference_density));
     const double drho_dT = getScalar(_component->property(drhodT));
@@ -52,4 +54,4 @@ PropertyDataType LinearTemperature::value(VariableArray const& v)
     return _value;
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

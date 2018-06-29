@@ -15,7 +15,8 @@
 
 namespace MaterialPropertyLib
 {
-IdealGasLaw::IdealGasLaw(Medium*) : _phase(nullptr), _component(nullptr)
+IdealGasLaw::IdealGasLaw(Medium* /*unused*/)
+    : _phase(nullptr), _component(nullptr)
 {
     notImplemented("IdealGasLaw", "Medium");
 }
@@ -26,12 +27,14 @@ IdealGasLaw::IdealGasLaw(Component* c) : _phase(nullptr), _component(c){};
 
 /**
  */
-PropertyDataType IdealGasLaw::value(VariableArray const&)
+PropertyDataType IdealGasLaw::value(VariableArray const& /*unused*/)
 {
     if (isUpdated())
+    {
         return _value;
+    }
 
     /// \todo: implementation of IdealGasLaw.
     return _value;
 }
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib
