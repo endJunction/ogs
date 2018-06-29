@@ -47,7 +47,7 @@ public:
 
     /// A method that creates the default properties of the medium.
     /// Currently, these defaults is the volume fraction average.
-    void createDefaultProperties(void);
+    void createDefaultProperties();
 
     /// A get-function for a particular phase. The ul argument specifies
     /// the index within the _phases vector.
@@ -58,8 +58,8 @@ public:
 
     /// A simple get-function for retrieving the number of phases the
     /// medium consists of.
-    std::size_t numberOfPhases(void) const;
+    std::size_t numberOfPhases() const;
 
-    void resetPropertyUpdateStatus(void);
+    void resetPropertyUpdateStatus();
 };
 }  // namespace MaterialPropertyLib

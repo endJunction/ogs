@@ -21,7 +21,7 @@ namespace MaterialPropertyLib
 {
 /// The base class constructor may remain empty since the base class is
 /// almost abstract.
-Property::Property() : _isUpdated(false){};
+Property::Property() = default;
 
 PropertyDataType Property::value() const
 {

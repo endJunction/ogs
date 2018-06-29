@@ -39,11 +39,11 @@ public:
     /// The method for creating component properties.
     void createProperties(BaseLib::ConfigTree const& /*config*/);
     /// The method for creating default properties.
-    void createDefaultProperties(void);
+    void createDefaultProperties();
     /// A get-function for retrieving a cartain property.
     Property& property(PropertyEnum const& /*p*/) const;
 
-    void resetPropertyUpdateStatus(void);
+    void resetPropertyUpdateStatus();
 };
 /*
  * Method for creating a new component based on the specified

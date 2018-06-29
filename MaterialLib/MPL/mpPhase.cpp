@@ -102,7 +102,7 @@ void Phase::createProperties(BaseLib::ConfigTree const& config)
  * are initialized by mole average functions of value zero. However,
  * 'special-default' properties are allowed to be set.
  */
-void Phase::createDefaultProperties(void)
+void Phase::createDefaultProperties()
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
     {
@@ -122,12 +122,12 @@ Property& Phase::property(PropertyEnum const& p) const
     return *_properties[p];
 }
 
-std::size_t Phase::numberOfComponents(void) const
+std::size_t Phase::numberOfComponents() const
 {
     return _components.size();
 }
 
-void Phase::resetPropertyUpdateStatus(void)
+void Phase::resetPropertyUpdateStatus()
 {
     // Component properties
     for (std::size_t c = 0; c < numberOfComponents(); ++c)

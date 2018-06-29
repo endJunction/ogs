@@ -57,7 +57,7 @@ void Component::createProperties(BaseLib::ConfigTree const& config)
  * This method initializes the component property array with
  * constant functions of value zero.
  */
-void Component::createDefaultProperties(void)
+void Component::createDefaultProperties()
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
     {
@@ -70,7 +70,7 @@ Property& Component::property(PropertyEnum const& p) const
     return *_properties[p];
 }
 
-void Component::resetPropertyUpdateStatus(void)
+void Component::resetPropertyUpdateStatus()
 {
     for (std::size_t p = 0; p < number_of_property_enums; ++p)
     {

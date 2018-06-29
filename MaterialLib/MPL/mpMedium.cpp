@@ -114,7 +114,7 @@ void Medium::createProperties(BaseLib::ConfigTree const& config)
  * are fine with the volume fraction average, but special-defaults are
  * allowed as well...
  */
-void Medium::createDefaultProperties(void)
+void Medium::createDefaultProperties()
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
     {
@@ -132,7 +132,7 @@ Property& Medium::property(PropertyEnum const& p) const
     return *_properties[p];
 }
 
-std::size_t Medium::numberOfPhases(void) const
+std::size_t Medium::numberOfPhases() const
 {
     return _phases.size();
 }
@@ -140,9 +140,9 @@ std::size_t Medium::numberOfPhases(void) const
 void Medium::resetPropertyUpdateStatus()
 {
     // Phase properties
-    for (std::size_t p = 0; p < _phases.size(); ++p)
+    for (auto& _phase : _phases)
     {
-        _phases[p]->resetPropertyUpdateStatus();
+        _phase->resetPropertyUpdateStatus();
     }
     // Medium properties
     for (std::size_t i = 0; i < number_of_property_enums; ++i)

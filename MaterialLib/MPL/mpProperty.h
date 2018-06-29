@@ -43,7 +43,7 @@ class Property
 protected:
     /// The single value of a property.
     PropertyDataType _value;
-    bool _isUpdated;
+    bool _isUpdated{false};
 
 public:
     Property();
