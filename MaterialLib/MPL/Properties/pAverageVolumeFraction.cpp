@@ -20,13 +20,13 @@ namespace MaterialPropertyLib
 AverageVolumeFraction::AverageVolumeFraction(Medium* m) : _medium(m){};
 /// This constructor throws an error, since the property is not
 /// implemented on the phase scale.
-AverageVolumeFraction::AverageVolumeFraction(Phase*) : _medium(0)
+AverageVolumeFraction::AverageVolumeFraction(Phase*) : _medium(nullptr)
 {
     notImplemented("AverageVolumeFraction", "Phase");
 };
 /// This constructor throws an error, since the property is not
 /// implemented on the component scale.
-AverageVolumeFraction::AverageVolumeFraction(Component*) : _medium(0)
+AverageVolumeFraction::AverageVolumeFraction(Component*) : _medium(nullptr)
 {
     notImplemented("AverageVolumeFraction", "Component");
 }

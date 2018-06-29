@@ -16,12 +16,12 @@
 
 namespace MaterialPropertyLib
 {
-ViscosityCO2Fenghour::ViscosityCO2Fenghour(Medium*) : _component(0)
+ViscosityCO2Fenghour::ViscosityCO2Fenghour(Medium*) : _component(nullptr)
 {
     notImplemented("ViscosityCO2Fenghour", "Medium");
 };
 
-ViscosityCO2Fenghour::ViscosityCO2Fenghour(Phase*) : _component(0)
+ViscosityCO2Fenghour::ViscosityCO2Fenghour(Phase*) : _component(nullptr)
 {
     notImplemented("ViscosityCO2Fenghour", "Phase");
 };

@@ -17,12 +17,12 @@
 
 namespace MaterialPropertyLib
 {
-ViscosityWaterIAPWS::ViscosityWaterIAPWS(Medium*) : _component(0)
+ViscosityWaterIAPWS::ViscosityWaterIAPWS(Medium*) : _component(nullptr)
 {
     notImplemented("Viscosity_IAPWS", "Medium");
 }
 
-ViscosityWaterIAPWS::ViscosityWaterIAPWS(Phase*) : _component(0)
+ViscosityWaterIAPWS::ViscosityWaterIAPWS(Phase*) : _component(nullptr)
 {
     notImplemented("Viscosity_IAPWS", "Phase");
 }

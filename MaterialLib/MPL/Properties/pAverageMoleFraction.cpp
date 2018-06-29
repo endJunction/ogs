@@ -15,14 +15,14 @@
 
 namespace MaterialPropertyLib
 {
-AverageMoleFraction::AverageMoleFraction(Medium*) : _phase(0)
+AverageMoleFraction::AverageMoleFraction(Medium*) : _phase(nullptr)
 {
     notImplemented("AverageMoleFraction", "Medium");
 }
 
 AverageMoleFraction::AverageMoleFraction(Phase* p) : _phase(p){};
 
-AverageMoleFraction::AverageMoleFraction(Component*) : _phase(0)
+AverageMoleFraction::AverageMoleFraction(Component*) : _phase(nullptr)
 {
     notImplemented("AverageMoleFraction", "Component");
 }

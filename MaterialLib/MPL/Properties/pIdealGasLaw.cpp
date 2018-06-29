@@ -15,14 +15,14 @@
 
 namespace MaterialPropertyLib
 {
-IdealGasLaw::IdealGasLaw(Medium*) : _phase(0), _component(0)
+IdealGasLaw::IdealGasLaw(Medium*) : _phase(nullptr), _component(nullptr)
 {
     notImplemented("IdealGasLaw", "Medium");
 }
 
-IdealGasLaw::IdealGasLaw(Phase* p) : _phase(p), _component(0){};
+IdealGasLaw::IdealGasLaw(Phase* p) : _phase(p), _component(nullptr){};
 
-IdealGasLaw::IdealGasLaw(Component* c) : _phase(0), _component(c){};
+IdealGasLaw::IdealGasLaw(Component* c) : _phase(nullptr), _component(c){};
 
 /**
  */

@@ -23,17 +23,17 @@ namespace MaterialPropertyLib
 {
 /// This constructor throws an error, since the property is not
 /// implemented on the medium scale.
-PengRobinson::PengRobinson(Medium*) : _phase(0), _component(0)
+PengRobinson::PengRobinson(Medium*) : _phase(nullptr), _component(nullptr)
 {
     notImplemented("PengRobinson", "Medium");
 }
 /// Constructor for the phase version (binary mixture) of
 /// the Peng-Robinson EOS
-PengRobinson::PengRobinson(Phase* p) : _phase(p), _component(0){};
+PengRobinson::PengRobinson(Phase* p) : _phase(p), _component(nullptr){};
 
 /// Constructor for the component version (pure substances) of
 /// the Peng-Robinson EOS
-PengRobinson::PengRobinson(Component* c) : _phase(0), _component(c){};
+PengRobinson::PengRobinson(Component* c) : _phase(nullptr), _component(c){};
 
 /**
  */

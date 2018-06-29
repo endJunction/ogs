@@ -19,14 +19,14 @@ namespace MaterialPropertyLib
 {
 /// This constructor throws an error since it was used for a medium
 /// property while it is a component property.
-LinearTemperature::LinearTemperature(Medium*) : _component(0)
+LinearTemperature::LinearTemperature(Medium*) : _component(nullptr)
 {
     notImplemented("LinearTemperature", "Medium");
 };
 
 /// This constructor throws an error since it was used for a phase
 /// property while it is a component property.
-LinearTemperature::LinearTemperature(Phase*) : _component(0)
+LinearTemperature::LinearTemperature(Phase*) : _component(nullptr)
 {
     notImplemented("LinearTemperature", "Phase");
 };
