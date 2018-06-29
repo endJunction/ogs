@@ -222,4 +222,4 @@ const static std::vector<std::string> convertEnumToString{
     {"thermal_conductivity"},
     {"viscosity"}};
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

@@ -48,14 +48,14 @@ public:
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
-    PropertyDataType value(VariableArray const&) override;
+    PropertyDataType value(VariableArray const& /*unused*/) override;
 };
 
 /// characteristic constant kappa as function of acentric factor omega
-double kappa(const double);
+double kappa(double);
 /// dimensionless function alpha of reduced temperature
-double alpha(const double, const double, const double);
-double cohesionPressure(const double Tc, const double pc);
-double coVolume(const double Tc, const double pc);
+double alpha(double, double, double);
+double cohesionPressure(double Tc, double pc);
+double coVolume(double Tc, double pc);
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

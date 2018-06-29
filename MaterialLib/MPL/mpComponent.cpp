@@ -117,4 +117,4 @@ std::unique_ptr<Component> newComponent(
               component_name.c_str());
     return nullptr;  // to avoid the 'no return' warning.
 }
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

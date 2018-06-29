@@ -37,11 +37,11 @@ public:
     virtual ~Component() = default;
 
     /// The method for creating component properties.
-    void createProperties(BaseLib::ConfigTree const&);
+    void createProperties(BaseLib::ConfigTree const& /*config*/);
     /// The method for creating default properties.
     void createDefaultProperties(void);
     /// A get-function for retrieving a cartain property.
-    Property& property(PropertyEnum const&) const;
+    Property& property(PropertyEnum const& /*p*/) const;
 
     void resetPropertyUpdateStatus(void);
 };
@@ -49,7 +49,7 @@ public:
  * Method for creating a new component based on the specified
  * component name.
  */
-std::unique_ptr<Component> newComponent(boost::optional<std::string> const&);
+std::unique_ptr<Component> newComponent(
+    boost::optional<std::string> const& /*name*/);
 
-}  // MaterialPropertyLib
-
+}  // namespace MaterialPropertyLib

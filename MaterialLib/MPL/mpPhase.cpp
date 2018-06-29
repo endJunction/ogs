@@ -141,4 +141,4 @@ void Phase::resetPropertyUpdateStatus(void)
     }
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

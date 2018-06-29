@@ -36,27 +36,27 @@ private:
 public:
     /// The Phase constructor is called with the optional
     /// phase name.
-    Phase(boost::optional<std::string> const&);
+    Phase(boost::optional<std::string> const& /*phase_name*/);
     Phase();
 
     ~Phase(){};
 
     /// The method creating phase components based on config subtree.
-    void createComponents(BaseLib::ConfigTree const&);
+    void createComponents(BaseLib::ConfigTree const& /*config*/);
     /// The method creating phase properties based on config subtree.
-    void createProperties(BaseLib::ConfigTree const&);
+    void createProperties(BaseLib::ConfigTree const& /*config*/);
     /// The method initializing the phase properties.
     void createDefaultProperties(void);
 
     /// A simple get-function for a component. The argument refers to the
     /// Index of the component in the components vector.
-    Component& component(std::size_t const&) const;
+    Component& component(std::size_t const& /*index*/) const;
     /// A get-function for a property. The argument refers to the
     /// name of the property.
-    Property& property(PropertyEnum const&) const;
+    Property& property(PropertyEnum const& /*p*/) const;
     /// A get-function for retrieving the number of components in this phase
     std::size_t numberOfComponents(void) const;
     void resetPropertyUpdateStatus(void);
 };
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

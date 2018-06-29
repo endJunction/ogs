@@ -21,7 +21,7 @@ namespace MaterialPropertyLib
 {
 /// The base class constructor may remain empty since the base class is
 /// almost abstract.
-Property::Property() : _isUpdated(0){};
+Property::Property() : _isUpdated(false){};
 
 PropertyDataType Property::value() const
 {
@@ -29,7 +29,7 @@ PropertyDataType Property::value() const
 }
 /// The default implementation of this method only returns the
 /// property value without altering it.
-PropertyDataType Property::value(VariableArray const&)
+PropertyDataType Property::value(VariableArray const& /*unused*/)
 {
     return _value;
 }
@@ -158,4 +158,4 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     //return nullptr;  // to avoid 'no return' warnings
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

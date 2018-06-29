@@ -27,4 +27,4 @@ public:
     explicit Constant(PropertyDataType const&);
 };
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

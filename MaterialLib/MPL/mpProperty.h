@@ -48,18 +48,18 @@ protected:
 public:
     Property();
     virtual ~Property() = default;
-    void isUpdated(bool);
+    void isUpdated(bool /*status*/);
     bool isUpdated();
     /// This method is called when a property is used for the wrong
     /// kind of material, or if the proeprty is not implemented on
     /// this kind of material yet.
-    void notImplemented(std::string, std::string);
+    void notImplemented(std::string /*property*/, std::string /*material*/);
     /// This virtual method simply returns the private _value attribute
     /// without changing it.
     virtual PropertyDataType value() const;
     /// This virtual method will compute the property value baesd on the
     /// primary variables that are passed as arguments.
-    virtual PropertyDataType value(VariableArray const&);
+    virtual PropertyDataType value(VariableArray const& /*unused*/);
 };  // class Property
 
 /**
@@ -75,16 +75,17 @@ using PropertyArray =
 /// constructor.
 template <typename MaterialType>
 // Property* selectProperty (BaseLib::ConfigTree const&, MaterialType);
-std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const&,
-                                         MaterialType);
+std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& /*config*/,
+                                         MaterialType /*M*/);
 /// This method creates a new medium property.
 std::unique_ptr<Property> newProperty(BaseLib::ConfigTree const& config,
-                                      Medium*);
+                                      Medium* /*m*/);
 /// This method creates a new phase property.
-std::unique_ptr<Property> newProperty(BaseLib::ConfigTree const&, Phase*);
+std::unique_ptr<Property> newProperty(BaseLib::ConfigTree const& /*config*/,
+                                      Phase* /*p*/);
 /// This method creates a new component property.
 std::unique_ptr<Property> newProperty(BaseLib::ConfigTree const& config,
-                                      Component*);
+                                      Component* /*c*/);
 
 /// This method returns a value of type double from the
 /// property value attribute
@@ -118,9 +119,9 @@ inline std::size_t getType(Property const& p)
 /// the property value attribute. The data type is provided
 /// by the first parameter in the argument list.
 template <typename T>
-T getValue(T const&, Property const& p)
+T getValue(T const& /*unused*/, Property const& p)
 {
     return boost::get<T>(p.value());
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

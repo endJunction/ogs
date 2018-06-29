@@ -151,4 +151,4 @@ void Medium::resetPropertyUpdateStatus()
     }
 }
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

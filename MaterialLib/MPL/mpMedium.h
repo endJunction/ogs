@@ -37,13 +37,13 @@ private:
 
 public:
     /// The medium is constructed based on the config tree object.
-    Medium(BaseLib::ConfigTree const&);
+    Medium(BaseLib::ConfigTree const& /*config*/);
     /// A method that parses the phase details and stores them in the
     /// private _phases member.
-    void createPhases(BaseLib::ConfigTree const&);
+    void createPhases(BaseLib::ConfigTree const& /*config*/);
     /// A method that parses the medium property details and stores
     /// them in the private _properties member.
-    void createProperties(BaseLib::ConfigTree const&);
+    void createProperties(BaseLib::ConfigTree const& /*config*/);
 
     /// A method that creates the default properties of the medium.
     /// Currently, these defaults is the volume fraction average.
@@ -51,10 +51,10 @@ public:
 
     /// A get-function for a particular phase. The ul argument specifies
     /// the index within the _phases vector.
-    Phase& phase(std::size_t const) const;
+    Phase& phase(std::size_t /*index*/) const;
     /// A get-function for a property. The argument refers to the
     /// name of the property.
-    Property& property(PropertyEnum const&) const;
+    Property& property(PropertyEnum const& /*p*/) const;
 
     /// A simple get-function for retrieving the number of phases the
     /// medium consists of.
@@ -62,4 +62,4 @@ public:
 
     void resetPropertyUpdateStatus(void);
 };
-} //MaterialPropertyLib
+}  // namespace MaterialPropertyLib

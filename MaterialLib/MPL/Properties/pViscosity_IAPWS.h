@@ -37,7 +37,7 @@ public:
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
-    PropertyDataType value(VariableArray const&) override;
+    PropertyDataType value(VariableArray const& /*unused*/) override;
 };
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib

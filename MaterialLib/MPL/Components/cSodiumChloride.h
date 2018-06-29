@@ -28,4 +28,4 @@ public:
     SodiumChloride();
 };
 
-}  // MaterialPropertyLib
+}  // namespace MaterialPropertyLib
