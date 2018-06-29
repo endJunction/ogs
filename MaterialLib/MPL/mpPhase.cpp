@@ -22,10 +22,14 @@ Phase::Phase(boost::optional<std::string> const& phase_name)
     createDefaultProperties();
 
     if (phase_name)
+    {
         _properties[name] =
             std::make_unique<Constant>(Constant(phase_name.get()));
+    }
     else
+    {
         _properties[name] = std::make_unique<Constant>(Constant("no_name"));
+    }
 };
 Phase::Phase()
 {
@@ -101,7 +105,9 @@ void Phase::createProperties(BaseLib::ConfigTree const& config)
 void Phase::createDefaultProperties(void)
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
+    {
         _properties[i] = std::make_unique<AverageMoleFraction>(this);
+    }
 
     // After this, other special properties can be set as default
 }
@@ -125,10 +131,14 @@ void Phase::resetPropertyUpdateStatus(void)
 {
     // Component properties
     for (std::size_t c = 0; c < numberOfComponents(); ++c)
+    {
         _components[c]->resetPropertyUpdateStatus();
+    }
     // Medium properties
     for (std::size_t p = 0; p < number_of_property_enums; ++p)
+    {
         _properties[p]->isUpdated(false);
+    }
 }
 
 }  // MaterialPropertyLib

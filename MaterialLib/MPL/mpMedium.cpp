@@ -50,7 +50,9 @@ Medium::Medium(BaseLib::ConfigTree const& config)
     auto const properties_config =
         config.getConfigSubtreeOptional("properties");
     if (properties_config)
+    {
         createProperties(*properties_config);
+    }
 }
 /**
  * This method creates the phases of the medium. Unlike a medium, a
@@ -79,7 +81,9 @@ void Medium::createPhases(BaseLib::ConfigTree const& config)
         // Properties of phases are optional
         if (auto const properties_config =
                 phase_config.getConfigSubtreeOptional("properties"))
+        {
             newPhase->createProperties(properties_config.get());
+        }
         // No else branch here, default properties are used. Those defaults
         // were assigned by the phase constructor.
         _phases.push_back(std::move(newPhase));
@@ -113,7 +117,9 @@ void Medium::createProperties(BaseLib::ConfigTree const& config)
 void Medium::createDefaultProperties(void)
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
+    {
         this->_properties[i] = std::make_unique<AverageVolumeFraction>(this);
+    }
 }
 
 Phase& Medium::phase(std::size_t const index) const
@@ -135,10 +141,14 @@ void Medium::resetPropertyUpdateStatus()
 {
     // Phase properties
     for (std::size_t p = 0; p < _phases.size(); ++p)
+    {
         _phases[p]->resetPropertyUpdateStatus();
+    }
     // Medium properties
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
+    {
         _properties[i]->isUpdated(false);
+    }
 }
 
 }  // MaterialPropertyLib

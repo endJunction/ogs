@@ -60,7 +60,9 @@ void Component::createProperties(BaseLib::ConfigTree const& config)
 void Component::createDefaultProperties(void)
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
+    {
         _properties[i] = std::make_unique<Constant>(0);
+    }
 }
 
 Property& Component::property(PropertyEnum const& p) const
@@ -71,7 +73,9 @@ Property& Component::property(PropertyEnum const& p) const
 void Component::resetPropertyUpdateStatus(void)
 {
     for (std::size_t p = 0; p < number_of_property_enums; ++p)
+    {
         _properties[p]->isUpdated(false);
+    }
 }
 /**
  * \brief This function creates a new component based on the (optional)
@@ -85,10 +89,12 @@ std::unique_ptr<Component> newComponent(
 {
     // Check whether a name is given or not
     if (!name)
+    {
         // If there is no component name given (which is common), the
         // method creates a custom component, where all properties have
         // to be specified manually.
         return std::make_unique<Component>();
+    }
 
     std::string component_name = static_cast<std::string>(name.get());
     // If a name is given, it must conform with one of the

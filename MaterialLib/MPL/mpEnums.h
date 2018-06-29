@@ -112,45 +112,85 @@ enum PropertyEnum : std::size_t
 inline PropertyEnum convertStringToProperty(std::string const& inString)
 {
     if (boost::iequals(inString, "acentric_factor"))
+    {
         return acentric_factor;
+    }
     if (boost::iequals(inString, "binary_interaction_coefficient"))
+    {
         return binary_interaction_coefficient;
+    }
     if (boost::iequals(inString, "critical_density"))
+    {
         return critical_density;
+    }
     if (boost::iequals(inString, "critical_pressure"))
+    {
         return critical_pressure;
+    }
     if (boost::iequals(inString, "critical_temperature"))
+    {
         return critical_temperature;
+    }
     if (boost::iequals(inString, "density"))
+    {
         return density;
+    }
     if (boost::iequals(inString, "drhodT"))
+    {
         return drhodT;
+    }
     if (boost::iequals(inString, "effective_stress"))
+    {
         return effective_stress;
+    }
     if (boost::iequals(inString, "heat_capacity"))
+    {
         return heat_capacity;
+    }
     if (boost::iequals(inString, "molar_mass"))
+    {
         return molar_mass;
+    }
     if (boost::iequals(inString, "mole_fraction"))
+    {
         return mole_fraction;
+    }
     if (boost::iequals(inString, "name"))
+    {
         return name;
+    }
     if (boost::iequals(inString, "permeability"))
+    {
         return permeability;
+    }
     if (boost::iequals(inString, "phase_velocity"))
+    {
         return phase_velocity;
+    }
     if (boost::iequals(inString, "reference_density"))
+    {
         return reference_density;
+    }
     if (boost::iequals(inString, "reference_temperature"))
+    {
         return reference_temperature;
+    }
     if (boost::iequals(inString, "relative_permeability"))
+    {
         return relative_permeability;
+    }
     if (boost::iequals(inString, "saturation"))
+    {
         return saturation;
+    }
     if (boost::iequals(inString, "thermal_conductivity"))
+    {
         return thermal_conductivity;
+    }
     if (boost::iequals(inString, "viscosity"))
+    {
         return viscosity;
+    }
 
     OGS_FATAL(
         "The property name \"%s\" does not correspond to any known "
