@@ -64,7 +64,8 @@ std::unique_ptr<Process> createTH2MProcess(
     std::vector<ProcessVariable> const& variables,
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
-    BaseLib::ConfigTree const& config)
+    BaseLib::ConfigTree const& config,
+    std::unique_ptr<MaterialPropertyLib::Medium>&& medium)
 {
     //! \ogs_file_param{prj__processes__process__type}
     config.checkConfigParameter("type", "TH2M");
@@ -199,7 +200,9 @@ std::unique_ptr<Process> createTH2MProcess(
                                                   biot_coefficient,
                                                   porosity,
                                                   solid_density,
-                                                  specific_body_force};
+                                                  specific_body_force,
+                                                  std::move(medium)
+    };
 
     SecondaryVariableCollection secondary_variables;
 
@@ -222,7 +225,8 @@ template std::unique_ptr<Process> createTH2MProcess<2>(
     std::vector<ProcessVariable> const& variables,
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
-    BaseLib::ConfigTree const& config);
+    BaseLib::ConfigTree const& config,
+    std::unique_ptr<MaterialPropertyLib::Medium>&& medium);
 
 template std::unique_ptr<Process> createTH2MProcess<3>(
     MeshLib::Mesh& mesh,
@@ -230,7 +234,8 @@ template std::unique_ptr<Process> createTH2MProcess<3>(
     std::vector<ProcessVariable> const& variables,
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
-    BaseLib::ConfigTree const& config);
+    BaseLib::ConfigTree const& config,
+    std::unique_ptr<MaterialPropertyLib::Medium>&& medium);
 
 }  // namespace TH2M
 }  // namespace ProcessLib

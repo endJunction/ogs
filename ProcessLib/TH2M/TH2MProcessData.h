@@ -19,6 +19,10 @@ template <int DisplacementDim>
 struct MechanicsBase;
 }
 }
+namespace MaterialPropertyLib
+{
+class Medium;
+}
 namespace ProcessLib
 {
 namespace TH2M
@@ -37,7 +41,8 @@ struct TH2MProcessData
         Parameter<double> const& porosity_,
         Parameter<double> const& solid_density_,
         Eigen::Matrix<double, DisplacementDim, 1>
-            specific_body_force_)
+            specific_body_force_,
+        std::unique_ptr<MaterialPropertyLib::Medium>&& medium_)
         : material{std::move(material_)},
           intrinsic_permeability(intrinsic_permeability_),
           specific_storage(specific_storage_),
@@ -46,7 +51,8 @@ struct TH2MProcessData
           biot_coefficient(biot_coefficient_),
           porosity(porosity_),
           solid_density(solid_density_),
-          specific_body_force(std::move(specific_body_force_))
+          specific_body_force(std::move(specific_body_force_)),
+          medium{std::move(medium_)}
     {
     }
 
@@ -60,6 +66,7 @@ struct TH2MProcessData
           porosity(other.porosity),
           solid_density(other.solid_density),
           specific_body_force(other.specific_body_force),
+          medium{std::move(other.medium)},
           dt(other.dt),
           t(other.t)
     {
@@ -97,6 +104,7 @@ struct TH2MProcessData
     /// It is usually used to apply gravitational forces.
     /// A vector of displacement dimension's length.
     Eigen::Matrix<double, DisplacementDim, 1> const specific_body_force;
+    std::unique_ptr<MaterialPropertyLib::Medium> medium;
     double dt = 0.0;
     double t = 0.0;
 

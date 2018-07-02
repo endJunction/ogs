@@ -12,6 +12,7 @@
 #include "LocalAssemblerInterface.h"
 #include "ProcessLib/Process.h"
 #include "TH2MProcessData.h"
+#include "MaterialLib/MPL/mpMedium.h"
 
 namespace ProcessLib
 {
