@@ -31,7 +31,7 @@ class Component;
  * strings. It can be further extended to hold symmetrical tensor data,
  * which consist of six components.
 */
-using PropertyDataType = boost::variant<double, Vector, Tensor, std::string>;
+using PropertyDataType = boost::variant<double, Pair, Vector, Tensor, std::string>;
 
 /**
  * This class is the base class for any material property of any

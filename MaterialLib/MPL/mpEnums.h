@@ -23,8 +23,13 @@
 namespace MaterialPropertyLib
 {
 /// Very simple vector data type for holding
+/// a pair of values.
+using Pair = std::array<double, 2>;
+
+/// Very simple vector data type for holding
 /// vector components.
 using Vector = std::array<double, 3>;
+
 /// Very simple tensor data type for holding
 /// tensor components.
 using Tensor = std::array<double, 9>;
