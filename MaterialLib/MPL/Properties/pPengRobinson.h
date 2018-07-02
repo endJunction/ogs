@@ -20,11 +20,8 @@ class Medium;
 class Phase;
 class Component;
 /**
- * \class AverageVolumeFraction
- * \brief A function averaging a property by volume fraction
- * \details This property is usually a medium property, it
- * computes the average of individual phase properties
- * weighted by volume fraction.
+ * \class PengRobinson
+ * \brief A function to calculate a fluid density using the Peng Robinson EOS
  */
 class PengRobinson final : public Property
 {
