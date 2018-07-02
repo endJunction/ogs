@@ -53,17 +53,16 @@ void TH2MProcess<DisplacementDim>::constructDofTable()
     DBUG("TH2M dof table construction..");
     // Create single component dof in every of the mesh's nodes.
     _mesh_subset_all_nodes =
-        std::make_unique<MeshLib::MeshSubset>(_mesh, &_mesh.getNodes());
+        std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
     // Create single component dof in the mesh's base nodes.
     _base_nodes = MeshLib::getBaseNodes(_mesh.getElements());
     _mesh_subset_base_nodes =
-        std::make_unique<MeshLib::MeshSubset>(_mesh, &_base_nodes);
+        std::make_unique<MeshLib::MeshSubset>(_mesh, _base_nodes);
 
     // TODO move the two data members somewhere else.
     // for extrapolation of secondary variables of stress or strain
-    std::vector<MeshLib::MeshSubsets> all_mesh_subsets_single_component;
-    all_mesh_subsets_single_component.emplace_back(
-        _mesh_subset_all_nodes.get());
+    std::vector<MeshLib::MeshSubset> all_mesh_subsets_single_component{
+        *_mesh_subset_all_nodes};
     _local_to_global_index_map_single_component =
         std::make_unique<NumLib::LocalToGlobalIndexMap>(
             std::move(all_mesh_subsets_single_component),
@@ -73,18 +72,18 @@ void TH2MProcess<DisplacementDim>::constructDofTable()
     if (_use_monolithic_scheme)
     {
         // Collect the mesh subsets in a vector.
-        std::vector<MeshLib::MeshSubsets> all_mesh_subsets;
+        std::vector<MeshLib::MeshSubset> all_mesh_subsets;
 
         // For gas pressure, capillary pressure, and temperature:
         for (int i = 0; i <= indexTemperature; i++)
-            all_mesh_subsets.emplace_back(_mesh_subset_base_nodes.get());
+            all_mesh_subsets.emplace_back(*_mesh_subset_base_nodes);
 
         // For displacement:
         const int monolithic_process_id = 0;
         std::generate_n(
                 std::back_inserter(all_mesh_subsets),
                 getProcessVariables(monolithic_process_id)[indexDisplacement].get().getNumberOfComponents(),
-                [&]() { return MeshLib::MeshSubsets{_mesh_subset_all_nodes.get()}; });
+                [&]() { return *_mesh_subset_all_nodes; });
 
         std::vector<int> const vec_n_components{1,1,1, DisplacementDim};
         _local_to_global_index_map =
@@ -271,7 +270,7 @@ void TH2MProcess<DisplacementDim>::preTimestepConcreteProcess(
 
 template <int DisplacementDim>
 void TH2MProcess<DisplacementDim>::postTimestepConcreteProcess(
-        GlobalVector const& x, const int process_id)
+        GlobalVector const& x,const double /*t*/, const double /*delta_t*/, const int process_id)
     {
         DBUG("PostTimestep HydroMechanicsProcess.");
         GlobalExecutor::executeMemberOnDereferenced(
