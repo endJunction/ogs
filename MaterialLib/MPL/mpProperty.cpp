@@ -148,7 +148,7 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     }
     if (boost::iequals(property_type, "Brooks_Corey_1964"))
     {
-        OGS_FATAL("TODO: Implementation of %s property!!", property_type.c_str());
+        return std::make_unique<BrooksCorey>(M);
     }
     // If none of the above property types are found, OGS throws an error.
     OGS_FATAL(

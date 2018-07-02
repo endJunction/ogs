@@ -14,6 +14,7 @@
 
 #include "pAverageMoleFraction.h"
 #include "pAverageVolumeFraction.h"
+#include "pBrooksCorey.h"
 #include "pConstant.h"
 #include "pLinearTemperature.h"
 #include "pPengRobinson.h"
