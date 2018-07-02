@@ -81,12 +81,14 @@ enum PropertyEnum : std::size_t
 {
     acentric_factor,
     binary_interaction_coefficient,
+    brooks_corey_exponent,
     critical_density,
     critical_pressure,
     critical_temperature,
     density,
     drhodT,
     effective_stress,
+    entry_pressure,
     heat_capacity,
     molar_mass,
     mole_fraction,
@@ -96,6 +98,8 @@ enum PropertyEnum : std::size_t
     reference_density,
     reference_temperature,
     relative_permeability,
+    residual_gas_saturation,
+    residual_liquid_saturation,
     saturation,
     thermal_conductivity,
     viscosity,
@@ -118,6 +122,10 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
     if (boost::iequals(inString, "binary_interaction_coefficient"))
     {
         return binary_interaction_coefficient;
+    }
+    if (boost::iequals(inString, "brooks_corey_exponent"))
+    {
+        return brooks_corey_exponent;
     }
     if (boost::iequals(inString, "critical_density"))
     {
@@ -142,6 +150,10 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
     if (boost::iequals(inString, "effective_stress"))
     {
         return effective_stress;
+    }
+    if (boost::iequals(inString, "entry_pressure"))
+    {
+        return entry_pressure;
     }
     if (boost::iequals(inString, "heat_capacity"))
     {
@@ -178,6 +190,14 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
     if (boost::iequals(inString, "relative_permeability"))
     {
         return relative_permeability;
+    }
+    if (boost::iequals(inString, "residual_gas_saturation"))
+    {
+        return residual_gas_saturation;
+    }
+    if (boost::iequals(inString, "residual_liquid_saturation"))
+    {
+        return residual_liquid_saturation;
     }
     if (boost::iequals(inString, "saturation"))
     {
