@@ -40,33 +40,33 @@ namespace ProcessLib
 {
     namespace HeatTransportBHE
     {
-        template <typename ShapeFunction,
-            typename IntegrationMethod,
-            int GlobalDim>
-            HeatTransportBHELocalAssemblerSoilNearBHE<ShapeFunction,
-            IntegrationMethod,
-            GlobalDim>::
-            HeatTransportBHELocalAssemblerSoilNearBHE(
-                MeshLib::Element const& e,
-                std::size_t const n_variables,
-                std::size_t const /*local_matrix_size*/,
-                std::vector<unsigned> const& dofIndex_to_localIndex,
-                bool const is_axially_symmetric,
-                unsigned const integration_order,
-                HeatTransportBHEProcessData& process_data)
-            : HeatTransportBHELocalAssemblerInterface(
-                n_variables * ShapeFunction::NPOINTS * GlobalDim,
-                dofIndex_to_localIndex),
-            _process_data(process_data),
-            _integration_method(integration_order),
-            _element(e),
-            _is_axially_symmetric(is_axially_symmetric)
-        {
-            unsigned const n_integration_points =
-                _integration_method.getNumberOfPoints();
+    template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
+    HeatTransportBHELocalAssemblerSoilNearBHE<ShapeFunction, IntegrationMethod,
+                                              GlobalDim>::
+        HeatTransportBHELocalAssemblerSoilNearBHE(
+            MeshLib::Element const& e,
+            std::size_t const n_variables,
+            std::size_t const /*local_matrix_size*/,
+            std::vector<unsigned> const& dofIndex_to_localIndex,
+            bool const is_axially_symmetric,
+            unsigned const integration_order,
+            HeatTransportBHEProcessData& process_data)
+        : HeatTransportBHELocalAssemblerInterface(
+              n_variables * ShapeFunction::NPOINTS * GlobalDim,
+              dofIndex_to_localIndex),
+          _process_data(process_data),
+          _integration_method(integration_order),
+          _element(e),
+          _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
+                                            IntegrationMethod, GlobalDim>(
+              e, is_axially_symmetric, _integration_method)),
+          _is_axially_symmetric(is_axially_symmetric)
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
 
-            _ip_data.reserve(n_integration_points);
-            _secondary_data.N.resize(n_integration_points);
+        _ip_data.reserve(n_integration_points);
+        _secondary_data.N.resize(n_integration_points);
         }
 
         template<typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
@@ -138,44 +138,7 @@ namespace ProcessLib
             GlobalDim>::
             postTimestepConcrete(std::vector<double> const& /*local_x*/)
         {
-            /*
-            // Compute average value per element
-            const int n = DisplacementDim == 2 ? 4 : 6;
-            Eigen::VectorXd ele_stress = Eigen::VectorXd::Zero(n);
-            Eigen::VectorXd ele_strain = Eigen::VectorXd::Zero(n);
 
-            unsigned const n_integration_points =
-                _integration_method.getNumberOfPoints();
-            for (unsigned ip = 0; ip < n_integration_points; ip++)
-            {
-                auto& ip_data = _ip_data[ip];
-
-                ele_stress += ip_data._sigma;
-                ele_strain += ip_data._eps;
-            }
-            ele_stress /= n_integration_points;
-            ele_strain /= n_integration_points;
-
-            (*_process_data._mesh_prop_stress_xx)[_element.getID()] = ele_stress[0];
-            (*_process_data._mesh_prop_stress_yy)[_element.getID()] = ele_stress[1];
-            (*_process_data._mesh_prop_stress_zz)[_element.getID()] = ele_stress[2];
-            (*_process_data._mesh_prop_stress_xy)[_element.getID()] = ele_stress[3];
-            if (DisplacementDim == 3)
-            {
-                (*_process_data._mesh_prop_stress_yz)[_element.getID()] = ele_stress[4];
-                (*_process_data._mesh_prop_stress_xz)[_element.getID()] = ele_stress[5];
-            }
-
-            (*_process_data._mesh_prop_strain_xx)[_element.getID()] = ele_strain[0];
-            (*_process_data._mesh_prop_strain_yy)[_element.getID()] = ele_strain[1];
-            (*_process_data._mesh_prop_strain_zz)[_element.getID()] = ele_strain[2];
-            (*_process_data._mesh_prop_strain_xy)[_element.getID()] = ele_strain[3];
-            if (DisplacementDim == 3)
-            {
-                (*_process_data._mesh_prop_strain_yz)[_element.getID()] = ele_strain[4];
-                (*_process_data._mesh_prop_strain_xz)[_element.getID()] = ele_strain[5];
-            }
-            */
         }
 
     }  // namespace HeatTransportBHE
