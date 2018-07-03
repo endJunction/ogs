@@ -9,6 +9,7 @@
 
 #include "CreateBoundaryCondition.h"
 
+#include "BHEInflowDirichletBoundaryCondition.h"
 #include "BoundaryCondition.h"
 #include "BoundaryConditionConfig.h"
 #include "ConstraintDirichletBoundaryCondition.h"
@@ -126,6 +127,12 @@ std::unique_ptr<BoundaryCondition> createBoundaryCondition(
             createPhaseFieldIrreversibleDamageOracleBoundaryCondition(
                 config.config, dof_table, bulk_mesh, variable_id,
                 *config.component_id);
+    }
+    if (type == "BHEInflowDirichlet")
+    {
+        return ProcessLib::createBHEInflowDirichletBoundaryCondition(
+            config.config, dof_table, config.mesh, variable_id,
+            integration_order, *config.component_id, parameters);
     }
     OGS_FATAL("Unknown boundary condition type: `%s'.", type.c_str());
 }

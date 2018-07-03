@@ -172,9 +172,9 @@
             <values>295.25 295.25 295.25 295.25</values>
         </parameter>
         <parameter>
-            <name>T_bound</name>
+            <name>T_inflow</name>
             <type>Constant</type>
-            <value>300.0</value>
+            <value>320.0</value>
         </parameter>
 
     </parameters>
@@ -197,9 +197,9 @@
                 <boundary_condition>
                     <geometrical_set>beier_sandbox</geometrical_set>
                     <geometry>BHE_TOP</geometry>
-                    <type>Dirichlet</type>
+                    <type>BHEInflowDirichlet</type>
                     <component>0</component>
-                    <parameter>T_bound</parameter>
+                    <parameter>T_inflow</parameter>
                 </boundary_condition>
             </boundary_conditions>
         </process_variable>
