@@ -40,33 +40,35 @@ namespace ProcessLib
 {
     namespace HeatTransportBHE
     {
-    template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
-    HeatTransportBHELocalAssemblerSoilNearBHE<ShapeFunction, IntegrationMethod,
-                                              GlobalDim>::
-        HeatTransportBHELocalAssemblerSoilNearBHE(
-            MeshLib::Element const& e,
-            std::size_t const n_variables,
-            std::size_t const /*local_matrix_size*/,
-            std::vector<unsigned> const& dofIndex_to_localIndex,
-            bool const is_axially_symmetric,
-            unsigned const integration_order,
-            HeatTransportBHEProcessData& process_data)
-        : HeatTransportBHELocalAssemblerInterface(
-              n_variables * ShapeFunction::NPOINTS * GlobalDim,
-              dofIndex_to_localIndex),
-          _process_data(process_data),
-          _integration_method(integration_order),
-          _element(e),
-          _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
-                                            IntegrationMethod, GlobalDim>(
-              e, is_axially_symmetric, _integration_method)),
-          _is_axially_symmetric(is_axially_symmetric)
-    {
-        unsigned const n_integration_points =
-            _integration_method.getNumberOfPoints();
+        template <typename ShapeFunction,
+            typename IntegrationMethod,
+            int GlobalDim>
+            HeatTransportBHELocalAssemblerSoilNearBHE<ShapeFunction,
+            IntegrationMethod,
+            GlobalDim>::
+            HeatTransportBHELocalAssemblerSoilNearBHE(
+                MeshLib::Element const& e,
+                std::size_t const n_variables,
+                std::size_t const /*local_matrix_size*/,
+                std::vector<unsigned> const& dofIndex_to_localIndex,
+                bool const is_axially_symmetric,
+                unsigned const integration_order,
+                HeatTransportBHEProcessData& process_data)
+            : HeatTransportBHELocalAssemblerInterface(
+                n_variables * ShapeFunction::NPOINTS * GlobalDim,
+                dofIndex_to_localIndex),
+            _process_data(process_data),
+            _integration_method(integration_order),
+            _element(e),
+            _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
+                IntegrationMethod, GlobalDim>(e, is_axially_symmetric, _integration_method)),
+            _is_axially_symmetric(is_axially_symmetric)
+        {
+            unsigned const n_integration_points =
+                _integration_method.getNumberOfPoints();
 
-        _ip_data.reserve(n_integration_points);
-        _secondary_data.N.resize(n_integration_points);
+            _ip_data.reserve(n_integration_points);
+            _secondary_data.N.resize(n_integration_points);
         }
 
         template<typename ShapeFunction, typename IntegrationMethod, int GlobalDim>

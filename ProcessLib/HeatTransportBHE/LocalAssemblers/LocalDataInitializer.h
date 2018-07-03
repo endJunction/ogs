@@ -255,7 +255,7 @@ public:
         auto n_local_dof = _dof_table.getNumberOfElementDOF(id);
         std::vector<unsigned> dofIndex_to_localIndex;
 
-        if (mesh_item.getDimension() < GlobalDim)
+        if (mesh_item.getDimension() < GlobalDim ) 
         {
             // this is a BHE element
             auto const n_global_components =
