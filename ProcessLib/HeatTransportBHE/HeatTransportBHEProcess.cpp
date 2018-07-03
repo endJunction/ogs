@@ -75,25 +75,6 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
         }
     }
 
-    // need to use a custom Dirichlet BC assembler for the inflow temperature of
-    // every BHE
-    int pv_BHE_temperature_id = 0;
-    const int process_id = 0;
-    for (ProcessVariable& pv : getProcessVariables(process_id))
-    {
-        if (pv.getName().find("temperature_BHE") == std::string::npos)
-        {
-            continue;
-        }
-        pv.createBoundaryConditions(*_local_to_global_index_map,
-                                    0, /* const int variable_id, */
-                                    integration_order,
-                                    parameters,
-                                    *this);
-
-        pv_BHE_temperature_id++;
-    }
-
     MeshLib::PropertyVector<int> const* material_ids(
         mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
     _process_data._mesh_prop_materialIDs = material_ids;
