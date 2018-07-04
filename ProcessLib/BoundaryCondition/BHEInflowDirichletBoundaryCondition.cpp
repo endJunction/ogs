@@ -32,14 +32,16 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
     bc_values.values.resize(_bc_values.values.size());
 
     const size_t n_nodes = _T_out_values.size();
-    double tmp_T_in(320.0);
-    for (size_t i = 0; i < n_nodes; i++)
+    double tmp_T_in(320.0); 
+    for (size_t i=0; i<n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
         // TODO, here call the BHE functions
-        // tmp_T_in = ;
+        // tmp_T_in = _BHE_property->;
         bc_values.values[i] = tmp_T_in;
+
     }
+
 
     /*
     // convert mesh node ids to global index for the given component
@@ -70,8 +72,8 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
 }
 
 // update new values and corresponding indices.
-void BHEInflowDirichletBoundaryCondition::preTimestep(const double t,
-                                                      const GlobalVector& x)
+void BHEInflowDirichletBoundaryCondition::preTimestep(
+    const double t, const GlobalVector& x)
 {
     // for each BHE, the inflow temperature is dependent on
     // the ouflow temperature of the BHE. 
@@ -82,11 +84,12 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(const double t,
     for (auto const* n : nodes)
     {
         std::size_t node_id = n->getID();
-        auto g_idx = _bc_values.ids.at(node_id);
+        auto g_idx = _bc_values.ids.at(node_id); 
 
         // read the T_out
         // TODO: notice that node_id + 1 is not always T_out!
-        _T_out_values[node_id] = x[g_idx + 1];
+        _T_out_values[node_id] = x[g_idx + 1]; 
+
     }
 }
 
@@ -99,12 +102,20 @@ createBHEInflowDirichletBoundaryCondition(
     int const component_id,
     const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters)
 {
-    DBUG(
-        "Constructing BHEInflowDirichletBoundaryCondition from "
-        "config.");
+    DBUG("Constructing BHEInflowDirichletBoundaryCondition from config.");
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__type}
     config.checkConfigParameter(
         "type", "BHEInflowDirichlet");
+
+    // make sure that the process is HEAT_TRANSPORT_BHE !
+    // config.checkConfigParameter("type", "HEAT_TRANSPORT_BHE");
+
+    // find the corresponding BHE id
+    auto const bhe_id = config.getConfigParameter<std::size_t>("bhe_id");
+
+    // TODO: try to locate the BHE instance here
+    // if BHE instance cannot be found,
+    // then complain about it.
 
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
     auto const param_name = config.getConfigParameter<std::string>("parameter");

@@ -12,12 +12,12 @@
 #include "BoundaryCondition.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/IndexValueVector.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 #include "ProcessLib/Parameter/Parameter.h"
 
 namespace ProcessLib
 {
-class BHEInflowDirichletBoundaryCondition final
-    : public BoundaryCondition
+class BHEInflowDirichletBoundaryCondition final : public BoundaryCondition
 {
 public:
     BHEInflowDirichletBoundaryCondition(
@@ -51,7 +51,7 @@ public:
 
         std::vector<MeshLib::Node*> const& bc_nodes = _bc_mesh.getNodes();
         DBUG(
-            "Found %d nodes for constraint Dirichlet BCs for the variable %d "
+            "Found %d nodes for BHE Inflow Dirichlet BCs for the variable %d "
             "and "
             "component %d",
             bc_nodes.size(), variable_id, component_id);
@@ -133,6 +133,8 @@ private:
     std::vector<double> _T_out_values;
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
+
+    HeatTransportBHE::BHE::BHEAbstract* _BHE_property;
 };
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>

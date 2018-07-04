@@ -9,9 +9,9 @@
 
 #include "CreateBoundaryCondition.h"
 
+#include "BHEInflowDirichletBoundaryCondition.h"
 #include "BoundaryCondition.h"
 #include "BoundaryConditionConfig.h"
-#include "BHEInflowDirichletBoundaryCondition.h"
 #include "ConstraintDirichletBoundaryCondition.h"
 #include "DirichletBoundaryCondition.h"
 #include "NeumannBoundaryCondition.h"

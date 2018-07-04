@@ -198,6 +198,7 @@
                     <geometrical_set>beier_sandbox</geometrical_set>
                     <geometry>BHE_TOP</geometry>
                     <type>BHEInflowDirichlet</type>
+                    <bhe_id>0</bhe_id>
                     <component>0</component>
                     <parameter>T_inflow</parameter>
                 </boundary_condition>
