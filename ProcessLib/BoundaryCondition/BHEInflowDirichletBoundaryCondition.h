@@ -16,7 +16,8 @@
 
 namespace ProcessLib
 {
-class BHEInflowDirichletBoundaryCondition final : public BoundaryCondition
+class BHEInflowDirichletBoundaryCondition final
+    : public BoundaryCondition
 {
 public:
     BHEInflowDirichletBoundaryCondition(
@@ -25,10 +26,12 @@ public:
         MeshLib::Mesh const& bc_mesh,
         int const variable_id,
         unsigned const integration_order,
+        std::size_t const bulk_mesh_id,
         int const component_id)
         : _parameter(parameter),
           _variable_id(variable_id),
           _component_id(component_id),
+          _bulk_mesh_id(bulk_mesh_id),
           _bc_mesh(bc_mesh),
           _integration_order(integration_order)
     {
@@ -55,10 +58,50 @@ public:
 
         MeshLib::MeshSubset bc_mesh_subset{_bc_mesh, bc_nodes};
 
+        // create memory to store Tout values
+        _T_out_values.resize(bc_nodes.size());
+
         // Create local DOF table from intersected mesh subsets for the given
         // variable and component ids.
         _dof_table_boundary.reset(dof_table_bulk.deriveBoundaryConstrainedMap(
             variable_id, {component_id}, std::move(bc_mesh_subset)));
+
+        SpatialPosition pos;
+
+        auto const& bulk_node_ids_map =
+            *_bc_mesh.getProperties().getPropertyVector<std::size_t>(
+                "bulk_node_ids");
+
+        _bc_values.ids.clear();
+        _bc_values.values.clear();
+
+        // convert mesh node ids to global index for the given component
+        _bc_values.ids.reserve(_bc_mesh.getNumberOfNodes());
+        _bc_values.values.reserve(_bc_mesh.getNumberOfNodes());
+        for (auto const* const node : _bc_mesh.getNodes())
+        {
+            pos.setNodeID(node->getID());
+            MeshLib::Location l(_bulk_mesh_id, MeshLib::MeshItemType::Node,
+                                node->getID());
+            // that might be slow, but only done once
+            const auto g_idx = _dof_table_boundary->getGlobalIndex(
+                l, _variable_id, _component_id);
+            if (g_idx == NumLib::MeshComponentMap::nop)
+                continue;
+            // For the DDC approach (e.g. with PETSc option), the negative
+            // index of g_idx means that the entry by that index is a ghost one,
+            // which should be dropped. Especially for PETSc routines
+            // MatZeroRows and MatZeroRowsColumns, which are called to apply the
+            // Dirichlet BC, the negative index is not accepted like other
+            // matrix or vector PETSc routines. Therefore, the following
+            // if-condition is applied.
+            if (g_idx >= 0)
+            {
+                _bc_values.ids.emplace_back(g_idx);
+                _bc_values.values.emplace_back(
+                    _parameter(0.0 /*using initial value*/, pos).front());
+            }
+        }
     }
 
     void getEssentialBCValues(
@@ -84,8 +127,10 @@ private:
     /// Integration order for integration over the lower-dimensional elements
     unsigned const _integration_order;
 
+    std::size_t const _bulk_mesh_id;
+
     /// Stores the results of the outflow temperatures per boundary node.
-    std::vector<double> _outflow_temperature;
+    std::vector<double> _T_out_values;
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 };
@@ -95,7 +140,8 @@ createBHEInflowDirichletBoundaryCondition(
     BaseLib::ConfigTree const& config,
     NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
     MeshLib::Mesh const& bc_mesh, int const variable_id,
-    unsigned const integration_order, int const component_id,
+    unsigned const integration_order, std::size_t const bulk_mesh_id,
+    int const component_id,
     const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters);
 
 }  // namespace ProcessLib

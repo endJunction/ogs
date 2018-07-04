@@ -9,9 +9,9 @@
 
 #include "CreateBoundaryCondition.h"
 
-#include "BHEInflowDirichletBoundaryCondition.h"
 #include "BoundaryCondition.h"
 #include "BoundaryConditionConfig.h"
+#include "BHEInflowDirichletBoundaryCondition.h"
 #include "ConstraintDirichletBoundaryCondition.h"
 #include "DirichletBoundaryCondition.h"
 #include "NeumannBoundaryCondition.h"
@@ -132,7 +132,8 @@ std::unique_ptr<BoundaryCondition> createBoundaryCondition(
     {
         return ProcessLib::createBHEInflowDirichletBoundaryCondition(
             config.config, dof_table, config.mesh, variable_id,
-            integration_order, *config.component_id, parameters);
+            integration_order, config.mesh.getID(), *config.component_id,
+            parameters);
     }
     OGS_FATAL("Unknown boundary condition type: `%s'.", type.c_str());
 }
