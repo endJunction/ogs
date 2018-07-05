@@ -104,12 +104,14 @@ void Phase::createProperties(BaseLib::ConfigTree const& config)
  */
 void Phase::createDefaultProperties()
 {
-    for (std::size_t i = 0; i < number_of_property_enums; ++i)
+        for (std::size_t i = 0; i < number_of_property_enums; ++i)
     {
-        _properties[i] = std::make_unique<AverageMoleFraction>(this);
+            _properties[i] = std::make_unique<Undefined>((PropertyEnum)i);
     }
 
-    // After this, other special properties can be set as default
+        // After this, other special properties can
+        // be set as exceptional defaults
+
 }
 
 Component& Phase::component(const std::size_t& index) const

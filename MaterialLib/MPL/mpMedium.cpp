@@ -16,7 +16,7 @@
 #include <boost/variant.hpp>
 #include <string>
 
-#include "Properties/pAverageVolumeFraction.h"
+#include "Properties/pUndefined.h"
 #include "Properties/pConstant.h"
 #include "mpComponent.h"
 #include "mpPhase.h"
@@ -118,7 +118,7 @@ void Medium::createDefaultProperties()
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
     {
-        this->_properties[i] = std::make_unique<AverageVolumeFraction>(this);
+        this->_properties[i] = std::make_unique<Undefined>((PropertyEnum)i);
     }
 }
 

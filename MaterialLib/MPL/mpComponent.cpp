@@ -61,7 +61,7 @@ void Component::createDefaultProperties()
 {
     for (std::size_t i = 0; i < number_of_property_enums; ++i)
     {
-        _properties[i] = std::make_unique<Constant>(0);
+        _properties[i] = std::make_unique<Undefined>((PropertyEnum)i);
     }
 }
 
