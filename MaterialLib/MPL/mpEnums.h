@@ -30,6 +30,10 @@ using Pair = std::array<double, 2>;
 /// vector components.
 using Vector = std::array<double, 3>;
 
+/// Simple symmetric tensor data type for holding
+/// xx, yy, zz, xy, xz, yz tensor components.
+using SymmTensor = std::array<double, 9>;
+
 /// Very simple tensor data type for holding
 /// tensor components.
 using Tensor = std::array<double, 9>;

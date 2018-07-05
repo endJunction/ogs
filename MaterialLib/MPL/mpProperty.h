@@ -31,7 +31,8 @@ class Component;
  * strings. It can be further extended to hold symmetrical tensor data,
  * which consist of six components.
 */
-using PropertyDataType = boost::variant<double, Pair, Vector, Tensor, std::string>;
+using PropertyDataType = boost::variant<double, Pair, Vector, SymmTensor,
+        Tensor, std::string>;
 
 /**
  * This class is the base class for any material property of any
@@ -99,6 +100,13 @@ inline double getScalar(Property& p)
 inline double getScalar(Property& p, VariableArray const& v)
 {
     return boost::get<double>(p.value(v));
+}
+
+/// This method forces the computation of a value of type
+/// Pair and returns it
+inline Pair getPair(Property& p, VariableArray const& v)
+{
+    return boost::get<Pair>(p.value(v));
 }
 
 /// This method returns a value of type string from the

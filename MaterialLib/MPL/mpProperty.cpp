@@ -17,6 +17,11 @@
 #include "mpMedium.h"
 #include "mpPhase.h"
 
+#include <sstream>
+#include <string>
+#include <iostream>
+#include <vector>
+
 namespace MaterialPropertyLib
 {
 /// The base class constructor may remain empty since the base class is
@@ -92,8 +97,72 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
         /// constructor, however, can handle any datatype defined
         /// by PropertyDataType. This could be enhanced in order
         /// to define vectors or even tensors as constant properties.
-        auto const property_value = config.getConfigParameter<double>("value");
+
+        auto const sValue = config.getConfigParameter<std::string>("value");
+
+        std::stringstream issValue(sValue);
+
+        std::vector<double> values;
+        double dummy(0);
+
+        while (issValue >> dummy)
+            values.push_back(dummy);
+
+        switch (values.size())
+        {
+        case 1:
+        {
+            // scalar
+            PropertyDataType property_value = values[0];
+            std::cout << "---create a constant scalar value property.\n";
+
+            return std::make_unique<Constant>(Constant(property_value));
+        }
+        case 2:
+        {
+            // Pair
+            PropertyDataType property_value = (Pair){values[0], values[1]};
+            std::cout << "---create a constant paired value property.\n";
+            return std::make_unique<Constant>(Constant(property_value));
+        }
+        case 3:
+        {
+            // Vector
+            PropertyDataType property_value =
+                    (Vector){values[0], values[1], values[2]};
+            std::cout << "---create a constant vector value property.\n";
+            return std::make_unique<Constant>(Constant(property_value));
+        }
+        case 6:
+        {
+            // Symmetric Tensor - xx, yy, zz, xy, xz, yz
+            PropertyDataType property_value =
+                    (SymmTensor){values[0], values[1], values[2],
+                                 values[3], values[4], values[5]};
+            std::cout << "---create a constant symmetric tensor value property.\n";
+            return std::make_unique<Constant>(Constant(property_value));
+        }
+        case 9:
+        {
+            // Tensor
+            PropertyDataType property_value =
+                    (Tensor){values[0], values[1], values[2],
+                             values[3], values[4], values[5],
+                             values[6], values[7], values[8]};
+            std::cout << "---create a constant tensor value property.\n";
+            return std::make_unique<Constant>(Constant(property_value));
+        }
+
+        default:
+        {
+            OGS_FATAL ("Given number of components for constant property. /%i", values.size());
+        }
+        }
+
+        PropertyDataType property_value;
         return std::make_unique<Constant>(Constant(property_value));
+
+       // return std::make_unique<Constant>(Constant(property_value));
     }
     /// Properties can be medium, phase, or component properties.
     /// Some of them require information about the respective material.
