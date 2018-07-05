@@ -90,10 +90,12 @@ enum PropertyEnum : std::size_t
 {
     acentric_factor,
     binary_interaction_coefficient,
+    biot_coefficient,
     brooks_corey_exponent,
     critical_density,
     critical_pressure,
     critical_temperature,
+    compressibility,
     density,
     drhodT,
     effective_stress,
@@ -104,6 +106,7 @@ enum PropertyEnum : std::size_t
     name,
     permeability,
     phase_velocity,
+    porosity,
     reference_density,
     reference_temperature,
     relative_permeability,
@@ -130,7 +133,11 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
     }
     if (boost::iequals(inString, "binary_interaction_coefficient"))
     {
-        return binary_interaction_coefficient;
+            return binary_interaction_coefficient;
+    }
+    if (boost::iequals(inString, "biot_coefficient"))
+    {
+            return biot_coefficient;
     }
     if (boost::iequals(inString, "brooks_corey_exponent"))
     {
@@ -147,6 +154,10 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
     if (boost::iequals(inString, "critical_temperature"))
     {
         return critical_temperature;
+    }
+    if (boost::iequals(inString, "compressibility"))
+    {
+        return compressibility;
     }
     if (boost::iequals(inString, "density"))
     {
@@ -183,6 +194,10 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
     if (boost::iequals(inString, "permeability"))
     {
         return permeability;
+    }
+    if (boost::iequals(inString, "porosity"))
+    {
+            return porosity;
     }
     if (boost::iequals(inString, "phase_velocity"))
     {
@@ -232,21 +247,28 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
 const static std::vector<std::string> convertEnumToString{
     {"acentric_factor"},
     {"binary_interaction_coefficient"},
+    {"biot_coefficient"},
+    {"brooks_corey_exponent"},
     {"critical_density"},
     {"critical_pressure"},
     {"critical_temperature"},
+    {"compressibility"},
     {"density"},
     {"drhodT"},
     {"effective_stress"},
+    {"entry_pressure"},
     {"heat_capacity"},
     {"molar_mass"},
     {"mole_fraction"},
     {"name"},
     {"permeability"},
     {"phase_velocity"},
+    {"porosity"},
     {"reference_density"},
     {"reference_temperature"},
     {"relative_permeability"},
+    {"residual_gas_saturation"},
+    {"residual_liquid_saturation"},
     {"saturation"},
     {"thermal_conductivity"},
     {"viscosity"}};
