@@ -19,14 +19,8 @@ namespace MaterialPropertyLib
 class Medium;
 class Phase;
 class Component;
-/**
- * \class AverageVolumeFraction
- * \brief A function averaging a property by volume fraction
- * \details This property is usually a medium property, it
- * computes the average of individual phase properties
- * weighted by volume fraction.
- */
-class BrooksCorey final : public Property
+
+class BrooksCoreyRelPerm final : public Property
 {
 private:
     /// A pointer to the phase object.
@@ -35,11 +29,11 @@ private:
 
 public:
     /// Constructor passing a pointer to the medium.
-    BrooksCorey(Medium*);
+    BrooksCoreyRelPerm(Medium*);
     /// Constructor passing a pointer to a phase.
-    BrooksCorey(Phase*);
+    BrooksCoreyRelPerm(Phase*);
     /// Constructor passing a pointer to a component.
-    BrooksCorey(Component*);
+    BrooksCoreyRelPerm(Component*);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.

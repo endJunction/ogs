@@ -146,9 +146,13 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     {
         return std::make_unique<PengRobinson>(M);
     }
-    if (boost::iequals(property_type, "Brooks_Corey_1964"))
+    if (boost::iequals(property_type, "Brooks_Corey_1964_saturation"))
     {
-        return std::make_unique<BrooksCorey>(M);
+        return std::make_unique<BrooksCoreySaturation>(M);
+    }
+    if (boost::iequals(property_type, "Brooks_Corey_1964_permeability"))
+    {
+        return std::make_unique<BrooksCoreyRelPerm>(M);
     }
     // If none of the above property types are found, OGS throws an error.
     OGS_FATAL(
