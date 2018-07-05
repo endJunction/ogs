@@ -17,6 +17,7 @@
 #include "pBrooksCoreyRelPerm.h"
 #include "pBrooksCoreySaturation.h"
 #include "pConstant.h"
+#include "pIdealGasLaw.h"
 #include "pLinearTemperature.h"
 #include "pPengRobinson.h"
 #include "pViscosity_Fenghour.h"

@@ -38,7 +38,9 @@ public:
     IdealGasLaw(Component* /*c*/);
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
-    PropertyDataType value(VariableArray const& /*unused*/) override;
+    PropertyDataType value(VariableArray const&) override;
+    PropertyDataType dvalue(VariableArray const&, PrimaryVariables const ) override;
+
 };
 
 }  // namespace MaterialPropertyLib

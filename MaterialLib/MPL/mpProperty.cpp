@@ -126,6 +126,10 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     {
         return std::make_unique<ViscosityWaterIAPWS>(M);
     }
+    if (boost::iequals(property_type, "ideal_gas_law"))
+    {
+        return std::make_unique<IdealGasLaw>(M);
+    }
     if (boost::iequals(property_type, "Islam_Carlson_2012"))
     {
         OGS_FATAL("TODO: Implementation of %s property!!", property_type.c_str());
