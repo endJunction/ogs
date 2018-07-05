@@ -41,6 +41,7 @@ Medium::Medium(BaseLib::ConfigTree const& config)
     auto const medium_name =
         config.getConfigParameter<std::string>("name", "no_name");
 
+    // 'name' is a constant property of the medium
     _properties[name] = std::make_unique<Constant>(medium_name);
 
     // Parsing the phases
@@ -74,9 +75,9 @@ void Medium::createPhases(BaseLib::ConfigTree const& config)
             phase_config.getConfigParameterOptional<std::string>("name");
         auto newPhase = std::make_unique<Phase>(phase_name);
         // Parsing the components
-        auto const components_config =
-            phase_config.getConfigSubtree("components");
-        newPhase->createComponents(components_config);
+        if (auto const components_config =
+            phase_config.getConfigSubtreeOptional("components"))
+        newPhase->createComponents(components_config.get());
 
         // Properties of phases are optional
         if (auto const properties_config =
