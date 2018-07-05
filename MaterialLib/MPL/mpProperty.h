@@ -44,6 +44,8 @@ class Property
 protected:
     /// The single value of a property.
     PropertyDataType _value;
+    PropertyDataType _dvalue;
+
     bool _isUpdated{false};
 
 public:
@@ -58,9 +60,13 @@ public:
     /// This virtual method simply returns the private _value attribute
     /// without changing it.
     virtual PropertyDataType value() const;
-    /// This virtual method will compute the property value baesd on the
+    /// This virtual method will compute the property value based on the
     /// primary variables that are passed as arguments.
     virtual PropertyDataType value(VariableArray const& /*unused*/);
+    /// This virtual method will compute the derivative of a property
+    /// with respect to the given variables pv.
+    virtual PropertyDataType dvalue(VariableArray const&, PrimaryVariables const pv);
+
 };  // class Property
 
 /**
@@ -107,6 +113,14 @@ inline double getScalar(Property& p, VariableArray const& v)
 inline Pair getPair(Property& p, VariableArray const& v)
 {
     return boost::get<Pair>(p.value(v));
+}
+
+/// This method forces the computation the derivative of a value,
+/// returns a double value. The derivative is computed with respect
+/// to variable pv.
+inline double getScalarDerivative(Property& p, VariableArray const& v, PrimaryVariables const pv)
+{
+    return boost::get<double>(p.dvalue(v,pv));
 }
 
 /// This method returns a value of type string from the

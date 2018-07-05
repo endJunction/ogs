@@ -39,6 +39,14 @@ PropertyDataType Property::value(VariableArray const& /*unused*/)
     return _value;
 }
 
+ /// Default implementation: derivative of any constant property is zero.
+ PropertyDataType Property::dvalue(VariableArray const&, PrimaryVariables const pv)
+ {
+     return 0.0;
+ }
+
+
+
 void Property::isUpdated(bool status)
 {
     _isUpdated = status;
