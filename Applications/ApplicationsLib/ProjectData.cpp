@@ -738,13 +738,13 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                     process = ProcessLib::TH2M::createTH2MProcess<2>(
                         *_mesh_vec[0], std::move(jacobian_assembler),
                         _process_variables, _parameters, integration_order,
-                        process_config, std::move(_medium));
+                        process_config, *_medium);
                     break;
                 case 3:
                     process = ProcessLib::TH2M::createTH2MProcess<3>(
                         *_mesh_vec[0], std::move(jacobian_assembler),
                         _process_variables, _parameters, integration_order,
-                        process_config, std::move(_medium));
+                        process_config, *_medium);
                     break;
                 default:
                     OGS_FATAL(

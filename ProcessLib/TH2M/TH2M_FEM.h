@@ -326,10 +326,10 @@ public:
             //            x_position)[0];
 
             // get porous medium properties from process data
-            auto const& medium = _process_data.medium;
+            auto& medium = _process_data.medium;
 
             // reset update status of all properties
-            medium->resetPropertyUpdateStatus();
+            medium.resetPropertyUpdateStatus();
 
             auto const p_cap = capillary_pressure.dot(N_p);
             auto const p_GR = gas_phase_pressure.dot(N_p);
@@ -375,13 +375,13 @@ public:
             // todo: displacement
 
             // get fluid phase properties
-            auto const& solid_phase = medium->phase(0);
-            auto const& liquid_phase = medium->phase(1);
-            auto const& gas_phase = medium->phase(2);
+            auto const& solid_phase = medium.phase(0);
+            auto const& liquid_phase = medium.phase(1);
+            auto const& gas_phase = medium.phase(2);
 
             // intrinsic permeability
             double const permeability =
-                MPL::getScalar(medium->property(MPL::permeability));
+                MPL::getScalar(medium.property(MPL::permeability));
 #ifdef DBG_OUTPUT
             std::cout << "   permeability: " << permeability << " \n";
 #endif
@@ -395,7 +395,7 @@ public:
             std::cout << "==================================\n";
 #endif
             auto const alpha_B = MPL::getScalar(
-                medium->property(MPL::PropertyEnum::biot_coefficient),
+                medium.property(MPL::PropertyEnum::biot_coefficient),
                 primaryVariables);
 
             auto const rho_SR =
@@ -416,9 +416,8 @@ public:
             std::cout << "   rho_GR: " << rho_GR << " \n";
             std::cout << "==================================\n";
 #endif
-            auto const phi =
-                MPL::getScalar(medium->property(MPL::PropertyEnum::porosity),
-                               primaryVariables);
+            auto const phi = MPL::getScalar(
+                medium.property(MPL::PropertyEnum::porosity), primaryVariables);
             auto const phi_S = 1. - phi;
 
 #ifdef DBG_OUTPUT
@@ -427,7 +426,7 @@ public:
             std::cout << "==================================\n";
 #endif
             auto const s_L =
-                MPL::getScalar(medium->property(MPL::PropertyEnum::saturation),
+                MPL::getScalar(medium.property(MPL::PropertyEnum::saturation),
                                primaryVariables);
             auto const s_G = 1 - s_L;
 
@@ -495,7 +494,7 @@ public:
             std::cout << "==================================\n";
 #endif
             auto const dsLdpc = MPL::getScalarDerivative(
-                medium->property(MPL::PropertyEnum::saturation),
+                medium.property(MPL::PropertyEnum::saturation),
                 primaryVariables, MPL::PrimaryVariables::p_cap);
 #ifdef DBG_OUTPUT
             std::cout << "   dsLdpc : " << dsLdpc << " \n";
@@ -503,10 +502,10 @@ public:
 #endif
 
             auto const k_rel_LR = MPL::getPair(
-                medium->property(MPL::PropertyEnum::relative_permeability),
+                medium.property(MPL::PropertyEnum::relative_permeability),
                 primaryVariables)[0];
             auto const k_rel_GR = MPL::getPair(
-                medium->property(MPL::PropertyEnum::relative_permeability),
+                medium.property(MPL::PropertyEnum::relative_permeability),
                 primaryVariables)[1];
 #ifdef DBG_OUTPUT
             std::cout << "    k_rel_LR: " << k_rel_LR << " \n";
@@ -528,7 +527,7 @@ public:
             const double beta_p_SR = getScalar(
                 solid_phase.property(MPL::PropertyEnum::compressibility));
             const double beta_p_PR =
-                getScalar(medium->property(MPL::PropertyEnum::compressibility));
+                getScalar(medium.property(MPL::PropertyEnum::compressibility));
             const double beta_p_GR = 1. / rho_GR * drhoGRdpGR;
             const double beta_p_LR = 1. / rho_LR * drhoLRdpLR;
 

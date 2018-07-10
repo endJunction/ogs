@@ -66,7 +66,7 @@ std::unique_ptr<Process> createTH2MProcess(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    std::unique_ptr<MaterialPropertyLib::Medium>&& medium)
+    MaterialPropertyLib::Medium& medium)
 {
     //! \ogs_file_param{prj__processes__process__type}
     config.checkConfigParameter("type", "TH2M");
@@ -193,15 +193,7 @@ std::unique_ptr<Process> createTH2MProcess(
     }
 
     TH2MProcessData<DisplacementDim> process_data{std::move(material),
-                                                  intrinsic_permeability,
-                                                  specific_storage,
-                                                  fluid_viscosity,
-                                                  fluid_density,
-                                                  biot_coefficient,
-                                                  porosity,
-                                                  solid_density,
-                                                  specific_body_force,
-                                                  std::move(medium)};
+                                                  specific_body_force, medium};
 
     SecondaryVariableCollection secondary_variables;
 
@@ -225,7 +217,7 @@ template std::unique_ptr<Process> createTH2MProcess<2>(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    std::unique_ptr<MaterialPropertyLib::Medium>&& medium);
+    MaterialPropertyLib::Medium& medium);
 
 template std::unique_ptr<Process> createTH2MProcess<3>(
     MeshLib::Mesh& mesh,
@@ -234,7 +226,7 @@ template std::unique_ptr<Process> createTH2MProcess<3>(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    std::unique_ptr<MaterialPropertyLib::Medium>&& medium);
+    MaterialPropertyLib::Medium& medium);
 
 }  // namespace TH2M
 }  // namespace ProcessLib
