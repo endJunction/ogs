@@ -120,61 +120,6 @@ std::unique_ptr<Process> createTH2MProcess(
             type.c_str());
     }
 
-    // Intrinsic permeability
-    auto& intrinsic_permeability = findParameter<double>(
-        config,
-        //! \ogs_file_param_special{prj__processes__process__TH2M__intrinsic_permeability}
-        "intrinsic_permeability", parameters, 1);
-
-    DBUG("Use \'%s\' as intrinsic conductivity parameter.",
-         intrinsic_permeability.name.c_str());
-
-    // Storage coefficient
-    auto& specific_storage = findParameter<double>(
-        config,
-        //! \ogs_file_param_special{prj__processes__process__TH2M__specific_storage}
-        "specific_storage", parameters, 1);
-
-    DBUG("Use \'%s\' as storage coefficient parameter.",
-         specific_storage.name.c_str());
-
-    // Fluid viscosity
-    auto& fluid_viscosity = findParameter<double>(
-        config,
-        //! \ogs_file_param_special{prj__processes__process__TH2M__fluid_viscosity}
-        "fluid_viscosity", parameters, 1);
-    DBUG("Use \'%s\' as fluid viscosity parameter.",
-         fluid_viscosity.name.c_str());
-
-    // Fluid density
-    auto& fluid_density = findParameter<double>(
-        config,
-        //! \ogs_file_param_special{prj__processes__process__TH2M__fluid_density}
-        "fluid_density", parameters, 1);
-    DBUG("Use \'%s\' as fluid density parameter.", fluid_density.name.c_str());
-
-    // Biot coefficient
-    auto& biot_coefficient = findParameter<double>(
-        config,
-        //! \ogs_file_param_special{prj__processes__process__TH2M__biot_coefficient}
-        "biot_coefficient", parameters, 1);
-    DBUG("Use \'%s\' as Biot coefficient parameter.",
-         biot_coefficient.name.c_str());
-
-    // Porosity
-    auto& porosity = findParameter<double>(
-        config,
-        //! \ogs_file_param_special{prj__processes__process__TH2M__porosity}
-        "porosity", parameters, 1);
-    DBUG("Use \'%s\' as porosity parameter.", porosity.name.c_str());
-
-    // Solid density
-    auto& solid_density = findParameter<double>(
-        config,
-        //! \ogs_file_param_special{prj__processes__process__TH2M__solid_density}
-        "solid_density", parameters, 1);
-    DBUG("Use \'%s\' as solid density parameter.", solid_density.name.c_str());
-
     // Specific body force
     Eigen::Matrix<double, DisplacementDim, 1> specific_body_force;
     {
