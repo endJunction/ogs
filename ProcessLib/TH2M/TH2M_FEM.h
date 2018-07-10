@@ -833,7 +833,6 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            OGS_FATAL("Intended halt.");
         }
 
         //        OGS_FATAL("Intended halt. (numerical)");
