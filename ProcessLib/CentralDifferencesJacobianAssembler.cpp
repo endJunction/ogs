@@ -22,14 +22,6 @@ CentralDifferencesJacobianAssembler::CentralDifferencesJacobianAssembler(
         OGS_FATAL("No values for the absolute epsilons have been given.");
 }
 
-void printStdVector (std::vector<double> v)
-{
-    for (unsigned i=0; i<v.size(); i++)
-    {
-        std::cout << "   " << v[i] << "\n";
-    }
-}
-
 void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     LocalAssemblerInterface& local_assembler, const double t,
     const std::vector<double>& local_x_data,
@@ -144,31 +136,6 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_K * dx_dx;
     }
-
-
-    if (num_r_c > 16) // in case of th2m
-    {
-   //     local_Jac.template block<20, 20>(8,8).setIdentity(); //H2
-        local_Jac.template block<4, 4>(8,8).setIdentity(); //TH2M
-    }
-
-
-//    auto const rows = local_Jac.rows();
-//    auto const cols = local_Jac.cols();
-//
-//    std::cout << "Jacobi-Matrix:\n";
-//
-//    for (int r = 0; r < rows; r++)
-//    {
-//        for (int c = 0; c < cols; c++)
-//        {
-//            std::cout << local_Jac(r,c) << " ";
-//        }
-//        std::cout << "\n";
-//    }
-//
-//    OGS_FATAL("Intended halt.");
-
 }
 
 std::unique_ptr<CentralDifferencesJacobianAssembler>
