@@ -31,6 +31,8 @@ class Component;
  * strings. It can be further extended to hold symmetrical tensor data,
  * which consist of six components.
 */
+enum PropertyDataTypeName { nScalar, nPair, nVector, nSymmTensor, nTensor};
+
 using PropertyDataType = boost::variant<double, Pair, Vector, SymmTensor,
         Tensor, std::string>;
 
@@ -93,11 +95,20 @@ std::unique_ptr<Property> newProperty(BaseLib::ConfigTree const& /*config*/,
 /// This method creates a new component property.
 std::unique_ptr<Property> newProperty(BaseLib::ConfigTree const& config,
                                       Component* /*c*/);
+/// This method returns the 0-based index of the variant
+/// data types. Can be enhanced by using enums.
+inline std::size_t getType(Property const& p)
+{
+    return p.value().which();
+}
 
 /// This method returns a value of type double from the
 /// property value attribute
 inline double getScalar(Property& p)
 {
+    assert((getType(p)==PropertyDataTypeName::nScalar) && "The requested "
+            "value type is not of type 'double'");
+
     return boost::get<double>(p.value());
 }
 
@@ -128,13 +139,6 @@ inline double getScalarDerivative(Property& p, VariableArray const& v, PrimaryVa
 inline std::string getString(Property const& p)
 {
     return boost::get<std::string>(p.value());
-}
-
-/// This method returns the 0-based index of the variant
-/// data types. Can be enhanced by using enums.
-inline std::size_t getType(Property const& p)
-{
-    return p.value().which();
 }
 
 /// This method returns a value of any valid type from
