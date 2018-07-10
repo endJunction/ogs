@@ -334,7 +334,7 @@ public:
             auto const p_cap = capillary_pressure.dot(N_p);
             auto const p_GR = gas_phase_pressure.dot(N_p);
             auto const T = temperature.dot(N_p);
-            auto const u = 0.;  // displacement.dot(N_u);
+            // auto const u = N_u_op.transpose().dot(displacement);
 
             const double p_LR = p_GR - p_cap;
 
@@ -354,15 +354,15 @@ public:
             std::cout << " p_cap: " << p_cap << "\n";
             std::cout << " p_GR: " << p_GR << "\n";
             std::cout << " T: " << T << "\n";
-            std::cout << " u: " << u << "\n";
+            // std::cout << " u: " << u << "\n";
             std::cout << "----------------------------------\n";
             std::cout << " Nodal values:\n";
             std::cout << " p_cap:\n " << capillary_pressure << "\n";
             std::cout << " p_GR:\n " << gas_phase_pressure << "\n";
             std::cout << " T:\n " << temperature << "\n";
-            std::cout << " u:\n "
-                      << "???"
-                      << "\n";
+            // std::cout << " u:\n "
+            //<< "???"
+            //<< "\n";
             std::cout << "==================================\n";
 #endif
 
