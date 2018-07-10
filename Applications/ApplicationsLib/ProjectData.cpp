@@ -326,8 +326,7 @@ void ProjectData::parseMaterials(
     }
 
     auto const medium_config = media_config->getConfigSubtree("medium");
-    _medium.reset (new MaterialPropertyLib::Medium(medium_config));
-
+    _medium = std::make_unique<MaterialPropertyLib::Medium>(medium_config);
 }
 
 void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
