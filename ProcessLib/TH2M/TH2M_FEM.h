@@ -483,11 +483,13 @@ public:
                 MPL::getScalarDerivative(liquid_phase.property(MPL::density),
                                          primaryVariables, MPL::p_LR);
 
+            /*
             auto const molar_mass =
                 getScalar(gas_phase.property(MPL::PropertyEnum::molar_mass));
+                */
 
 #ifdef DBG_OUTPUT
-            std::cout << "   M_g : " << molar_mass << " \n";
+            // std::cout << "   M_g : " << molar_mass << " \n";
             std::cout << "==================================\n";
             std::cout << "   drho_gr_dp_gr : " << drhoGRdpGR << " \n";
             std::cout << "   drho_lr_dp_lr : " << drhoLRdpLR << " \n";
