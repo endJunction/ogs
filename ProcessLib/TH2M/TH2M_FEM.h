@@ -1,4 +1,6 @@
 /**
+ * \file
+ *
  * \copyright
  * Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
  *            Distributed under a Modified BSD License.
@@ -57,6 +59,9 @@ public:
     using ShapeMatricesTypePressure =
         ShapeMatrixPolicyType<ShapeFunctionPressure, DisplacementDim>;
 
+    using GlobalDimMatrixType =
+        typename ShapeMatricesTypePressure::GlobalDimMatrixType;
+
     TH2MLocalAssembler(TH2MLocalAssembler const&) = delete;
     TH2MLocalAssembler(TH2MLocalAssembler&&) = delete;
 
@@ -68,23 +73,7 @@ public:
         : _process_data(process_data),
           _integration_method(integration_order),
           _element(e),
-          _is_axially_symmetric(is_axially_symmetric),
-          _saturation(
-              std::vector<double>(_integration_method.getNumberOfPoints())),
-          _pressure_wet(
-              std::vector<double>(_integration_method.getNumberOfPoints())),
-          _density_gas(
-              std::vector<double>(_integration_method.getNumberOfPoints())),
-          _density_liquid(
-              std::vector<double>(_integration_method.getNumberOfPoints())),
-          _pressure_gas_linear(
-              std::vector<double>(_integration_method.getNumberOfPoints())),
-          _pressure_cap_linear(
-              std::vector<double>(_integration_method.getNumberOfPoints())),
-          _velocity_gas(std::vector<double>(
-              DisplacementDim * _integration_method.getNumberOfPoints())),
-          _velocity_liquid(std::vector<double>(
-              DisplacementDim * _integration_method.getNumberOfPoints()))
+          _is_axially_symmetric(is_axially_symmetric)
     {
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
@@ -109,7 +98,7 @@ public:
             _ip_data.emplace_back(*_process_data.material);
             auto& ip_data = _ip_data[ip];
             auto const& sm_u = shape_matrices_u[ip];
-            _ip_data[ip].integration_weight =
+            ip_data.integration_weight =
                 _integration_method.getWeightedPoint(ip).getWeight() *
                 sm_u.integralMeasure * sm_u.detJ;
 
@@ -303,38 +292,18 @@ public:
             _integration_method.getNumberOfPoints();
         double const& dt = _process_data.dt;
 
-        //
-        //        const Eigen::MatrixXd& perm =
-        //        _process_data.material->getPermeability(
-        //            material_id, t, pos, _element.getDimension());
-        //        assert(perm.rows() == _element.getDimension() || perm.rows()
-        //        == 1); GlobalDimMatrixType permeability =
-        //        GlobalDimMatrixType::Zero(
-        //            _element.getDimension(), _element.getDimension());
-        //        if (perm.rows() == _element.getDimension())
-        //            permeability = perm;
-        //        else if (perm.rows() == 1)
-        //            permeability.diagonal().setConstant(perm(0, 0));
-
-        _velocity_gas.clear();
-        auto velocity_matrix_gas = MathLib::createZeroedMatrix<Eigen::Matrix<
-            double, DisplacementDim, Eigen::Dynamic, Eigen::RowMajor>>(
-            _velocity_gas, DisplacementDim, _ip_data.size());
-
-        _velocity_liquid.clear();
-        auto velocity_matrix_liquid = MathLib::createZeroedMatrix<Eigen::Matrix<
-            double, DisplacementDim, Eigen::Dynamic, Eigen::RowMajor>>(
-            _velocity_liquid, DisplacementDim, _ip_data.size());
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
-            auto const& w = _ip_data[ip].integration_weight;
-            auto const& N_u_op = _ip_data[ip].N_u_op;
-            auto const& N_u = _ip_data[ip].N_u;
-            auto const& dNdx_u = _ip_data[ip].dNdx_u;
-            auto const& N_p = _ip_data[ip].N_p;
-            auto const& dNdx_p = _ip_data[ip].dNdx_p;
-            auto const& mass_operator = N_p.transpose() * N_p * w;
+            auto& ip_data = _ip_data[ip];
+
+            auto const& w = ip_data.integration_weight;
+            auto const& N_u_op = ip_data.N_u_op;
+            auto const& N_u = ip_data.N_u;
+            auto const& dNdx_u = ip_data.dNdx_u;
+            auto const& N_p = ip_data.N_p;
+            auto const& dNdx_p = ip_data.dNdx_p;
+            // auto const& mass_operator = N_p.transpose() * N_p * w;
             auto const x_coord =
                 interpolateXCoordinate<ShapeFunctionDisplacement,
                                        ShapeMatricesTypeDisplacement>(_element,
@@ -343,8 +312,8 @@ public:
                 DisplacementDim, ShapeFunctionDisplacement::NPOINTS,
                 typename BMatricesType::BMatrixType>(dNdx_u, N_u, x_coord,
                                                      _is_axially_symmetric);
-            auto& eps = _ip_data[ip].eps;
-            auto const& sigma_eff = _ip_data[ip].sigma_eff;
+            auto& eps = ip_data.eps;
+            auto const& sigma_eff = ip_data.sigma_eff;
 
             //            double const S = _process_data.specific_storage(t,
             //            x_position)[0]; double const K_over_mu =
@@ -416,10 +385,10 @@ public:
 #ifdef DBG_OUTPUT
             std::cout << "   permeability: " << permeability << " \n";
 #endif
-            Eigen::Matrix<double, DisplacementDim, DisplacementDim> perm_tensor;
-            perm_tensor.setIdentity();
+            GlobalDimMatrixType permeability_tensor =
+                GlobalDimMatrixType::Zero(DisplacementDim, DisplacementDim);
+            permeability_tensor.diagonal().setConstant(permeability);
 
-            auto const permeability_tensor = permeability * perm_tensor;
 #ifdef DBG_OUTPUT
             std::cout << "   permeability_tensor: " << permeability_tensor
                       << " \n";
@@ -505,8 +474,8 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            auto C = _ip_data[ip].updateConstitutiveRelation(t, x_position, dt,
-                                                             displacement);
+            auto C = ip_data.updateConstitutiveRelation(t, x_position, dt,
+                                                        displacement);
 
             auto const drhoGRdpGR = MPL::getScalarDerivative(
                 gas_phase.property(MPL::density), primaryVariables, MPL::p_GR);
@@ -546,12 +515,12 @@ public:
 #endif
 
             // for output only
-            _pressure_gas_linear[ip] = p_GR;
-            _pressure_cap_linear[ip] = p_cap;
-            _pressure_wet[ip] = p_LR;
-            _density_gas[ip] = rho_GR;
-            _density_liquid[ip] = rho_LR;
-            _saturation[ip] = s_L;
+            ip_data.pressure_gas_linear = p_GR;
+            ip_data.pressure_cap_linear = p_cap;
+            ip_data.pressure_wet = p_LR;
+            ip_data.density_gas = rho_GR;
+            ip_data.density_liquid = rho_LR;
+            ip_data.saturation = s_L;
 
             const double k_over_mu_GR = k_rel_GR / mu_GR;
             const double k_over_mu_LR = k_rel_LR / mu_LR;
@@ -571,34 +540,25 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            velocity_matrix_liquid.col(ip).noalias() =
+            ip_data.velocity_liquid.noalias() =
                 -permeability_tensor * k_over_mu_LR * dNdx_p *
                     (gas_phase_pressure - capillary_pressure) +
                 permeability_tensor * k_over_mu_LR * rho_LR * b;
 
-            velocity_matrix_gas.col(ip).noalias() =
+            ip_data.velocity_gas.noalias() =
                 -permeability_tensor * k_over_mu_GR * dNdx_p *
                     gas_phase_pressure +
                 permeability_tensor * k_over_mu_GR * rho_GR * b;
 
-            const auto w_LS = velocity_matrix_liquid.col(ip);
-            const auto w_GS = velocity_matrix_gas.col(ip);
+            const auto w_LS = ip_data.velocity_liquid;
+            const auto w_GS = ip_data.velocity_gas;
 
 #ifdef DBG_OUTPUT
-            std::cout << "   Velocity-matrices: \n";
-            std::cout << "   w_GR: \n" << velocity_matrix_gas << " \n";
-            std::cout << "   w_LR: \n" << velocity_matrix_liquid << " \n";
+            std::cout << "   Velocities: \n";
             std::cout << "   ----------------------------------\n";
             std::cout << "   w_GR: \n" << w_GS << " \n";
             std::cout << "   w_LR: \n" << w_LS << " \n";
             std::cout << "   Velocities : \n";
-            std::cout << "   w_GR: \n";
-            for (size_t i = 0; i < _velocity_gas.size(); i++)
-                std::cout << "     " << _velocity_gas[i] << " \n";
-
-            std::cout << "   w_LR: \n";
-            for (size_t i = 0; i < _velocity_liquid.size(); i++)
-                std::cout << "     " << _velocity_liquid[i] << " \n";
             std::cout << "==================================\n";
 #endif
 
@@ -915,6 +875,7 @@ public:
                               std::vector<double>& local_rhs_data,
                               std::vector<double>& local_Jac_data) override
     {
+#if 0
         assert(local_x.size() == gas_pressure_size + cap_pressure_size +
                                      temperature_size + displacement_size);
 
@@ -1184,10 +1145,10 @@ public:
             const double lambda_GR = k_rel_GR / mu_GR;
             const double lambda_LR = k_rel_LR / mu_LR;
 
-            velocity_matrix_liquid.col(ip).noalias() =
+            ip_data.velocity_liquid.noalias() =
                 -K_over_mu * dNdx_p * (p_GR - p_cap) - K_over_mu * rho_LR * b;
 
-            velocity_matrix_gas.col(ip).noalias() =
+            ip_data.velocity_gas.noalias() =
                 -K_over_mu * dNdx_p * p_GR - K_over_mu * rho_GR * b;
 
             Eigen::Matrix<double, DisplacementDim, DisplacementDim> perm_tensor;
@@ -1403,6 +1364,7 @@ public:
         ////
         ////        std::cout << "Analytical J.\n";
         //        OGS_FATAL("Intended halt.");
+#endif  // 0
     }
 
     void preTimestepConcrete(std::vector<double> const& /*local_x*/,
@@ -1427,6 +1389,7 @@ public:
         return Eigen::Map<const Eigen::RowVectorXd>(N_u.data(), N_u.size());
     }
 
+private:
     std::vector<double> const& getIntPtSigma(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
@@ -1483,158 +1446,149 @@ public:
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
+        std::vector<double>& cache) const override
     {
-        assert(!_saturation.empty());
-        return _saturation;
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].saturation;
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtWetPressure(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
+        std::vector<double>& cache) const override
     {
-        assert(!_pressure_wet.empty());
-        return _pressure_wet;
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].pressure_wet;
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtDensityGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
+        std::vector<double>& cache) const override
     {
-        assert(!_density_gas.empty());
-        return _density_gas;
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].density_gas;
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtDensityLiquid(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
+        std::vector<double>& cache) const override
     {
-        assert(!_density_liquid.empty());
-        return _density_liquid;
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].density_liquid;
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtDarcyVelocityLiquid(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
+        std::vector<double>& cache) const override
     {
-        assert(!_velocity_liquid.empty());
-        return _velocity_liquid;
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        auto cache_mat = MathLib::createZeroedMatrix<Eigen::Matrix<
+            double, DisplacementDim, Eigen::Dynamic, Eigen::RowMajor>>(
+            cache, DisplacementDim, n_integration_points);
+
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache_mat.col(ip) = _ip_data[ip].velocity_liquid;
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtPressureGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
+        std::vector<double>& cache) const override
     {
-        assert(!_pressure_gas_linear.empty());
-        return _pressure_gas_linear;
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].pressure_gas_linear;
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtPressureCap(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
+        std::vector<double>& cache) const override
     {
-        assert(!_pressure_cap_linear.empty());
-        return _pressure_cap_linear;
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].pressure_cap_linear;
+        }
+
+        return cache;
     }
 
     std::vector<double> const& getIntPtDarcyVelocityGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
-        std::vector<double>& /*cache*/) const override
-    {
-        assert(!_velocity_gas.empty());
-        return _velocity_gas;
-    }
-
-    std::vector<double> const& getIntPtDarcyVelocity(
-        const double t,
-        GlobalVector const& current_solution,
-        NumLib::LocalToGlobalIndexMap const& dof_table,
         std::vector<double>& cache) const override
     {
-        auto const num_intpts = _ip_data.size();
-
-        auto const indices = NumLib::getIndices(_element.getID(), dof_table);
-        assert(!indices.empty());
-        auto const local_x = current_solution.get(indices);
-
-        cache.clear();
-        auto cache_matrix = MathLib::createZeroedMatrix<Eigen::Matrix<
-            double, DisplacementDim, Eigen::Dynamic, Eigen::RowMajor>>(
-            cache, DisplacementDim, num_intpts);
-
-        SpatialPosition pos;
-        pos.setElementID(_element.getID());
-
-        auto p_GR =
-            Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
-                gas_pressure_size> const>(local_x.data() + gas_pressure_index,
-                                          gas_pressure_size);
-
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
-        SpatialPosition x_position;
-        x_position.setElementID(_element.getID());
-        for (unsigned ip = 0; ip < n_integration_points; ip++)
-        {
-            x_position.setIntegrationPoint(ip);
-            double const K_over_mu =
-                _process_data.intrinsic_permeability(t, x_position)[0] /
-                _process_data.fluid_viscosity(t, x_position)[0];
-
-            auto const rho_fr = _process_data.fluid_density(t, x_position)[0];
-            auto const& b = _process_data.specific_body_force;
-
-            // Compute the velocity
-            auto const& dNdx_p = _ip_data[ip].dNdx_p;
-            cache_matrix.col(ip).noalias() =
-                -K_over_mu * dNdx_p * p_GR - K_over_mu * rho_fr * b;
-        }
-
-        return cache;
-    }
-
-private:
-    std::vector<double> const& getIntPtSigma(std::vector<double>& cache,
-                                             std::size_t const component) const
-    {
         cache.clear();
-        cache.reserve(_ip_data.size());
+        auto cache_mat = MathLib::createZeroedMatrix<Eigen::Matrix<
+            double, DisplacementDim, Eigen::Dynamic, Eigen::RowMajor>>(
+            cache, DisplacementDim, n_integration_points);
 
-        for (auto const& ip_data : _ip_data)
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
-            if (component < 3)  // xx, yy, zz components
-                cache.push_back(ip_data.sigma_eff[component]);
-            else  // mixed xy, yz, xz components
-                cache.push_back(ip_data.sigma_eff[component] / std::sqrt(2));
-        }
-
-        return cache;
-    }
-
-    std::vector<double> const& getIntPtEpsilon(
-        std::vector<double>& cache, std::size_t const component) const
-    {
-        cache.clear();
-        cache.reserve(_ip_data.size());
-
-        for (auto const& ip_data : _ip_data)
-        {
-            cache.push_back(ip_data.eps[component]);
+            cache_mat.col(ip) = _ip_data[ip].velocity_gas;
         }
 
         return cache;
@@ -1657,17 +1611,6 @@ private:
     SecondaryData<
         typename ShapeMatricesTypeDisplacement::ShapeMatrices::ShapeType>
         _secondary_data;
-
-    // output vector for wetting phase saturation and pressure with
-    // respect to each integration point
-    std::vector<double> _saturation;
-    std::vector<double> _pressure_wet;
-    std::vector<double> _density_gas;
-    std::vector<double> _density_liquid;
-    std::vector<double> _pressure_gas_linear;
-    std::vector<double> _pressure_cap_linear;
-    std::vector<double> _velocity_gas;
-    std::vector<double> _velocity_liquid;
 
     static const int Np_intPoints = ShapeFunctionPressure::NPOINTS;
     static const int gas_pressure_index = 0;
