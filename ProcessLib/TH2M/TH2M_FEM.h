@@ -1,6 +1,6 @@
 /**
  * \copyright
- * Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
+ * Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
  *            Distributed under a Modified BSD License.
  *              See accompanying file LICENSE.txt or
  *              http://www.opengeosys.org/project/license
@@ -28,7 +28,6 @@
 #include "LocalAssemblerInterface.h"
 #include "TH2MProcessData.h"
 
-namespace MPL = MaterialPropertyLib;
 
 #include <iostream>
 
@@ -36,6 +35,8 @@ namespace ProcessLib
 {
 namespace TH2M
 {
+namespace MPL = MaterialPropertyLib;
+
 template <typename BMatricesType, typename ShapeMatrixTypeDisplacement,
           typename ShapeMatricesTypePressure, int DisplacementDim, int NPoints>
 struct IntegrationPointData final

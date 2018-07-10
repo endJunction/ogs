@@ -1,6 +1,6 @@
 /**
  * \copyright
- * Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
+ * Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
  *            Distributed under a Modified BSD License.
  *              See accompanying file LICENSE.txt or
  *              http://www.opengeosys.org/project/license
@@ -33,7 +33,8 @@ void validateTH2MProcessVariables(
             " temperature, and displacement!");
     }
 
-    const int DisplacementDimVector[4] = {1, 1, 1, DisplacementDim};
+    std::array<int, 4> const number_variable_components = {1, 1, 1,
+                                                           DisplacementDim};
     const std::string process_variable_name[4] = {
         "gas pressure", "capillary pressure", "temperature", "displacement"};
 
@@ -44,15 +45,15 @@ void validateTH2MProcessVariables(
              process_variables[i].get().getName().c_str());
 
         if (process_variables[i].get().getNumberOfComponents() !=
-            DisplacementDimVector[i])
+            number_variable_components[i])
         {
             OGS_FATAL(
                 "Number of components of the process variable '%s' is "
-                "different "
-                "from the displacement dimension: got %d, expected %d",
+                "different from the displacement dimension: got %d, expected "
+                "%d",
                 process_variables[i].get().getName().c_str(),
                 process_variables[i].get().getNumberOfComponents(),
-                DisplacementDimVector[i]);
+                number_variable_components[i]);
         }
     }
 }
@@ -73,18 +74,18 @@ std::unique_ptr<Process> createTH2MProcess(
 
     // Process variable.
 
-    //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS__process_variables}
+    //! \ogs_file_param{prj__processes__process__TH2M__process_variables}
     auto const pv_config = config.getConfigSubtree("process_variables");
 
     auto per_process_variables = findProcessVariables(
         variables, pv_config,
-        {//! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__process_variables__pressure}
+        {//! \ogs_file_param_special{prj__processes__process__TH2M__process_variables__gas_pressure}
          "gas_pressure",
-         //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__process_variables__pressure}
+         //! \ogs_file_param_special{prj__processes__process__TH2M__process_variables__capillary_pressure}
          "capillary_pressure",
-         //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__process_variables__pressure}
+         //! \ogs_file_param_special{prj__processes__process__TH2M__process_variables__temperature}
          "temperature",
-         //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__process_variables__displacement}
+         //! \ogs_file_param_special{prj__processes__process__TH2M__process_variables__displacement}
          "displacement"});
 
     std::vector<std::vector<std::reference_wrapper<ProcessVariable>>>
@@ -97,11 +98,11 @@ std::unique_ptr<Process> createTH2MProcess(
     // Constitutive relation.
     // read type;
     auto const constitutive_relation_config =
-        //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS__constitutive_relation}
+        //! \ogs_file_param{prj__processes__process__TH2M__constitutive_relation}
         config.getConfigSubtree("constitutive_relation");
 
     auto const type =
-        //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS__constitutive_relation__type}
+        //! \ogs_file_param{prj__processes__process__TH2M__constitutive_relation__type}
         constitutive_relation_config.peekConfigParameter<std::string>("type");
 
     std::unique_ptr<MaterialLib::Solids::MechanicsBase<DisplacementDim>>
@@ -122,7 +123,7 @@ std::unique_ptr<Process> createTH2MProcess(
     // Intrinsic permeability
     auto& intrinsic_permeability = findParameter<double>(
         config,
-        //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__intrinsic_permeability}
+        //! \ogs_file_param_special{prj__processes__process__TH2M__intrinsic_permeability}
         "intrinsic_permeability", parameters, 1);
 
     DBUG("Use \'%s\' as intrinsic conductivity parameter.",
@@ -131,7 +132,7 @@ std::unique_ptr<Process> createTH2MProcess(
     // Storage coefficient
     auto& specific_storage = findParameter<double>(
         config,
-        //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__specific_storage}
+        //! \ogs_file_param_special{prj__processes__process__TH2M__specific_storage}
         "specific_storage", parameters, 1);
 
     DBUG("Use \'%s\' as storage coefficient parameter.",
@@ -140,7 +141,7 @@ std::unique_ptr<Process> createTH2MProcess(
     // Fluid viscosity
     auto& fluid_viscosity = findParameter<double>(
         config,
-        //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__fluid_viscosity}
+        //! \ogs_file_param_special{prj__processes__process__TH2M__fluid_viscosity}
         "fluid_viscosity", parameters, 1);
     DBUG("Use \'%s\' as fluid viscosity parameter.",
          fluid_viscosity.name.c_str());
@@ -148,14 +149,14 @@ std::unique_ptr<Process> createTH2MProcess(
     // Fluid density
     auto& fluid_density = findParameter<double>(
         config,
-        //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__fluid_density}
+        //! \ogs_file_param_special{prj__processes__process__TH2M__fluid_density}
         "fluid_density", parameters, 1);
     DBUG("Use \'%s\' as fluid density parameter.", fluid_density.name.c_str());
 
     // Biot coefficient
     auto& biot_coefficient = findParameter<double>(
         config,
-        //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__biot_coefficient}
+        //! \ogs_file_param_special{prj__processes__process__TH2M__biot_coefficient}
         "biot_coefficient", parameters, 1);
     DBUG("Use \'%s\' as Biot coefficient parameter.",
          biot_coefficient.name.c_str());
@@ -163,14 +164,14 @@ std::unique_ptr<Process> createTH2MProcess(
     // Porosity
     auto& porosity = findParameter<double>(
         config,
-        //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__porosity}
+        //! \ogs_file_param_special{prj__processes__process__TH2M__porosity}
         "porosity", parameters, 1);
     DBUG("Use \'%s\' as porosity parameter.", porosity.name.c_str());
 
     // Solid density
     auto& solid_density = findParameter<double>(
         config,
-        //! \ogs_file_param_special{prj__processes__process__HYDRO_MECHANICS__solid_density}
+        //! \ogs_file_param_special{prj__processes__process__TH2M__solid_density}
         "solid_density", parameters, 1);
     DBUG("Use \'%s\' as solid density parameter.", solid_density.name.c_str());
 
@@ -178,7 +179,7 @@ std::unique_ptr<Process> createTH2MProcess(
     Eigen::Matrix<double, DisplacementDim, 1> specific_body_force;
     {
         std::vector<double> const b =
-            //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS__specific_body_force}
+            //! \ogs_file_param{prj__processes__process__TH2M__specific_body_force}
             config.getConfigParameter<std::vector<double>>(
                 "specific_body_force");
         if (b.size() != DisplacementDim)
