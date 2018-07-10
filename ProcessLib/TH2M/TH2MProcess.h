@@ -10,17 +10,21 @@
 #pragma once
 
 #include "LocalAssemblerInterface.h"
+#include "MaterialLib/MPL/mpMedium.h"
 #include "ProcessLib/Process.h"
 #include "TH2MProcessData.h"
-#include "MaterialLib/MPL/mpMedium.h"
 
 namespace ProcessLib
 {
 namespace TH2M
 {
-
-enum { indexGasPressure, indexCapillaryPressure,
-    indexTemperature, indexDisplacement};
+enum
+{
+    indexGasPressure,
+    indexCapillaryPressure,
+    indexTemperature,
+    indexDisplacement
+};
 
 struct LocalAssemblerInterface;
 

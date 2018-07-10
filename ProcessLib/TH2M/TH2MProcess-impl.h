@@ -81,15 +81,17 @@ void TH2MProcess<DisplacementDim>::constructDofTable()
         // For displacement:
         const int monolithic_process_id = 0;
         std::generate_n(
-                std::back_inserter(all_mesh_subsets),
-                getProcessVariables(monolithic_process_id)[indexDisplacement].get().getNumberOfComponents(),
-                [&]() { return *_mesh_subset_all_nodes; });
+            std::back_inserter(all_mesh_subsets),
+            getProcessVariables(monolithic_process_id)[indexDisplacement]
+                .get()
+                .getNumberOfComponents(),
+            [&]() { return *_mesh_subset_all_nodes; });
 
-        std::vector<int> const vec_n_components{1,1,1, DisplacementDim};
+        std::vector<int> const vec_n_components{1, 1, 1, DisplacementDim};
         _local_to_global_index_map =
-                std::make_unique<NumLib::LocalToGlobalIndexMap>(
-                        std::move(all_mesh_subsets), vec_n_components,
-                        NumLib::ComponentOrder::BY_LOCATION);
+            std::make_unique<NumLib::LocalToGlobalIndexMap>(
+                std::move(all_mesh_subsets), vec_n_components,
+                NumLib::ComponentOrder::BY_LOCATION);
 
         assert(_local_to_global_index_map);
     }
@@ -106,9 +108,9 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
     unsigned const integration_order)
 {
     const int mechanical_process_id = _use_monolithic_scheme ? 0 : 1;
-   // const int deformation_variable_id = _use_monolithic_scheme ? 1 : 0;
-    ProcessLib::TH2M::createLocalAssemblers<
-        DisplacementDim, TH2MLocalAssembler>(
+    // const int deformation_variable_id = _use_monolithic_scheme ? 1 : 0;
+    ProcessLib::TH2M::createLocalAssemblers<DisplacementDim,
+                                            TH2MLocalAssembler>(
         mesh.getDimension(), mesh.getElements(), dof_table,
         // use displacement process variable to set shape function order
         getProcessVariables(mechanical_process_id)[indexDisplacement]
@@ -132,52 +134,46 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
                          &LocalAssemblerInterface::getIntPtEpsilon));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "saturation",
-            makeExtrapolator(
-                    1, getExtrapolator(), _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtSaturation));
+        "saturation",
+        makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtSaturation));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "pressure_wet",
-            makeExtrapolator(
-                    1, getExtrapolator(), _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtWetPressure));
+        "pressure_wet",
+        makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtWetPressure));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "density_gas",
-            makeExtrapolator(
-                    1, getExtrapolator(), _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtDensityGas));
+        "density_gas",
+        makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtDensityGas));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "density_liquid",
-            makeExtrapolator(
-                    1, getExtrapolator(), _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtDensityLiquid));
+        "density_liquid",
+        makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtDensityLiquid));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "pressure_gas_linear",
-            makeExtrapolator(
-                    1, getExtrapolator(), _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtPressureGas));
+        "pressure_gas_linear",
+        makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtPressureGas));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "pressure_cap_linear",
-            makeExtrapolator(
-                    1, getExtrapolator(), _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtPressureCap));
+        "pressure_cap_linear",
+        makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtPressureCap));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "velocity_gas",
-            makeExtrapolator(mesh.getDimension(), getExtrapolator(),
-                    _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtDarcyVelocityGas));
+        "velocity_gas",
+        makeExtrapolator(mesh.getDimension(), getExtrapolator(),
+                         _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtDarcyVelocityGas));
 
     Base::_secondary_variables.addSecondaryVariable(
-            "velocity_liquid",
-            makeExtrapolator(mesh.getDimension(), getExtrapolator(),
-                    _local_assemblers,
-                    &LocalAssemblerInterface::getIntPtDarcyVelocityLiquid));
+        "velocity_liquid",
+        makeExtrapolator(
+            mesh.getDimension(), getExtrapolator(), _local_assemblers,
+            &LocalAssemblerInterface::getIntPtDarcyVelocityLiquid));
 }
 
 template <int DisplacementDim>
@@ -201,12 +197,11 @@ void TH2MProcess<DisplacementDim>::assembleConcreteProcess(
     }
 }
 
-
-//template <int DisplacementDim>
-//void TH2MProcess<DisplacementDim>::assembleWithJacobianConcreteProcess(
+// template <int DisplacementDim>
+// void TH2MProcess<DisplacementDim>::assembleWithJacobianConcreteProcess(
 //    const double t, GlobalVector const& x, GlobalVector const& xdot,
-//    const double dxdot_dx, const double dx_dx, GlobalMatrix& M, GlobalMatrix& K,
-//    GlobalVector& b, GlobalMatrix& Jac)
+//    const double dxdot_dx, const double dx_dx, GlobalMatrix& M, GlobalMatrix&
+//    K, GlobalVector& b, GlobalMatrix& Jac)
 //{
 //    DBUG("AssembleJacobian TH2MProcess.");
 //    DBUG("x: %i", x.size());
@@ -219,13 +214,10 @@ void TH2MProcess<DisplacementDim>::assembleConcreteProcess(
 //}
 
 template <int DisplacementDim>
-void TH2MProcess<DisplacementDim>::
-    assembleWithJacobianConcreteProcess(const double t, GlobalVector const& x,
-                                        GlobalVector const& xdot,
-                                        const double dxdot_dx,
-                                        const double dx_dx, GlobalMatrix& M,
-                                        GlobalMatrix& K, GlobalVector& b,
-                                        GlobalMatrix& Jac)
+void TH2MProcess<DisplacementDim>::assembleWithJacobianConcreteProcess(
+    const double t, GlobalVector const& x, GlobalVector const& xdot,
+    const double dxdot_dx, const double dx_dx, GlobalMatrix& M, GlobalMatrix& K,
+    GlobalVector& b, GlobalMatrix& Jac)
 {
     std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>>
         dof_tables;
@@ -270,14 +262,14 @@ void TH2MProcess<DisplacementDim>::preTimestepConcreteProcess(
 
 template <int DisplacementDim>
 void TH2MProcess<DisplacementDim>::postTimestepConcreteProcess(
-        GlobalVector const& x,const double /*t*/, const double /*delta_t*/, const int process_id)
-    {
-        DBUG("PostTimestep HydroMechanicsProcess.");
-        GlobalExecutor::executeMemberOnDereferenced(
-            &LocalAssemblerInterface::postTimestep, _local_assemblers,
-            getDOFTable(process_id), x);
-    }
-
+    GlobalVector const& x, const double /*t*/, const double /*delta_t*/,
+    const int process_id)
+{
+    DBUG("PostTimestep HydroMechanicsProcess.");
+    GlobalExecutor::executeMemberOnDereferenced(
+        &LocalAssemblerInterface::postTimestep, _local_assemblers,
+        getDOFTable(process_id), x);
+}
 
 }  // namespace TH2M
 }  // namespace ProcessLib

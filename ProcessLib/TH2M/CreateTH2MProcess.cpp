@@ -94,7 +94,6 @@ std::unique_ptr<Process> createTH2MProcess(
 
     validateTH2MProcessVariables(process_variables[0], DisplacementDim);
 
-
     // Constitutive relation.
     // read type;
     auto const constitutive_relation_config =
@@ -201,8 +200,7 @@ std::unique_ptr<Process> createTH2MProcess(
                                                   porosity,
                                                   solid_density,
                                                   specific_body_force,
-                                                  std::move(medium)
-    };
+                                                  std::move(medium)};
 
     SecondaryVariableCollection secondary_variables;
 
@@ -211,7 +209,7 @@ std::unique_ptr<Process> createTH2MProcess(
          "TH2M_displacement"});
 
     ProcessLib::createSecondaryVariables(config, secondary_variables,
-                                        named_function_caller);
+                                         named_function_caller);
 
     return std::make_unique<TH2MProcess<DisplacementDim>>(
         mesh, std::move(jacobian_assembler), parameters, integration_order,

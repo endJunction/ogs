@@ -9,16 +9,15 @@
 
 #pragma once
 
-#include "ProcessLib/LocalAssemblerInterface.h"
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
+#include "ProcessLib/LocalAssemblerInterface.h"
 
 namespace ProcessLib
 {
 namespace TH2M
 {
-struct LocalAssemblerInterface
-        : public ProcessLib::LocalAssemblerInterface,
-          public NumLib::ExtrapolatableElement
+struct LocalAssemblerInterface : public ProcessLib::LocalAssemblerInterface,
+                                 public NumLib::ExtrapolatableElement
 {
     virtual std::vector<double> const& getIntPtSigma(
         const double /*t*/,
@@ -85,7 +84,6 @@ struct LocalAssemblerInterface
         GlobalVector const& /*current_solution*/,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& /*cache*/) const = 0;
-
 };
 
 }  // namespace TH2M
