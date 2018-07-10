@@ -113,7 +113,9 @@ enum PropertyEnum : std::size_t
     residual_gas_saturation,
     residual_liquid_saturation,
     saturation,
+    specific_heat_capacity,
     thermal_conductivity,
+    thermal_expansivity,
     viscosity,
     number_of_property_enums
 };
@@ -227,9 +229,17 @@ inline PropertyEnum convertStringToProperty(std::string const& inString)
     {
         return saturation;
     }
+    if (boost::iequals(inString, "specific_heat_capacity"))
+    {
+            return specific_heat_capacity;
+    }
     if (boost::iequals(inString, "thermal_conductivity"))
     {
         return thermal_conductivity;
+    }
+    if (boost::iequals(inString, "thermal_expansivity"))
+    {
+        return thermal_expansivity;
     }
     if (boost::iequals(inString, "viscosity"))
     {
@@ -270,7 +280,9 @@ const static std::vector<std::string> convertEnumToString{
     {"residual_gas_saturation"},
     {"residual_liquid_saturation"},
     {"saturation"},
+    {"specific_heat_capacity"},
     {"thermal_conductivity"},
+    {"thermal_expansivity"},
     {"viscosity"}};
 
 }  // namespace MaterialPropertyLib
