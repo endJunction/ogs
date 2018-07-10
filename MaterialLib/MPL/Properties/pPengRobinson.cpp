@@ -14,9 +14,9 @@
 #include "pPengRobinson.h"
 #include <algorithm>
 #include <cmath>
-#include "../../MathLib/poly34.h"
-#include "../mpComponent.h"
-#include "../mpPhase.h"
+#include "MaterialLib/MPL/mpComponent.h"
+#include "MaterialLib/MPL/mpPhase.h"
+#include "MathLib/poly34.h"
 #include "pUniversalConstants.h"
 
 namespace MaterialPropertyLib
