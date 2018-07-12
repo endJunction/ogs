@@ -35,12 +35,7 @@ AverageMoleFraction::AverageMoleFraction(Component* /*unused*/)
  */
 PropertyDataType AverageMoleFraction::value(VariableArray const& /*unused*/)
 {
-    if (isUpdated())
-    {
-        return _value;
-    }
-
     /// \todo: implementation of AverageMoleFraction.
-    return _value;
+    return 0.;
 }
 }  // namespace MaterialPropertyLib

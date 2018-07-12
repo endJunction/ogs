@@ -44,7 +44,7 @@ public:
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
     PropertyDataType value(VariableArray const&) override;
-    PropertyDataType dvalue(VariableArray const&, PrimaryVariables const ) override;
+    PropertyDataType dvalue(VariableArray const&, Variables const ) override;
 };
 
 

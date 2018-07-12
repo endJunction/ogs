@@ -37,11 +37,9 @@ BrooksCoreySaturation::BrooksCoreySaturation(Component*) : _medium(0)
  */
 PropertyDataType  BrooksCoreySaturation::value(VariableArray const& v)
 {
-    if (isUpdated())
-        return _value;
 
-    const double p_cap = getScalar(v[MaterialPropertyLib::PrimaryVariables::p_cap]);
-    const double p_GR = getScalar(v[MaterialPropertyLib::PrimaryVariables::p_GR]);
+    const double p_cap = getScalar(v[MaterialPropertyLib::Variables::p_cap]);
+    const double p_GR = getScalar(v[MaterialPropertyLib::Variables::p_GR]);
 
     const double s_L_res =
             getScalar(_medium->property(PropertyEnum::residual_liquid_saturation));
@@ -54,20 +52,13 @@ PropertyDataType  BrooksCoreySaturation::value(VariableArray const& v)
             getScalar(_medium->property(PropertyEnum::brooks_corey_exponent));
 
     const double s_eff = std::pow(p_b/p_cap, lambda);
-
-    _value= s_eff*(s_L_max - s_L_res) + s_L_res;
-
-    double s_L = s_eff*(s_L_max - s_L_res) + s_L_res;
-
-    isUpdated(true);
-
-    return _value;
+    return s_eff*(s_L_max - s_L_res) + s_L_res;
 }
 
-PropertyDataType BrooksCoreySaturation::dvalue(VariableArray const& v, PrimaryVariables const pv)
+PropertyDataType BrooksCoreySaturation::dvalue(VariableArray const& v, Variables const pv)
 {
 
-    assert((pv == PrimaryVariables::p_cap) && "BrooksCoreySaturation::dvalue is implemented for "
+    assert((pv == Variables::p_cap) && "BrooksCoreySaturation::dvalue is implemented for "
             " derivatives with respect to capillary pressure only.");
 
     const double p_c = getScalar(v[pv]);
@@ -78,8 +69,6 @@ PropertyDataType BrooksCoreySaturation::dvalue(VariableArray const& v, PrimaryVa
     const double lambda =
             getScalar(_medium->property(PropertyEnum::brooks_corey_exponent));
 
-    _dvalue = -lambda / p_c * ( s_L - s_L_res);
-    return _dvalue;
-
+    return -lambda / p_c * ( s_L - s_L_res);
 }
 }  // MaterialPropertyLib

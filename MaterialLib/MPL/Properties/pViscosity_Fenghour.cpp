@@ -41,17 +41,13 @@ static constexpr std::array<double, 5> d = {{0.4071119e-02, 0.7198037e-04,
 
 PropertyDataType ViscosityCO2Fenghour::value(VariableArray const& vars)
 {
-    if (isUpdated())
-    {
-        return _value;
-    }
 
-    const double temperature = getScalar(vars[T]);
+    const double temperature = getScalar(vars[Variables::T]);
     const double epsilon_k = 251.196;  // I think it might be ok to hard-code
     // such rare material constants; It is not used anywhere else, and this
     // method here is specifically designed for carbon doxide...
     const double T_red = temperature / epsilon_k;
-    const double rho = getScalar(_component->property(density), vars);
+    const double rho = getScalar(vars[Variables::gas_density]);
 
     // some powers of rho, just in order to avoid expensive pow methods
     const double rho_pow_2 = rho * rho;
@@ -72,7 +68,6 @@ PropertyDataType ViscosityCO2Fenghour::value(VariableArray const& vars)
                          d[4] / T_red * rho_pow_8;
     const double eta = (eta_0 + eta_d) / 1.e6;  // conversion MPa*s in Pa*s
 
-    _value = eta;
     return eta;
 }
 

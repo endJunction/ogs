@@ -41,12 +41,8 @@ AverageVolumeFraction::AverageVolumeFraction(Component* /*unused*/)
  */
 PropertyDataType AverageVolumeFraction::value(VariableArray const& /*unused*/)
 {
-    if (isUpdated())
-    {
-        return _value;
-    }
 
     /// \todo: implementation of AverageVolumeFraction.
-    return _value;
+    return 0.;
 }
 }  // namespace MaterialPropertyLib

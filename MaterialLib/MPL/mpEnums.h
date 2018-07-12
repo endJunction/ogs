@@ -39,40 +39,42 @@ using SymmTensor = std::array<double, 9>;
 using Tensor = std::array<double, 9>;
 
 /**
- * PrimaryVariables is simply a list of all commonly used primary variables.
- * It is used to determine the size of the VariableArray. If the primary
- * variable of your choice is missing, simply add it somewhere at the list,
- * but above the last entry 'numberOfPrimaryVariables'
+ * Variables is simply a list of all commonly used variables that are used
+ * to determine the size of the VariableArray. If the variable of your choice
+ * is missing, simply add it somewhere at the list, but above the last entry
+ * 'numberOfVariables'
 */
-enum PrimaryVariables : std::size_t
+enum Variables : std::size_t
 {
     p_GR,
     p_LR,
     p_cap,
+    gas_density,
+    liquid_density,
     T_S,
     T_L,
     T_G,
     T,
     u,
-    numberOfPrimaryVariables
+    numberOfVariables
 };
 
 /**
  * Data type for primary variables, designed to contain both
  * scalar and vector data.
  */
-using PrimaryVariableType = boost::variant<double, Vector>;
+using VariableType = boost::variant<double, Vector>;
 
 /**
  * The VariableArray is a std::array of fixed size. Its size is determined
- * by the PrimaryVariables enumerator list. Data type of that array is
- * defined by the PrimaryVariableType definition.
+ * by the Variables enumerator list. Data type of that array is
+ * defined by the VariableType definition.
 */
-using VariableArray = std::array<PrimaryVariableType, numberOfPrimaryVariables>;
+using VariableArray = std::array<VariableType, numberOfVariables>;
 
 /// This method returns a value of type double from the
-/// primar variables array
-inline double getScalar(PrimaryVariableType pv)
+/// variables array
+inline double getScalar(VariableType pv)
 {
     return boost::get<double>(pv);
 }

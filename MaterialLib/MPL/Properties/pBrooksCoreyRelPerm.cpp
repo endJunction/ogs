@@ -37,8 +37,6 @@ BrooksCoreyRelPerm::BrooksCoreyRelPerm(Component*) : _medium(0)
  */
 PropertyDataType  BrooksCoreyRelPerm::value(VariableArray const& v)
 {
-    if (isUpdated())
-        return _value;
 
     const double p_cap = getScalar(v[MaterialPropertyLib::p_cap]);
     const double p_GR = getScalar(v[MaterialPropertyLib::p_GR]);
@@ -60,11 +58,7 @@ PropertyDataType  BrooksCoreyRelPerm::value(VariableArray const& v)
 
     const Pair value = {k_rel_LR, k_rel_GR};
 
-    _value = value;
-
-    isUpdated(true);
-
-    return _value;
+    return value;
 }
 
 }  // MaterialPropertyLib

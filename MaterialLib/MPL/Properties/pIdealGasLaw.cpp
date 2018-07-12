@@ -37,56 +37,41 @@ IdealGasLaw::IdealGasLaw(Component* c) : _phase(nullptr), _component(c){};
  */
 PropertyDataType IdealGasLaw::value(VariableArray const& v)
 {
-    if (isUpdated())
-    {
-        return _value;
-    }
-
     double molar_mass;
-
     if (_phase)
         molar_mass = getScalar(_phase->property(PropertyEnum::molar_mass));
     else
         molar_mass = getScalar(_component->property(PropertyEnum::molar_mass));
 
     const double R = gasConstant;
-    const double p = getScalar(v[PrimaryVariables::p_GR]);
-    const double T = getScalar(v[PrimaryVariables::T]);
+    const double p = getScalar(v[Variables::p_GR]);
+    const double T = getScalar(v[Variables::T]);
 
-    _value = p*molar_mass / R / T;
-
-    isUpdated(true);
-
-    return _value;
+    const double density = p*molar_mass / R / T;
+    return density;
 }
 
-PropertyDataType IdealGasLaw::dvalue(VariableArray const& v, PrimaryVariables const pv)
+PropertyDataType IdealGasLaw::dvalue(VariableArray const& v, Variables const pv)
 {
 
-    double density;
-    if (_phase)
-        density = getScalar(_phase->property(PropertyEnum::density));
-    else
-        density = getScalar(_component->property(PropertyEnum::density));
+    const double density= getScalar(v[Variables::gas_density]);
 
     switch (pv)
     {
-    case PrimaryVariables::p_GR:
+    case Variables::p_GR:
     {
         const double p = getScalar(v[pv]);
-        _dvalue = density / p;
-        return _dvalue;
+        return density / p;
     }
-    case PrimaryVariables::T:
+    case Variables::T:
     {
         const double T = getScalar(v[pv]);
-        _dvalue = - density / T;
-        return _dvalue;
+        return -density / T;
     }
     default:
         return 0.;
     }
-    return _dvalue;
+    return 0.;
 }
 
 }  // namespace MaterialPropertyLib

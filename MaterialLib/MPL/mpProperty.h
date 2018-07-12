@@ -48,13 +48,8 @@ protected:
     PropertyDataType _value;
     PropertyDataType _dvalue;
 
-    bool _isUpdated{false};
-
 public:
-    Property();
     virtual ~Property() = default;
-    void isUpdated(bool /*status*/);
-    bool isUpdated();
     /// This method is called when a property is used for the wrong
     /// kind of material, or if the proeprty is not implemented on
     /// this kind of material yet.
@@ -67,7 +62,7 @@ public:
     virtual PropertyDataType value(VariableArray const& /*unused*/);
     /// This virtual method will compute the derivative of a property
     /// with respect to the given variables pv.
-    virtual PropertyDataType dvalue(VariableArray const&, PrimaryVariables const pv);
+    virtual PropertyDataType dvalue(VariableArray const&, Variables const pv);
 
 };  // class Property
 
@@ -129,7 +124,7 @@ inline Pair getPair(Property& p, VariableArray const& v)
 /// This method forces the computation the derivative of a value,
 /// returns a double value. The derivative is computed with respect
 /// to variable pv.
-inline double getScalarDerivative(Property& p, VariableArray const& v, PrimaryVariables const pv)
+inline double getScalarDerivative(Property& p, VariableArray const& v, Variables const pv)
 {
     return boost::get<double>(p.dvalue(v,pv));
 }

@@ -70,13 +70,6 @@ Property& Component::property(PropertyEnum const& p) const
     return *_properties[p];
 }
 
-void Component::resetPropertyUpdateStatus()
-{
-    for (std::size_t p = 0; p < number_of_property_enums; ++p)
-    {
-        _properties[p]->isUpdated(false);
-    }
-}
 /**
  * \brief This function creates a new component based on the (optional)
  * component name that is given in the prj-file.

@@ -40,10 +40,6 @@ PengRobinson::PengRobinson(Component* c) : _phase(nullptr), _component(c){};
  */
 PropertyDataType PengRobinson::value(VariableArray const& v)
 {
-    if (isUpdated())
-    {
-        return _value;
-    }
 
     double M(0);
     double k_ij(0);
@@ -72,7 +68,7 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
             temp_components.push_back(&_phase->component(c));
         }
 
-        M = getScalar(_phase->property(molar_mass));
+        M = getScalar(_phase->property(PropertyEnum::molar_mass));
         k_ij = getScalar(_phase->property(binary_interaction_coefficient));
     }
     else
@@ -80,7 +76,7 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
         // Implementation as component property. The component properties
         // are simply copied to the temporary component vector.
         temp_components.push_back(_component);
-        M = getScalar(_component->property(molar_mass));
+        M = getScalar(_component->property(PropertyEnum::molar_mass));
         k_ij = 0;
     }
 
@@ -149,11 +145,8 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
         (numberRoots > 1 ? *std::max_element(std::begin(roots), std::end(roots))
                          : roots[0]);
 
-    _value = M * pressure / Z / gasConstant / temperature;
-
-    isUpdated(true);
-
-    return _value;
+    const double value = M * pressure / Z / gasConstant / temperature;
+    return value;
 }
 double kappa(const double omega)
 {

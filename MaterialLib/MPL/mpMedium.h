@@ -60,6 +60,5 @@ public:
     /// medium consists of.
     std::size_t numberOfPhases() const;
 
-    void resetPropertyUpdateStatus();
 };
 }  // namespace MaterialPropertyLib

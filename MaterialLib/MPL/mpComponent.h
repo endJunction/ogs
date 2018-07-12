@@ -42,8 +42,6 @@ public:
     void createDefaultProperties();
     /// A get-function for retrieving a cartain property.
     Property& property(PropertyEnum const& /*p*/) const;
-
-    void resetPropertyUpdateStatus();
 };
 /*
  * Method for creating a new component based on the specified

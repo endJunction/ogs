@@ -46,10 +46,6 @@ static constexpr std::array<std::array<double, 7>, 6> h = {
 
 PropertyDataType ViscosityWaterIAPWS::value(VariableArray const& vars)
 {
-    if (isUpdated())
-    {
-        return _value;
-    }
 
     const double T_crit = getScalar(_component->property(critical_temperature));
     const double T_red = getScalar(vars[T]) / T_crit;
@@ -88,7 +84,6 @@ PropertyDataType ViscosityWaterIAPWS::value(VariableArray const& vars)
 
     const double eta = eta_0 * eta_1 / 1.e6;
 
-    _value = eta;
     return eta;
 }
 

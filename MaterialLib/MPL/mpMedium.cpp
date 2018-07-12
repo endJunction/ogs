@@ -138,18 +138,4 @@ std::size_t Medium::numberOfPhases() const
     return _phases.size();
 }
 
-void Medium::resetPropertyUpdateStatus()
-{
-    // Phase properties
-    for (auto& _phase : _phases)
-    {
-        _phase->resetPropertyUpdateStatus();
-    }
-    // Medium properties
-    for (std::size_t i = 0; i < number_of_property_enums; ++i)
-    {
-        _properties[i]->isUpdated(false);
-    }
-}
-
 }  // namespace MaterialPropertyLib

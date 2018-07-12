@@ -24,9 +24,6 @@
 
 namespace MaterialPropertyLib
 {
-/// The base class constructor may remain empty since the base class is
-/// almost abstract.
-Property::Property() = default;
 
 PropertyDataType Property::value() const
 {
@@ -40,22 +37,10 @@ PropertyDataType Property::value(VariableArray const& /*unused*/)
 }
 
  /// Default implementation: derivative of any constant property is zero.
- PropertyDataType Property::dvalue(VariableArray const&, PrimaryVariables const pv)
+ PropertyDataType Property::dvalue(VariableArray const&, Variables const pv)
  {
      return 0.0;
  }
-
-
-
-void Property::isUpdated(bool status)
-{
-    _isUpdated = status;
-}
-
-bool Property::isUpdated()
-{
-    return _isUpdated;
-}
 
 void Property::notImplemented(std::string property, std::string material)
 {
