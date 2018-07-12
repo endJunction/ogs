@@ -338,7 +338,7 @@ public:
 
             const double p_LR = p_GR - p_cap;
 
-#define DBG_OUTPUT
+#define nDBG_OUTPUT
 
 #ifdef DBG_OUTPUT
             std::cout << "= Shape functions: ===============\n";
@@ -834,19 +834,17 @@ public:
 #endif
 
         }
-
-        //        OGS_FATAL("Intended halt. (numerical)");
-        //        std::cout << "== Local M: ====\n";
-        //        std::cout << local_M << "\n";
-        //        std::cout << "================\n";
-        //        std::cout << "== Local K: ====\n";
-        //        std::cout << local_K << "\n";
-        //        std::cout << "================\n";
-        //        std::cout << "== Local f: ====\n";
-        //        std::cout << local_rhs << "\n";
-        //        std::cout << "================\n";
-        //
-        //        OGS_FATAL("Intended halt.");
+#ifdef DBG_OUTPUT
+                std::cout << "== Local M: ====\n";
+                std::cout << local_M << "\n";
+                std::cout << "================\n";
+                std::cout << "== Local K: ====\n";
+                std::cout << local_K << "\n";
+                std::cout << "================\n";
+                std::cout << "== Local f: ====\n";
+                std::cout << local_rhs << "\n";
+                std::cout << "================\n";
+#endif
 
         for (unsigned row = 0; row < Mgpc.cols(); row++)
         {

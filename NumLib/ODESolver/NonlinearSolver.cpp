@@ -314,7 +314,8 @@ bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
             // cf.
             // http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecWAXPY.html
             auto& x_new =
-                NumLib::GlobalVectorProvider::provider.getVector(x, _x_new_id);
+                NumLib::GlobalVectorProvider::provider.getVector(
+                    x, _x_new_id);
             LinAlg::axpy(x_new, -_damping, minus_delta_x);
 
             if (postIterationCallback)
@@ -335,12 +336,14 @@ bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
                         "iteration"
                         " has to be repeated.");
                     // TODO introduce some onDestroy hook.
-                    NumLib::GlobalVectorProvider::provider.releaseVector(x_new);
+                    NumLib::GlobalVectorProvider::provider
+                        .releaseVector(x_new);
                     continue;  // That throws the iteration result away.
             }
 
             LinAlg::copy(x_new, x);  // copy new solution to x
-            NumLib::GlobalVectorProvider::provider.releaseVector(x_new);
+            NumLib::GlobalVectorProvider::provider.releaseVector(
+                x_new);
         }
 
         if (!iteration_succeeded)
