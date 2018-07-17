@@ -16,13 +16,13 @@
                 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8</relative_epsilons>
             </jacobian_assembler>
 
-            <dimension>3</dimension>
+            <dimension>2</dimension>
             <constitutive_relation>
                 <type>LinearElasticIsotropic</type>
                 <youngs_modulus>E</youngs_modulus>
                 <poissons_ratio>nu</poissons_ratio>
             </constitutive_relation>
-            <specific_body_force>0 0 0</specific_body_force>
+            <specific_body_force>0 0</specific_body_force>
             <process_variables>
                 <gas_pressure>gas_pressure</gas_pressure>
                 <capillary_pressure>capillary_pressure</capillary_pressure>
@@ -218,13 +218,25 @@
         <parameter>
             <name>displacement0</name>
             <type>Constant</type>
-            <values>0 0 0</values>
+            <values>0 0</values>
         </parameter>
         <parameter>
             <name>scalar_zero</name>
             <type>Constant</type>
             <values>0</values>
         </parameter>
+        <parameter>
+            <name>p_cap_1</name>
+            <type>Constant</type>
+            <values>-10</values>
+        </parameter>  
+
+        <parameter>
+            <name>p_cap_2</name>
+            <type>Constant</type>
+            <values>-20</values>
+        </parameter>  
+
         <parameter>
             <name>scalar_one</name>
             <type>Constant</type>
@@ -234,7 +246,7 @@
     <process_variables>
         <process_variable>
             <name>displacement</name>
-            <components>3</components>
+            <components>2</components>
             <order>2</order>
             <initial_condition>displacement0</initial_condition>
             <boundary_conditions>
@@ -257,30 +269,16 @@
                     <geometrical_set>square_geometry</geometrical_set>
                     <geometry>bottom</geometry>
                     <type>Dirichlet</type>
-                    <component>2</component>
+                    <component>1</component>
                     <parameter>scalar_zero</parameter>
                 </boundary_condition>
                 <boundary_condition>
                     <geometrical_set>square_geometry</geometrical_set>
                     <geometry>top</geometry>
                     <type>Dirichlet</type>
-                    <component>2</component>
+                    <component>1</component>
                     <parameter>scalar_zero</parameter>
                 </boundary_condition> 
-                <boundary_condition>
-                    <geometrical_set>square_geometry</geometrical_set>
-                    <geometry>front</geometry>
-                    <type>Dirichlet</type>
-                    <component>1</component>
-                    <parameter>scalar_zero</parameter>
-                </boundary_condition>                
-                <boundary_condition>
-                    <geometrical_set>square_geometry</geometrical_set>
-                    <geometry>back</geometry>
-                    <type>Dirichlet</type>
-                    <component>1</component>
-                    <parameter>scalar_zero</parameter>
-                </boundary_condition>                
             </boundary_conditions>
         </process_variable>
         <process_variable>
@@ -289,19 +287,7 @@
             <order>1</order>
             <initial_condition>scalar_zero</initial_condition>
             <boundary_conditions>
-                <boundary_condition>
-                    <geometrical_set>square_geometry</geometrical_set>
-                    <geometry>bottom</geometry>
-                    <type>Dirichlet</type>
-                    <parameter>scalar_zero</parameter>
-                </boundary_condition>                
-                <boundary_condition>
-                    <geometrical_set>square_geometry</geometrical_set>
-                    <geometry>top</geometry>
-                    <type>Dirichlet</type>
-                    <parameter>scalar_zero</parameter>
-                </boundary_condition> 
-                <boundary_condition>
+                 <boundary_condition>
                     <geometrical_set>square_geometry</geometrical_set>
                     <geometry>left</geometry>
                     <type>Dirichlet</type>
@@ -337,15 +323,15 @@
             <boundary_conditions>
                 <boundary_condition>
                     <geometrical_set>square_geometry</geometrical_set>
-                    <geometry>bottom</geometry>
+                    <geometry>left</geometry>
                     <type>Dirichlet</type>
-                    <parameter>scalar_zero</parameter>
+                    <parameter>p_cap_1</parameter>
                 </boundary_condition>                
                 <boundary_condition>
                     <geometrical_set>square_geometry</geometrical_set>
-                    <geometry>top</geometry>
+                    <geometry>right</geometry>
                     <type>Dirichlet</type>
-                    <parameter>scalar_zero</parameter>
+                    <parameter>p_cap_2</parameter>
                 </boundary_condition>                  
             </boundary_conditions>
         </process_variable>
