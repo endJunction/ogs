@@ -136,6 +136,55 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_K * dx_dx;
     }
+
+#define nDOF_PGAS
+#define nDOF_PLIQUID
+#define nDOF_T
+#define nDOF_U
+
+#ifndef DOF_PGAS
+        if (num_r_c == 28) // quad8
+        {
+            local_Jac.template block<4, 4>(0,0).setIdentity();
+        }
+        else if (num_r_c == 84) // hex20
+        {
+            local_Jac.template block<8, 8>(0,0).setIdentity();
+        }
+#endif
+
+#ifndef DOF_PLIQUID
+        if (num_r_c == 28) // quad8
+        {
+            local_Jac.template block<4, 4>(4,4).setIdentity();
+        }
+        else if (num_r_c == 84) // hex20
+        {
+            local_Jac.template block<8, 8>(8,8).setIdentity();
+        }
+#endif
+
+#ifndef DOF_T
+        if (num_r_c == 28) // quad8
+        {
+            local_Jac.template block<4, 4>(8,8).setIdentity();
+        }
+        else if (num_r_c == 84) // hex20
+        {
+            local_Jac.template block<8, 8>(16,16).setIdentity();
+        }
+#endif
+
+#ifndef DOF_U
+        if (num_r_c == 28) // quad8
+        {
+            local_Jac.template block<16, 16>(12,12).setIdentity();
+        }
+        else if (num_r_c == 84) // hex20
+        {
+            local_Jac.template block<60, 60>(24,24).setIdentity();
+        }
+#endif
 }
 
 std::unique_ptr<CentralDifferencesJacobianAssembler>
