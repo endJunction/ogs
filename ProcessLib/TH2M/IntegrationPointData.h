@@ -78,8 +78,8 @@ struct IntegrationPointData final
     double density_liquid;
     double pressure_gas_linear;
     double pressure_cap_linear;
-    GlobalDimVectorType velocity_gas;
-    GlobalDimVectorType velocity_liquid;
+    GlobalDimVectorType velocity_gas{DisplacementDim};
+    GlobalDimVectorType velocity_liquid{DisplacementDim};
     void pushBackState()
     {
         eps_prev = eps;
