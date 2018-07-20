@@ -689,16 +689,16 @@ public:
 
             Mepg.noalias() -=
                 N_p.transpose() *
-                (phi_G * beta_T_GR * T + phi_L * beta_T_LR * T + phi_S) * N_p *
+                (phi_G*beta_T_GR + phi_L*beta_T_LR + phi_S*beta_T_SR) * T * N_p *
                 w;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Mepg:\n " << Mepg << " \n";
             std::cout << "=================================\n";
 #endif
-            Mepc.noalias() -=
+            Mepc.noalias() +=
                 N_p.transpose() *
-                (phi_L * beta_T_LR * T + phi_S * s_L + p_cap * dsLdpc) * N_p *
+                (phi_L*beta_T_LR * T + phi_S*s_L*beta_T_SR*T + p_cap*phi*dsLdpc) * N_p *
                 w;
 
 #ifdef DBG_OUTPUT
@@ -732,11 +732,11 @@ public:
 #endif
 
             Aepg.noalias() = N_p.transpose() *
-                             (s_G * beta_T_GR * T * w_GS.transpose() +
-                              s_L * beta_T_LR * T * w_LS.transpose()) *
+                             (s_G*beta_T_GR*w_GS.transpose() +
+                              s_L*beta_T_LR*w_LS.transpose()) * T *
                              dNdx_p * w;
 
-            Kepg.noalias() += Aepg;
+            Kepg.noalias() -= Aepg;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Aepg:\n " << Aepg << " \n";
@@ -747,9 +747,9 @@ public:
 
             Aepc.noalias() =
                 N_p.transpose() *
-                ((p_cap * dsLdpc - s_L * beta_T_LR * T) * w_LS.transpose() -
-                 p_GR * dsLdpc * w_GS.transpose()) *
-                dNdx_p * w;
+                ( p_GR*dsLdpc*w_GS.transpose() +
+                        (s_L*beta_T_LR*T-p_LR*dsLdpc)*w_LS.transpose()) *
+                        dNdx_p * w;
 
             Kepc.noalias() += Aepc;
 
@@ -760,8 +760,8 @@ public:
 #endif
 
             AeT.noalias() = N_p.transpose() *
-                            (rho_GR * cp_G * w_GS.transpose() +
-                             rho_LR * cp_L * w_LS.transpose()) *
+                            (s_G*rho_GR*cp_G*w_GS.transpose() +
+                             s_L*rho_LR*cp_L*w_LS.transpose()) *
                             dNdx_p * w;
 
 #ifdef DBG_OUTPUT
@@ -834,9 +834,10 @@ public:
             std::cout << "   Bu:\n " << Bu << " \n";
             std::cout << "==================================\n";
 #endif
-
         }
+
 #ifdef DBG_OUTPUT
+
                 std::cout << "== Local M: ====\n";
                 std::cout << local_M << "\n";
                 std::cout << "================\n";
@@ -846,6 +847,8 @@ public:
                 std::cout << "== Local f: ====\n";
                 std::cout << local_rhs << "\n";
                 std::cout << "================\n";
+
+               OGS_FATAL ("##########################################");
 #endif
 
         for (unsigned row = 0; row < Mgpc.cols(); row++)
@@ -1094,7 +1097,6 @@ private:
         auto cache_mat = MathLib::createZeroedMatrix<Eigen::Matrix<
             double, DisplacementDim, Eigen::Dynamic, Eigen::RowMajor>>(
             cache, DisplacementDim, n_integration_points);
-
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
             cache_mat.col(ip) = _ip_data[ip].velocity_gas;
