@@ -55,11 +55,11 @@ void MohrCoulomb<DisplacementDim>::computeConstitutiveRelation(
     Eigen::Ref<Eigen::VectorXd const>
         sigma0,
     Eigen::Ref<Eigen::VectorXd const>
-        w_prev,
+        /*w_prev*/,
     Eigen::Ref<Eigen::VectorXd const>
         w,
     Eigen::Ref<Eigen::VectorXd const>
-        sigma_prev,
+        /*sigma_prev*/,
     Eigen::Ref<Eigen::VectorXd>
         sigma,
     Eigen::Ref<Eigen::MatrixXd>
