@@ -225,7 +225,7 @@ void HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
         auto& eps = ip_data.eps;
         auto& state = ip_data.material_state_variables;
 
-        auto q = ip_data.darcy_velocity.head(GlobalDim);
+        auto q = ip_data.darcy_velocity;
 
         auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
         auto const rho_sr = _process_data.solid_density(t, x_position)[0];
@@ -376,7 +376,7 @@ void HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
             auto const& gravity_vec = _process_data.specific_body_force;
             auto const& dNdx_p = ip_data.dNdx_p;
 
-            ip_data.darcy_velocity.head(GlobalDim).noalias() =
+            ip_data.darcy_velocity.noalias() =
                 -k_over_mu * (dNdx_p * p + rho_fr * gravity_vec);
         }
     }
@@ -384,7 +384,8 @@ void HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
     int n = GlobalDim == 2 ? 4 : 6;
     Eigen::VectorXd ele_stress = Eigen::VectorXd::Zero(n);
     Eigen::VectorXd ele_strain = Eigen::VectorXd::Zero(n);
-    Eigen::Vector3d ele_velocity = Eigen::Vector3d::Zero();
+    typename ShapeMatricesTypePressure::GlobalDimVectorType ele_velocity =
+        ShapeMatricesTypePressure::GlobalDimVectorType::Zero(GlobalDim);
 
     for (auto const& ip_data : _ip_data)
     {
@@ -418,7 +419,8 @@ void HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
         (*_process_data.mesh_prop_strain_xz)[_element.getID()] = ele_strain[5];
     }
 
-    for (unsigned i = 0; i < 3; i++)
+    // copy GlobalDim velocity vector into 3d mesh property vector.
+    for (unsigned i = 0; i < GlobalDim; i++)
         (*_process_data.mesh_prop_velocity)[element_id * 3 + i] =
             ele_velocity[i];
 

@@ -53,7 +53,8 @@ struct IntegrationPointDataFracture final
     Eigen::MatrixXd C;
     double integration_weight;
 
-    Eigen::Vector3d darcy_velocity;
+    typename ShapeMatrixTypePressure::GlobalDimVectorType darcy_velocity =
+        ShapeMatrixTypePressure::GlobalDimVectorType::Zero(GlobalDim);
 
     void pushBackState()
     {

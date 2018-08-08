@@ -313,7 +313,7 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         Eigen::Matrix<double, 1, displacement_size> const mT_R_Hg =
             identity2.transpose() * R * H_g;
         // velocity in global coordinates
-        ip_data.darcy_velocity.head(GlobalDim).noalias() =
+        ip_data.darcy_velocity.noalias() =
             -R.transpose() * k * grad_head_over_mu;
         J_pg.noalias() += N_p.transpose() * S * N_p * p_dot * mT_R_Hg * ip_w;
         J_pg.noalias() +=
@@ -404,7 +404,8 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
     typename HMatricesType::ForceVectorType ele_w =
         HMatricesType::ForceVectorType::Zero(GlobalDim);
     double ele_Fs = -std::numeric_limits<double>::max();
-    Eigen::Vector3d ele_velocity = Eigen::Vector3d::Zero();
+    typename ShapeMatricesTypePressure::GlobalDimVectorType ele_velocity =
+        ShapeMatricesTypePressure::GlobalDimVectorType::Zero(GlobalDim);
     for (auto const& ip : _ip_data)
     {
         ele_b += ip.aperture;
@@ -438,7 +439,7 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             ele_sigma_eff[1];
     }
 
-    for (unsigned i = 0; i < 3; i++)
+    for (unsigned i = 0; i < GlobalDim; i++)
         (*_process_data.mesh_prop_velocity)[element_id * 3 + i] =
             ele_velocity[i];
 }
