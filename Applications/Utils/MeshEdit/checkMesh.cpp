@@ -156,4 +156,6 @@ int main(int argc, char *argv[])
             INFO ("No holes found within the mesh.");
         }
     }
+
+    MeshLib::IO::writeMeshToFile(*mesh, "/tmp/x.vtu");
 }
