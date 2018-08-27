@@ -33,7 +33,7 @@ target_link_libraries(editMaterialID MeshLib)
 set_target_properties(editMaterialID PROPERTIES FOLDER Utilities)
 
 add_executable(checkMesh checkMesh.cpp)
-target_link_libraries(checkMesh MeshLib)
+target_link_libraries(checkMesh MeshLib NumLib)
 set_target_properties(checkMesh PROPERTIES FOLDER Utilities)
 
 add_executable(reviseMesh reviseMesh.cpp)

@@ -11,6 +11,7 @@
 
 #include <tclap/CmdLine.h>
 
+#include "Applications/ApplicationsLib/LinearSolverLibrarySetup.h"
 #include "Applications/ApplicationsLib/LogogSetup.h"
 
 #include "BaseLib/BuildInfo.h"
@@ -28,10 +29,13 @@
 #include "MeshLib/MeshQuality/MeshValidation.h"
 
 #include "MeshLib/IO/readMeshFromFile.h"
+#include "MeshLib/IO/writeMeshToFile.h"
 
 int main(int argc, char *argv[])
 {
     ApplicationsLib::LogogSetup logog_setup;
+    ApplicationsLib::LinearSolverLibrarySetup linear_solver_library_setup(argc,
+                                                                          argv);
 
     TCLAP::CmdLine cmd(
         "Checks mesh properties.\n\n"
