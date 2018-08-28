@@ -88,17 +88,19 @@ std::unique_ptr<Output> createOutput(const BaseLib::ConfigTree& config,
     std::vector<MathLib::Point3d> timeseries_output_points;
     auto const points_output_config =
         //! \ogs_file_param{prj__time_loop__output__points}
-        config.getConfigSubtree("points");
-
-    for (auto point_config :
-         //! \ogs_file_param{prj__time_loop__output__points__point}
-         points_output_config.getConfigParameterList("point"))
+        config.getConfigSubtreeOptional("points");
+    if (points_output_config)
     {
-        std::istringstream sstr{point_config.getValue<std::string>()};
-        std::array<double, 3> coordinates;
-        sstr >> coordinates[0] >> coordinates[1] >> coordinates[2];
+        for (auto point_config :
+             //! \ogs_file_param{prj__time_loop__output__points__point}
+             points_output_config->getConfigParameterList("point"))
+        {
+            std::istringstream sstr{point_config.getValue<std::string>()};
+            std::array<double, 3> coordinates;
+            sstr >> coordinates[0] >> coordinates[1] >> coordinates[2];
 
-        timeseries_output_points.emplace_back(coordinates);
+            timeseries_output_points.emplace_back(coordinates);
+        }
     }
 
     bool const output_iteration_results =
