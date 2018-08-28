@@ -12,8 +12,8 @@
 #include "BoundaryCondition.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/IndexValueVector.h"
-#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 #include "ProcessLib/Parameter/Parameter.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 
 namespace ProcessLib
 {
@@ -105,7 +105,7 @@ public:
     }
 
     void getEssentialBCValues(
-        const double t,
+        const double t, GlobalVector const& x,
         NumLib::IndexValueVector<GlobalIndexType>& bc_values) const override;
 
     void preTimestep(const double t, const GlobalVector& x) override;

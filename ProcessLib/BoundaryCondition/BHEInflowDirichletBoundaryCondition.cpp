@@ -17,7 +17,8 @@
 namespace ProcessLib
 {
 void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
-    const double t, NumLib::IndexValueVector<GlobalIndexType>& bc_values) const
+    const double t, GlobalVector const& x,
+    NumLib::IndexValueVector<GlobalIndexType>& bc_values) const
 {
     SpatialPosition pos;
 
@@ -102,7 +103,8 @@ createBHEInflowDirichletBoundaryCondition(
     int const component_id,
     const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters)
 {
-    DBUG("Constructing BHEInflowDirichletBoundaryCondition from config.");
+    DBUG(
+        "Constructing BHEInflowDirichletBoundaryCondition from config.");
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__type}
     config.checkConfigParameter(
         "type", "BHEInflowDirichlet");
@@ -116,6 +118,7 @@ createBHEInflowDirichletBoundaryCondition(
     // TODO: try to locate the BHE instance here
     // if BHE instance cannot be found,
     // then complain about it.
+
 
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
     auto const param_name = config.getConfigParameter<std::string>("parameter");
