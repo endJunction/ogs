@@ -48,8 +48,9 @@ void getRotationMatrixToGlobal(const unsigned element_dimension,
         else
             GeoLib::compute3DRotationMatrixToX(xx, matR);
         matR.transposeInPlace();
+        return;
     }
-    else if (global_dim == 3 && element_dimension == 2)
+    if (element_dimension == 2)
     {
         // get plane normal
         MathLib::Vector3 plane_normal;
@@ -60,6 +61,7 @@ void getRotationMatrixToGlobal(const unsigned element_dimension,
         GeoLib::computeRotationMatrixToXY(plane_normal, matR);
         // set a transposed matrix
         matR.transposeInPlace();
+        return;
     }
 }
 }  // namespace detail
@@ -77,13 +79,9 @@ ElementCoordinatesMappingLocal::ElementCoordinatesMappingLocal(
 
     auto const element_dim = e.getDimension();
 
-    if (global_dim == element_dim)
-    {
-        _matR2global.setIdentity();
-        return;
-    }
-
-    detail::getRotationMatrixToGlobal(element_dim, global_dim, _points, _matR2global);
+    _matR2global.setIdentity();
+    detail::getRotationMatrixToGlobal(
+        element_dim, global_dim, _points, _matR2global);
     detail::rotateToLocal(_matR2global.transpose(), _points);
 }
 
