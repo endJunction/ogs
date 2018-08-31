@@ -488,7 +488,8 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            ip_data.updateConstitutiveRelation(t, x_position, dt, displacement);
+            ip_data.updateConstitutiveRelation(t, x_position, dt, displacement,
+                    T, p_GR);
 
             auto const drhoGRdpGR = MPL::getScalarDerivative(
                 gas_phase.property(MPL::density), variables, MPL::p_GR);

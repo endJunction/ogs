@@ -79,6 +79,9 @@ bool NonlinearSolver<NonlinearSolverTag::Picard>::solve(
 
         BaseLib::RunTime time_linear_solver;
         time_linear_solver.start();
+
+
+
         bool iteration_succeeded = _linear_solver.solve(A, rhs, x_new);
         INFO("[time] Linear solver took %g s.", time_linear_solver.elapsed());
 
@@ -205,82 +208,14 @@ bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
         sys.getResidual(x, res);
         sys.getJacobian(J);
 
-
-//        std::cout << std::showpos << std::scientific;
-//        std::cout.precision(5);
-//
-//        auto x_vector = x.getRawVector();
-//
-//        std::cout << "~> ===================\n";
-//        std::cout << "~> Iteration: " << iteration << "\n\n";
-//
-//        std::cout << "~> x: \n";
-//        std::cout << "~> -------------------\n";
-//
-//        for (std::size_t i=0; i<x_vector.size(); i++)
-//        {
-//            std::cout << "~> x:[" << i << "]: " << x_vector[i] << "\n";
-//        }
-//
-//        auto res_vector = res.getRawVector();
-//        std::cout << "~> \n";
-//        std::cout << "~> res: \n";
-//        std::cout << "~> -------------------\n";
-//
-//        for (std::size_t i=0; i<res_vector.size(); i++)
-//        {
-//            std::cout << "~> res[" << i << "]: " << res_vector[i] << "\n";
-//        }
-//
-//        std::cout << "~> \n";
-//        std::cout << "~> J: \n";
-//
-//        std::cout << "~> -------------------\n";
-////
-////        for (std::size_t r=0; r<J.getNumberOfRows(); r++)
-////        {
-////            std::cout << "~> ";
-////            for (std::size_t c=0; c<J.getNumberOfColumns(); c++)
-////            {
-////                const double j_c_r = J.get(r,c);
-////                std::cout <<  j_c_r << " ";
-////            }
-////            std::cout << "\n";
-////        }
-//
-//
-//        for (std::size_t r=0; r<J.getNumberOfRows(); r++)
-//             for (std::size_t c=0; c<J.getNumberOfColumns(); c++)
-//            {
-//                const double j_c_r = J.get(r,c);
-//                std::cout << "~> J["<< r << "," << c << "]: " <<  j_c_r << "\n";
-//            }
-//
-//         std::cout << "~> \n\n";
-//
-
-
-
-//          std::cout << "=== x: ===\n\n";
-//          std::cout << x.getRawVector() << "\n\n";
-//          std::cout << "==========\n\n";
-//        std::cout << "=== Jacobian: ===\n\n";
-//        std::cout << J.getRawMatrix() << "\n\n";
-
-//        std::cout << "=== Residuum: ===\n\n";
-//        std::cout << res.getRawVector() << "\n\n";
-
-//        OGS_FATAL("Halt.");
-
-
         INFO("[time] Assembly took %g s.", time_assembly.elapsed());
 
         minus_delta_x.setZero();
 
-        timer_dirichlet.start();
-        sys.applyKnownSolutionsNewton(J, res, minus_delta_x);
-        time_dirichlet += timer_dirichlet.elapsed();
-        INFO("[time] Applying Dirichlet BCs took %g s.", time_dirichlet);
+        BaseLib::RunTime time_dirichlet;
+        time_dirichlet.start();
+        sys.applyKnownSolutionsNewton(J, res, minus_delta_x, x);
+        INFO("[time] Applying Dirichlet BCs took %g s.", time_dirichlet.elapsed());
 
         if (!sys.isLinear() && _convergence_criterion->hasResidualCheck())
             _convergence_criterion->checkResidual(res);
@@ -288,6 +223,7 @@ bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
         BaseLib::RunTime time_linear_solver;
         time_linear_solver.start();
         bool iteration_succeeded = _linear_solver.solve(J, res, minus_delta_x);
+
         INFO("[time] Linear solver took %g s.", time_linear_solver.elapsed());
 
         if (!iteration_succeeded)
