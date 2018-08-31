@@ -427,10 +427,23 @@ public:
             std::cout << "  phi_S : " << phi_S << " \n";
             std::cout << "==================================\n";
 #endif
-            auto const s_L =
-                MPL::getScalar(medium.property(MPL::PropertyEnum::saturation),
-                               variables);
+
+
+//            auto const s_L =
+//                MPL::getScalar(medium.property(MPL::PropertyEnum::saturation),
+//                               variables);
+
+            auto const s_L = 1 - 1.9722e-11 * pow (p_cap, 2.4279);
+
+            if (s_L < 0.9)
+            {
+                OGS_FATAL ("s_L dropped below 0.9!");
+            }
             auto const s_G = 1 - s_L;
+
+            auto const s_e = (s_L - 0.2) / (1.0 - 0.2);
+
+
 
 #ifdef DBG_OUTPUT
             std::cout << "  s_L : " << s_L << " \n";
@@ -468,7 +481,7 @@ public:
 
             eps.noalias() = B * displacement;
 
-            auto const e =
+            auto const e = // volume strain
                 MathLib::KelvinVector::Invariants<KelvinVectorSize>::trace(eps);
 #ifdef DBG_OUTPUT
             std::cout << "   e: " << e << " \n";
@@ -504,12 +517,20 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            auto const k_rel_LR = MPL::getPair(
-                medium.property(MPL::PropertyEnum::relative_permeability),
-                variables)[0];
-            auto const k_rel_GR = MPL::getPair(
-                medium.property(MPL::PropertyEnum::relative_permeability),
-                variables)[1];
+//            auto const k_rel_LR = MPL::getPair(
+//                medium.property(MPL::PropertyEnum::relative_permeability),
+//                variables)[0];
+//            auto const k_rel_GR = MPL::getPair(
+//                medium.property(MPL::PropertyEnum::relative_permeability),
+//                variables)[1];
+
+            auto const k_rel_LR = 1.0 - 2.207*pow((1.0 - s_L), 1.0121);
+
+            auto const min_k_rel_GR = 0.000;
+
+            auto const k_rel_GR = (1.0 - s_e) * (1 - s_e)
+                    * (1.0 - pow(s_e, (5./3.))) + min_k_rel_GR;
+
 #ifdef DBG_OUTPUT
             std::cout << "    k_rel_LR: " << k_rel_LR << " \n";
             std::cout << "    k_rel_GR: " << k_rel_GR << " \n";
