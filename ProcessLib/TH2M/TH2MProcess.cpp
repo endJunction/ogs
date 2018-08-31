@@ -267,7 +267,7 @@ void TH2MProcess<DisplacementDim>::postTimestepConcreteProcess(
     GlobalVector const& x, const double /*t*/, const double /*delta_t*/,
     const int process_id)
 {
-    DBUG("PostTimestep HydroMechanicsProcess.");
+    DBUG("PostTimestep TH2MProcess.");
     GlobalExecutor::executeMemberOnDereferenced(
         &LocalAssemblerInterface::postTimestep, _local_assemblers,
         getDOFTable(process_id), x);
