@@ -985,6 +985,7 @@ private:
             _integration_method.getNumberOfPoints();
 
         cache.clear();
+        cache.resize(n_integration_points);
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
             cache[ip] = _ip_data[ip].saturation;
@@ -1003,6 +1004,7 @@ private:
             _integration_method.getNumberOfPoints();
 
         cache.clear();
+        cache.resize(n_integration_points);
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
             cache[ip] = _ip_data[ip].pressure_wet;
@@ -1021,6 +1023,7 @@ private:
             _integration_method.getNumberOfPoints();
 
         cache.clear();
+        cache.resize(n_integration_points);
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
             cache[ip] = _ip_data[ip].density_gas;
@@ -1039,6 +1042,7 @@ private:
             _integration_method.getNumberOfPoints();
 
         cache.clear();
+        cache.resize(n_integration_points);
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
             cache[ip] = _ip_data[ip].density_liquid;
@@ -1079,6 +1083,7 @@ private:
             _integration_method.getNumberOfPoints();
 
         cache.clear();
+        cache.resize(n_integration_points);
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
             cache[ip] = _ip_data[ip].pressure_gas_linear;
@@ -1097,6 +1102,7 @@ private:
             _integration_method.getNumberOfPoints();
 
         cache.clear();
+        cache.resize(n_integration_points);
         for (unsigned ip = 0; ip < n_integration_points; ++ip)
         {
             cache[ip] = _ip_data[ip].pressure_cap_linear;
