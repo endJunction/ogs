@@ -107,12 +107,12 @@
                         <property>
                             <name>density</name>
                             <type>Constant</type>
-                            <value>1000</value>
+                            <value>1.2</value>
                         </property>
                         <property>
                             <name>viscosity</name>
                             <type>Constant</type>
-                            <value>1e-3</value>
+                            <value>1.8e-5</value>
                         </property>
                         <property>
                             <name>specific_heat_capacity</name>
@@ -131,7 +131,7 @@
                 <property>
                     <name>permeability</name>
                     <type>Constant</type>
-                    <value>1e-12</value>
+                    <value>4.5e-13</value>
                 </property>
                 <property>
                     <name>compressibility</name>
@@ -141,7 +141,7 @@
                 <property>
                     <name>porosity</name>
                     <type>Constant</type>
-                    <value>0.29</value>
+                    <value>0.2975</value>
                 </property>
                 <property>
                     <name>relative_permeability</name>
@@ -176,7 +176,7 @@
                     <type>PerComponentDeltaX</type>
                     <norm_type>NORM2</norm_type>
                     <!--      p_g   p_cap  T     ux    uy    uz  -->
-                    <reltols>1e-12 1e-12 1e-12 1e-13 1e-13 </reltols>
+                    <abstols>1e-6 1e-6 1e-6 1e-1 1e-1 </abstols>
                 </convergence_criterion>
 
                 <time_discretization>
@@ -207,7 +207,7 @@
                     <timesteps>
                         <pair>
                             <repeat>1</repeat>
-                            <delta_t>0.25</delta_t>
+                            <delta_t>0.0025</delta_t>
                         </pair>
                     </timesteps>
                 </time_stepping>
@@ -248,10 +248,23 @@
         </parameter>
 
         <parameter>
-            <name>scalar_zero</name>
+            <name>T_0</name>
             <type>Constant</type>
             <values>0</values>
         </parameter>
+
+        <parameter>
+            <name>p_Cap_ini</name>
+            <type>Constant</type>
+            <values>1</values>
+        </parameter>
+
+        <parameter>
+            <name>p_Cap_boundary</name>
+            <type>Constant</type>
+            <values>1</values>
+        </parameter>
+
 
         <parameter>
             <name>atmospheric</name>
@@ -326,19 +339,19 @@
             <name>temperature</name>
             <components>1</components>
             <order>1</order>
-            <initial_condition>scalar_zero</initial_condition>
+            <initial_condition>T_0</initial_condition>
             <boundary_conditions>
                 <boundary_condition>
                     <geometrical_set>column_geometry</geometrical_set>
                     <geometry>bottom</geometry>
                     <type>Dirichlet</type>
-                    <parameter>scalar_zero</parameter>
+                    <parameter>T_0</parameter>
                 </boundary_condition>                
                 <boundary_condition>
                     <geometrical_set>column_geometry</geometrical_set>
                     <geometry>top</geometry>
                     <type>Dirichlet</type>
-                    <parameter>scalar_zero</parameter>
+                    <parameter>T_0</parameter>
                 </boundary_condition>                  
             </boundary_conditions>
         </process_variable>
@@ -366,13 +379,13 @@
             <name>capillary_pressure</name>
             <components>1</components>
             <order>1</order>
-            <initial_condition>scalar_zero</initial_condition>
+            <initial_condition>p_Cap_ini</initial_condition>
             <boundary_conditions>
                 <boundary_condition>
                     <geometrical_set>column_geometry</geometrical_set>
                     <geometry>bottom</geometry>
                     <type>Dirichlet</type>
-                    <parameter>scalar_zero</parameter>
+                    <parameter>p_Cap_boundary</parameter>
                 </boundary_condition>                
             </boundary_conditions>
         </process_variable>
@@ -381,7 +394,7 @@
         <nonlinear_solver>
             <name>basic_newton</name>
             <type>Newton</type>
-            <max_iter>3</max_iter>
+            <max_iter>30</max_iter>
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
