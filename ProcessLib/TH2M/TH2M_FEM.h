@@ -696,7 +696,7 @@ public:
             const double phi_L = s_L * phi;
             const double phi_G = s_G * phi;
 
-            const double cp_eff = phi_G * rho_GR * cp_G +
+            const double rho_cp_eff = phi_G * rho_GR * cp_G +
                                   phi_L * rho_LR * cp_L + phi_S * rho_SR * cp_S;
 
 #ifdef DBG_OUTPUT
@@ -704,7 +704,7 @@ public:
             std::cout << "   cp_L: " << cp_L << " \n";
             std::cout << "   cp_S: " << cp_S << " \n";
 
-            std::cout << " cp_eff: " << cp_eff << " \n";
+            std::cout << " cp_eff: " << rho_cp_eff << " \n";
             std::cout << "=================================\n";
 #endif
 
