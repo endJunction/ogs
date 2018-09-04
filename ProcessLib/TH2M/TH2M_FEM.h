@@ -634,7 +634,7 @@ public:
 
             std::cout << "=================================\n";
 #endif
-            MgT.noalias() += N_p.transpose() * s_G * rho_GR *
+            MgT.noalias() -= N_p.transpose() * s_G * rho_GR *
                              (phi * beta_T_GR + beta_T_SR * (alpha_B - phi)) *
                              N_p * w;
 
@@ -659,18 +659,17 @@ public:
 #endif
 
             Mlpc.noalias() +=
-                N_p.transpose() * rho_LR *
-                ((phi - s_L * (alpha_B - phi) * beta_p_SR * p_cap) * dsLdpc -
-                 phi * s_L * beta_p_LR -
-                 (alpha_B - phi) * beta_p_SR * s_L * s_L) *
-                N_p * w;
+            		N_p.transpose() * rho_LR *
+					( phi * dsLdpc
+							- s_L*(s_L+p_cap*dsLdpc)*(alpha_B-phi)*beta_p_SR)
+							*  N_p * w;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Mlpc:\n " << Mlpc << " \n";
             std::cout << "==================================\n";
 #endif
 
-            MlT.noalias() += N_p.transpose() * s_L * rho_LR *
+            MlT.noalias() -= N_p.transpose() * s_L * rho_LR *
                              (phi * beta_T_LR + beta_T_SR * (alpha_B - phi)) *
                              N_p * w;
 
@@ -720,7 +719,7 @@ public:
 #endif
             Mepc.noalias() +=
                 N_p.transpose() *
-                (phi_L*beta_T_LR * T + phi_S*s_L*beta_T_SR*T + p_cap*phi*dsLdpc) * N_p *
+                (phi_L*beta_T_LR - (s_L + p_cap*dsLdpc)*phi_S*beta_T_SR) * T * N_p *
                 w;
 
 #ifdef DBG_OUTPUT
@@ -728,7 +727,7 @@ public:
             std::cout << "=================================\n";
 #endif
 
-            MeT.noalias() += N_p.transpose() * cp_eff * N_p * w;
+            MeT.noalias() += N_p.transpose() * rho_cp_eff * N_p * w;
 
 #ifdef DBG_OUTPUT
             std::cout << "   MeT:\n " << MeT << " \n";
@@ -753,12 +752,12 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            Aepg.noalias() = N_p.transpose() *
-                             (s_G*beta_T_GR*w_GS.transpose() +
-                              s_L*beta_T_LR*w_LS.transpose()) * T *
+            Aepg.noalias() = - N_p.transpose() *
+                             (phi_G*beta_T_GR*w_GS.transpose() +
+                              phi_L*beta_T_LR*w_LS.transpose()) * T *
                              dNdx_p * w;
 
-            Kepg.noalias() -= Aepg;
+            Kepg.noalias() += Aepg;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Aepg:\n " << Aepg << " \n";
@@ -768,10 +767,8 @@ public:
 #endif
 
             Aepc.noalias() =
-                N_p.transpose() *
-                ( p_GR*dsLdpc*w_GS.transpose() +
-                        (s_L*beta_T_LR*T-p_LR*dsLdpc)*w_LS.transpose()) *
-                        dNdx_p * w;
+            		N_p.transpose() * (phi_L*beta_T_LR*T*w_LS.transpose())
+					* dNdx_p * w;
 
             Kepc.noalias() += Aepc;
 
