@@ -9,6 +9,10 @@
 
 #include "CreateHeatTransportBHEProcess.h"
 
+#include "ProcessLib/Output/CreateSecondaryVariables.h"
+#include "ProcessLib/Utils/ProcessUtils.h"
+#include "HeatTransportBHEProcess.h"
+#include "HeatTransportBHEProcessData.h"
 #include "BHE/BHEAbstract.h"
 #include "BHE/BHE_1U.h"
 #include "BHE/BHE_2U.h"
@@ -19,16 +23,12 @@
 #include "BHE/CreateBHE2U.h"
 #include "BHE/CreateBHECXA.h"
 #include "BHE/CreateBHECXC.h"
-#include "BaseLib/Algorithm.h"
-#include "HeatTransportBHEProcess.h"
-#include "HeatTransportBHEProcessData.h"
-#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
 #include "MaterialLib/Fluid/FluidProperty.h"
+#include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
+#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
 #include "MaterialLib/Fluid/SpecificHeatCapacity/CreateSpecificFluidHeatCapacityModel.h"
 #include "MaterialLib/Fluid/ThermalConductivity/CreateFluidThermalConductivityModel.h"
-#include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
-#include "ProcessLib/Output/CreateSecondaryVariables.h"
-#include "ProcessLib/Utils/ProcessUtils.h"
+#include "BaseLib/Algorithm.h"
 
 namespace ProcessLib
 {
