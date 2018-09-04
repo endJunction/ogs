@@ -37,7 +37,9 @@ void getBHEDataInMesh(
     std::vector<MeshLib::Element*>& vec_soil_elements,
     std::vector<int>& vec_BHE_mat_IDs,
     std::vector<std::vector<MeshLib::Element*>>& vec_BHE_elements,
+    std::vector<MeshLib::Node*>& vec_pure_soil_nodes,
     std::vector<std::vector<MeshLib::Node*>>& vec_BHE_nodes,
+    std::vector<std::vector<MeshLib::Node*>>& vec_BHE_soil_nodes,
     std::vector<std::vector<MeshLib::Element*>>& vec_BHE_soil_elements);
 } // end of namespace HeatTransportBHE
 

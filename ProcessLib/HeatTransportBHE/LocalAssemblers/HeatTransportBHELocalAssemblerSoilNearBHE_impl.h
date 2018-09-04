@@ -126,10 +126,11 @@ namespace ProcessLib
                 }
 
                 // debugging
-                // std::string sep = "\n----------------------------------------\n";
-                // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-                // std::cout << local_K.format(CleanFmt) << sep;
-                // std::cout << local_M.format(CleanFmt) << sep;
+                std::string sep =
+                    "\n----------------------------------------\n";
+                Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+                std::cout << local_K.format(CleanFmt) << sep;
+                std::cout << local_M.format(CleanFmt) << sep;
             }
 
         template <typename ShapeFunction,
