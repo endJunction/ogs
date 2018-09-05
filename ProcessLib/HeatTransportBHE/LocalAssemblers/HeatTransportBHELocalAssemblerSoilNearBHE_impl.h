@@ -32,9 +32,9 @@
 #include "ProcessLib/LIE/Common/LevelSetFunction.h"
 #include "ProcessLib/LIE/Common/Utils.h"
 
-// #include "IntegrationPointDataMatrix.h"
-#include "SecondaryData.h"
 #include "HeatTransportBHEProcessAssemblerInterface.h"
+#include "ProcessLib/HeatTransportBHE/LocalAssemblers/IntegrationPointDataSoilNearBHE.h"
+#include "SecondaryData.h"
 
 namespace ProcessLib
 {
@@ -64,11 +64,44 @@ namespace ProcessLib
                 IntegrationMethod, GlobalDim>(e, is_axially_symmetric, _integration_method)),
             _is_axially_symmetric(is_axially_symmetric)
         {
+            // need to make sure that the soil elements are 3-dimensional
+            assert(_element.getDimension() == 3);
+
             unsigned const n_integration_points =
                 _integration_method.getNumberOfPoints();
+            const int nnodes = _element.getNumberOfNodes();
 
             _ip_data.reserve(n_integration_points);
             _secondary_data.N.resize(n_integration_points);
+
+            auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
+            auto BHE_id = _process_data._map_materialID_to_BHE_ID[mat_id];
+
+            SpatialPosition x_position;
+            x_position.setElementID(_element.getID());
+
+            // ip data initialization
+            for (unsigned ip = 0; ip < n_integration_points; ip++)
+            {
+                x_position.setIntegrationPoint(ip);
+
+                IntegrationPointDataSoilNearBHE<ShapeMatricesType,
+                                                BMatricesType, GlobalDim>
+                    int_Point_Data_BHE(
+                        *(_process_data._vec_BHE_property[BHE_id]));
+
+                _ip_data.emplace_back(int_Point_Data_BHE);
+                auto const& sm = _shape_matrices[ip];
+                auto& ip_data = _ip_data[ip];
+                ip_data.integration_weight =
+                    _integration_method.getWeightedPoint(ip).getWeight() *
+                    sm.integralMeasure * sm.detJ;
+
+                _secondary_data.N[ip] = sm.N;
+            }
+
+            const int BHE_n_unknowns =
+                _ip_data[0]._bhe_instance.get_n_unknowns();
         }
 
         template<typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
@@ -82,7 +115,13 @@ namespace ProcessLib
 
                 auto const local_matrix_size = local_x.size();
 
-                assert(local_matrix_size == ShapeFunction::NPOINTS * NUM_NODAL_DOF_SOIL);
+                const int BHE_n_unknowns =
+                    _ip_data[0]._bhe_instance.get_n_unknowns();
+
+                assert(local_matrix_size ==
+                       ShapeFunction::NPOINTS *
+                           (BHE_n_unknowns +
+                            1) /*plus 1 becasue of soil temperature*/);
 
                 auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
                     local_M_data, local_matrix_size, local_matrix_size);
@@ -115,14 +154,21 @@ namespace ProcessLib
 
                     // for now only using the solid phase parameters
 
-                    // assemble Conductance matrix
-                    local_K.noalias() += sm.dNdx.transpose() * k_s * sm.dNdx * sm.detJ *
-                        wp.getWeight() * sm.integralMeasure;
+                    // assemble Conductance matrix, just the soil part
+                    local_K
+                        .block<ShapeFunction::NPOINTS, ShapeFunction::NPOINTS>(
+                            0, 0)
+                        .noalias() += sm.dNdx.transpose() * k_s * sm.dNdx *
+                                      sm.detJ * wp.getWeight() *
+                                      sm.integralMeasure;
 
-                    // assemble Mass matrix
-                    local_M.noalias() += sm.N.transpose() * density_s * heat_capacity_s *
-                        sm.N * sm.detJ * wp.getWeight() *
-                        sm.integralMeasure;
+                    // assemble Mass matrix, just the soil part
+                    local_M
+                        .block<ShapeFunction::NPOINTS, ShapeFunction::NPOINTS>(
+                            0, 0)
+                        .noalias() += sm.N.transpose() * density_s *
+                                      heat_capacity_s * sm.N * sm.detJ *
+                                      wp.getWeight() * sm.integralMeasure;
                 }
 
                 // debugging

@@ -25,22 +25,11 @@ namespace ProcessLib
             explicit IntegrationPointDataSoil(
                 MaterialLib::Solids::MechanicsBase<GlobalDim>& solid_material)
                 : _solid_material(solid_material)
-                // _material_state_variables(
-                //     _solid_material.createMaterialStateVariables())
             {
             }
 
-            // typename BMatricesType::KelvinVectorType _sigma, _sigma_prev;
-            // typename BMatricesType::KelvinVectorType _eps, _eps_prev;
-
             MaterialLib::Solids::MechanicsBase<GlobalDim>& _solid_material;
-            /*
-            std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
-                DisplacementDim>::MaterialStateVariables>
-                _material_state_variables;
-            */
 
-            // typename BMatricesType::KelvinMatrixType _C;
             double integration_weight;
 
             typename ShapeMatricesType::NodalRowVectorType N;
@@ -48,11 +37,7 @@ namespace ProcessLib
 
             void pushBackState()
             {
-                /*
-                _eps_prev = _eps;
-                _sigma_prev = _sigma;
-                _material_state_variables->pushBackState();
-                */
+            
             }
 
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
