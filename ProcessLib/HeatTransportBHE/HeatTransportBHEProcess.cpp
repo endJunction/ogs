@@ -41,7 +41,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
                      _vec_pure_soil_elements,
                      _vec_BHE_mat_IDs,
                      _vec_BHE_elements,
-                     _vec_pure_soil_nodes,
+                     _vec_pure_soil_nodes, 
                      _vec_BHE_nodes,
                      _vec_BHE_soil_nodes,
                      _vec_BHE_soil_elements);
@@ -120,8 +120,8 @@ void HeatTransportBHEProcess::constructDofTable()
     for (auto& ms : _mesh_subset_BHE_soil_nodes)
     {
         std::generate_n(std::back_inserter(all_mesh_subsets),
-                        4 + 1 /*TODO: The number "4+1" needs to be changed
-                                   according to BHE type*/
+                        4+1 /*TODO: The number "4+1" needs to be changed
+                                 according to BHE type*/
                         ,
                         [&]() { return *ms; });
     }
@@ -143,7 +143,7 @@ void HeatTransportBHEProcess::constructDofTable()
     for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
         /*TODO: The number "4+1" needs to be changed according to BHE type*/
-        vec_n_components.push_back(4 + 1);
+        vec_n_components.push_back(4+1);
     }
     // now the BHE subsets
     for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
