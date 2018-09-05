@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <OpenGeoSysProject>
-    <mesh>Twophase_Lia_quad.vtu</mesh>
-    <geometry>Twophase_Lia.gml</geometry>
+<!--    <mesh>Twophase_Lia_quad.vtu</mesh> -->
+<!--    <geometry>Twophase_Lia.gml</geometry> -->
+    <mesh>column_1e1.vtu</mesh> 
+    <geometry>column.gml</geometry>
     <processes>
         <process>
             <name>GW23</name>
@@ -97,7 +99,7 @@
         <parameter>
             <name>pg_Dirichlet_bottom</name>
             <type>Constant</type>
-            <value>101325.0</value>
+            <value>0.0</value>
         </parameter>
         <parameter>
             <name>pg_Dirichlet_top</name>
@@ -196,14 +198,14 @@
             <initial_condition>pg_0</initial_condition>
             <boundary_conditions>
                 <boundary_condition>
-                    <geometrical_set>Twophase_Lia_Geometry</geometrical_set>
-                    <geometry>TOP</geometry>
+                    <geometrical_set>column_geometry</geometrical_set>
+                    <geometry>top</geometry>
                     <type>Dirichlet</type>
                     <parameter>pg_Dirichlet_top</parameter>
                 </boundary_condition>
                 <boundary_condition>
-                    <geometrical_set>Twophase_Lia_Geometry</geometrical_set>
-                    <geometry>BOTTOM</geometry>
+                    <geometrical_set>column_geometry</geometrical_set>
+                    <geometry>bottom</geometry>
                     <type>Dirichlet</type>
                     <parameter>pg_Dirichlet_bottom</parameter>
                 </boundary_condition>
@@ -216,8 +218,8 @@
             <initial_condition>pc_0</initial_condition>
             <boundary_conditions>
                 <boundary_condition>
-                    <geometrical_set>Twophase_Lia_Geometry</geometrical_set>
-                    <geometry>BOTTOM</geometry>
+                    <geometrical_set>column_geometry</geometrical_set>
+                    <geometry>bottom</geometry>
                     <type>Dirichlet</type>
                     <parameter>pc_Dirichlet_bottom</parameter>
                 </boundary_condition>
