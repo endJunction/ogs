@@ -159,38 +159,6 @@ namespace HeatTransportBHE
             // reorganized into a seperate vector at the end of the function.
             vec_pure_soil_nodes.push_back(n);
         }
-        // pick out all the nodes that are connected with a BHE
-        for (unsigned bhe_id = 0; bhe_id < vec_BHE_nodes.size();
-             bhe_id++)
-        {
-            std::vector<MeshLib::Node*>& tmp_vec_BHE_nodes =
-                vec_BHE_nodes[bhe_id];
-            std::vector<MeshLib::Node*>& tmp_vec_BHE_soil_nodes =
-                vec_BHE_soil_nodes[bhe_id];
-            // if an element appear in vec_BHE_soil_elements, then remove
-            // this element from the total elements list
-            for (auto it = vec_pure_soil_nodes.begin();
-                 it != vec_pure_soil_nodes.end();)
-            {
-                if (std::find(tmp_vec_BHE_nodes.begin(),
-                              tmp_vec_BHE_nodes.end(),
-                              *it) != tmp_vec_BHE_nodes.end())
-                {
-                    it = vec_pure_soil_nodes.erase(it);
-                }  // end of if
-                else if (std::find(tmp_vec_BHE_soil_nodes.begin(),
-                                   tmp_vec_BHE_soil_nodes.end(),
-                                   *it) != tmp_vec_BHE_soil_nodes.end())
-                {
-                    it = vec_pure_soil_nodes.erase(it);
-                }  // end of else if
-                else
-                {
-                    ++it;
-                }  // end of else
-            }      // end of inner for
-        }          // end of outer for
-
 
         // counting how many soil elements are connected with BHE
         std::size_t n_BHE_soil_elems(0);
