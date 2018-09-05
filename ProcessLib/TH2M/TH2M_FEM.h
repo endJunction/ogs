@@ -357,10 +357,12 @@ public:
             std::cout << " p_cap:\n " << capillary_pressure << "\n";
             std::cout << " p_GR:\n " << gas_phase_pressure << "\n";
             std::cout << " T:\n " << temperature << "\n";
-            // std::cout << " u:\n "
-            //<< "???"
-            //<< "\n";
+             std::cout << " u:\n "  << "???" << "\n";
+
+            std::cout << "= Mass Operator: ===============\n";
+            std::cout << " N_u_op:\n " <<  N_p.transpose() * N_p * w << "\n";
             std::cout << "==================================\n";
+
 #endif
 
             // insert all primary variables into one object
@@ -510,9 +512,14 @@ public:
             std::cout << "   drho_lr_dp_lr : " << drhoLRdpLR << " \n";
             std::cout << "==================================\n";
 #endif
-            auto const dsLdpc = MPL::getScalarDerivative(
-                medium.property(MPL::PropertyEnum::saturation),
-                variables, MPL::Variables::p_cap);
+
+//            auto const dsLdpc = MPL::getScalarDerivative(
+//                medium.property(MPL::PropertyEnum::saturation),
+//                variables, MPL::Variables::p_cap);
+
+            auto const dsLdpc = -4.78830438E-11*std::pow(p_cap,1.4279);
+
+
 #ifdef DBG_OUTPUT
             std::cout << "   dsLdpc : " << dsLdpc << " \n";
             std::cout << "==================================\n";
@@ -527,7 +534,7 @@ public:
 
             auto const k_rel_LR = 1.0 - 2.207*pow((1.0 - s_L), 1.0121);
 
-            auto const min_k_rel_GR = 0.0000;
+            auto const min_k_rel_GR = 0.0001;
 
             auto const k_rel_GR = (1.0 - s_e) * (1 - s_e)
                     * (1.0 - pow(s_e, (5./3.))) + min_k_rel_GR;
@@ -549,6 +556,11 @@ public:
             const double k_over_mu_GR = k_rel_GR / mu_GR;
             const double k_over_mu_LR = k_rel_LR / mu_LR;
 
+#ifdef DBG_OUTPUT
+            std::cout << "   k_over_mu_GR: " << k_over_mu_GR << " \n";
+            std::cout << "   k_over_mu_LR: " << k_over_mu_LR << " \n";
+            std::cout << "==================================\n";
+#endif
             const double beta_p_SR = getScalar(
                 solid_phase.property(MPL::PropertyEnum::compressibility));
             const double beta_p_PR =
@@ -588,6 +600,7 @@ public:
 
             Laplace.noalias() =
                 dNdx_p.transpose() * permeability_tensor * dNdx_p * w;
+
 #ifdef DBG_OUTPUT
             std::cout << "   Laplace: \n";
             std::cout << "   L:\n " << Laplace << " \n";
@@ -852,6 +865,7 @@ public:
 #ifdef DBG_OUTPUT
             std::cout << "   Bu:\n " << Bu << " \n";
             std::cout << "==================================\n";
+            OGS_FATAL ("-------------------------------------------");
 #endif
         }
 

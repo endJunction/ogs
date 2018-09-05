@@ -137,10 +137,16 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         local_Jac.noalias() += local_K * dx_dx;
     }
 
-#define nDOF_PGAS
-#define nDOF_PLIQUID
-#define nDOF_T
-#define nDOF_U
+
+//    std::cout << " Jacobian (CD): \n\n";
+//    std::cout << local_Jac << "\n\n";
+//    OGS_FATAL("Oh stop it, you!");
+
+
+#define DOF_PGAS
+#define DOF_PLIQUID
+#define DOF_T
+#define DOF_U
 
 #ifndef DOF_PGAS
         if (num_r_c == 28) // quad8
