@@ -29,7 +29,7 @@ namespace ProcessLib
             }
 
             MaterialLib::Solids::MechanicsBase<GlobalDim>& _solid_material;
-
+            
             double integration_weight;
 
             typename ShapeMatricesType::NodalRowVectorType N;

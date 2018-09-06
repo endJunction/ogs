@@ -73,11 +73,6 @@ private:
     std::vector<MeshLib::Element*> _vec_pure_soil_elements;
 
     /**
-     * These are the elements that are connected with a BHE
-     */
-    std::vector<std::vector<MeshLib::Element*>> _vec_BHE_soil_elements;
-
-    /**
      * These are the soil nodes that are not connected with a BHE
      */
     std::vector<MeshLib::Node*> _vec_pure_soil_nodes;
@@ -87,12 +82,6 @@ private:
      * ordered according to each BHE
      */
     std::vector<std::vector<MeshLib::Node*>> _vec_BHE_nodes;
-
-    /**
-     * Mesh nodes that are located on any soil element connected with BHE
-     * ordered according to each BHE
-     */
-    std::vector<std::vector<MeshLib::Node*>> _vec_BHE_soil_nodes;
 
     std::vector<std::unique_ptr<MeshLib::MeshSubset const>>
         _mesh_subset_BHE_nodes;

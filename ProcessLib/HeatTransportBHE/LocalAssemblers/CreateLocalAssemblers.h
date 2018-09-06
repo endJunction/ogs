@@ -22,14 +22,11 @@ namespace HeatTransportBHE
 {
 namespace detail
 {
-template <int GlobalDim,
-          template <typename, typename, int>
-          class LocalAssemblerSoilImplementation,
-          template <typename, typename, int>
-          class LocalAssemblerSoilNearBHEImplementation,
-          template <typename, typename, int>
-          class LocalAssemblerBHEImplementation,
-          typename LocalAssemblerInterface, typename... ExtraCtorArgs>
+template <
+    int GlobalDim,
+    template <typename, typename, int> class LocalAssemblerSoilImplementation,
+    template <typename, typename, int> class LocalAssemblerBHEImplementation,
+    typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
     NumLib::LocalToGlobalIndexMap const& dof_table,
     std::vector<MeshLib::Element*> const& mesh_elements,
@@ -41,7 +38,6 @@ void createLocalAssemblers(
     // Shape matrices initializer
     using LocalDataInitializer = LocalDataInitializer<
         LocalAssemblerInterface, LocalAssemblerSoilImplementation,
-        LocalAssemblerSoilNearBHEImplementation,
         LocalAssemblerBHEImplementation, 3, ExtraCtorArgs...>;
 
     DBUG("Create local assemblers for the HeatTransportBHE process.");
@@ -73,8 +69,6 @@ template <int GlobalDim,
           template <typename, typename, int>
           class LocalAssemblerSoilImplementation,
           template <typename, typename, int>
-          class LocalAssemblerSoilNearBHEImplementation,
-          template <typename, typename, int>
           class LocalAssemblerBHEImplementation,
           typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
@@ -88,7 +82,6 @@ void createLocalAssemblers(
     detail::createLocalAssemblers<
         GlobalDim, 
         LocalAssemblerSoilImplementation,
-        LocalAssemblerSoilNearBHEImplementation,
         LocalAssemblerBHEImplementation>(
         dof_table, mesh_elements, local_assemblers,
         std::forward<ExtraCtorArgs>(extra_ctor_args)...);

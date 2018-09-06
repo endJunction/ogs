@@ -119,7 +119,6 @@ namespace HeatTransportBHE
 /// NumLib::ShapeQuad4 is created.
 template <typename LocalAssemblerInterface,
           template <typename, typename, int> class LocalAssemblerDataSoil,
-          template <typename, typename, int> class LocalAssemblerDataSoilNearBHE,
           template <typename, typename, int> class LocalAssemblerDataBHE,
           int GlobalDim, typename... ConstructorArgs>
 class LocalDataInitializer final
@@ -131,8 +130,8 @@ public:
         NumLib::LocalToGlobalIndexMap const& dof_table)
         : _dof_table(dof_table)
     {
-        // REMARKS: At the moment, only a 3D mesh (soil) with 1D elements (BHE) are
-        // supported.
+        // REMARKS: At the moment, only a 3D mesh (soil) with 1D elements (BHE)
+        // are supported.
 
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_QUAD) != 0 && \
     OGS_MAX_ELEMENT_DIM >= 2 && OGS_MAX_ELEMENT_ORDER >= 1
@@ -231,12 +230,13 @@ public:
     /// \attention
     /// The index \c id is not necessarily the mesh item's id. Especially when
     /// having multiple meshes it will differ from the latter.
-    void operator()(std::size_t const id,
-                    MeshLib::Element const& mesh_item,
-                    LADataIntfPtr& data_ptr,
-                    const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
-                    const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property, 
-                    ConstructorArgs&&... args) const
+    void operator()(
+        std::size_t const id,
+        MeshLib::Element const& mesh_item,
+        LADataIntfPtr& data_ptr,
+        const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
+        const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property,
+        ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
         auto const it = _builder.find(type_idx);
@@ -255,7 +255,7 @@ public:
         auto n_local_dof = _dof_table.getNumberOfElementDOF(id);
         std::vector<unsigned> dofIndex_to_localIndex;
 
-        if (mesh_item.getDimension() < GlobalDim ) 
+        if (mesh_item.getDimension() < GlobalDim)
         {
             // this is a BHE element
             auto const n_global_components =
@@ -286,22 +286,25 @@ public:
                 }
             }
         }
-        else if (mesh_item.getDimension() == GlobalDim && vec_ele_connected_BHE_IDs[id].size() >0 )
+        /*
+        else if (mesh_item.getDimension() == GlobalDim &&
+                 vec_ele_connected_BHE_IDs[id].size() > 0)
         {
             // this is a soil element connected with a BHE
             const int id_BHE = vec_ele_connected_BHE_IDs[id][0];
-            const int n_unknowns_connected_BHE = vec_BHE_property[id_BHE]->get_n_unknowns(); 
-            auto n_global_components =
-                _dof_table.getNumberOfElementComponents(id); // only the soil parts
-            n_global_components += n_unknowns_connected_BHE; 
+            const int n_unknowns_connected_BHE =
+                vec_BHE_property[id_BHE]->get_n_unknowns();
+            auto n_global_components = _dof_table.getNumberOfElementComponents(
+                id);  // only the soil parts
+            n_global_components += n_unknowns_connected_BHE;
 
             // the size of n_local_dof should include the unknowns
             // on the connected BHE elements
-            n_local_dof += n_unknowns_connected_BHE * 2; // TODO
+            n_local_dof += n_unknowns_connected_BHE * 2;  // TODO
 
             // the second varID is the temperature on BHE
             // varIDs = varIDs + 1;
-            
+
             // this is a soil element near a BHE
             dofIndex_to_localIndex.resize(n_local_dof);
             unsigned dof_id = 0;
@@ -309,15 +312,15 @@ public:
             for (auto i : varIDs)
             {
                 for (int j = 0; j < _dof_table.getNumberOfVariableComponents(i);
-                    j++)
+                     j++)
                 {
                     auto const& ms = _dof_table.getMeshSubset(i, j);
                     auto const mesh_id = ms.getMeshID();
                     for (unsigned k = 0; k < mesh_item.getNumberOfNodes(); k++)
                     {
                         MeshLib::Location l(mesh_id,
-                            MeshLib::MeshItemType::Node,
-                            mesh_item.getNodeIndex(k));
+                                            MeshLib::MeshItemType::Node,
+                                            mesh_item.getNodeIndex(k));
                         auto global_index = _dof_table.getGlobalIndex(l, i, j);
                         if (global_index != NumLib::MeshComponentMap::nop)
                         {
@@ -328,6 +331,7 @@ public:
                 }
             }
         }
+        */
 
         data_ptr = it->second(mesh_item, varIDs.size(), n_local_dof,
                               dofIndex_to_localIndex,
@@ -346,11 +350,16 @@ private:
     using IntegrationMethod = typename NumLib::GaussLegendreIntegrationPolicy<
         typename ShapeFunction::MeshElement>::IntegrationMethod;
 
+    // local assembler builder implementations.
     template <typename ShapeFunction>
     using LADataSoil =
-        LocalAssemblerDataSoil<ShapeFunction,
-                                 IntegrationMethod<ShapeFunction>, GlobalDim>;
+        LocalAssemblerDataSoil<ShapeFunction, IntegrationMethod<ShapeFunction>,
+                               GlobalDim>;
 
+    template <typename ShapeFunction>
+    using LADataBHE =
+        LocalAssemblerDataBHE<ShapeFunction, IntegrationMethod<ShapeFunction>,
+                              GlobalDim>;
     /// A helper forwarding to the correct version of makeLocalAssemblerBuilder
     /// depending whether the global dimension is less than the shape function's
     /// dimension or not.
@@ -367,16 +376,6 @@ private:
 
     NumLib::LocalToGlobalIndexMap const& _dof_table;
 
-    template <typename ShapeFunction>
-    using LADataSoilNearBHE = LocalAssemblerDataSoilNearBHE<
-        ShapeFunction, IntegrationMethod<ShapeFunction>, GlobalDim>;
-
-    template <typename ShapeFunction>
-    using LADataBHE =
-        LocalAssemblerDataBHE<ShapeFunction,
-                                   IntegrationMethod<ShapeFunction>, GlobalDim>;
-
-    // local assembler builder implementations.
 private:
     /// Generates a function that creates a new LocalAssembler of type
     /// LAData<ShapeFunction>. Only functions with shape function's dimension
@@ -393,18 +392,19 @@ private:
                   ConstructorArgs&&... args) {
             if (e.getDimension() == GlobalDim)
             {
+                /*
                 if (dofIndex_to_localIndex.empty())
                 {
-                    return LADataIntfPtr{new LADataSoil<ShapeFunction>{
-                        e, local_matrix_size,
-                        std::forward<ConstructorArgs>(args)...}};
-                }
+                */
+                return LADataIntfPtr{new LADataSoil<ShapeFunction>{
+                    e, local_matrix_size,
+                    std::forward<ConstructorArgs>(args)...}};
+                /*}
 
-                return LADataIntfPtr{
-                    new LADataSoilNearBHE<ShapeFunction>{
-                        e, n_variables, local_matrix_size,
-                        dofIndex_to_localIndex,
-                        std::forward<ConstructorArgs>(args)...}};
+                return LADataIntfPtr{new LADataSoilNearBHE<ShapeFunction>{
+                    e, n_variables, local_matrix_size, dofIndex_to_localIndex,
+                    std::forward<ConstructorArgs>(args)...}};
+                */
             }
             return LADataIntfPtr{new LADataBHE<ShapeFunction>{
                 e, local_matrix_size, dofIndex_to_localIndex,
@@ -419,7 +419,7 @@ private:
     {
         return nullptr;
     }
-};
+};  // namespace HeatTransportBHE
 
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

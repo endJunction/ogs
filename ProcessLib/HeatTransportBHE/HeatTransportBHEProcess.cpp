@@ -16,7 +16,6 @@
 
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerBHE.h"
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerSoil.h"
-#include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerSoilNearBHE.h"
 
 namespace ProcessLib
 {
@@ -41,10 +40,8 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
                      _vec_pure_soil_elements,
                      _vec_BHE_mat_IDs,
                      _vec_BHE_elements,
-                     _vec_pure_soil_nodes, 
-                     _vec_BHE_nodes,
-                     _vec_BHE_soil_nodes,
-                     _vec_BHE_soil_elements);
+                     _vec_pure_soil_nodes,
+                     _vec_BHE_nodes);
 
     if (_vec_BHE_mat_IDs.size() != _process_data._vec_BHE_property.size())
     {
@@ -67,6 +64,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
         _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] = i;
     }
 
+    /*
     // create a table of connected BHE IDs for each element
     _process_data._vec_ele_connected_BHE_IDs.resize(mesh.getNumberOfElements());
     for (unsigned i = 0; i < _vec_BHE_soil_elements.size(); i++)
@@ -76,6 +74,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
             _process_data._vec_ele_connected_BHE_IDs[e->getID()].push_back(i);
         }
     }
+    */
 
     MeshLib::PropertyVector<int> const* material_ids(
         mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
@@ -95,20 +94,17 @@ void HeatTransportBHEProcess::constructDofTable()
     _mesh_subset_pure_soil_nodes =
         std::make_unique<MeshLib::MeshSubset>(_mesh, _vec_pure_soil_nodes);
 
-    // the soil nodes connected with BHEs
-    for (unsigned i = 0; i < _vec_BHE_soil_nodes.size(); i++)
-    {
-        _mesh_subset_BHE_soil_nodes.push_back(
-            std::make_unique<MeshLib::MeshSubset const>(
-                _mesh, _vec_BHE_soil_nodes[i]));
-    }
-
+    std::vector<size_t> vec_n_BHE_unknowns;
+    vec_n_BHE_unknowns.reserve(_vec_BHE_nodes.size());
     // the BHE nodes need to be cherry-picked from the vector
     for (unsigned i = 0; i < _vec_BHE_nodes.size(); i++)
     {
         _mesh_subset_BHE_nodes.push_back(
             std::make_unique<MeshLib::MeshSubset const>(_mesh,
                                                         _vec_BHE_nodes[i]));
+        size_t n_BHE_unknowns =
+            _process_data._vec_BHE_property[i]->get_n_unknowns();
+        vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
     }
 
     // Collect the mesh subsets in a vector.
@@ -116,48 +112,34 @@ void HeatTransportBHEProcess::constructDofTable()
     std::vector<MeshLib::MeshSubset> all_mesh_subsets{
         *_mesh_subset_pure_soil_nodes};
 
-    // All the soil nodes connected with BHE have additional variables
-    for (auto& ms : _mesh_subset_BHE_soil_nodes)
-    {
-        std::generate_n(std::back_inserter(all_mesh_subsets),
-                        4+1 /*TODO: The number "4+1" needs to be changed
-                                 according to BHE type*/
-                        ,
-                        [&]() { return *ms; });
-    }
-
     // All the BHE nodes have additinal variables
+    int count = 0;
     for (auto& ms : _mesh_subset_BHE_nodes)
     {
-        std::generate_n(
-            std::back_inserter(all_mesh_subsets),
-            4 /*TODO: The number "4" needs to be changed according to BHE type*/
-            ,
-            [&]() { return *ms; });
+        std::generate_n(std::back_inserter(all_mesh_subsets),
+                        // Here the number of components equals to
+                        // the number of unknowns on the BHE
+                        vec_n_BHE_unknowns[count],
+                        [&]() { return *ms; });
+        count++;
     }
 
     std::vector<int> vec_n_components;
     // this is the soil temperature for first mesh subset
+    // 1 because for the soil part ther is just one var which is the soile
+    // temperatrure
     vec_n_components.push_back(1);
-    // now the subset containing BHE connected soil elements
-    for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
-    {
-        /*TODO: The number "4+1" needs to be changed according to BHE type*/
-        vec_n_components.push_back(4+1);
-    }
     // now the BHE subsets
     for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
-        /*TODO: The number "4" needs to be changed according to BHE type*/
-        vec_n_components.push_back(4);
+        // Here the number of components equals to
+        // the number of unknowns on the BHE
+        vec_n_components.push_back(vec_n_BHE_unknowns[i]);
     }
 
     std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
-    vec_var_elements.push_back(&_vec_pure_soil_elements);
-    for (unsigned i = 0; i < _vec_BHE_soil_elements.size(); i++)
-    {
-        vec_var_elements.push_back(&_vec_BHE_soil_elements[i]);
-    }
+    // vec_var_elements.push_back(&_vec_pure_soil_elements);
+    vec_var_elements.push_back(&(_mesh.getElements()));
     for (unsigned i = 0; i < _vec_BHE_elements.size(); i++)
     {
         vec_var_elements.push_back(&_vec_BHE_elements[i]);
@@ -169,6 +151,9 @@ void HeatTransportBHEProcess::constructDofTable()
             vec_n_components,
             vec_var_elements,
             NumLib::ComponentOrder::BY_COMPONENT);
+
+    // in case of debugging the dof table, activate the following line
+    std::cout << *_local_to_global_index_map << "\n";
 }
 
 void HeatTransportBHEProcess::initializeConcreteProcess(
@@ -182,9 +167,7 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     // this process can only run with 3-dimensional mesh
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
         3, /*mesh.getDimension(),*/
-        HeatTransportBHELocalAssemblerSoil,
-        HeatTransportBHELocalAssemblerSoilNearBHE,
-        HeatTransportBHELocalAssemblerBHE>(
+        HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(
         mesh.getElements(), dof_table, _local_assemblers,
         _process_data._vec_ele_connected_BHE_IDs,
         _process_data._vec_BHE_property, mesh.isAxiallySymmetric(),
