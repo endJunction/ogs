@@ -284,7 +284,9 @@ namespace ProcessLib
                 assert(_element.getDimension() == 1);
                 auto const local_matrix_size = local_x.size();
                 const int BHE_n_unknowns = _ip_data[0]._bhe_instance.get_n_unknowns();
-                assert(local_matrix_size == ShapeFunction::NPOINTS * BHE_n_unknowns);
+                // plus one because the soil temperature is included in local_x
+                assert(local_matrix_size ==
+                       ShapeFunction::NPOINTS * (BHE_n_unknowns + 1));
                 const int nnodes = _element.getNumberOfNodes();
 
                 auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
@@ -297,8 +299,12 @@ namespace ProcessLib
 
                 SpatialPosition x_position;
                 x_position.setElementID(_element.getID());
-                
-                int shift = 0; 
+
+                int shift = 0;
+                const int local_BHE_matrix_size =
+                    ShapeFunction::NPOINTS * BHE_n_unknowns;
+                const int shift_start =
+                    local_matrix_size - local_BHE_matrix_size;
 
                 // the mass and conductance matrix terms
                 for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -318,8 +324,8 @@ namespace ProcessLib
                         auto& laplace_mat = ip_data._vec_mat_Laplace[idx_bhe_unknowns];
                         auto& advection_vec = ip_data._vec_Advection_vectors[idx_bhe_unknowns];
 
-                        // calculate shift. 
-                        shift = nnodes * idx_bhe_unknowns;
+                        // calculate shift.
+                        shift = shift_start + nnodes * idx_bhe_unknowns;
                         // local M
                         local_M.block(shift, shift, nnodes, nnodes).noalias() += sm.N.transpose() * mass_coeff *
                             sm.N * sm.detJ * wp.getWeight() * sm.integralMeasure;
@@ -336,11 +342,24 @@ namespace ProcessLib
 
                 }
 
-                // add the R matrix to local_K 
-                local_K += _R_matrix;
+                // add the R matrix to local_K
+                local_K.block(shift_start, shift_start, local_BHE_matrix_size,
+                              local_BHE_matrix_size) += _R_matrix;
+
+                // add the R_pi_s matrix to local_K
+                local_K.block(shift_start, 0, local_BHE_matrix_size,
+                              shift_start) += _R_pi_s_matrix;
+                local_K.block(0, shift_start, shift_start,
+                              local_BHE_matrix_size) +=
+                    _R_pi_s_matrix.transpose();
+
+                // add the R_s matrix to local_K
+                local_K.block(0, 0, shift_start, shift_start) +=
+                    2.0 * _R_s_matrix;
 
                 // debugging
-                // std::string sep = "\n----------------------------------------\n";
+                // std::string sep =
+                //     "\n----------------------------------------\n";
                 // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
                 // std::cout << local_K.format(CleanFmt) << sep;
                 // std::cout << local_M.format(CleanFmt) << sep;

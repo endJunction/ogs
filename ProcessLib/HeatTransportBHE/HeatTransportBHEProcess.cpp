@@ -153,7 +153,7 @@ void HeatTransportBHEProcess::constructDofTable()
             NumLib::ComponentOrder::BY_COMPONENT);
 
     // in case of debugging the dof table, activate the following line
-    std::cout << *_local_to_global_index_map << "\n";
+    // std::cout << *_local_to_global_index_map << "\n";
 }
 
 void HeatTransportBHEProcess::initializeConcreteProcess(
