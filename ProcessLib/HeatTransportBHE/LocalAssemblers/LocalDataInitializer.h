@@ -399,29 +399,29 @@ private:
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
                     e, local_matrix_size,
                     std::forward<ConstructorArgs>(args)...}};
-                /*}
+            /*}
 
-                return LADataIntfPtr{new LADataSoilNearBHE<ShapeFunction>{
-                    e, n_variables, local_matrix_size, dofIndex_to_localIndex,
-                    std::forward<ConstructorArgs>(args)...}};
-                */
+            return LADataIntfPtr{new LADataSoilNearBHE<ShapeFunction>{
+                e, n_variables, local_matrix_size, dofIndex_to_localIndex,
+                std::forward<ConstructorArgs>(args)...}};
+            */
             }
             return LADataIntfPtr{new LADataBHE<ShapeFunction>{
-                e, local_matrix_size, dofIndex_to_localIndex,
-                std::forward<ConstructorArgs>(args)...}};
-        };
-    }
+                   e, local_matrix_size, dofIndex_to_localIndex,
+                   std::forward<ConstructorArgs>(args)...}};
+    };
+}
 
-    /// Returns nullptr for shape functions whose dimensions are less than the
-    /// global dimension.
-    template <typename ShapeFunction>
-    static LADataBuilder makeLocalAssemblerBuilder(std::false_type*)
-    {
-        return nullptr;
-    }
+/// Returns nullptr for shape functions whose dimensions are less than the
+/// global dimension.
+template <typename ShapeFunction>
+static LADataBuilder makeLocalAssemblerBuilder(std::false_type*)
+{
+    return nullptr;
+}
 };  // namespace HeatTransportBHE
 
-}  // namespace HeatTransportBHE
+}  // namespace ProcessLib
 }  // namespace ProcessLib
 
 #undef ENABLED_ELEMENT_TYPE_SIMPLEX

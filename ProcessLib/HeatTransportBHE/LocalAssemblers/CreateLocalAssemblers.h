@@ -22,16 +22,17 @@ namespace HeatTransportBHE
 {
 namespace detail
 {
-template <
-    int GlobalDim,
-    template <typename, typename, int> class LocalAssemblerSoilImplementation,
-    template <typename, typename, int> class LocalAssemblerBHEImplementation,
-    typename LocalAssemblerInterface, typename... ExtraCtorArgs>
+template <int GlobalDim,
+          template <typename, typename, int>
+          class LocalAssemblerSoilImplementation,
+          template <typename, typename, int>
+          class LocalAssemblerBHEImplementation,
+          typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
     NumLib::LocalToGlobalIndexMap const& dof_table,
     std::vector<MeshLib::Element*> const& mesh_elements,
     std::vector<std::unique_ptr<LocalAssemblerInterface>>& local_assemblers,
-    const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
+    const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs, 
     const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property,
     ExtraCtorArgs&&... extra_ctor_args)
 {

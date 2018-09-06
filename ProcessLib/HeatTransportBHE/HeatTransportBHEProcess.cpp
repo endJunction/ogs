@@ -40,7 +40,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
                      _vec_pure_soil_elements,
                      _vec_BHE_mat_IDs,
                      _vec_BHE_elements,
-                     _vec_pure_soil_nodes,
+                     _vec_pure_soil_nodes, 
                      _vec_BHE_nodes);
 
     if (_vec_BHE_mat_IDs.size() != _process_data._vec_BHE_property.size())
@@ -128,7 +128,7 @@ void HeatTransportBHEProcess::constructDofTable()
     // this is the soil temperature for first mesh subset
     // 1 because for the soil part ther is just one var which is the soile
     // temperatrure
-    vec_n_components.push_back(1);
+    vec_n_components.push_back(1); 
     // now the BHE subsets
     for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
@@ -167,9 +167,10 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     // this process can only run with 3-dimensional mesh
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
         3, /*mesh.getDimension(),*/
-        HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(
+        HeatTransportBHELocalAssemblerSoil,
+        HeatTransportBHELocalAssemblerBHE>(
         mesh.getElements(), dof_table, _local_assemblers,
-        _process_data._vec_ele_connected_BHE_IDs,
+        _process_data._vec_ele_connected_BHE_IDs, 
         _process_data._vec_BHE_property, mesh.isAxiallySymmetric(),
         integration_order, _process_data);
 

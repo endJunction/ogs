@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <OpenGeoSysProject>
-    <mesh>beier_sandbox_small.vtu</mesh>
+    <mesh>beier_sandbox.vtu</mesh>
     <geometry>beier_sandbox.gml</geometry>
 
     <processes>
