@@ -169,12 +169,17 @@
         <parameter>
             <name>T0_BHE1</name>
             <type>Constant</type>
-            <values>295.25 295.25 295.25 295.25</values>
+            <values>295.90 295.25 295.25 295.25</values>
         </parameter>
         <parameter>
             <name>T_inflow</name>
             <type>Constant</type>
             <value>320.0</value>
+        </parameter>
+		<parameter>
+            <name>T_outflow</name>
+            <type>Constant</type>
+            <value>0.0</value>
         </parameter>
 
     </parameters>
@@ -201,6 +206,14 @@
                     <bhe_id>0</bhe_id>
                     <component>0</component>
                     <parameter>T_inflow</parameter>
+                </boundary_condition>
+			    <boundary_condition>
+                    <geometrical_set>beier_sandbox</geometrical_set>
+                    <geometry>BHE_BOTTOM</geometry>
+                    <type>BHEBottomDirichlet</type>
+                    <bhe_id>0</bhe_id>
+                    <component>1</component>
+					<parameter>T_outflow</parameter>
                 </boundary_condition>
             </boundary_conditions>
         </process_variable>

@@ -9,6 +9,7 @@
 
 #include "CreateBoundaryCondition.h"
 
+#include "BHEBottomDirichletBoundaryCondition.h"
 #include "BHEInflowDirichletBoundaryCondition.h"
 #include "BoundaryCondition.h"
 #include "BoundaryConditionConfig.h"
@@ -133,8 +134,14 @@ std::unique_ptr<BoundaryCondition> createBoundaryCondition(
         return ProcessLib::createBHEInflowDirichletBoundaryCondition(
             config.config, dof_table, config.boundary_mesh, variable_id,
             integration_order, config.boundary_mesh.getID(),
-            *config.component_id,
-            parameters);
+            *config.component_id, parameters);
+    }
+    if (type == "BHEBottomDirichlet")
+    {
+        return ProcessLib::createBHEBottomDirichletBoundaryCondition(
+            config.config, dof_table, config.boundary_mesh, variable_id,
+            integration_order, config.boundary_mesh.getID(),
+            *config.component_id, parameters);
     }
     OGS_FATAL("Unknown boundary condition type: `%s'.", type.c_str());
 }
