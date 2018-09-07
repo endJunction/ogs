@@ -22,35 +22,32 @@ void BHEBottomDirichletBoundaryCondition::getEssentialBCValues(
 {
     SpatialPosition pos;
 
-    // auto const& bulk_node_ids_map =
-    //     *_bc_mesh.getProperties().getPropertyVector<std::size_t>(
-    //         "bulk_node_ids");
-
     bc_values.ids.clear();
     bc_values.values.clear();
 
     bc_values.ids.resize(_bc_values.ids.size());
     bc_values.values.resize(_bc_values.values.size());
 
-    const size_t n_nodes = _T_in_values.size();
-    double tmp_T_out(300.0);
-    for (size_t i = 0; i < n_nodes; i++)
+    const size_t n_nodes = _T_in_values.ids.size();
+    double tmp_T_out(300.0); 
+    for (size_t i=0; i<n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
         // here, the outflow temperature is always
         // the same as the inflow temperature
-        // TODO: get the inflow temperature from here.
-        tmp_T_out = 300.0;
+        // get the inflow temperature from here.
+        tmp_T_out = x[_T_in_values.ids.at(i)];
         bc_values.values[i] = tmp_T_out;
+
     }
 }
 
 // update new values and corresponding indices.
-void BHEBottomDirichletBoundaryCondition::preTimestep(const double t,
-                                                      const GlobalVector& x)
+void BHEBottomDirichletBoundaryCondition::preTimestep(
+    const double t, const GlobalVector& x)
 {
     // At the bottom of each BHE, the outflow temperature
-    // is the same as the inflow temperature.
+    // is the same as the inflow temperature. 
     // Here the task is to get the inflow temperature and
     // save it locally
     auto const mesh_id = _bc_mesh.getID();
@@ -58,12 +55,12 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(const double t,
     for (auto const* n : nodes)
     {
         std::size_t node_id = n->getID();
-        auto g_idx = _bc_values.ids.at(node_id);
+        auto g_idx = _T_in_values.ids.at(node_id);
 
         // read the T_in
-        // TODO: notice that "g_idx" points to T_in!
-        _T_in_values[node_id] = x[g_idx];
+        _T_in_values.values.at(node_id) = x[g_idx];
     }
+	
 }
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
@@ -75,12 +72,12 @@ createBHEBottomDirichletBoundaryCondition(
     int const component_id,
     const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters)
 {
-    DBUG("Constructing BHEBottomDirichletBoundaryCondition from config.");
+    DBUG(
+        "Constructing BHEBottomDirichletBoundaryCondition from config.");
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__type}
-    config.checkConfigParameter("type", "BHEBottomDirichlet");
+    config.checkConfigParameter(
+        "type", "BHEBottomDirichlet");
 
-    // make sure that the process is HEAT_TRANSPORT_BHE !
-    // config.checkConfigParameter("type", "HEAT_TRANSPORT_BHE");
 
     // find the corresponding BHE id
     auto const bhe_id = config.getConfigParameter<std::size_t>("bhe_id");

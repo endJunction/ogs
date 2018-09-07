@@ -12,8 +12,8 @@
 #include "BoundaryCondition.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/IndexValueVector.h"
-#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 #include "ProcessLib/Parameter/Parameter.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 
 namespace ProcessLib
 {
@@ -59,12 +59,19 @@ public:
         MeshLib::MeshSubset bc_mesh_subset{_bc_mesh, bc_nodes};
 
         // create memory to store Tout values
-        _T_in_values.resize(bc_nodes.size());
+        _T_in_values.ids.clear();
+        _T_in_values.values.clear();
 
         // Create local DOF table from intersected mesh subsets for the given
         // variable and component ids.
         _dof_table_boundary.reset(dof_table_bulk.deriveBoundaryConstrainedMap(
             variable_id, {component_id}, std::move(bc_mesh_subset)));
+
+        // get the right T_in component dof_table
+        int const component_id_T_in = 0;
+        _dof_table_boundary_T_in.reset(
+            dof_table_bulk.deriveBoundaryConstrainedMap(
+                variable_id, {component_id_T_in}, std::move(bc_mesh_subset)));
 
         SpatialPosition pos;
 
@@ -84,9 +91,9 @@ public:
             MeshLib::Location l(_bulk_mesh_id, MeshLib::MeshItemType::Node,
                                 node->getID());
             // that might be slow, but only done once
-            const auto g_idx = _dof_table_boundary->getGlobalIndex(
+            const auto g_T_out_idx = _dof_table_boundary->getGlobalIndex(
                 l, _variable_id, _component_id);
-            if (g_idx == NumLib::MeshComponentMap::nop)
+            if (g_T_out_idx == NumLib::MeshComponentMap::nop)
                 continue;
             // For the DDC approach (e.g. with PETSc option), the negative
             // index of g_idx means that the entry by that index is a ghost one,
@@ -95,10 +102,22 @@ public:
             // Dirichlet BC, the negative index is not accepted like other
             // matrix or vector PETSc routines. Therefore, the following
             // if-condition is applied.
-            if (g_idx >= 0)
+            if (g_T_out_idx >= 0)
             {
-                _bc_values.ids.emplace_back(g_idx);
+                _bc_values.ids.emplace_back(g_T_out_idx);
                 _bc_values.values.emplace_back(
+                    _parameter(0.0 /*using initial value*/, pos).front());
+            }
+
+            const auto g_T_in_idx = _dof_table_boundary_T_in->getGlobalIndex(
+                l, _variable_id, component_id_T_in);
+            if (g_T_in_idx == NumLib::MeshComponentMap::nop)
+                continue;
+
+            if (g_T_in_idx >= 0)
+            {
+                _T_in_values.ids.emplace_back(g_T_in_idx);
+                _T_in_values.values.emplace_back(
                     _parameter(0.0 /*using initial value*/, pos).front());
             }
         }
@@ -117,6 +136,10 @@ private:
     /// participating number of elements of the boundary condition.
     std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary;
 
+    /// Local dof table, a subset of the global one restricted to the
+    /// participating number of elements of the boundary condition.
+    std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary_T_in;
+
     int const _variable_id;
     int const _component_id;
 
@@ -129,10 +152,9 @@ private:
 
     std::size_t const _bulk_mesh_id;
 
-    /// Stores the results of the inflow temperatures per boundary node.
-    std::vector<double> _T_in_values;
-
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
+
+    NumLib::IndexValueVector<GlobalIndexType> _T_in_values;
 
     HeatTransportBHE::BHE::BHEAbstract* _BHE_property;
 };

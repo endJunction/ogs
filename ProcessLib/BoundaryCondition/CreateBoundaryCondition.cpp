@@ -9,7 +9,6 @@
 
 #include "CreateBoundaryCondition.h"
 
-#include "BHEBottomDirichletBoundaryCondition.h"
 #include "BHEInflowDirichletBoundaryCondition.h"
 #include "BoundaryCondition.h"
 #include "BoundaryConditionConfig.h"
@@ -22,6 +21,7 @@
 #include "NormalTractionBoundaryCondition.h"
 #include "PhaseFieldIrreversibleDamageOracleBoundaryCondition.h"
 #include "RobinBoundaryCondition.h"
+#include "BHEBottomDirichletBoundaryCondition.h"
 #ifdef OGS_USE_PYTHON
 #include "Python/PythonBoundaryCondition.h"
 #endif
