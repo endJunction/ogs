@@ -269,7 +269,9 @@ public:
         auto Kupc =
             local_K.template block<displacement_size, cap_pressure_size>(
                 displacement_index, cap_pressure_index);
-
+        auto Kuu=
+            local_K.template block<displacement_size, displacement_size>(
+                displacement_index, displacement_index);
         auto Bg =
             local_rhs.template segment<gas_pressure_size>(gas_pressure_index);
 
@@ -435,7 +437,7 @@ public:
 //                MPL::getScalar(medium.property(MPL::PropertyEnum::saturation),
 //                               variables);
 
-            auto const s_L = std::min(1.0,std::max(0.55,1. - 1.9722e-11 * pow (std::max(0.,p_cap), 2.4279)));
+            auto const s_L = std::min(1.0,std::max(0.55,1. - 1.9722e-11 * std::pow (std::max(0.,p_cap), 2.4279)));
 
             if (s_L < 0.55)
             {
@@ -490,7 +492,7 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            ip_data.updateConstitutiveRelation(t, x_position, dt, displacement,
+            auto C = ip_data.updateConstitutiveRelation(t, x_position, dt, displacement,
                     T, p_GR);
 
             auto const drhoGRdpGR = MPL::getScalarDerivative(
@@ -532,12 +534,12 @@ public:
 //                medium.property(MPL::PropertyEnum::relative_permeability),
 //                variables)[1];
 
-            auto const k_rel_LR = 1.0 - 2.207*pow((1.0 - s_L), 1.0121);
+            auto const k_rel_LR = 1.0 - 2.207*std::pow((1.0 - s_L), 1.0121);
 
             auto const min_k_rel_GR = 0.0001;
 
             auto const k_rel_GR = (1.0 - s_e) * (1 - s_e)
-                    * (1.0 - pow(s_e, (5./3.))) + min_k_rel_GR;
+                    * (1.0 - std::pow(s_e, (5./3.))) + min_k_rel_GR;
 
 #ifdef DBG_OUTPUT
             std::cout << "    k_rel_LR: " << k_rel_LR << " \n";
@@ -842,6 +844,13 @@ public:
             std::cout << "==================================\n";
 #endif
 
+            Kuu.noalias() +=
+                B.transpose() * C * B * w;
+#ifdef DBG_OUTPUT
+            std::cout << "   Kuu:\n " << Kupc << " \n";
+            std::cout << "==================================\n";
+#endif
+
             auto const gravity_operator =
                 (dNdx_p.transpose() * permeability_tensor * b * w).eval();
 
@@ -859,8 +868,7 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            Bu.noalias() -=
-                (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
+            Bu.noalias() += N_u_op.transpose() * rho * b * w;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Bu:\n " << Bu << " \n";
