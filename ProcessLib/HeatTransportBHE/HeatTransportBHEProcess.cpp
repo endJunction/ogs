@@ -17,6 +17,9 @@
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerBHE.h"
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/HeatTransportBHELocalAssemblerSoil.h"
 
+#include "ProcessLib/BoundaryCondition/BHEBottomDirichletBoundaryCondition.h"
+#include "ProcessLib/BoundaryCondition/BHEInflowDirichletBoundaryCondition.h"
+
 namespace ProcessLib
 {
 namespace HeatTransportBHE
@@ -40,7 +43,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
                      _vec_pure_soil_elements,
                      _vec_BHE_mat_IDs,
                      _vec_BHE_elements,
-                     _vec_pure_soil_nodes, 
+                     _vec_pure_soil_nodes,
                      _vec_BHE_nodes);
 
     if (_vec_BHE_mat_IDs.size() != _process_data._vec_BHE_property.size())
@@ -128,7 +131,7 @@ void HeatTransportBHEProcess::constructDofTable()
     // this is the soil temperature for first mesh subset
     // 1 because for the soil part ther is just one var which is the soile
     // temperatrure
-    vec_n_components.push_back(1); 
+    vec_n_components.push_back(1);
     // now the BHE subsets
     for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
@@ -167,34 +170,16 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     // this process can only run with 3-dimensional mesh
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
         3, /*mesh.getDimension(),*/
-        HeatTransportBHELocalAssemblerSoil,
-        HeatTransportBHELocalAssemblerBHE>(
+        HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(
         mesh.getElements(), dof_table, _local_assemblers,
-        _process_data._vec_ele_connected_BHE_IDs, 
+        _process_data._vec_ele_connected_BHE_IDs,
         _process_data._vec_BHE_property, mesh.isAxiallySymmetric(),
         integration_order, _process_data);
 
-    /*
-    _secondary_variables.addSecondaryVariable(
-        "heat_flux_x", makeExtrapolator(
-            1, getExtrapolator(), _local_assemblers,
-            &HeatTransportBHELocalAssemblerInterface::getIntPtHeatFluxX));
-
-    if (mesh.getDimension() > 1)
-    {
-        _secondary_variables.addSecondaryVariable(
-            "heat_flux_y", makeExtrapolator(
-            1, getExtrapolator(), _local_assemblers,
-                &HeatTransportBHELocalAssemblerInterface::getIntPtHeatFluxY));
-    }
-    if (mesh.getDimension() > 2)
-    {
-        _secondary_variables.addSecondaryVariable(
-            "heat_flux_z", makeExtrapolator(
-            1, getExtrapolator(), _local_assemblers,
-                &HeatTransportBHELocalAssemblerInterface::getIntPtHeatFluxZ));
-    }
-    */
+    // create BHE boundary conditions
+    // for each BHE, one BC on the top
+    // and one BC at the bottom.
+    auto bc_collections = createBHEBoundaryConditionTopBottom();
 }
 
 void HeatTransportBHEProcess::assembleConcreteProcess(const double t,
@@ -237,6 +222,69 @@ void HeatTransportBHEProcess::computeSecondaryVariableConcrete(
         &HeatTransportBHELocalAssemblerInterface::computeSecondaryVariable,
         _local_assemblers, *_local_to_global_index_map, t, x,
         _coupled_solutions);
+}
+
+std::vector<std::unique_ptr<BoundaryCondition>>
+HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
+{
+    std::vector<std::unique_ptr<BoundaryCondition>> bcs;
+
+    auto const n_BHEs = _process_data._vec_BHE_property.size();
+
+    // bulk dof table
+    NumLib::LocalToGlobalIndexMap dof_table_bulk = *_local_to_global_index_map;
+
+    // for each BHE
+    for (auto bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
+    {
+        // the the BHE name
+        auto bhe_name = _process_data._vec_BHE_property.at(bhe_i)->get_name();
+        // get the BHE type
+        auto bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->get_type();
+        // find the variable ID
+        const int variable_id = 1;  // TODO
+        // find the mesh that contains the bottom nodes
+        auto const n_bhe_nodes = _vec_BHE_nodes[bhe_i].size();
+        // TODO
+
+        MeshLib::MeshSubset bc_mesh_subset{_mesh, bc_bottom_nodes};
+        // depending on the BHE type
+        switch (bhe_typ)
+        {
+            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_2U:
+                // TODO
+                break;
+            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_1U:
+                unsigned const component_id_T_in = 0;
+                unsigned const component_id_T_out = 1;
+                // there is one BC on the top node
+                auto bc_top =
+                    ProcessLib::createBHEInflowDirichletBoundaryCondition(
+                        dof_table_bulk, boundary_mesh, variable_id,
+                        _integration_order, boundary_mesh.getID(),
+                        component_id_T_in, bhe_i);
+                // there is also one BC on the bottom node
+                auto bc_bottom =
+                    ProcessLib::createBHEBottomDirichletBoundaryCondition(
+                        dof_table_bulk, boundary_mesh, variable_id,
+                        _integration_order, boundary_mesh.getID(),
+                        component_id_T_out, bhe_i);
+                // add bc_top and bc_bottom to the vector
+                bcs.emplace_back(bc_top);
+                bcs.emplace_back(bc_bottom);
+                break;
+            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_CXC:
+                // TODO
+                break;
+            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_CXA:
+                // TODO
+                break;
+            default:
+                break;
+        }
+    }
+
+    return bcs;
 }
 
 }  // namespace HeatTransportBHE

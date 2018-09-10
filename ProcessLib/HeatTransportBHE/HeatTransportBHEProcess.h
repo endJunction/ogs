@@ -57,6 +57,9 @@ private:
         const double dxdot_dx, const double dx_dx, GlobalMatrix& M,
         GlobalMatrix& K, GlobalVector& b, GlobalMatrix& Jac) override;
 
+    std::vector<std::unique_ptr<BoundaryCondition>>
+    createBHEBoundaryConditionTopBottom();
+
     HeatTransportBHEProcessData _process_data;
 
     std::vector<std::unique_ptr<HeatTransportBHELocalAssemblerInterface>>

@@ -198,24 +198,6 @@
             <components>4</components>
             <order>1</order>
             <initial_condition>T0_BHE1</initial_condition>
-            <boundary_conditions>
-                <boundary_condition>
-                    <geometrical_set>beier_sandbox</geometrical_set>
-                    <geometry>BHE_TOP</geometry>
-                    <type>BHEInflowDirichlet</type>
-                    <bhe_id>0</bhe_id>
-                    <component>0</component>
-                    <parameter>T_inflow</parameter>
-                </boundary_condition>
-			    <boundary_condition>
-                    <geometrical_set>beier_sandbox</geometrical_set>
-                    <geometry>BHE_BOTTOM</geometry>
-                    <type>BHEBottomDirichlet</type>
-                    <bhe_id>0</bhe_id>
-                    <component>1</component>
-					<parameter>T_outflow</parameter>
-                </boundary_condition>
-            </boundary_conditions>
         </process_variable>
     </process_variables>
 

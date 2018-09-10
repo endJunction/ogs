@@ -21,18 +21,17 @@ class BHEInflowDirichletBoundaryCondition final : public BoundaryCondition
 {
 public:
     BHEInflowDirichletBoundaryCondition(
-        Parameter<double> const& parameter,
         NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-        MeshLib::Mesh const& bc_mesh,
+        std::vector<MeshLib::Node*> const& bc_inlet_nodes,
+        MeshLib::Mesh const& bulk_mesh,
         int const variable_id,
         unsigned const integration_order,
         std::size_t const bulk_mesh_id,
         int const component_id)
-        : _parameter(parameter),
-          _variable_id(variable_id),
+        : _variable_id(variable_id),
           _component_id(component_id),
           _bulk_mesh_id(bulk_mesh_id),
-          _bc_mesh(bc_mesh),
+          _bc_inlet_node(bc_inlet_nodes),
           _integration_order(integration_order)
     {
         if (variable_id >=
@@ -49,17 +48,16 @@ public:
                 dof_table_bulk.getNumberOfVariableComponents(variable_id));
         }
 
-        std::vector<MeshLib::Node*> const& bc_nodes = _bc_mesh.getNodes();
         DBUG(
             "Found %d nodes for BHE Inflow Dirichlet BCs for the variable %d "
             "and "
             "component %d",
-            bc_nodes.size(), variable_id, component_id);
+            _bc_inlet_node.size(), variable_id, component_id);
 
-        MeshLib::MeshSubset bc_mesh_subset{_bc_mesh, bc_nodes};
+        MeshLib::MeshSubset bc_mesh_subset{bulk_mesh, _bc_inlet_node};
 
         // create memory to store Tout values
-        _T_out_values.resize(bc_nodes.size());
+        _T_out_values.resize(_bc_inlet_node.size());
 
         // Create local DOF table from intersected mesh subsets for the given
         // variable and component ids.
@@ -68,17 +66,17 @@ public:
 
         SpatialPosition pos;
 
-        auto const& bulk_node_ids_map =
-            *_bc_mesh.getProperties().getPropertyVector<std::size_t>(
-                "bulk_node_ids");
+        // auto const& bulk_node_ids_map =
+        //     *_bc_mesh.getProperties().getPropertyVector<std::size_t>(
+        //         "bulk_node_ids");
 
         _bc_values.ids.clear();
         _bc_values.values.clear();
 
         // convert mesh node ids to global index for the given component
-        _bc_values.ids.reserve(_bc_mesh.getNumberOfNodes());
-        _bc_values.values.reserve(_bc_mesh.getNumberOfNodes());
-        for (auto const* const node : _bc_mesh.getNodes())
+        _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
+        _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
+        for (auto const* const node : bc_mesh_subset.getNodes())
         {
             pos.setNodeID(node->getID());
             MeshLib::Location l(_bulk_mesh_id, MeshLib::MeshItemType::Node,
@@ -98,8 +96,7 @@ public:
             if (g_idx >= 0)
             {
                 _bc_values.ids.emplace_back(g_idx);
-                _bc_values.values.emplace_back(
-                    _parameter(0.0 /*using initial value*/, pos).front());
+                _bc_values.values.emplace_back(320.0 /*using initial value*/);
             }
         }
     }
@@ -111,8 +108,6 @@ public:
     void preTimestep(const double t, const GlobalVector& x) override;
 
 private:
-    Parameter<double> const& _parameter;
-
     /// Local dof table, a subset of the global one restricted to the
     /// participating number of elements of the boundary condition.
     std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary;
@@ -120,9 +115,9 @@ private:
     int const _variable_id;
     int const _component_id;
 
-    /// Vector of (lower-dimensional) boundary elements on which the boundary
+    /// reference to the BHE node where inflow Direchlet boundary
     /// condition is defined.
-    MeshLib::Mesh const& _bc_mesh;
+    std::vector<MeshLib::Node*> const& _bc_inlet_node;
 
     /// Integration order for integration over the lower-dimensional elements
     unsigned const _integration_order;
@@ -139,11 +134,10 @@ private:
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
 createBHEInflowDirichletBoundaryCondition(
-    BaseLib::ConfigTree const& config,
     NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-    MeshLib::Mesh const& bc_mesh, int const variable_id,
+    std::vector<MeshLib::Node*> const& bc_inlet_node,
+    MeshLib::Mesh const& bulk_mesh, int const variable_id,
     unsigned const integration_order, std::size_t const bulk_mesh_id,
-    int const component_id,
-    const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters);
+    int const component_id, int const bhe_id);
 
 }  // namespace ProcessLib

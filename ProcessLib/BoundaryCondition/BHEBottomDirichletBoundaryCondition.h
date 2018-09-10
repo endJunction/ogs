@@ -21,18 +21,17 @@ class BHEBottomDirichletBoundaryCondition final : public BoundaryCondition
 {
 public:
     BHEBottomDirichletBoundaryCondition(
-        Parameter<double> const& parameter,
         NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-        MeshLib::Mesh const& bc_mesh,
+        std::vector<MeshLib::Node*> const& bc_bottom_nodes,
+        MeshLib::Mesh const& bulk_mesh,
         int const variable_id,
         unsigned const integration_order,
         std::size_t const bulk_mesh_id,
         int const component_id)
-        : _parameter(parameter),
-          _variable_id(variable_id),
+        : _variable_id(variable_id),
           _component_id(component_id),
           _bulk_mesh_id(bulk_mesh_id),
-          _bc_mesh(bc_mesh),
+          _bulk_mesh(bulk_mesh),
           _integration_order(integration_order)
     {
         if (variable_id >=
@@ -49,14 +48,13 @@ public:
                 dof_table_bulk.getNumberOfVariableComponents(variable_id));
         }
 
-        std::vector<MeshLib::Node*> const& bc_nodes = _bc_mesh.getNodes();
         DBUG(
             "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d "
             "and "
             "component %d",
-            bc_nodes.size(), variable_id, component_id);
+            bc_bottom_nodes.size(), variable_id, component_id);
 
-        MeshLib::MeshSubset bc_mesh_subset{_bc_mesh, bc_nodes};
+        _bc_mesh = bc_mesh_subset.getMesh();
 
         // create memory to store Tout values
         _T_in_values.ids.clear();
@@ -75,17 +73,13 @@ public:
 
         SpatialPosition pos;
 
-        auto const& bulk_node_ids_map =
-            *_bc_mesh.getProperties().getPropertyVector<std::size_t>(
-                "bulk_node_ids");
-
         _bc_values.ids.clear();
         _bc_values.values.clear();
 
         // convert mesh node ids to global index for the given component
-        _bc_values.ids.reserve(_bc_mesh.getNumberOfNodes());
-        _bc_values.values.reserve(_bc_mesh.getNumberOfNodes());
-        for (auto const* const node : _bc_mesh.getNodes())
+        _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
+        _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
+        for (auto const* const node : bc_mesh_subset.getNodes())
         {
             pos.setNodeID(node->getID());
             MeshLib::Location l(_bulk_mesh_id, MeshLib::MeshItemType::Node,
@@ -105,8 +99,7 @@ public:
             if (g_T_out_idx >= 0)
             {
                 _bc_values.ids.emplace_back(g_T_out_idx);
-                _bc_values.values.emplace_back(
-                    _parameter(0.0 /*using initial value*/, pos).front());
+                _bc_values.values.emplace_back(298.15);
             }
 
             const auto g_T_in_idx = _dof_table_boundary_T_in->getGlobalIndex(
@@ -117,8 +110,7 @@ public:
             if (g_T_in_idx >= 0)
             {
                 _T_in_values.ids.emplace_back(g_T_in_idx);
-                _T_in_values.values.emplace_back(
-                    _parameter(0.0 /*using initial value*/, pos).front());
+                _T_in_values.values.emplace_back(298.15);
             }
         }
     }
@@ -130,8 +122,6 @@ public:
     void preTimestep(const double t, const GlobalVector& x) override;
 
 private:
-    Parameter<double> const& _parameter;
-
     /// Local dof table, a subset of the global one restricted to the
     /// participating number of elements of the boundary condition.
     std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary;
@@ -145,7 +135,7 @@ private:
 
     /// Vector of (lower-dimensional) boundary elements on which the boundary
     /// condition is defined.
-    MeshLib::Mesh const& _bc_mesh;
+    MeshLib::Mesh& _bc_mesh;
 
     /// Integration order for integration over the lower-dimensional elements
     unsigned const _integration_order;
@@ -161,9 +151,9 @@ private:
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
-    BaseLib::ConfigTree const& config,
     NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-    MeshLib::Mesh const& bc_mesh, int const variable_id,
+    std::vector<MeshLib::Node*> const& bc_inlet_nodes,
+    MeshLib::Mesh const& bulk_mesh, int const variable_id,
     unsigned const integration_order, std::size_t const bulk_mesh_id,
     int const component_id,
     const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters);
