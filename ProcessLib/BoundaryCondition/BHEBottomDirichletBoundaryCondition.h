@@ -22,17 +22,19 @@ class BHEBottomDirichletBoundaryCondition final : public BoundaryCondition
 public:
     BHEBottomDirichletBoundaryCondition(
         NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-        std::vector<MeshLib::Node*> const& bc_bottom_nodes,
         MeshLib::Mesh const& bulk_mesh,
+        std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
         int const variable_id,
         unsigned const integration_order,
         std::size_t const bulk_mesh_id,
-        int const component_id)
+        int const component_id,
+        unsigned const bhe_idx)
         : _variable_id(variable_id),
           _component_id(component_id),
           _bulk_mesh_id(bulk_mesh_id),
           _bulk_mesh(bulk_mesh),
-          _integration_order(integration_order)
+          _integration_order(integration_order),
+          _bhe_idx(bhe_idx)
     {
         if (variable_id >=
                 static_cast<int>(dof_table_bulk.getNumberOfVariables()) ||
@@ -52,9 +54,9 @@ public:
             "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d "
             "and "
             "component %d",
-            bc_bottom_nodes.size(), variable_id, component_id);
+            vec_outflow_bc_nodes.size(), variable_id, component_id);
 
-        _bc_mesh = bc_mesh_subset.getMesh();
+        MeshLib::MeshSubset bc_mesh_subset{_bulk_mesh, vec_outflow_bc_nodes};
 
         // create memory to store Tout values
         _T_in_values.ids.clear();
@@ -135,7 +137,7 @@ private:
 
     /// Vector of (lower-dimensional) boundary elements on which the boundary
     /// condition is defined.
-    MeshLib::Mesh& _bc_mesh;
+    MeshLib::Mesh const& _bulk_mesh;
 
     /// Integration order for integration over the lower-dimensional elements
     unsigned const _integration_order;
@@ -147,15 +149,17 @@ private:
     NumLib::IndexValueVector<GlobalIndexType> _T_in_values;
 
     HeatTransportBHE::BHE::BHEAbstract* _BHE_property;
+
+    unsigned const _bhe_idx;
 };
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
     NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-    std::vector<MeshLib::Node*> const& bc_inlet_nodes,
-    MeshLib::Mesh const& bulk_mesh, int const variable_id,
-    unsigned const integration_order, std::size_t const bulk_mesh_id,
-    int const component_id,
-    const std::vector<std::unique_ptr<ProcessLib::ParameterBase>>& parameters);
+    MeshLib::Mesh const& bulk_mesh,
+    std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
+    int const variable_id, unsigned const integration_order,
+    std::size_t const bulk_mesh_id, int const component_id,
+    unsigned const bhe_id);
 
 }  // namespace ProcessLib

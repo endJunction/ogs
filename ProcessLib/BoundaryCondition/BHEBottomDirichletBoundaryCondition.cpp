@@ -50,8 +50,8 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(
     // is the same as the inflow temperature. 
     // Here the task is to get the inflow temperature and
     // save it locally
-    auto const mesh_id = _bc_mesh.getID();
-    auto const& nodes = _bc_mesh.getNodes();
+    auto const mesh_id = _bulk_mesh.getID();
+    auto const& nodes = _bulk_mesh.getNodes();
     for (auto const* n : nodes)
     {
         std::size_t node_id = n->getID();
@@ -66,16 +66,18 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
     NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-    MeshLib::Mesh const& bc_mesh, int const variable_id,
-    unsigned const integration_order, std::size_t const bulk_mesh_id,
-    int const component_id, int const bhe_id)
+    MeshLib::Mesh const& bulk_mesh,
+    std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
+    int const variable_id, unsigned const integration_order,
+    std::size_t const bulk_mesh_id, int const component_id,
+    unsigned const bhe_id)
 {
     DBUG(
         "Constructing BHEBottomDirichletBoundaryCondition from config.");
 
     return std::make_unique<BHEBottomDirichletBoundaryCondition>(
-        dof_table_bulk, bc_mesh, variable_id, integration_order, bulk_mesh_id,
-        component_id);
+        dof_table_bulk, bulk_mesh, vec_outflow_bc_nodes, variable_id,
+        integration_order, bulk_mesh_id, component_id, bhe_id);
 }
 
 }  // namespace ProcessLib

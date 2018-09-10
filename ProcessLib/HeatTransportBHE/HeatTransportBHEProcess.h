@@ -58,7 +58,7 @@ private:
         GlobalMatrix& K, GlobalVector& b, GlobalMatrix& Jac) override;
 
     std::vector<std::unique_ptr<BoundaryCondition>>
-    createBHEBoundaryConditionTopBottom();
+    createBHEBoundaryConditionTopBottom(); 
 
     HeatTransportBHEProcessData _process_data;
 

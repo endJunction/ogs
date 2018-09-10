@@ -234,20 +234,46 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
     // bulk dof table
     NumLib::LocalToGlobalIndexMap dof_table_bulk = *_local_to_global_index_map;
 
+    std::vector<MeshLib::Node*> bc_top_nodes;
+    std::vector<MeshLib::Node*> bc_bottom_nodes;
+
     // for each BHE
     for (auto bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
-        // the the BHE name
+        // get the BHE name
         auto bhe_name = _process_data._vec_BHE_property.at(bhe_i)->get_name();
         // get the BHE type
         auto bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->get_type();
         // find the variable ID
-        const int variable_id = 1;  // TODO
-        // find the mesh that contains the bottom nodes
+        const int variable_id = 1; // TODO
+        // find the node in mesh that are at the top
         auto const n_bhe_nodes = _vec_BHE_nodes[bhe_i].size();
-        // TODO
+        unsigned int idx_top = 0;
+        unsigned int idx_bottom = _vec_BHE_nodes[bhe_i].size() - 1;
+        double top_z_coord = _vec_BHE_nodes[bhe_i].at(idx_top)->getCoords()[2];
+        double bottom_z_coord =
+            _vec_BHE_nodes[bhe_i].at(idx_bottom)->getCoords()[2];
+        for (auto bhe_node_i = 0; bhe_node_i < n_bhe_nodes; bhe_node_i++)
+        {
+            if (_vec_BHE_nodes[bhe_i].at(bhe_node_i)->getCoords()[2] >=
+                top_z_coord)
+                idx_top = bhe_node_i;
 
-        MeshLib::MeshSubset bc_mesh_subset{_mesh, bc_bottom_nodes};
+            if (_vec_BHE_nodes[bhe_i].at(bhe_node_i)->getCoords()[2] <=
+                bottom_z_coord)
+                idx_bottom = bhe_node_i;
+        }
+        bc_top_nodes.clear();
+        bc_top_nodes.emplace_back(_vec_BHE_nodes[bhe_i].at(idx_top));
+        bc_bottom_nodes.clear();
+        bc_bottom_nodes.emplace_back(_vec_BHE_nodes[bhe_i].at(idx_top));
+
+        MeshLib::MeshSubset bc_mesh_subset_top{_mesh, bc_top_nodes};
+        MeshLib::Mesh const& bc_mesh_top = bc_mesh_subset_top.getMesh();
+
+        MeshLib::MeshSubset bc_mesh_subset_bottom{_mesh, bc_bottom_nodes};
+        MeshLib::Mesh const& bc_mesh_bottom = bc_mesh_subset_bottom.getMesh();
+
         // depending on the BHE type
         switch (bhe_typ)
         {
@@ -255,23 +281,25 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                 // TODO
                 break;
             case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_1U:
+            {
                 unsigned const component_id_T_in = 0;
                 unsigned const component_id_T_out = 1;
                 // there is one BC on the top node
-                auto bc_top =
+                std::unique_ptr<BHEInflowDirichletBoundaryCondition> bc_top =
                     ProcessLib::createBHEInflowDirichletBoundaryCondition(
-                        dof_table_bulk, boundary_mesh, variable_id,
-                        _integration_order, boundary_mesh.getID(),
+                        dof_table_bulk, _mesh, bc_top_nodes, variable_id,
+                        _integration_order, bc_mesh_top.getID(),
                         component_id_T_in, bhe_i);
                 // there is also one BC on the bottom node
-                auto bc_bottom =
+                std::unique_ptr<BHEBottomDirichletBoundaryCondition> bc_bottom =
                     ProcessLib::createBHEBottomDirichletBoundaryCondition(
-                        dof_table_bulk, boundary_mesh, variable_id,
-                        _integration_order, boundary_mesh.getID(),
+                        dof_table_bulk, _mesh, bc_bottom_nodes, variable_id,
+                        _integration_order, bc_mesh_bottom.getID(),
                         component_id_T_out, bhe_i);
                 // add bc_top and bc_bottom to the vector
-                bcs.emplace_back(bc_top);
-                bcs.emplace_back(bc_bottom);
+                bcs.emplace_back(std::move(bc_top));
+                bcs.emplace_back(std::move(bc_bottom));
+            }
                 break;
             case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_CXC:
                 // TODO
@@ -283,8 +311,8 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                 break;
         }
     }
-
-    return bcs;
+    
+    return bcs; 
 }
 
 }  // namespace HeatTransportBHE

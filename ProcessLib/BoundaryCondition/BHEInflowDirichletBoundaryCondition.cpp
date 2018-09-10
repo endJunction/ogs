@@ -70,18 +70,18 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
 createBHEInflowDirichletBoundaryCondition(
     NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-    MeshLib::Node const& bc_inlet_node, int const variable_id,
-    unsigned const integration_order, std::size_t const bulk_mesh_id,
-    int const component_id, int const bhe_id)
+    MeshLib::Mesh const& bc_mesh,
+    std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
+    int const variable_id, unsigned const integration_order,
+    std::size_t const bulk_mesh_id, int const component_id, int const bhe_id)
 {
-    DBUG(
-        "Constructing BHEInflowDirichletBoundaryCondition from config.");
+    DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
 
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
-        dof_table_bulk, bc_inlet_node, variable_id, integration_order,
-        bulk_mesh_id, component_id);
+        dof_table_bulk, bc_mesh, vec_inflow_bc_nodes, variable_id,
+        integration_order, bulk_mesh_id, component_id, bhe_id);
 }
 
 }  // namespace ProcessLib
