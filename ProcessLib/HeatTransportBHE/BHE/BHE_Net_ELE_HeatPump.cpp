@@ -56,13 +56,15 @@ double BHE_Net_ELE_HeatPump::set_BC(double T_in, double current_time)
 			delta_T = -power_bhe / rho_cp_u;
 			T_out = T_in - delta_T;
 		}
-		
-        DBUG("Heat pump: \'%s\', T_in: %.2d, T_out: %.2d. \n", this->get_ele_name(), T_in, T_out );
-        DBUG("COP: %.2d, Q_bhe: %.2d, Q_electricity: %.2d. \n", COP, power_bhe, power_el);
-		break;
-	}
 
-	return T_out;
+        DBUG("Heat pump: \'%s\', T_in: %.2d, T_out: %.2d. \n",
+             get_ele_name().c_str(), T_in, T_out);
+        DBUG("COP: %.2d, Q_bhe: %.2d, Q_electricity: %.2d. \n", COP, power_bhe,
+             power_el);
+        break;
+    }
+
+    return T_out;
 }
 
 double BHE_Net_ELE_HeatPump::get_RHS_value()

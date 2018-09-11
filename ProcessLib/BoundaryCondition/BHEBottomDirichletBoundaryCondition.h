@@ -22,19 +22,19 @@ class BHEBottomDirichletBoundaryCondition final : public BoundaryCondition
 public:
     BHEBottomDirichletBoundaryCondition(
         GlobalIndexType global_idx_T_in_bottom,
-        GlobalIndexType global_idx_T_out_bottom,
+        GlobalIndexType global_idx_T_out_bottom, 
         MeshLib::Mesh const& bulk_mesh,
-        std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
+        std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes, 
         int const variable_id,
         unsigned const integration_order,
         std::size_t const bulk_mesh_id,
         int const component_id,
-        unsigned const bhe_idx)
+        unsigned const bhe_idx)        
         : _variable_id(variable_id),
           _component_id(component_id),
           _bulk_mesh_id(bulk_mesh_id),
           _bulk_mesh(bulk_mesh),
-          _integration_order(integration_order),
+          _integration_order(integration_order), 
           _bhe_idx(bhe_idx)
     {
         DBUG(
@@ -63,14 +63,14 @@ public:
             MeshLib::Location l(_bulk_mesh_id, MeshLib::MeshItemType::Node,
                                 node->getID());
             // that might be slow, but only done once
-            const auto g_T_out_idx = global_idx_T_out_bottom;
+            const auto g_T_out_idx = global_idx_T_out_bottom; 
             if (g_T_out_idx >= 0)
             {
                 _bc_values.ids.emplace_back(g_T_out_idx);
                 _bc_values.values.emplace_back(298.15);
             }
 
-            const auto g_T_in_idx = global_idx_T_in_bottom;
+            const auto g_T_in_idx = global_idx_T_in_bottom; 
 
             if (g_T_in_idx >= 0)
             {
@@ -118,11 +118,12 @@ private:
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_bottom,
-    GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
+    GlobalIndexType global_idx_T_in_bottom, 
+    GlobalIndexType global_idx_T_out_bottom, 
+    MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
-    int const variable_id, unsigned const integration_order,
-    std::size_t const bulk_mesh_id, int const component_id,
-    unsigned const bhe_id);
+    int const variable_id,
+    unsigned const integration_order, std::size_t const bulk_mesh_id,
+    int const component_id, unsigned const bhe_id);
 
 }  // namespace ProcessLib

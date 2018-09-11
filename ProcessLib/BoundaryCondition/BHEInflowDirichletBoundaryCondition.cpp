@@ -61,17 +61,19 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(
         auto g_idx = _bc_values.ids.at(node_id); 
 
         // read the T_out
-        _T_out_values[node_id] = x[_T_out_indices[i]];
+        _T_out_values[node_id] = x[_T_out_indices[i]]; 
     }
 }
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
 createBHEInflowDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_top, GlobalIndexType global_idx_T_out_top,
+    GlobalIndexType global_idx_T_in_top,
+    GlobalIndexType global_idx_T_out_top,
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
-    int const variable_id, unsigned const integration_order,
-    std::size_t const bulk_mesh_id, int const component_id,
+    int const variable_id,
+    unsigned const integration_order, std::size_t const bulk_mesh_id,
+    int const component_id,
     std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract>& pt_bhe)
 {
     DBUG(
@@ -80,7 +82,8 @@ createBHEInflowDirichletBoundaryCondition(
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
-        global_idx_T_in_top, global_idx_T_out_top, bc_mesh, vec_inflow_bc_nodes,
+        global_idx_T_in_top, global_idx_T_out_top,
+        bc_mesh, vec_inflow_bc_nodes,
         variable_id, integration_order, bulk_mesh_id, component_id, pt_bhe);
 }
 
