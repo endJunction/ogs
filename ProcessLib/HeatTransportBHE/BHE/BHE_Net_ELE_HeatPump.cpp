@@ -64,7 +64,7 @@ double BHE_Net_ELE_HeatPump::set_BC(double T_in, double current_time)
         break;
     }
 
-    return T_out;
+	return T_out;
 }
 
 double BHE_Net_ELE_HeatPump::get_RHS_value()

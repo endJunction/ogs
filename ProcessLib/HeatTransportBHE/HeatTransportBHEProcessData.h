@@ -51,19 +51,8 @@ namespace ProcessLib
             {
             }
 
-            HeatTransportBHEProcessData(HeatTransportBHEProcessData&& other)
-                : thermal_conductivity_solid(other.thermal_conductivity_solid),
-                thermal_conductivity_fluid(other.thermal_conductivity_fluid),
-                thermal_conductivity_gas(other.thermal_conductivity_gas),
-                heat_capacity_solid(other.heat_capacity_solid),
-                heat_capacity_fluid(other.heat_capacity_fluid),
-                heat_capacity_gas(other.heat_capacity_gas),
-                density_solid(other.density_solid), 
-                density_fluid(other.density_fluid),
-                density_gas(other.density_gas),
-                _vec_BHE_property(std::move(other._vec_BHE_property))
-            {
-            }
+            HeatTransportBHEProcessData(HeatTransportBHEProcessData&& other) =
+                default;
 
             //! Copies are forbidden.
             HeatTransportBHEProcessData(HeatTransportBHEProcessData const&) = delete;
