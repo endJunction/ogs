@@ -181,9 +181,9 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     // and one BC at the bottom.
     std::vector<std::unique_ptr<BoundaryCondition>> bc_collections =
         createBHEBoundaryConditionTopBottom();
-    auto current_process_BCs = _boundary_conditions[process_id];
-    // for ( auto i=0; i< bc_collections.size(); i++ )
-        // current_process_BCs.addCreatedBC( std::move(bc_collections[i]) );
+    auto& current_process_BCs = _boundary_conditions[process_id];
+    for (auto i = 0; i < bc_collections.size(); i++)
+        current_process_BCs.addCreatedBC(std::move(bc_collections[i]));
 }
 
 void HeatTransportBHEProcess::assembleConcreteProcess(const double t,
