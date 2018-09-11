@@ -37,10 +37,10 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
     for (size_t i=0; i<n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
-        // TODO, here call the BHE functions
-        // tmp_T_in = _BHE_property->;
+        // here call the corresponding BHE functions
+        auto tmp_T_out = x[_T_out_indices[i]];
+        tmp_T_in = _pt_bhe->get_Tin_by_Tout(tmp_T_out, t);
         bc_values.values[i] = tmp_T_in;
-
     }
 
 }
@@ -55,33 +55,33 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(
     // save it locally
     auto const mesh_id = _bc_mesh.getID();
     auto const& nodes = _bc_mesh.getNodes();
-    for (auto const* n : nodes)
+    for (size_t i = 0; i < nodes.size(); i++)
     {
-        std::size_t node_id = n->getID();
+        std::size_t node_id = nodes.at(i)->getID();
         auto g_idx = _bc_values.ids.at(node_id); 
 
         // read the T_out
-        // TODO: notice that node_id + 1 is not always T_out!
-        _T_out_values[node_id] = x[g_idx + 1]; 
-
+        _T_out_values[node_id] = x[_T_out_indices[i]];
     }
 }
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
 createBHEInflowDirichletBoundaryCondition(
-    NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
+    GlobalIndexType global_idx_T_in_top, GlobalIndexType global_idx_T_out_top,
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id, unsigned const integration_order,
-    std::size_t const bulk_mesh_id, int const component_id, int const bhe_id)
+    std::size_t const bulk_mesh_id, int const component_id,
+    std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract>& pt_bhe)
 {
-    DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
+    DBUG(
+        "Constructing BHEInflowDirichletBoundaryCondition.");
 
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
-        dof_table_bulk, bc_mesh, vec_inflow_bc_nodes, variable_id,
-        integration_order, bulk_mesh_id, component_id, bhe_id);
+        global_idx_T_in_top, global_idx_T_out_top, bc_mesh, vec_inflow_bc_nodes,
+        variable_id, integration_order, bulk_mesh_id, component_id, pt_bhe);
 }
 
 }  // namespace ProcessLib

@@ -65,8 +65,8 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
-    NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-    MeshLib::Mesh const& bulk_mesh,
+    GlobalIndexType global_idx_T_in_bottom,
+    GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, unsigned const integration_order,
     std::size_t const bulk_mesh_id, int const component_id,
@@ -76,8 +76,9 @@ createBHEBottomDirichletBoundaryCondition(
         "Constructing BHEBottomDirichletBoundaryCondition from config.");
 
     return std::make_unique<BHEBottomDirichletBoundaryCondition>(
-        dof_table_bulk, bulk_mesh, vec_outflow_bc_nodes, variable_id,
-        integration_order, bulk_mesh_id, component_id, bhe_id);
+        global_idx_T_in_bottom, global_idx_T_out_bottom, bulk_mesh,
+        vec_outflow_bc_nodes, variable_id, integration_order, bulk_mesh_id,
+        component_id, bhe_id);
 }
 
 }  // namespace ProcessLib

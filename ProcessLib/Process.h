@@ -282,6 +282,11 @@ protected:
 
     GlobalSparsityPattern _sparsity_pattern;
 
+    /// Vector for boundary conditions. For the monolithic scheme or a
+    /// single process, the size of the vector is one. For the staggered
+    /// scheme, the size of vector is the number of the coupled processes.
+    std::vector<BoundaryConditionCollection> _boundary_conditions;
+
 private:
     /// Variables used by this process.  For the monolithic scheme or a
     /// single process, the size of the outer vector is one. For the
@@ -289,11 +294,6 @@ private:
     /// coupled processes.
     std::vector<std::vector<std::reference_wrapper<ProcessVariable>>>
         _process_variables;
-
-    /// Vector for boundary conditions. For the monolithic scheme or a
-    /// single process, the size of the vector is one. For the staggered
-    /// scheme, the size of vector is the number of the coupled processes.
-    std::vector<BoundaryConditionCollection> _boundary_conditions;
 
     /// Vector for nodal source term collections. For the monolithic scheme
     /// or a single process, the size of the vector is one. For the staggered

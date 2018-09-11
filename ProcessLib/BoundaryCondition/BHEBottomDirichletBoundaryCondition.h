@@ -21,7 +21,8 @@ class BHEBottomDirichletBoundaryCondition final : public BoundaryCondition
 {
 public:
     BHEBottomDirichletBoundaryCondition(
-        NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
+        GlobalIndexType global_idx_T_in_bottom,
+        GlobalIndexType global_idx_T_out_bottom,
         MeshLib::Mesh const& bulk_mesh,
         std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
         int const variable_id,
@@ -36,42 +37,17 @@ public:
           _integration_order(integration_order),
           _bhe_idx(bhe_idx)
     {
-        if (variable_id >=
-                static_cast<int>(dof_table_bulk.getNumberOfVariables()) ||
-            component_id >=
-                dof_table_bulk.getNumberOfVariableComponents(variable_id))
-        {
-            OGS_FATAL(
-                "Variable id or component id too high. Actual values: (%d, "
-                "%d), "
-                "maximum values: (%d, %d).",
-                variable_id, component_id,
-                dof_table_bulk.getNumberOfVariables(),
-                dof_table_bulk.getNumberOfVariableComponents(variable_id));
-        }
-
         DBUG(
             "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d "
             "and "
             "component %d",
             vec_outflow_bc_nodes.size(), variable_id, component_id);
 
-        MeshLib::MeshSubset bc_mesh_subset{_bulk_mesh, vec_outflow_bc_nodes};
+        MeshLib::MeshSubset bc_mesh_subset{ _bulk_mesh, vec_outflow_bc_nodes };
 
         // create memory to store Tout values
         _T_in_values.ids.clear();
         _T_in_values.values.clear();
-
-        // Create local DOF table from intersected mesh subsets for the given
-        // variable and component ids.
-        _dof_table_boundary.reset(dof_table_bulk.deriveBoundaryConstrainedMap(
-            variable_id, {component_id}, std::move(bc_mesh_subset)));
-
-        // get the right T_in component dof_table
-        int const component_id_T_in = 0;
-        _dof_table_boundary_T_in.reset(
-            dof_table_bulk.deriveBoundaryConstrainedMap(
-                variable_id, {component_id_T_in}, std::move(bc_mesh_subset)));
 
         SpatialPosition pos;
 
@@ -87,27 +63,14 @@ public:
             MeshLib::Location l(_bulk_mesh_id, MeshLib::MeshItemType::Node,
                                 node->getID());
             // that might be slow, but only done once
-            const auto g_T_out_idx = _dof_table_boundary->getGlobalIndex(
-                l, _variable_id, _component_id);
-            if (g_T_out_idx == NumLib::MeshComponentMap::nop)
-                continue;
-            // For the DDC approach (e.g. with PETSc option), the negative
-            // index of g_idx means that the entry by that index is a ghost one,
-            // which should be dropped. Especially for PETSc routines
-            // MatZeroRows and MatZeroRowsColumns, which are called to apply the
-            // Dirichlet BC, the negative index is not accepted like other
-            // matrix or vector PETSc routines. Therefore, the following
-            // if-condition is applied.
+            const auto g_T_out_idx = global_idx_T_out_bottom;
             if (g_T_out_idx >= 0)
             {
                 _bc_values.ids.emplace_back(g_T_out_idx);
                 _bc_values.values.emplace_back(298.15);
             }
 
-            const auto g_T_in_idx = _dof_table_boundary_T_in->getGlobalIndex(
-                l, _variable_id, component_id_T_in);
-            if (g_T_in_idx == NumLib::MeshComponentMap::nop)
-                continue;
+            const auto g_T_in_idx = global_idx_T_in_bottom;
 
             if (g_T_in_idx >= 0)
             {
@@ -155,8 +118,8 @@ private:
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
-    NumLib::LocalToGlobalIndexMap const& dof_table_bulk,
-    MeshLib::Mesh const& bulk_mesh,
+    GlobalIndexType global_idx_T_in_bottom,
+    GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, unsigned const integration_order,
     std::size_t const bulk_mesh_id, int const component_id,
