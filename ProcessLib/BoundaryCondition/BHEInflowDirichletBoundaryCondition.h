@@ -22,19 +22,20 @@ class BHEInflowDirichletBoundaryCondition final : public BoundaryCondition
 public:
     BHEInflowDirichletBoundaryCondition(
         GlobalIndexType global_idx_T_in_top,
-        GlobalIndexType global_idx_T_out_top, 
+        GlobalIndexType global_idx_T_out_top,
         MeshLib::Mesh const& bc_mesh,
-        std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes, 
+        std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
         int const variable_id,
         unsigned const integration_order,
         std::size_t const bulk_mesh_id,
         int const component_id,
-        std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract>& pt_bhe)
+        std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
+            pt_bhe)
         : _variable_id(variable_id),
           _component_id(component_id),
           _bulk_mesh_id(bulk_mesh_id),
           _bc_mesh(bc_mesh),
-          _integration_order(integration_order), 
+          _integration_order(integration_order),
           _pt_bhe(pt_bhe)
     {
 
@@ -107,13 +108,12 @@ private:
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
 createBHEInflowDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_top,
-    GlobalIndexType global_idx_T_out_top,
+    GlobalIndexType global_idx_T_in_top, GlobalIndexType global_idx_T_out_top,
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
-    int const variable_id,
-    unsigned const integration_order, std::size_t const bulk_mesh_id,
-    int const component_id,
-    std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract>& pt_bhe);
+    int const variable_id, unsigned const integration_order,
+    std::size_t const bulk_mesh_id, int const component_id,
+    std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
+        pt_bhe);
 
 }  // namespace ProcessLib

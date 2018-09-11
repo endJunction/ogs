@@ -51,8 +51,7 @@ namespace ProcessLib
             {
             }
 
-            HeatTransportBHEProcessData(HeatTransportBHEProcessData&& other) =
-                default;
+            HeatTransportBHEProcessData(HeatTransportBHEProcessData&& other) = default;
 
             //! Copies are forbidden.
             HeatTransportBHEProcessData(HeatTransportBHEProcessData const&) = delete;
