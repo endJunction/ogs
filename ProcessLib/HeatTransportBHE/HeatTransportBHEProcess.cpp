@@ -228,7 +228,7 @@ void HeatTransportBHEProcess::computeSecondaryVariableConcrete(
         _coupled_solutions);
 }
 
-std::vector<std::unique_ptr<BoundaryCondition>>&&
+std::vector<std::unique_ptr<BoundaryCondition>>
 HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
 {
     /**

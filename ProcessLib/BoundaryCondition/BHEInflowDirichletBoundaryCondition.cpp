@@ -53,15 +53,13 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(
     // the ouflow temperature of the BHE. 
     // Here the task is to get the outflow temperature and
     // save it locally
-    auto const mesh_id = _bc_mesh.getID();
-    auto const& nodes = _bc_mesh.getNodes();
-    for (size_t i = 0; i < nodes.size(); i++)
+    auto const n_nodes = _bc_values.ids.size();
+    for (size_t i = 0; i < n_nodes; i++)
     {
-        std::size_t node_id = nodes.at(i)->getID();
-        auto g_idx = _bc_values.ids.at(node_id); 
+        auto g_idx = _T_out_indices[i];
 
         // read the T_out
-        _T_out_values[node_id] = x[_T_out_indices[i]]; 
+        _T_out_values[i] = x[_T_out_indices[i]];
     }
 }
 

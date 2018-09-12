@@ -50,17 +50,14 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(
     // is the same as the inflow temperature. 
     // Here the task is to get the inflow temperature and
     // save it locally
-    auto const mesh_id = _bulk_mesh.getID();
-    auto const& nodes = _bulk_mesh.getNodes();
-    for (auto const* n : nodes)
+    auto const n_nodes = _bc_values.ids.size();
+    for (size_t i = 0; i < n_nodes; i++)
     {
-        std::size_t node_id = n->getID();
-        auto g_idx = _T_in_values.ids.at(node_id); 
+        auto g_idx = _T_in_values.ids[i];
 
-        // read the T_in
-        _T_in_values.values.at(node_id) = x[g_idx];
+        // read the T_out
+        _T_in_values.values.at(i) = x[g_idx];
     }
-	
 }
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
