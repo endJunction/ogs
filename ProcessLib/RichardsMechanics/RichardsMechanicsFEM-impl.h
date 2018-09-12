@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include<iostream>
+
 #include "RichardsMechanicsFEM.h"
 
 #include "MaterialLib/SolidModels/SelectSolidConstitutiveRelation.h"
@@ -167,37 +169,79 @@ void RichardsMechanicsLocalAssembler<
         auto& eps = _ip_data[ip].eps;
         auto& S_L = _ip_data[ip].saturation;
 
+#define nDBG_OUTPUT
+
         auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
+#ifdef DBG_OUTPUT
+        std::cout << "    alpha: " << alpha<< "\n";
+#endif
         auto const rho_SR = _process_data.solid_density(t, x_position)[0];
+#ifdef DBG_OUTPUT
+        std::cout << "    rho_SR: " << rho_SR<< "\n";
+#endif
         auto const K_SR = _process_data.solid_bulk_modulus(t, x_position)[0];
+#ifdef DBG_OUTPUT
+        std::cout << "    K_SR: " << K_SR<< "\n";
+#endif
         auto const K_LR = _process_data.fluid_bulk_modulus(t, x_position)[0];
+#ifdef DBG_OUTPUT
+        std::cout << "    K_LR: " << K_LR << "\n";
+#endif
         auto const temperature = _process_data.temperature(t, x_position)[0];
+#ifdef DBG_OUTPUT
+        std::cout << "    temperature: " << temperature << "\n";
+#endif
         auto const porosity = _process_data.flow_material->getPorosity(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);
+#ifdef DBG_OUTPUT
+        std::cout << "    porosity: " << porosity << "\n";
+#endif
         auto const rho_LR = _process_data.flow_material->getFluidDensity(
             -p_cap_ip, temperature);
+#ifdef DBG_OUTPUT
+        std::cout << "   rho_LR : " << rho_LR << "\n";
+#endif
         auto const& b = _process_data.specific_body_force;
+#ifdef DBG_OUTPUT
+        std::cout << "   b : " << b << "\n";
+#endif
         auto const& identity2 = MathLib::KelvinVector::Invariants<
             MathLib::KelvinVector::KelvinVectorDimensions<
                 DisplacementDim>::value>::identity2;
 
         S_L = _process_data.flow_material->getSaturation(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);
+        S_L = 1.0;
 
-        double const dS_L_dp_cap =
-            _process_data.flow_material->getSaturationDerivative(
-                material_id, t, x_position, -p_cap_ip, temperature, S_L);
-
+#ifdef DBG_OUTPUT
+        std::cout << "    S_L: " << S_L << "\n";
+#endif
+        double const dS_L_dp_cap = 0.0;
+//            _process_data.flow_material->getSaturationDerivative(
+//                material_id, t, x_position, -p_cap_ip, temperature, S_L);
+#ifdef DBG_OUTPUT
+        std::cout << "    dS_L_dp_cap: " << dS_L_dp_cap << "\n";
+#endif
         double const k_rel =
             _process_data.flow_material->getRelativePermeability(
                 t, x_position, -p_cap_ip, temperature, S_L);
+#ifdef DBG_OUTPUT
+        std::cout << "    k_rel: " << k_rel << "\n";
+#endif
         auto const mu = _process_data.flow_material->getFluidViscosity(
             -p_cap_ip, temperature);
-
+#ifdef DBG_OUTPUT
+        std::cout << "    mu: " << mu<< "\n";
+#endif
         double const K_intrinsic =
             _process_data.intrinsic_permeability(t, x_position)[0];
+#ifdef DBG_OUTPUT
+        std::cout << "    K_intrinsic: " << K_intrinsic << "\n";
+#endif
         double const K_over_mu = K_intrinsic / mu;
-
+#ifdef DBG_OUTPUT
+        std::cout << "    K_over_mu: " << K_over_mu<< "\n";
+#endif
         //
         // displacement equation, displacement part
         //
@@ -205,6 +249,9 @@ void RichardsMechanicsLocalAssembler<
 
         auto C = _ip_data[ip].updateConstitutiveRelation(t, x_position, dt, u,
                                                          temperature);
+//        std::cout << "    eps: " << eps << "\n";
+//        std::cout << "    : " << << "\n";
+//        std::cout << "    : " << << "\n";
 
         //
         // displacement equation, displacement part
@@ -212,19 +259,30 @@ void RichardsMechanicsLocalAssembler<
         K.template block<displacement_size, displacement_size>(
              displacement_index, displacement_index)
             .noalias() += B.transpose() * C * B * w;
-
+#ifdef DBG_OUTPUT
+        std::cout << "    C: " << C << "\n";
+#endif
         double const rho = rho_SR * (1 - porosity) + porosity * rho_LR;
         rhs.template segment<displacement_size>(displacement_index).noalias() +=
             N_u_op.transpose() * rho * b * w;
-
+#ifdef DBG_OUTPUT
+        std::cout << "    rho: " << rho << "\n";
+#endif
         //
         // pressure equation, pressure part.
         //
         double const a0 = S_L * (alpha - porosity) / K_SR;
+#ifdef DBG_OUTPUT
+        std::cout << "    a0: " << a0<< "\n";
+#endif
         // Volumetric average specific storage of the solid and fluid phases.
         double const specific_storage =
             dS_L_dp_cap * (p_cap_ip * a0 - porosity) +
             S_L * (porosity / K_LR + a0);
+
+#ifdef DBG_OUTPUT
+        std::cout << "    specific_storage: " << specific_storage << "\n";
+#endif
         M.template block<pressure_size, pressure_size>(pressure_index,
                                                        pressure_index)
             .noalias() += N_p.transpose() * rho_LR * specific_storage * N_p * w;
@@ -252,6 +310,14 @@ void RichardsMechanicsLocalAssembler<
             .noalias() += N_p.transpose() * S_L * rho_LR * alpha *
                           identity2.transpose() * B * w;
     }
+
+#ifdef DBG_OUTPUT
+    std::cout << "    M:\n\n" << M << "\n";
+    std::cout << "    K:\n\n" << K << "\n";
+    std::cout << "  rhs:\n\n" << rhs << "\n";
+    OGS_FATAL("");
+#endif
+
 }
 
 template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,

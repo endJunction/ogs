@@ -437,14 +437,26 @@ public:
 //                MPL::getScalar(medium.property(MPL::PropertyEnum::saturation),
 //                               variables);
 
-            auto const s_L = std::min(1.0,std::max(0.55,1. - 1.9722e-11 * std::pow (std::max(0.,p_cap), 2.4279)));
 
-            if (s_L < 0.55)
-            {
-                OGS_FATAL ("s_L dropped below 0.9!");
-            }
-            auto const s_G = 1 - s_L+0.0;
-            auto const s_e = (s_L - 0.2) / (1.0 - 0.2);
+            auto const s_L_r = 0.2;
+//            auto const s_G_r = 0.5;
+            auto const s_a = -1.9722e-11;
+            auto const s_b = 2.4279;
+
+
+            auto const s_L = std::max(s_L_r,1. + s_a * std::pow (std::max(0.,p_cap), s_b));
+//            auto const s_L = std::min(1.0-s_G_r,std::max(0.0, s_m*p_cap+1.0));
+
+//            for (double test_p = -120000; test_p <= 120000; test_p +=5000)
+//            {
+//            double test_s_L = std::min(1.0-s_G_r,std::max(s_L_r,1. - 1.9722e-11 * std::pow (std::max(0.,test_p), 2.4279)));
+//            std::cout << test_p << " " << test_s_L << "\n";
+//            }
+//
+//            OGS_FATAL ("");
+
+            auto const s_G = 1 - s_L;
+            auto const s_e = (s_L - s_L_r) / (1.0 - s_L_r);
 
 
 
@@ -495,6 +507,13 @@ public:
             auto C = ip_data.updateConstitutiveRelation(t, x_position, dt, displacement,
                     T, p_GR);
 
+
+#ifdef DBG_OUTPUT
+            // std::cout << "   M_g : " << molar_mass << " \n";
+            std::cout << "   C : " << C << " \n";
+            std::cout << "==================================\n";
+#endif
+
             auto const drhoGRdpGR = MPL::getScalarDerivative(
                 gas_phase.property(MPL::density), variables, MPL::p_GR);
 
@@ -509,7 +528,7 @@ public:
 
 #ifdef DBG_OUTPUT
             // std::cout << "   M_g : " << molar_mass << " \n";
-            std::cout << "==================================\n";
+//            std::cout << "==================================\n";
             std::cout << "   drho_gr_dp_gr : " << drhoGRdpGR << " \n";
             std::cout << "   drho_lr_dp_lr : " << drhoLRdpLR << " \n";
             std::cout << "==================================\n";
@@ -519,7 +538,8 @@ public:
 //                medium.property(MPL::PropertyEnum::saturation),
 //                variables, MPL::Variables::p_cap);
 
-            auto const dsLdpc = -4.78830438E-11*std::pow(p_cap,1.4279);
+//            auto const dsLdpc = -4.78830438E-11*std::pow(p_cap,1.4279);
+            auto const dsLdpc = s_a*s_b*std::pow(std::max(0.,p_cap), s_b - 1.0);
 
 
 #ifdef DBG_OUTPUT
@@ -535,11 +555,12 @@ public:
 //                variables)[1];
 
             auto const k_rel_LR = 1.0 - 2.207*std::pow((1.0 - s_L), 1.0121);
-
             auto const min_k_rel_GR = 0.0001;
 
             auto const k_rel_GR = (1.0 - s_e) * (1 - s_e)
-                    * (1.0 - std::pow(s_e, (5./3.))) + min_k_rel_GR;
+                    		* (1.0 - std::pow(s_e, (5./3.))) + min_k_rel_GR;
+
+    //        std::cout << "pCap: " << p_cap << "s_L: " << s_L << " s_G: " << s_G << " dsldpc: " << dsLdpc << " k_rel_LR: " << k_rel_LR << " k_rel_GR: " << k_rel_GR << "\n";
 
 #ifdef DBG_OUTPUT
             std::cout << "    k_rel_LR: " << k_rel_LR << " \n";
@@ -567,8 +588,10 @@ public:
                 solid_phase.property(MPL::PropertyEnum::compressibility));
             const double beta_p_PR =
                 getScalar(medium.property(MPL::PropertyEnum::compressibility));
-            const double beta_p_GR = 1. / rho_GR * drhoGRdpGR;
-            const double beta_p_LR = 1. / rho_LR * drhoLRdpLR;
+            const double beta_p_GR = getScalar(
+                gas_phase.property(MPL::PropertyEnum::compressibility));
+            const double beta_p_LR = getScalar(
+                liquid_phase.property(MPL::PropertyEnum::compressibility));
 
 #ifdef DBG_OUTPUT
             std::cout << "   beta_p_SR: " << beta_p_SR << " \n";
@@ -630,7 +653,7 @@ public:
             auto const drhoGRdT = MPL::getScalarDerivative(
                 gas_phase.property(MPL::density), variables, MPL::T);
 
-            const double beta_T_GR = drhoGRdT / rho_GR;
+            const double beta_T_GR = rho_GR == 0. ? 0 : drhoGRdT / rho_GR;
 
             auto const drhoLRdT = MPL::getScalarDerivative(
                 liquid_phase.property(MPL::density), variables, MPL::T);
@@ -673,13 +696,15 @@ public:
             std::cout << "==================================\n";
 #endif
 
+            const auto a_L = s_L * (alpha_B - phi) * beta_p_SR;
+
             Mlpc.noalias() +=
             		N_p.transpose() * rho_LR *
-					( phi * dsLdpc
-							- s_L*(s_L+p_cap*dsLdpc)*(alpha_B-phi)*beta_p_SR)
-							*  N_p * w;
+					(dsLdpc * (phi - a_L*p_cap) - s_L*(phi*beta_p_LR + a_L)) *  N_p * w;
 
 #ifdef DBG_OUTPUT
+            std::cout << "     a_L: " << a_L << " \n";
+            std::cout << "==================================\n";
             std::cout << "   Mlpc:\n " << Mlpc << " \n";
             std::cout << "==================================\n";
 #endif
@@ -873,7 +898,6 @@ public:
 #ifdef DBG_OUTPUT
             std::cout << "   Bu:\n " << Bu << " \n";
             std::cout << "==================================\n";
-            OGS_FATAL ("-------------------------------------------");
 #endif
         }
 
@@ -892,21 +916,21 @@ public:
                OGS_FATAL ("##########################################");
 #endif
 
-        for (unsigned row = 0; row < Mgpc.cols(); row++)
-        {
-            for (unsigned column = 0; column < Mgpc.cols(); column++)
-            {
-                if (row != column)
-                {
-                    Mgpc(row, row) += Mgpc(row, column);
-                    Mgpc(row, column) = 0.0;
-                    Mgpg(row, row) += Mgpg(row, column);
-                    Mgpg(row, column) = 0.0;
-                    Mlpc(row, row) += Mlpc(row, column);
-                    Mlpc(row, column) = 0.0;
-                }
-            }
-        }
+//        for (unsigned row = 0; row < Mgpc.cols(); row++)
+//        {
+//            for (unsigned column = 0; column < Mgpc.cols(); column++)
+//            {
+//                if (row != column)
+//                {
+//                    Mgpc(row, row) += Mgpc(row, column);
+//                    Mgpc(row, column) = 0.0;
+//                    Mgpg(row, row) += Mgpg(row, column);
+//                    Mgpg(row, column) = 0.0;
+//                    Mlpc(row, row) += Mlpc(row, column);
+//                    Mlpc(row, column) = 0.0;
+//                }
+//            }
+  //      }
     }
 
     void assembleWithJacobian(double const t,

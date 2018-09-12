@@ -288,7 +288,7 @@ void TwoPhaseFlowWithPPLocalAssembler<
             std::cout << "   Bl:\n " << Bl << " \n";
             std::cout << "==================================\n";
 
-            OGS_FATAL("End the plague!");
+            OGS_FATAL("");
 
 #endif
 
