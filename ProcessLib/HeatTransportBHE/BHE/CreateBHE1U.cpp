@@ -135,7 +135,10 @@ namespace ProcessLib
                 else if (bhe_bound_type_str.compare("FIXED_TEMP_DIFF") == 0)
                 {
                     bhe_bound_type = BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY;
-                    bhe_delta_T_val = bhe_conf.getConfigParameterOptional<double>("bhe_inout_delta_T_value").get();
+                    bhe_delta_T_val = bhe_conf
+                                          .getConfigParameterOptional<double>(
+                                              "bhe_inout_delta_temperature")
+                                          .get();
                 }
 
                 // get the refrigerant properties from fluid property class
