@@ -80,9 +80,16 @@ namespace ProcessLib
 
 					// get the corresponding curve 
 					std::map<std::string, std::unique_ptr<MathLib::PiecewiseLinearInterpolation>>::const_iterator it;
-					if (bound_type == BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY ||
-						bound_type == BHE_BOUNDARY_TYPE::BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE_BOUNDARY)
-					{
+                    if (bound_type ==
+                            BHE_BOUNDARY_TYPE::
+                                POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY ||
+                        bound_type ==
+                            BHE_BOUNDARY_TYPE::
+                                POWER_IN_WATT_CURVE_FIXED_FLOW_RATE_BOUNDARY ||
+                        bound_type ==
+                            BHE_BOUNDARY_TYPE::
+                                BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE_BOUNDARY)
+                    {
 						it = _bhe_curves.find("power_in_watt_curve");
 						if (it == _bhe_curves.end())
 						{
