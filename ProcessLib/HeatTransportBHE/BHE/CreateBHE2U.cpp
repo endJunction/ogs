@@ -26,9 +26,6 @@ namespace ProcessLib
 					std::map < std::string,
 					std::unique_ptr < MathLib::PiecewiseLinearInterpolation >> const& curves)
 			{
-				// BHE type is clear
-				BHE::BHE_TYPE bhe_type = BHE_TYPE::TYPE_2U;
-
 				// read in the parameters
 				const std::string bhe_ply_name = bhe_conf.getConfigParameter<std::string>("bhe_polyline");
 				const std::string bhe_bound_type_str = bhe_conf.getConfigParameter<std::string>("bhe_bound_type");
