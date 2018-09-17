@@ -167,8 +167,6 @@ namespace ProcessLib
 				{
 					if (use_flowrate_curve)
 					{
-						int flag_valid = false;
-						// double Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
 						double Q_r_tmp(0.0);
 						Q_r_tmp = _flowrate_curve->getValue(current_time);
 						update_flow_rate(Q_r_tmp);
