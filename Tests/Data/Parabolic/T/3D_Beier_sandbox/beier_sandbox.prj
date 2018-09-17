@@ -171,17 +171,6 @@
             <type>Constant</type>
             <values>295.90 295.25 295.25 295.25</values>
         </parameter>
-        <parameter>
-            <name>T_inflow</name>
-            <type>Constant</type>
-            <value>320.0</value>
-        </parameter>
-        <parameter>
-            <name>T_outflow</name>
-            <type>Constant</type>
-            <value>0.0</value>
-        </parameter>
-
     </parameters>
 
     <process_variables>
