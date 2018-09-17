@@ -362,10 +362,10 @@ namespace ProcessLib
 
 				const int N_OUT;
 
-				const BHE_NET_ELE::type _ele_type;
+                std::string _name;
 
-				std::string _name;
-
+                const BHE_NET_ELE::type _ele_type;
+                
 				std::vector<BHE_Net_ELE_Abstract*> _vec_ele_inlet;
 
 				std::vector<BHE_Net_ELE_Abstract*> _vec_ele_outlet;

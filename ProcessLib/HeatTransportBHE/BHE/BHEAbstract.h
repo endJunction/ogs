@@ -590,6 +590,11 @@ namespace ProcessLib
                 const BHE_TYPE type;
 
                 /**
+                  * name of the borehole heat exchanger
+                  */
+                const std::string _name;
+
+                /**
                   * the type of the boundary condition on this BHE
                   */
                 const BHE_BOUNDARY_TYPE bound_type;
@@ -598,12 +603,7 @@ namespace ProcessLib
                   * the polyline geometry representing the BHE
                   */
                 const GeoLib::Polyline* _geo_ply;
-
-                /**
-                  * name of the borehole heat exchanger
-                  */
-                const std::string _name;
-
+                               
                 /**
                   * epsilon value of the BHE polyline
                   */
