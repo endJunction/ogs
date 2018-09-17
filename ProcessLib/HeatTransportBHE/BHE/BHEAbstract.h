@@ -487,10 +487,37 @@ namespace ProcessLib
                   */
                 double get_ply_eps(void) { return _ply_eps; }
 
+            private:
                 /**
-                  * total refrigerant flow discharge of BHE
-                  * unit is m^3/sec
-                  */
+                 * the type of the BHE
+                 */
+                const BHE_TYPE type;
+
+                /**
+                 * name of the borehole heat exchanger
+                 */
+                const std::string _name;
+
+                /**
+                 * the type of the boundary condition on this BHE
+                 */
+                const BHE_BOUNDARY_TYPE bound_type;
+
+                /**
+                 * the polyline geometry representing the BHE
+                 */
+                const GeoLib::Polyline* _geo_ply;
+
+                /**
+                 * epsilon value of the BHE polyline
+                 */
+                double _ply_eps;
+
+            public: 
+                /**
+                 * total refrigerant flow discharge of BHE
+                 * unit is m^3/sec
+                 */
                 double Q_r;
 
                 /**
@@ -581,33 +608,6 @@ namespace ProcessLib
                 {
                     return 0;
                 }
-
-            private:
-
-                /**
-                  * the type of the BHE
-                  */
-                const BHE_TYPE type;
-
-                /**
-                  * name of the borehole heat exchanger
-                  */
-                const std::string _name;
-
-                /**
-                  * the type of the boundary condition on this BHE
-                  */
-                const BHE_BOUNDARY_TYPE bound_type;
-
-                /**
-                  * the polyline geometry representing the BHE
-                  */
-                const GeoLib::Polyline* _geo_ply;
-                               
-                /**
-                  * epsilon value of the BHE polyline
-                  */
-                double _ply_eps;
             };
 
         }  // end of namespace BHE

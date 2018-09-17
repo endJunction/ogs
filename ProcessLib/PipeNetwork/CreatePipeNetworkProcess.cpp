@@ -25,7 +25,7 @@ namespace ProcessLib
             std::vector<std::unique_ptr<ParameterBase>> const& parameters,
             unsigned const integration_order,
             BaseLib::ConfigTree const& config,
-            std::map<std::string, std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const& curves)
+            std::map<std::string, std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const& /*curves*/)
         {
             //! \ogs_file_param{prj__processes__process__type}
             config.checkConfigParameter("type", "PIPE_NETWORK");

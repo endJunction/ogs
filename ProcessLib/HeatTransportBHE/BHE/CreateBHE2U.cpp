@@ -37,7 +37,7 @@ namespace ProcessLib
 				const double bhe_pipe_outer_radius = bhe_conf.getConfigParameter<double>("bhe_pipe_outer_radius");
 				const double bhe_pipe_in_wall_thickness = bhe_conf.getConfigParameter<double>("bhe_pipe_in_wall_thickness");
 				const double bhe_pipe_out_wall_thickness = bhe_conf.getConfigParameter<double>("bhe_pipe_out_wall_thickness");
-				const std::size_t bhe_fluid_idx = bhe_conf.getConfigParameter<std::size_t>("bhe_fluid_idx");
+				// const std::size_t bhe_fluid_idx = bhe_conf.getConfigParameter<std::size_t>("bhe_fluid_idx");
 				const double bhe_fluid_longitudinal_dispsion_length = bhe_conf.getConfigParameter<double>("bhe_fluid_longitudinal_dispsion_length");
 				const double bhe_grout_density = bhe_conf.getConfigParameter<double>("bhe_grout_density");
 				const double bhe_grout_porosity = bhe_conf.getConfigParameter<double>("bhe_grout_porosity");
