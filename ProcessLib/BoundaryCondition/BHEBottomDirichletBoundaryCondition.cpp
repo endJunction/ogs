@@ -17,7 +17,7 @@
 namespace ProcessLib
 {
 void BHEBottomDirichletBoundaryCondition::getEssentialBCValues(
-    const double t, GlobalVector const& x,
+    const double /*t*/, GlobalVector const& x,
     NumLib::IndexValueVector<GlobalIndexType>& bc_values) const
 {
     SpatialPosition pos;
@@ -44,7 +44,7 @@ void BHEBottomDirichletBoundaryCondition::getEssentialBCValues(
 
 // update new values and corresponding indices.
 void BHEBottomDirichletBoundaryCondition::preTimestep(
-    const double t, const GlobalVector& x)
+    const double /*t*/, const GlobalVector& x)
 {
     // At the bottom of each BHE, the outflow temperature
     // is the same as the inflow temperature. 

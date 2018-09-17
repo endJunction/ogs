@@ -280,13 +280,13 @@ namespace ProcessLib
                         BHE::BHE_NET_ELE::BHE_NET_BOREHOLE, n_T_in, n_T_out),
                     type(my_type),
                     _name(name),
+                    bound_type(my_bound_type),
                     borehole_geometry(borehole_geometry_),
                     pipe_param(pipe_param_),
                     refrigerant_param(refrigerant_param_),
                     grout_param(grout_param_),
                     extern_Ra_Rb(extern_Ra_Rb_),
                     extern_def_thermal_resistances(extern_def_thermal_resistances_),
-                    bound_type(my_bound_type),
                     _bhe_curves(bhe_curves),
                     use_flowrate_curve(if_flowrate_curve)
                 {};

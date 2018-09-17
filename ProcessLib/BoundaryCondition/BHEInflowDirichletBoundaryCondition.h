@@ -87,12 +87,12 @@ private:
     int const _variable_id;
     int const _component_id;
 
+    std::size_t const _bulk_mesh_id;
+
     MeshLib::Mesh const & _bc_mesh; 
 
     /// Integration order for integration over the lower-dimensional elements
     unsigned const _integration_order;
-
-    std::size_t const _bulk_mesh_id;
 
     /// Stores the results of the outflow temperatures per boundary node.
     std::vector<double> _T_out_values;

@@ -47,7 +47,7 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
 
 // update new values and corresponding indices.
 void BHEInflowDirichletBoundaryCondition::preTimestep(
-    const double t, const GlobalVector& x)
+    const double /*t*/, const GlobalVector& x)
 {
     // for each BHE, the inflow temperature is dependent on
     // the ouflow temperature of the BHE. 
@@ -56,8 +56,6 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(
     auto const n_nodes = _bc_values.ids.size();
     for (size_t i = 0; i < n_nodes; i++)
     {
-        auto g_idx = _T_out_indices[i]; 
-
         // read the T_out
         _T_out_values[i] = x[_T_out_indices[i]]; 
     }

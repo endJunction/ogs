@@ -98,14 +98,14 @@ private:
     int const _variable_id;
     int const _component_id;
 
-    /// Vector of (lower-dimensional) boundary elements on which the boundary
-    /// condition is defined.
+    /// id of bulk mesh
+    std::size_t const _bulk_mesh_id;
+
+    /// the bulk mesh
     MeshLib::Mesh const& _bulk_mesh;
 
     /// Integration order for integration over the lower-dimensional elements
     unsigned const _integration_order;
-
-    std::size_t const _bulk_mesh_id;
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 
@@ -113,6 +113,7 @@ private:
 
     HeatTransportBHE::BHE::BHEAbstract* _BHE_property;
 
+    /// index of the bhe
     unsigned const _bhe_idx;
 };
 
