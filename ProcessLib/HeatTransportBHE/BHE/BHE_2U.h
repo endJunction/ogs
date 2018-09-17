@@ -160,11 +160,6 @@ namespace ProcessLib
 				  */
 				void set_T_in_out_global_idx(std::size_t start_idx);
 
-				double set_BC(double T_in, double current_time)
-				{
-					return 0;
-				}
-
 				double get_flowrate()
 				{
 					return Q_r;

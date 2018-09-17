@@ -290,9 +290,6 @@ namespace ProcessLib
 					return _penalty_factor;
 				}
 
-				// this one is needed for the setting the heat pump B.C.
-				virtual double set_BC(double T_in, double current_time) = 0;
-
 				virtual double get_flowrate() = 0;
 
 				/**
