@@ -183,8 +183,6 @@ namespace ProcessLib
                 //! \ogs_file_param prj__processes__process___HEAT_TRANSPORT_BHE__borehole_heat_exchangers__borehole_heat_exchanger}
                 bhe_configs.getConfigSubtreeList("borehole_heat_exchanger"))
             {
-                auto const bhe_id = bhe_conf.getConfigAttribute<int>("id");
-
                 // read in the parameters
                 using namespace BHE;
                 const std::string bhe_type_str = bhe_conf.getConfigParameter<std::string>("bhe_type");

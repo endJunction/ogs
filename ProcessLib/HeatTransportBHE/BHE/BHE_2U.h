@@ -171,6 +171,7 @@ namespace ProcessLib
 					{
 						double Q_r_tmp(0.0);
 						Q_r_tmp = _flowrate_curve->getValue(current_time);
+                        update_flow_rate(Q_r_tmp);
 					}
 				};
 

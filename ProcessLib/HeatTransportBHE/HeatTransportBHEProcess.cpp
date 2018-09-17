@@ -165,7 +165,6 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     unsigned const integration_order)
 {
     const int process_id = 0;
-    ProcessLib::ProcessVariable const& pv = getProcessVariables(process_id)[0];
 
     // this process can only run with 3-dimensional mesh
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
@@ -182,7 +181,8 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     std::vector<std::unique_ptr<BoundaryCondition>> bc_collections =
         createBHEBoundaryConditionTopBottom();
     auto& current_process_BCs = _boundary_conditions[process_id];
-    for (auto i = 0; i < bc_collections.size(); i++)
+    auto const bc_collections_size = bc_collections.size();
+    for (unsigned i = 0; i < bc_collections_size; i++)
         current_process_BCs.addCreatedBC(std::move(bc_collections[i]));
 }
 
@@ -245,7 +245,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
     std::vector<MeshLib::Node*> bc_bottom_nodes;
 
     // for each BHE
-    for (auto bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
+    for (unsigned bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
         // get the BHE name
         auto bhe_name = _process_data._vec_BHE_property.at(bhe_i)->get_name();
@@ -259,7 +259,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
         unsigned int idx_bottom = _vec_BHE_nodes[bhe_i].size()-1;
         double top_z_coord = _vec_BHE_nodes[bhe_i].at(idx_top)->getCoords()[2];
         double bottom_z_coord = _vec_BHE_nodes[bhe_i].at(idx_bottom)->getCoords()[2];
-        for (auto bhe_node_i = 0; bhe_node_i < n_bhe_nodes; bhe_node_i++ )
+        for (unsigned bhe_node_i = 0; bhe_node_i < n_bhe_nodes; bhe_node_i++ )
         {
             if (_vec_BHE_nodes[bhe_i].at(bhe_node_i)->getCoords()[2] >= top_z_coord)
                 idx_top = bhe_node_i;

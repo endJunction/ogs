@@ -258,16 +258,14 @@ public:
         if (mesh_item.getDimension() < GlobalDim)
         {
             // this is a BHE element
-            auto const n_global_components =
-                _dof_table.getNumberOfElementComponents(id);
-
             dofIndex_to_localIndex.resize(n_local_dof);
             unsigned dof_id = 0;
             unsigned local_id = 0;
             for (auto i : varIDs)
             {
-                for (int j = 0; j < _dof_table.getNumberOfVariableComponents(i);
-                     j++)
+                auto const n_global_components =
+                    _dof_table.getNumberOfElementComponents(i);
+                for (unsigned j = 0; j < n_global_components; j++)
                 {
                     auto const& ms = _dof_table.getMeshSubset(i, j);
                     auto const mesh_id = ms.getMeshID();
