@@ -36,45 +36,15 @@ namespace ProcessLib
                 _local_A.resize(_local_T.size(), _local_T.size());
             }
 
-            void assembleWithJacobian(double const t,
-                std::vector<double> const& local_x_,
+            void assembleWithJacobian(double const /*t*/,
+                std::vector<double> const& /*local_x_*/,
                 std::vector<double> const& /*local_xdot*/,
                 const double /*dxdot_dx*/, const double /*dx_dx*/,
                 std::vector<double>& /*local_M_data*/,
                 std::vector<double>& /*local_K_data*/,
-                std::vector<double>& local_b_data,
-                std::vector<double>& local_Jac_data) override
+                std::vector<double>& /*local_b_data*/,
+                std::vector<double>& /*local_Jac_data*/) override
             {
-                /*
-                auto const local_dof_size = local_x_.size();
-
-                _local_u.setZero();
-                for (unsigned i = 0; i < local_dof_size; i++)
-                {
-                    _local_u[_dofIndex_to_localIndex[i]] = local_x_[i];
-                }
-                _local_b.setZero();
-                _local_J.setZero();
-
-                assembleWithJacobian(t, _local_u, _local_b, _local_J);
-
-                local_b_data.resize(local_dof_size);
-                for (unsigned i = 0; i < local_dof_size; i++)
-                {
-                    local_b_data[i] = _local_b[_dofIndex_to_localIndex[i]];
-                }
-
-                local_Jac_data.resize(local_dof_size * local_dof_size);
-                for (unsigned i = 0; i < local_dof_size; i++)
-                {
-                    for (unsigned j = 0; j < local_dof_size; j++)
-                    {
-                        local_Jac_data[i * local_dof_size + j] = _local_J(
-                            _dofIndex_to_localIndex[i], _dofIndex_to_localIndex[j]);
-                    }
-                }
-                */
-
                 OGS_FATAL(
                     "HeatTransportBHELocalAssemblerInterface::assembleWithJacobian() "
                     "is not implemented");
