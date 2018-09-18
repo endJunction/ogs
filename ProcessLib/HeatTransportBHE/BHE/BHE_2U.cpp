@@ -99,8 +99,8 @@ void BHE_2U::calc_thermal_resistances()
 
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 36 in Diersch_2011_CG
-    double _R_con_a;
-    _R_con_a = std::log(r_outer / r_inner) / ( 2.0 * PI * lambda_p );
+    // double _R_con_a;
+    // _R_con_a = std::log(r_outer / r_inner) / ( 2.0 * PI * lambda_p );
 
     d0 = 2.0 * r_inner;
     s = omega * std::sqrt(2); 

@@ -441,7 +441,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     double T_in(0.0);
     double power_tmp(0.0); 
     double building_power_tmp(0.0);
-    double power_elect_tmp(0.0);
+    // double power_elect_tmp(0.0);
     double Q_r_tmp(0.0);
     double COP_tmp(0.0);
     double fac_dT = 1.0;
@@ -521,7 +521,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // now calculate how much power needed from BHE
             power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
             // also how much power from electricity
-            power_elect_tmp = building_power_tmp - power_tmp;
+            // power_elect_tmp = building_power_tmp - power_tmp;
             // print the amount of power needed
             //std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
             fac_dT = -1.0;
@@ -534,7 +534,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // now calculate how much power needed from BHE
             power_tmp = building_power_tmp * (COP_tmp + 1.0) / COP_tmp;
             // also how much power from electricity
-            power_elect_tmp = -building_power_tmp + power_tmp;
+            // power_elect_tmp = -building_power_tmp + power_tmp;
             // print the amount of power needed
             //std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
             fac_dT = 1.0;
@@ -575,7 +575,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // now calculate how much power needed from BHE
             power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
             // also how much power from electricity
-            power_elect_tmp = building_power_tmp - power_tmp;
+            // power_elect_tmp = building_power_tmp - power_tmp;
             // print the amount of power needed
             //std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
         }
@@ -586,7 +586,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // now calculate how much power needed from BHE
             power_tmp = building_power_tmp * (COP_tmp + 1.0) / COP_tmp;
             // also how much power from electricity
-            power_elect_tmp = -building_power_tmp + power_tmp;
+            // power_elect_tmp = -building_power_tmp + power_tmp;
             // print the amount of power needed
             //std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
         }
