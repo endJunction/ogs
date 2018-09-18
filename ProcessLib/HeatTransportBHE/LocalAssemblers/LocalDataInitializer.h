@@ -342,13 +342,15 @@ private:
                   std::size_t const local_matrix_size,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) {
-            if (e.getDimension() == GlobalDim)
+
+            if (e.getDimension() == GlobalDim) // soil elements
             {
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
                     e, local_matrix_size,
                     std::forward<ConstructorArgs>(args)...}};
             }
-            return LADataIntfPtr{new LADataBHE<ShapeFunction>{
+            else if (e.getDimension() == 1 && n_variables > 1) // BHE elements
+                return LADataIntfPtr{new LADataBHE<ShapeFunction>{
                    e, local_matrix_size, dofIndex_to_localIndex,
                    std::forward<ConstructorArgs>(args)...}};
     };
