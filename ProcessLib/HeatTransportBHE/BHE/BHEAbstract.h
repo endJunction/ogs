@@ -274,7 +274,6 @@ namespace ProcessLib
                     bool if_use_ext_Ra_Rb = false,
                     bool user_defined_R_vals = false,
                     bool if_flowrate_curve = false,
-                    bool if_inflow_temp_curve = false,
                     int n_T_in = 1,
                     int n_T_out = 1)
                     : BHE_Net_ELE_Abstract(name,
@@ -290,7 +289,6 @@ namespace ProcessLib
                     extern_def_thermal_resistances(extern_def_thermal_resistances_),
                     _bhe_curves(bhe_curves),
                     use_flowrate_curve(if_flowrate_curve),
-                    use_inflow_temp_curve(if_inflow_temp_curve),
                     if_use_ext_Ra_Rb(if_use_ext_Ra_Rb),
                     user_defined_R_vals(user_defined_R_vals)
                 {};
@@ -609,11 +607,6 @@ namespace ProcessLib
                   * use refrigerant flow rate curve
                   */
                 bool use_flowrate_curve;
-
-                /**
-                  * use inflow temperature curve
-                  */
-                bool use_inflow_temp_curve;
 
                 /**
                   * whether external Ra an Rb values are supplied by the user

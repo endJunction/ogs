@@ -29,7 +29,7 @@
                 <borehole_heat_exchanger>
                     <bhe_polyline>BHE_1</bhe_polyline>
                     <bhe_type>BHE_TYPE_1U</bhe_type>
-                    <bhe_bound_type>POWER_IN_WATT_CURVE_FIXED_FLOW_RATE</bhe_bound_type>
+                    <bhe_bound_type>FIXED_INFLOW_TEMP_CURVE</bhe_bound_type>
                     <bhe_use_external_therm_resis>false</bhe_use_external_therm_resis>
                     <bhe_length>18.0</bhe_length>
                     <bhe_diameter>0.13</bhe_diameter>
@@ -45,7 +45,7 @@
                     <bhe_pipe_wall_thermal_conductivity>0.39</bhe_pipe_wall_thermal_conductivity>
                     <bhe_grout_thermal_conductivity>0.806</bhe_grout_thermal_conductivity>
                     <bhe_pipe_distance>0.053</bhe_pipe_distance>
-                    <bhe_switch_off_threshold>0.001</bhe_switch_off_threshold>
+                    
                 </borehole_heat_exchanger>
             </borehole_heat_exchangers>
 
@@ -168,7 +168,7 @@
         <parameter>
             <name>T0_BHE1</name>
             <type>Constant</type>
-            <values>295.90 295.25 295.25 295.25</values>
+            <values>295.36 295.13 295.23 295.115</values>
         </parameter>
     </parameters>
 
@@ -216,10 +216,10 @@
     </linear_solvers>
     <curves>
         <curve>
-            <name>power_in_watt_curve</name>
-            <coords>186420.0    1000.0    0.0
+            <name>inflow_temp_curve</name>
+            <coords>186420 300 240 180 120 60 0   
             </coords>
-            <values>1000.0    1000.0    1000.0
+            <values>295.36 296.05 296.61 296.87 297.32 297.42 297.83
             </values>
         </curve>
     </curves>

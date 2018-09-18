@@ -64,10 +64,9 @@ namespace ProcessLib
 
 
 					bool if_flowrate_curve = false     /* whether flowrate curve is used*/,
-                    bool if_inflow_temp_curve = false  /* whether inflow temperature curve is used*/,
 					double my_threshold = 0.1)         /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/
 					: BHEAbstract(BHE_TYPE::TYPE_1U, name, borehole_geometry, pipe_geometry, refrigerant_param, grout_param,
-                        extern_Ra_Rb, extern_def_thermal_resistances, std::move(bhe_curves), bound_type, if_flowrate_curve, if_inflow_temp_curve)
+                        extern_Ra_Rb, extern_def_thermal_resistances, std::move(bhe_curves), bound_type, if_flowrate_curve)
 				{
 					_u = Eigen::Vector2d::Zero();
 					_Nu = Eigen::Vector2d::Zero();
@@ -82,9 +81,6 @@ namespace ProcessLib
 					// get the corresponding curve 
 					std::map<std::string, std::unique_ptr<MathLib::PiecewiseLinearInterpolation>>::const_iterator it;
                     if (bound_type ==
-                            BHE_BOUNDARY_TYPE::
-                                FIXED_INFLOW_TEMP_CURVE_BOUNDARY ||
-                        bound_type ==
                             BHE_BOUNDARY_TYPE::
                                 POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY ||
                         bound_type ==
@@ -118,10 +114,10 @@ namespace ProcessLib
 						// curve successfully found
 						_flowrate_curve = it->second.get();
 					}
-                    if (if_inflow_temp_curve)
+                    if (bound_type ==
+                            BHE_BOUNDARY_TYPE::
+                                FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
                     {
-                        use_inflow_temp_curve = true;
-
                         it = _bhe_curves.find("inflow_temp_curve");
                         if (it == _bhe_curves.end())
                         {
