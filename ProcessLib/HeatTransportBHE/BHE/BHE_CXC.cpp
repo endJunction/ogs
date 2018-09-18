@@ -161,7 +161,7 @@ void BHE_CXC::calc_Nu()
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
-    double const& b_out = pipe_param.b_out;
+    // double const& b_out = pipe_param.b_out;
 
     d_o1 = 2.0 * r_outer;
     d_i1 = 2.0 * r_inner;

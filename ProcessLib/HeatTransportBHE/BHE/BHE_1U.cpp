@@ -74,10 +74,10 @@ void BHE_1U::calc_thermal_resistances()
     // thermal resistance due to the grout transition
     double chi;
     double d0; // the average outer diameter of the pipes
-    double s; // diagonal distances of pipes
+    // double s; // diagonal distances of pipes
     double R_adv, R_con;
     double const& D = borehole_geometry.D; 
-    double const& L = borehole_geometry.L;
+    // double const& L = borehole_geometry.L;
     double const& lambda_r = refrigerant_param.lambda_r; 
     double const& lambda_g = grout_param.lambda_g; 
     double const& lambda_p = pipe_param.lambda_p;
@@ -88,7 +88,7 @@ void BHE_1U::calc_thermal_resistances()
     _R_adv_o1 = 1.0 / (_Nu(1) * lambda_r * PI);
 
     d0 = 2.0 * pipe_param.r_outer;
-    s = omega * std::sqrt(2);
+    // s = omega * std::sqrt(2);
     // Eq. 49
     _R_con_a_i1 = _R_con_a_o1 = std::log(pipe_param.r_outer / pipe_param.r_inner) / (2.0 * PI * lambda_p);
     // Eq. 51

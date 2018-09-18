@@ -222,7 +222,7 @@ void BHE_2U::calc_Nu()
     double gamma, xi; 
     double d; 
     double const& L = borehole_geometry.L;
-    double const& r_outer = pipe_param.r_outer;
+    // double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
 
     d = 2.0 * r_inner;
@@ -259,7 +259,7 @@ void BHE_2U::calc_Re()
     double u_norm, d; 
     double const& mu_r = refrigerant_param.mu_r;
     double const& rho_r = refrigerant_param.rho_r;
-    double const& r_outer = pipe_param.r_outer;
+    // double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
 
     u_norm = _u.norm();
@@ -298,7 +298,7 @@ void BHE_2U::calc_heat_transfer_coefficients()
 void BHE_2U::calc_u()
 {
     double tmp_u; 
-    double const& r_outer = pipe_param.r_outer;
+    // double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
 
     // which discharge type it is? 
