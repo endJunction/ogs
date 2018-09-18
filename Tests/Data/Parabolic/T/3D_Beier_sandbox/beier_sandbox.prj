@@ -26,7 +26,7 @@
             <density_gas>rho_g</density_gas>
             
             <borehole_heat_exchangers>
-                <borehole_heat_exchanger id="0">
+                <borehole_heat_exchanger>
                     <bhe_polyline>BHE_1</bhe_polyline>
                     <bhe_type>BHE_TYPE_1U</bhe_type>
                     <bhe_bound_type>POWER_IN_WATT_CURVE_FIXED_FLOW_RATE</bhe_bound_type>
@@ -38,7 +38,6 @@
                     <bhe_pipe_outer_radius>0.0167</bhe_pipe_outer_radius>
                     <bhe_pipe_in_wall_thickness>0.003035</bhe_pipe_in_wall_thickness>
                     <bhe_pipe_out_wall_thickness>0.003035</bhe_pipe_out_wall_thickness>
-                    <bhe_fluid_idx>0</bhe_fluid_idx>
                     <bhe_fluid_longitudinal_dispsion_length>0.001</bhe_fluid_longitudinal_dispsion_length>
                     <bhe_grout_density>2190.0</bhe_grout_density>
                     <bhe_grout_porosity>0.0</bhe_grout_porosity>
