@@ -17,10 +17,9 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
 * 0 - the first u-tube
 * 1 - the second u-tube
 */
-double BHE_1U::get_thermal_resistance_fig(std::size_t idx = 0)
+double BHE_1U::get_thermal_resistance_fig(std::size_t /*idx = 0*/)
 {
-    // TODO
-    return 0.0;
+    return _R_fig;
 }
 
 /**
@@ -29,16 +28,15 @@ double BHE_1U::get_thermal_resistance_fig(std::size_t idx = 0)
 * 0 - the first u-tube
 * 1 - the second u-tube
 */
-double BHE_1U::get_thermal_resistance_fog(std::size_t idx = 0)
+double BHE_1U::get_thermal_resistance_fog(std::size_t /*idx = 0*/)
 {
-    // TODO
-    return 0.0;
+    return _R_fog;
 }
 
 /**
 * return the thermal resistance
 */
-double BHE_1U::get_thermal_resistance(std::size_t idx = 0)
+double BHE_1U::get_thermal_resistance(std::size_t /*idx = 0*/)
 {
     // TODO
     return 0.0;
@@ -182,12 +180,12 @@ void BHE_1U::calc_thermal_resistances()
     }
 
     // print R and phi values
-    //std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
-    double phi_fig = 1.0 / (_R_fig * S_i);
-    double phi_fog = 1.0 / (_R_fog * S_o);
-    double phi_gg = 1.0 / (_R_gg * S_g1);
-    double phi_gs = 1.0 / (_R_gs * S_gs);
-    //std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
+    // std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
+    // double phi_fig = 1.0 / (_R_fig * S_i);
+    // double phi_fog = 1.0 / (_R_fog * S_o);
+    // double phi_gg = 1.0 / (_R_gg * S_g1);
+    // double phi_gs = 1.0 / (_R_gs * S_gs);
+    // std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
 }
 
 /**
@@ -444,7 +442,6 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     double power_tmp(0.0); 
     double building_power_tmp(0.0);
     double power_elect_tmp(0.0);
-    int flag_valid = false; 
     double Q_r_tmp(0.0);
     double COP_tmp(0.0);
     double fac_dT = 1.0;

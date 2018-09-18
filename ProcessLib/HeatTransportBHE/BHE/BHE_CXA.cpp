@@ -16,10 +16,9 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
 * 0 - the first u-tube
 * 1 - the second u-tube
 */
-double BHE_CXA::get_thermal_resistance_fig(std::size_t idx = 0)
+double BHE_CXA::get_thermal_resistance_fig(std::size_t /*idx = 0*/)
 {
-    // TODO
-    return 0.0;
+    return _R_fig;
 }
 
 /**
@@ -28,16 +27,16 @@ double BHE_CXA::get_thermal_resistance_fig(std::size_t idx = 0)
 * 0 - the first u-tube
 * 1 - the second u-tube
 */
-double BHE_CXA::get_thermal_resistance_fog(std::size_t idx = 0)
+double BHE_CXA::get_thermal_resistance_fog(std::size_t /*idx = 0*/)
 {
-    // TODO
+    // notice that there is no R_fog values for co-axial pipes
     return 0.0;
 }
 
 /**
 * return the thermal resistance
 */
-double BHE_CXA::get_thermal_resistance(std::size_t idx = 0)
+double BHE_CXA::get_thermal_resistance(std::size_t /*idx = 0*/)
 {
     // TODO
     return 0.0;
@@ -419,7 +418,6 @@ double BHE_CXA::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 {
     double T_in(0.0);
     double power_tmp(0.0);
-    int flag_valid = true;
     double Q_r_tmp(0.0);
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
