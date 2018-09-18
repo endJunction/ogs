@@ -55,22 +55,22 @@ public:
         _bc_values.values.clear();
 
         // convert mesh node ids to global index for the given component
+        assert(bc_mesh_subset.getNumberOfNodes() == 1); 
         _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
         _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
-        for (auto const* const node : bc_mesh_subset.getNodes())
-        {
-            // that might be slow, but only done once
-            const auto g_idx_T_in = global_idx_T_in_top;
-            const auto g_idx_T_out = global_idx_T_out_top;
+
+        // that might be slow, but only done once
+        const auto g_idx_T_in = global_idx_T_in_top;
+        const auto g_idx_T_out = global_idx_T_out_top;
             
-            if (g_idx_T_in >= 0 && g_idx_T_out >= 0)
-            {
-                _T_out_indices.emplace_back(g_idx_T_out);
-                _T_out_values.emplace_back(320.0 /*using initial value*/);
-                _bc_values.ids.emplace_back(g_idx_T_in);
-                _bc_values.values.emplace_back(320.0 /*using initial value*/);
-            }
+        if (g_idx_T_in >= 0 && g_idx_T_out >= 0)
+        {
+            _T_out_indices.emplace_back(g_idx_T_out);
+            _T_out_values.emplace_back(320.0 /*using initial value*/);
+            _bc_values.ids.emplace_back(g_idx_T_in);
+            _bc_values.values.emplace_back(320.0 /*using initial value*/);
         }
+        
     }
 
     void getEssentialBCValues(

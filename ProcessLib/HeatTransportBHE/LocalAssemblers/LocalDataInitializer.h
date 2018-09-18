@@ -234,8 +234,8 @@ public:
         std::size_t const id,
         MeshLib::Element const& mesh_item,
         LADataIntfPtr& data_ptr,
-        const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
-        const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property,
+        const std::vector<std::vector<int>>& /*vec_ele_connected_BHE_IDs*/,
+        const std::vector<std::unique_ptr<BHEAbstract>>& /*vec_BHE_property*/,
         ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
@@ -338,7 +338,7 @@ private:
     static LADataBuilder makeLocalAssemblerBuilder(std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::size_t const n_variables,
+                  std::size_t const /*n_variables*/,
                   std::size_t const local_matrix_size,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) {
@@ -349,12 +349,12 @@ private:
                     e, local_matrix_size,
                     std::forward<ConstructorArgs>(args)...}};
             }
-            else if (e.getDimension() == 1 && n_variables > 1) // BHE elements
-                return LADataIntfPtr{new LADataBHE<ShapeFunction>{
+
+            return LADataIntfPtr{new LADataBHE<ShapeFunction>{ // BHE elements
                    e, local_matrix_size, dofIndex_to_localIndex,
                    std::forward<ConstructorArgs>(args)...}};
-    };
-}
+        };
+    }
 
 /// Returns nullptr for shape functions whose dimensions are less than the
 /// global dimension.
