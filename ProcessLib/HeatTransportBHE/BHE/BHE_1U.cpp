@@ -450,6 +450,12 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 
     switch (this->get_bound_type())
     {
+    case BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY:
+        if (use_inflow_temp_curve)
+        {
+           T_in = _inflow_temp_curve->getValue(current_time);
+        }
+        break;
     case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
         if (use_flowrate_curve)
         {

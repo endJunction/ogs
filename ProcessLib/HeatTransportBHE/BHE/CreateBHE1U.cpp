@@ -29,6 +29,7 @@ namespace ProcessLib
                 const std::string bhe_ply_name = bhe_conf.getConfigParameter<std::string>("bhe_polyline");
                 const std::string bhe_bound_type_str = bhe_conf.getConfigParameter<std::string>("bhe_bound_type");
                 const bool bhe_if_use_flow_rate_curve = false;
+                const bool bhe_if_use_inflow_temp_curve = true;
                 const double bhe_length = bhe_conf.getConfigParameter<double>("bhe_length");
                 const double bhe_diameter = bhe_conf.getConfigParameter<double>("bhe_diameter");
                 const double bhe_refrigerant_flow_rate = bhe_conf.getConfigParameter<double>("bhe_refrigerant_flow_rate");
@@ -181,6 +182,7 @@ namespace ProcessLib
                     bhe_power_in_watt_val,
                     bhe_delta_T_val,
                     bhe_if_use_flow_rate_curve,
+                    bhe_if_use_inflow_temp_curve,
                     bhe_switch_off_threshold);
 
                 return m_bhe_1u;
