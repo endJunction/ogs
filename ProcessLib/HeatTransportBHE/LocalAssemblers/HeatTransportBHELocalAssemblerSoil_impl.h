@@ -41,10 +41,9 @@ namespace ProcessLib
                 HeatTransportBHEProcessData& process_data)
             : _process_data(process_data),
             _integration_method(integration_order),
-            _element(e),
             _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
-                    IntegrationMethod, GlobalDim>(
-                        e, is_axially_symmetric, _integration_method)),
+                IntegrationMethod, GlobalDim>(e, is_axially_symmetric, _integration_method)),
+            _element(e),             
             _is_axially_symmetric(is_axially_symmetric)
         {
             unsigned const n_integration_points =

@@ -92,7 +92,6 @@ namespace ProcessLib
                     x_position.setIntegrationPoint(ip);
                     auto& ip_data = _ip_data[ip];
 
-                    auto const& integration_weight = ip_data.integration_weight;
                     auto const& sm = _shape_matrices[ip];
                     auto const& wp = _integration_method.getWeightedPoint(ip);
 
