@@ -41,9 +41,9 @@ namespace ProcessLib
                 dofIndex_to_localIndex),
             _process_data(process_data),
             _integration_method(integration_order),
+            _element(e), 
             _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
-                IntegrationMethod, BHE_Dim>(e, is_axially_symmetric, _integration_method)),
-            _element(e)
+                IntegrationMethod, BHE_Dim>(e, is_axially_symmetric, _integration_method))            
         {
             // need to make sure that the BHE elements are one-dimensional
             assert(_element.getDimension() == 1);
@@ -274,10 +274,10 @@ namespace ProcessLib
 
         template<typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
             void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
-                assemble(double const t, std::vector<double> const& local_x,
+                assemble(double const /*t*/, std::vector<double> const& local_x,
                          std::vector<double>& local_M_data,
                          std::vector<double>& local_K_data,
-                         std::vector<double>& local_b_data)
+                         std::vector<double>& /*local_b_data*/) // local b vector is not touched
         {
                 // BHE must be assembled with one dimentional element
                 assert(_element.getDimension() == 1);

@@ -53,10 +53,10 @@ namespace ProcessLib
                 std::vector<double>& /*local_K_data*/,
                 std::vector<double>& /*local_b_data*/) override;
 
-            void assembleWithJacobian(double const t,
-                Eigen::VectorXd const& local_u,
-                Eigen::VectorXd& local_b,
-                Eigen::MatrixXd& local_J) override
+            void assembleWithJacobian(double const /*t*/,
+                Eigen::VectorXd const& /*local_u*/,
+                Eigen::VectorXd& /*local_b*/,
+                Eigen::MatrixXd& /*local_J*/) override
             {
                 OGS_FATAL(
                     "HeatTransportBHELocalAssembler: assembly with jacobian is not "

@@ -59,7 +59,7 @@ namespace ProcessLib
                     std::vector<double> const& local_x,
                     std::vector<double>& local_M_data,
                     std::vector<double>& local_K_data,
-                    std::vector<double>& local_b_data)
+                    std::vector<double>& /*local_b_data*/)
         {
             assert(_element.getDimension() == GlobalDim);
 
@@ -84,16 +84,16 @@ namespace ProcessLib
                 auto const& sm = _shape_matrices[ip];
                 auto const& wp = _integration_method.getWeightedPoint(ip);
 
-                auto const k_f = _process_data.thermal_conductivity_fluid(t, pos)[0];
-                auto const k_g = _process_data.thermal_conductivity_gas(t, pos)[0];
+                // auto const k_f = _process_data.thermal_conductivity_fluid(t, pos)[0];
+                // auto const k_g = _process_data.thermal_conductivity_gas(t, pos)[0];
                 auto const k_s = _process_data.thermal_conductivity_solid(t, pos)[0];
 
-                auto const heat_capacity_f = _process_data.heat_capacity_fluid(t, pos)[0];
-                auto const heat_capacity_g = _process_data.heat_capacity_gas(t, pos)[0];
+                // auto const heat_capacity_f = _process_data.heat_capacity_fluid(t, pos)[0];
+                // auto const heat_capacity_g = _process_data.heat_capacity_gas(t, pos)[0];
                 auto const heat_capacity_s = _process_data.heat_capacity_solid(t, pos)[0];
 
-                auto const density_f = _process_data.density_fluid(t, pos)[0];
-                auto const density_g = _process_data.density_gas(t, pos)[0];
+                // auto const density_f = _process_data.density_fluid(t, pos)[0];
+                // auto const density_g = _process_data.density_gas(t, pos)[0];
                 auto const density_s = _process_data.density_solid(t, pos)[0];
 
                 // for now only using the solid phase parameters

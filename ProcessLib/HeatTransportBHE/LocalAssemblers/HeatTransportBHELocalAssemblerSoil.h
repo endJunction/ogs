@@ -68,8 +68,8 @@ namespace ProcessLib
                 const double /*dxdot_dx*/, const double /*dx_dx*/,
                 std::vector<double>& /*local_M_data*/,
                 std::vector<double>& /*local_K_data*/,
-                std::vector<double>& local_b_data,
-                std::vector<double>& local_Jac_data) override
+                std::vector<double>& /*local_b_data*/,
+                std::vector<double>& /*local_Jac_data*/) override
             {
                 OGS_FATAL(
                     "HeatTransportBHELocalAssemblerMatrix: assembly with jacobian is not "
