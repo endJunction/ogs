@@ -41,9 +41,9 @@ namespace ProcessLib
                 dofIndex_to_localIndex),
             _process_data(process_data),
             _integration_method(integration_order),
-            _element(e), 
             _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
-                IntegrationMethod, BHE_Dim>(e, is_axially_symmetric, _integration_method))            
+                IntegrationMethod, BHE_Dim>(e, is_axially_symmetric, _integration_method)),
+            _element(e)
         {
             // need to make sure that the BHE elements are one-dimensional
             assert(_element.getDimension() == 1);
@@ -90,7 +90,7 @@ namespace ProcessLib
                 for (unsigned ip = 0; ip < n_integration_points; ip++)
                 {
                     x_position.setIntegrationPoint(ip);
-                    auto& ip_data = _ip_data[ip];
+                    // auto& ip_data = _ip_data[ip];
 
                     auto const& sm = _shape_matrices[ip];
                     auto const& wp = _integration_method.getWeightedPoint(ip);
@@ -311,7 +311,7 @@ namespace ProcessLib
                     x_position.setIntegrationPoint(ip);
                     auto& ip_data = _ip_data[ip];
 
-                    auto const& integration_weight = ip_data.integration_weight;
+                    // auto const& integration_weight = ip_data.integration_weight;
                     auto const& sm = _shape_matrices[ip];
                     auto const& wp = _integration_method.getWeightedPoint(ip);
 
