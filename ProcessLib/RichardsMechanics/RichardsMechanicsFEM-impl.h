@@ -375,10 +375,10 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
                                                          pressure_size);
 
     typename ShapeMatricesTypeDisplacement::template MatrixType<
-        displacement_size, pressure_size>
-        Kup = ShapeMatricesTypeDisplacement::template MatrixType<
-            displacement_size, pressure_size>::Zero(displacement_size,
-                                                    pressure_size);
+            displacement_size, pressure_size>
+            Kup = ShapeMatricesTypeDisplacement::template MatrixType<
+                displacement_size, pressure_size>::Zero(displacement_size,
+                                                        pressure_size);
 
     typename ShapeMatricesTypeDisplacement::template MatrixType<
         pressure_size, displacement_size>

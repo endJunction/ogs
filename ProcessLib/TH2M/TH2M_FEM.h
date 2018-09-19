@@ -403,6 +403,982 @@ public:
                     MPL::getScalar(solid_phase.property(MPL::PropertyEnum::density),
                             variables);
 
+            const double beta_p_SR = getScalar(
+                solid_phase.property(MPL::PropertyEnum::compressibility));
+            const double beta_p_PR =
+                getScalar(medium.property(MPL::PropertyEnum::compressibility));
+            const double beta_p_GR = getScalar(
+                gas_phase.property(MPL::PropertyEnum::compressibility));
+            const double beta_p_LR = getScalar(
+                liquid_phase.property(MPL::PropertyEnum::compressibility));
+
+#ifdef DBG_OUTPUT
+            std::cout << "   beta_p_SR: " << beta_p_SR << " \n";
+            std::cout << "   beta_p_PR: " << beta_p_PR << " \n";
+            std::cout << "   beta_p_GR: " << beta_p_GR << " \n";
+            std::cout << "   beta_p_LR: " << beta_p_LR << " \n";
+            std::cout << "==================================\n";
+#endif
+
+
+                        auto const rho_LR = MPL::getScalar(
+                                liquid_phase.property(MPL::PropertyEnum::density),
+                                variables);
+
+                        auto const rho_GR =
+                                MPL::getScalar(gas_phase.property(MPL::PropertyEnum::density),
+                                        variables);
+
+//            auto const rho_LR_0 = 1000.;
+//            auto const p_LR_0 = 100000.0;
+//
+//            double rho_LR = rho_LR_0 * ( 1 + beta_p_LR*(p_LR - p_LR_0));
+//
+//            auto const rho_GR_0 = 10.;
+//            auto const p_GR_0 = 100000.0;
+//
+//            double rho_GR = rho_GR_0 * ( 1 + beta_p_GR*(p_GR - p_GR_0));
+
+            variables[MPL::Variables::liquid_density] = rho_LR;
+            variables[MPL::Variables::gas_density] = rho_GR;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   alpha_B: " << alpha_B << " \n";
+            std::cout << "==================================\n";
+            std::cout << "   rho_SR: " << rho_SR << " \n";
+            std::cout << "   rho_LR: " << rho_LR << " \n";
+            std::cout << "   rho_GR: " << rho_GR << " \n";
+            std::cout << "==================================\n";
+#endif
+            auto const phi = MPL::getScalar(
+                medium.property(MPL::PropertyEnum::porosity), variables);
+            auto const phi_S = 1. - phi;
+
+#ifdef DBG_OUTPUT
+            std::cout << "  phi : " << phi << " \n";
+            std::cout << "  phi_S : " << phi_S << " \n";
+            std::cout << "==================================\n";
+#endif
+
+
+//            auto const s_L =
+//                MPL::getScalar(medium.property(MPL::PropertyEnum::saturation),
+//                               variables);
+
+
+            auto const s_L_r = 0.2;
+//            auto const s_G_r = 0.5;
+            auto const s_a = -1.9722e-11;
+            auto const s_b = 2.4279;
+
+
+            auto const s_L = std::max(s_L_r,1. + s_a * std::pow (std::max(0.,p_cap), s_b));
+//            auto const s_L = std::min(1.0-s_G_r,std::max(0.0, s_m*p_cap+1.0));
+
+//            for (double test_p = -120000; test_p <= 120000; test_p +=5000)
+//            {
+//            double test_s_L = std::min(1.0-s_G_r,std::max(s_L_r,1. - 1.9722e-11 * std::pow (std::max(0.,test_p), 2.4279)));
+//            std::cout << test_p << " " << test_s_L << "\n";
+//            }
+//
+//            OGS_FATAL ("");
+
+            auto const s_G = 1 - s_L;
+            auto const s_e = (s_L - s_L_r) / (1.0 - s_L_r);
+
+
+
+#ifdef DBG_OUTPUT
+            std::cout << "  p_cap : " << p_cap << " \n";
+            std::cout << "  s_L : " << s_L << " \n";
+            std::cout << "  s_G: " << s_G << " \n";
+#endif
+
+            auto const mu_LR = MPL::getScalar(
+                liquid_phase.property(MPL::PropertyEnum::viscosity),
+                variables);
+            auto const mu_GR =
+                MPL::getScalar(gas_phase.property(MPL::PropertyEnum::viscosity),
+                               variables);
+
+#ifdef DBG_OUTPUT
+            std::cout << "  mu_LR: " << mu_LR << " \n";
+            std::cout << "  mu_GR: " << mu_GR << " \n";
+            std::cout << "==================================\n";
+#endif
+            auto const rho =
+                phi_S * rho_SR + phi * (s_L * rho_LR + s_G * rho_GR);
+            auto const& b = _process_data.specific_body_force;
+
+#ifdef DBG_OUTPUT
+            std::cout << "  rho: " << rho << " \n";
+            std::cout << "   Gravity vector: \n";
+            std::cout << "   b: \n" << b << " \n";
+            std::cout << "==================================\n";
+#endif
+            static int const KelvinVectorSize =
+                MathLib::KelvinVector::KelvinVectorDimensions<
+                    DisplacementDim>::value;
+
+            auto const& identity2 =
+                MathLib::KelvinVector::Invariants<KelvinVectorSize>::identity2;
+
+            eps.noalias() = B * displacement;
+
+            auto const e = // volume strain
+                MathLib::KelvinVector::Invariants<KelvinVectorSize>::trace(eps);
+#ifdef DBG_OUTPUT
+            std::cout << "   e: " << e << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            auto C = ip_data.updateConstitutiveRelation(t, x_position, dt, displacement,
+                    T, p_GR);
+
+
+#ifdef DBG_OUTPUT
+            // std::cout << "   M_g : " << molar_mass << " \n";
+            std::cout << "   C : " << C << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            auto const drhoGRdpGR = MPL::getScalarDerivative(
+                gas_phase.property(MPL::density), variables, MPL::p_GR);
+
+            auto const drhoLRdpLR =
+                MPL::getScalarDerivative(liquid_phase.property(MPL::density),
+                                         variables, MPL::p_LR);
+
+            /*
+            auto const molar_mass =
+                getScalar(gas_phase.property(MPL::PropertyEnum::molar_mass));
+                */
+
+#ifdef DBG_OUTPUT
+            // std::cout << "   M_g : " << molar_mass << " \n";
+//            std::cout << "==================================\n";
+            std::cout << "   drho_gr_dp_gr : " << drhoGRdpGR << " \n";
+            std::cout << "   drho_lr_dp_lr : " << drhoLRdpLR << " \n";
+            std::cout << "==================================\n";
+#endif
+
+//            auto const dsLdpc = MPL::getScalarDerivative(
+//                medium.property(MPL::PropertyEnum::saturation),
+//                variables, MPL::Variables::p_cap);
+
+//            auto const dsLdpc = -4.78830438E-11*std::pow(p_cap,1.4279);
+            auto const dsLdpc = s_a*s_b*std::pow(std::max(0.,p_cap), s_b - 1.0);
+
+
+#ifdef DBG_OUTPUT
+            std::cout << "   dsLdpc : " << dsLdpc << " \n";
+            std::cout << "==================================\n";
+#endif
+
+//            auto const k_rel_LR = MPL::getPair(
+//                medium.property(MPL::PropertyEnum::relative_permeability),
+//                variables)[0];
+//            auto const k_rel_GR = MPL::getPair(
+//                medium.property(MPL::PropertyEnum::relative_permeability),
+//                variables)[1];
+
+            auto const k_rel_LR = 1.0 - 2.207*std::pow((1.0 - s_L), 1.0121);
+            auto const min_k_rel_GR = 0.0001;
+
+            auto const k_rel_GR = (1.0 - s_e) * (1 - s_e)
+                    		* (1.0 - std::pow(s_e, (5./3.))) + min_k_rel_GR;
+
+    //        std::cout << "pCap: " << p_cap << "s_L: " << s_L << " s_G: " << s_G << " dsldpc: " << dsLdpc << " k_rel_LR: " << k_rel_LR << " k_rel_GR: " << k_rel_GR << "\n";
+
+#ifdef DBG_OUTPUT
+            std::cout << "    k_rel_LR: " << k_rel_LR << " \n";
+            std::cout << "    k_rel_GR: " << k_rel_GR << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            // for output only
+            ip_data.pressure_gas_linear = p_GR;
+            ip_data.pressure_cap_linear = p_cap;
+            ip_data.pressure_wet = p_LR;
+            ip_data.density_gas = rho_GR;
+            ip_data.density_liquid = rho_LR;
+            ip_data.saturation = s_L;
+
+            const double k_over_mu_GR = k_rel_GR / mu_GR;
+            const double k_over_mu_LR = k_rel_LR / mu_LR;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   k_over_mu_GR: " << k_over_mu_GR << " \n";
+            std::cout << "   k_over_mu_LR: " << k_over_mu_LR << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            ip_data.velocity_liquid.noalias() =
+                -permeability_tensor * k_over_mu_LR * dNdx_p *
+                    (gas_phase_pressure - capillary_pressure) +
+                permeability_tensor * k_over_mu_LR * rho_LR * b;
+
+            ip_data.velocity_gas.noalias() =
+                -permeability_tensor * k_over_mu_GR * dNdx_p *
+                    gas_phase_pressure +
+                permeability_tensor * k_over_mu_GR * rho_GR * b;
+
+            const auto w_LS = ip_data.velocity_liquid;
+            const auto w_GS = ip_data.velocity_gas;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Velocities: \n";
+            std::cout << "   ----------------------------------\n";
+            std::cout << "   w_GR: \n" << w_GS << " \n";
+            std::cout << "   w_LR: \n" << w_LS << " \n";
+            std::cout << "   Velocities : \n";
+            std::cout << "==================================\n";
+#endif
+
+            Laplace.noalias() =
+                dNdx_p.transpose() * permeability_tensor * dNdx_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Laplace: \n";
+            std::cout << "   L:\n " << Laplace << " \n";
+            std::cout << "==================================\n";
+#endif
+            Mgpg.noalias() += N_p.transpose() * rho_GR * s_G *
+                              (phi * beta_p_GR + (alpha_B - phi) * beta_p_SR) *
+                              N_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Mgpg:\n " << Mgpg << " \n";
+            std::cout << "==================================\n";
+#endif
+            Mgpc.noalias() -=
+                N_p.transpose() * rho_GR *
+                ((phi + s_G * (alpha_B - phi) * beta_p_SR * p_cap) * dsLdpc +
+                 s_G * s_L * (alpha_B - phi) * beta_p_SR) *
+                N_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Mgpc:\n " << Mgpc << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            auto const drhoGRdT = MPL::getScalarDerivative(
+                gas_phase.property(MPL::density), variables, MPL::T);
+
+            const double beta_T_GR = rho_GR == 0. ? 0 : drhoGRdT / rho_GR;
+
+            auto const drhoLRdT = MPL::getScalarDerivative(
+                liquid_phase.property(MPL::density), variables, MPL::T);
+
+            const double beta_T_LR = drhoLRdT / rho_LR;
+
+            const double beta_T_SR = getScalar(
+                solid_phase.property(MPL::PropertyEnum::thermal_expansivity));
+
+#ifdef DBG_OUTPUT
+            std::cout << " drhoGRdT: " << drhoGRdT << " \n";
+            std::cout << " beta_T_GR: " << beta_T_GR << " \n";
+            std::cout << " drhoLRdT: " << drhoLRdT << " \n";
+            std::cout << " beta_T_LR: " << beta_T_LR << " \n";
+            std::cout << " beta_T_SR: " << beta_T_SR << " \n";
+
+            std::cout << "=================================\n";
+#endif
+            MgT.noalias() -= N_p.transpose() * s_G * rho_GR *
+                             (phi * beta_T_GR + beta_T_SR * (alpha_B - phi)) *
+                             N_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   MgT:\n " << MgT << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Mgus.noalias() += N_p.transpose() * s_G * rho_GR * alpha_B *
+                              identity2.transpose() * B * w;
+#ifdef DBG_OUTPUT
+            std::cout << "   Mgus:\n " << Mgus << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Mlpg.noalias() += N_p.transpose() * rho_LR * s_L *
+                              (phi * beta_p_LR + (alpha_B - phi) * beta_p_SR) *
+                              N_p * w;
+#ifdef DBG_OUTPUT
+            std::cout << "   Mlpg:\n " << Mlpg << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            const auto a_L = s_L * (alpha_B - phi) * beta_p_SR;
+
+            Mlpc.noalias() +=
+            		N_p.transpose() * rho_LR *
+					(dsLdpc * (phi - a_L*p_cap) - s_L*(phi*beta_p_LR + a_L)) *  N_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "     a_L: " << a_L << " \n";
+            std::cout << "==================================\n";
+            std::cout << "   Mlpc:\n " << Mlpc << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            MlT.noalias() -= N_p.transpose() * s_L * rho_LR *
+                             (phi * beta_T_LR + beta_T_SR * (alpha_B - phi)) *
+                             N_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   MlT:\n " << MlT << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Mlus.noalias() += N_p.transpose() * rho_LR * s_L * alpha_B *
+                              identity2.transpose() * B * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Mlus:\n " << Mlus << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            const double cp_G = getScalar(
+                gas_phase.property(MPL::PropertyEnum::specific_heat_capacity));
+            const double cp_L = getScalar(liquid_phase.property(
+                MPL::PropertyEnum::specific_heat_capacity));
+            const double cp_S = getScalar(solid_phase.property(
+                MPL::PropertyEnum::specific_heat_capacity));
+
+            const double phi_L = s_L * phi;
+            const double phi_G = s_G * phi;
+
+            const double rho_cp_eff = phi_G * rho_GR * cp_G +
+                                  phi_L * rho_LR * cp_L + phi_S * rho_SR * cp_S;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   cp_G: " << cp_G << " \n";
+            std::cout << "   cp_L: " << cp_L << " \n";
+            std::cout << "   cp_S: " << cp_S << " \n";
+
+            std::cout << " cp_eff: " << rho_cp_eff << " \n";
+            std::cout << "=================================\n";
+#endif
+
+            Mepg.noalias() -=
+                N_p.transpose() *
+                (phi_G*beta_T_GR + phi_L*beta_T_LR + phi_S*beta_T_SR) * T * N_p *
+                w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Mepg:\n " << Mepg << " \n";
+            std::cout << "=================================\n";
+#endif
+            Mepc.noalias() +=
+                N_p.transpose() *
+                (phi_L*beta_T_LR - (s_L + p_cap*dsLdpc)*phi_S*beta_T_SR) * T * N_p *
+                w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Mepc:\n " << Mepc << " \n";
+            std::cout << "=================================\n";
+#endif
+
+            MeT.noalias() += N_p.transpose() * rho_cp_eff * N_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   MeT:\n " << MeT << " \n";
+            std::cout << "=================================\n";
+#endif
+
+            Kgpg.noalias() += rho_GR * k_over_mu_GR * Laplace;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Kgpg:\n " << Kgpg << " \n";
+            std::cout << "==================================\n";
+#endif
+            Klpg.noalias() += rho_LR * k_over_mu_LR * Laplace;
+#ifdef DBG_OUTPUT
+            std::cout << "   Klpg:\n " << Klpg << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Klpc.noalias() -= rho_LR * k_over_mu_LR * Laplace;
+#ifdef DBG_OUTPUT
+            std::cout << "   Klpc:\n " << Klpc << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Aepg.noalias() = - N_p.transpose() *
+                             (phi_G*beta_T_GR*w_GS.transpose() +
+                              phi_L*beta_T_LR*w_LS.transpose()) * T *
+                             dNdx_p * w;
+
+            Kepg.noalias() += Aepg;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Aepg:\n " << Aepg << " \n";
+            std::cout << "   Kepg:\n " << Kepg << " \n";
+            std::cout << "=================================\n";
+            // Aepc(0, 0) = 3.4;
+#endif
+
+            Aepc.noalias() =
+            		N_p.transpose() * (phi_L*beta_T_LR*T*w_LS.transpose())
+					* dNdx_p * w;
+
+            Kepc.noalias() += Aepc;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Aepc:\n " << Aepc << " \n";
+            std::cout << "   Kepc:\n " << Kepc << " \n";
+            std::cout << "=================================\n";
+#endif
+
+            AeT.noalias() = N_p.transpose() *
+                            (s_G*rho_GR*cp_G*w_GS.transpose() +
+                             s_L*rho_LR*cp_L*w_LS.transpose()) *
+                            dNdx_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   AeT:\n " << AeT << " \n";
+            std::cout << "=================================\n";
+#endif
+            Eigen::Matrix<double, DisplacementDim, DisplacementDim>
+                conductivity_tensor;
+            conductivity_tensor.setIdentity();
+
+            const double lambda_G = getScalar(
+                gas_phase.property(MPL::PropertyEnum::thermal_conductivity));
+            const double lambda_L = getScalar(
+                liquid_phase.property(MPL::PropertyEnum::thermal_conductivity));
+            const double lambda_S = getScalar(
+                solid_phase.property(MPL::PropertyEnum::thermal_conductivity));
+
+            const double lambda_eff = phi_G * rho_GR * lambda_G +
+                                      phi_L * rho_LR * lambda_L +
+                                      phi_S * rho_SR * lambda_S;
+
+            const auto conductivity_effective =
+                lambda_eff * conductivity_tensor;
+
+            LeT.noalias() =
+                dNdx_p.transpose() * conductivity_effective * dNdx_p * w;
+
+            KeT.noalias() += AeT + LeT;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   LeT:\n " << LeT << " \n";
+            std::cout << "   KeT:\n " << KeT << " \n";
+            std::cout << "=================================\n";
+#endif
+
+            Kupg.noalias() -= B.transpose() * alpha_B * identity2 * N_p * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Kupg:\n " << Kupg << " \n";
+            std::cout << "==================================\n";
+#endif
+            Kupc.noalias() +=
+                B.transpose() * alpha_B * identity2 * s_L * N_p * w;
+#ifdef DBG_OUTPUT
+            std::cout << "   Kupc:\n " << Kupc << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Kuu.noalias() +=
+                B.transpose() * C * B * w;
+#ifdef DBG_OUTPUT
+            std::cout << "   Kuu:\n " << Kupc << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            auto const gravity_operator =
+                (dNdx_p.transpose() * permeability_tensor * b * w).eval();
+
+            Bg.noalias() += rho_GR * rho_GR * k_over_mu_GR * gravity_operator;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Bg:\n " << Bg << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Bl.noalias() += rho_LR * rho_LR * k_over_mu_LR * gravity_operator;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Bl:\n " << Bl << " \n";
+            std::cout << "==================================\n";
+#endif
+
+            Bu.noalias() += N_u_op.transpose() * rho * b * w;
+
+#ifdef DBG_OUTPUT
+            std::cout << "   Bu:\n " << Bu << " \n";
+            std::cout << "==================================\n";
+#endif
+        }
+
+#ifdef DBG_OUTPUT
+
+                std::cout << "== Local M: ====\n";
+                std::cout << local_M << "\n";
+                std::cout << "================\n";
+                std::cout << "== Local K: ====\n";
+                std::cout << local_K << "\n";
+                std::cout << "================\n";
+                std::cout << "== Local f: ====\n";
+                std::cout << local_rhs << "\n";
+                std::cout << "================\n";
+
+               OGS_FATAL ("##########################################");
+#endif
+
+//        for (unsigned row = 0; row < Mgpc.cols(); row++)
+//        {
+//            for (unsigned column = 0; column < Mgpc.cols(); column++)
+//            {
+//                if (row != column)
+//                {
+//                    Mgpc(row, row) += Mgpc(row, column);
+//                    Mgpc(row, column) = 0.0;
+//                    Mgpg(row, row) += Mgpg(row, column);
+//                    Mgpg(row, column) = 0.0;
+//                    Mlpc(row, row) += Mlpc(row, column);
+//                    Mlpc(row, column) = 0.0;
+//                }
+//            }
+  //      }
+    }
+
+    void assembleWithJacobian(double const t,
+                              std::vector<double> const& local_x,
+                              std::vector<double> const& local_xdot,
+                              const double /*dxdot_dx*/, const double /*dx_dx*/,
+                              std::vector<double>& /*local_M_data*/,
+                              std::vector<double>& /*local_K_data*/,
+                              std::vector<double>& local_rhs_data,
+                              std::vector<double>& local_Jac_data) override
+    {
+
+        assert(local_x.size() == gas_pressure_size + cap_pressure_size +
+                                     temperature_size + displacement_size);
+
+        const auto matrix_size = gas_pressure_size + cap_pressure_size +
+                                 temperature_size + displacement_size;
+
+        // primary variables
+        auto gas_phase_pressure =
+            Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+                gas_pressure_size> const>(local_x.data() + gas_pressure_index,
+                                          gas_pressure_size);
+
+        auto gas_phase_pressure_dot =
+            Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+                gas_pressure_size> const>(local_xdot.data() + gas_pressure_index,
+                                          gas_pressure_size);
+
+        auto capillary_pressure =
+            Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+                cap_pressure_size> const>(local_x.data() + cap_pressure_index,
+                                          cap_pressure_size);
+
+        auto capillary_pressure_dot =
+            Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+                cap_pressure_size> const>(local_xdot.data() + cap_pressure_index,
+                                          cap_pressure_size);
+
+
+        auto temperature =
+            Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+                temperature_size> const>(local_x.data() + temperature_index,
+                                         temperature_size);
+
+        auto temperature_dot =
+            Eigen::Map<typename ShapeMatricesTypePressure::template VectorType<
+                temperature_size> const>(local_xdot.data() + temperature_index,
+                                         temperature_size);
+
+        auto displacement =
+            Eigen::Map<typename ShapeMatricesTypeDisplacement::
+                           template VectorType<displacement_size> const>(
+                local_x.data() + displacement_index, displacement_size);
+
+
+        auto displacement_dot =
+            Eigen::Map<typename ShapeMatricesTypeDisplacement::
+                           template VectorType<displacement_size> const>(
+                local_xdot.data() + displacement_index, displacement_size);
+
+
+        // create Jacobian
+        auto J = MathLib::createZeroedMatrix<
+            typename ShapeMatricesTypeDisplacement::template MatrixType<
+                matrix_size, matrix_size>>(
+            local_Jac_data, matrix_size, matrix_size);
+
+        // create residuum
+        auto r = MathLib::createZeroedVector<
+            typename ShapeMatricesTypeDisplacement::template VectorType<
+                matrix_size>>(
+            local_rhs_data, matrix_size);
+
+        //         ********************************************************************
+        //         ********************************************************************
+
+
+        // Matrix templates
+        using PgPgMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<gas_pressure_size, gas_pressure_size>;
+
+        using PgPcMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<gas_pressure_size, cap_pressure_size>;
+
+        using PgTMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<gas_pressure_size, temperature_size>;
+
+        using PgUMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<gas_pressure_size, displacement_size>;
+
+
+        using PcPgMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<cap_pressure_size, gas_pressure_size>;
+
+        using PcPcMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<cap_pressure_size, cap_pressure_size>;
+
+        using PcTMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<cap_pressure_size, temperature_size>;
+
+        using PcUMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<cap_pressure_size, displacement_size>;
+
+
+        using TPgMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<temperature_size, gas_pressure_size>;
+
+        using TPcMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<temperature_size, cap_pressure_size>;
+
+        using TTMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<temperature_size, temperature_size>;
+
+        using TUMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<temperature_size, displacement_size>;
+
+
+        using UPgMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<displacement_size, gas_pressure_size>;
+
+        using UPcMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<displacement_size, cap_pressure_size>;
+
+        using UTMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<displacement_size, temperature_size>;
+
+        using UUMatrix = typename ShapeMatricesTypeDisplacement::template
+        		MatrixType<displacement_size, displacement_size>;
+
+
+        using PgVector = typename ShapeMatricesTypeDisplacement::template
+        		VectorType<gas_pressure_size>;
+
+        using PcVector = typename ShapeMatricesTypeDisplacement::template
+        		VectorType<cap_pressure_size>;
+
+        using TVector = typename ShapeMatricesTypeDisplacement::template
+        		VectorType<temperature_size>;
+
+        using UVector = typename ShapeMatricesTypeDisplacement::template
+        		VectorType<displacement_size>;
+
+        // gas phase mass matrices
+        PgPgMatrix Mgpg =
+        		PgPgMatrix::Zero(gas_pressure_size, gas_pressure_size);
+        PgPcMatrix Mgpc =
+        		PgPcMatrix::Zero(gas_pressure_size,cap_pressure_size);
+        PgTMatrix MgT =
+        		PgPcMatrix::Zero(gas_pressure_size,temperature_size);
+        PgUMatrix Mgus =
+        		PgUMatrix::Zero(gas_pressure_size, displacement_size);
+
+        PcPgMatrix Mlpg =
+        		PgPgMatrix::Zero(cap_pressure_size, gas_pressure_size);
+        PcPcMatrix Mlpc =
+        		PgPcMatrix::Zero(cap_pressure_size,cap_pressure_size);
+        PcTMatrix MlT =
+        		PgPcMatrix::Zero(cap_pressure_size,temperature_size);
+        PcUMatrix Mlus =
+        		PgUMatrix::Zero(cap_pressure_size, displacement_size);
+
+        TPgMatrix Mepg =
+        		TPcMatrix::Zero(temperature_size,gas_pressure_size);
+        TPcMatrix Mepc =
+        		TPcMatrix::Zero(temperature_size,cap_pressure_size);
+        TTMatrix MeT =
+        		TPcMatrix::Zero(temperature_size,temperature_size);
+
+
+        // mass matrix derivatives
+
+        PgPgMatrix dMgpc_dpg =
+        		PgPcMatrix::Zero(gas_pressure_size,gas_pressure_size);
+        PgPcMatrix dMgpg_dpg =
+        		PgPgMatrix::Zero(gas_pressure_size, cap_pressure_size);
+        PgTMatrix dMgT_dpg =
+        		PgPcMatrix::Zero(gas_pressure_size,temperature_size);
+        PgUMatrix dMgus_dpg =
+        		PgUMatrix::Zero(gas_pressure_size, displacement_size);
+
+
+        PcPgMatrix dMlpg_dpg =
+        		PgPgMatrix::Zero(cap_pressure_size, gas_pressure_size);
+        PcPcMatrix dMlpc_dpg =
+        		PgPcMatrix::Zero(cap_pressure_size,cap_pressure_size);
+        PcTMatrix dMlT_dpg =
+        		PgPcMatrix::Zero(cap_pressure_size,temperature_size);
+        PcUMatrix dMlus_dpg =
+        		PgUMatrix::Zero(cap_pressure_size, displacement_size);
+
+        TPgMatrix dMepg_dpg =
+        		PgPcMatrix::Zero(temperature_size, gas_pressure_size);
+        TPcMatrix dMepc_dpg =
+        		PgPcMatrix::Zero(temperature_size, cap_pressure_size);
+        TTMatrix dMeT_dpg =
+        		PgPcMatrix::Zero(temperature_size,temperature_size);
+
+        // Laplace matrix coefficients
+        PgPgMatrix Lgpg =
+        		PgPgMatrix::Zero(gas_pressure_size, gas_pressure_size);
+        PcPgMatrix Llpg =
+                		PcPgMatrix::Zero(cap_pressure_size, gas_pressure_size);
+        PcPcMatrix Llpc =
+                		PcPcMatrix::Zero(cap_pressure_size, cap_pressure_size);
+        TTMatrix LeT =
+        		PgPcMatrix::Zero(temperature_size,temperature_size);
+
+        // Laplace matrix derivatives
+        PgPgMatrix dLgpg_dpg =
+        		PgPgMatrix::Zero(gas_pressure_size, gas_pressure_size);
+
+        // advection matrices
+        PgTMatrix AeT =
+        		PgPcMatrix::Zero(temperature_size,temperature_size);
+
+        // stiffness matrices
+        UPgMatrix Kupg =
+        		UPgMatrix::Zero(displacement_size,gas_pressure_size);
+        UPcMatrix Kupc =
+        		UPcMatrix::Zero(displacement_size,cap_pressure_size);
+
+
+        // right hand side vectors
+        PgVector fg = PgVector::Zero(gas_pressure_size);
+        PgVector fl = PgVector::Zero(cap_pressure_size);
+        PgVector fe = PgVector::Zero(temperature_size);
+        PgVector fu = PgVector::Zero(displacement_size);
+
+        // right hand side derivatives
+        PgVector dfg_dpg = PgVector::Zero(gas_pressure_size);
+        PgVector dfg_dpc = PgVector::Zero(gas_pressure_size);
+        PgVector dfg_dT = PgVector::Zero(gas_pressure_size);
+        PgVector dfg_du = PgVector::Zero(gas_pressure_size);
+
+        PgVector dfl_dpg = PgVector::Zero(gas_pressure_size);
+        PgVector dfl_dpc = PgVector::Zero(gas_pressure_size);
+        PgVector dfl_dT = PgVector::Zero(gas_pressure_size);
+        PgVector dfl_du = PgVector::Zero(gas_pressure_size);
+
+        PgVector dfe_dpg = PgVector::Zero(gas_pressure_size);
+        PgVector dfe_dpc = PgVector::Zero(gas_pressure_size);
+        PgVector dfe_dT = PgVector::Zero(gas_pressure_size);
+        PgVector dfe_du = PgVector::Zero(gas_pressure_size);
+
+        PgVector dfu_dpg = PgVector::Zero(gas_pressure_size);
+        PgVector dfu_dpc = PgVector::Zero(gas_pressure_size);
+        PgVector dfu_dT = PgVector::Zero(gas_pressure_size);
+        PgVector dfu_du = PgVector::Zero(gas_pressure_size);
+
+
+        typename ShapeMatricesTypePressure::NodalMatrixType Laplace =
+        		ShapeMatricesTypePressure::NodalMatrixType::Zero(gas_pressure_size,
+        				gas_pressure_size);
+
+        // Jacobian blocks:
+        auto drg_dpg =
+        		J.template block<gas_pressure_size, gas_pressure_size>(
+        				gas_pressure_index, gas_pressure_index);
+
+        auto drg_dpc =
+        		J.template block<gas_pressure_size, cap_pressure_size>(
+        				gas_pressure_index, cap_pressure_index);
+
+        auto drg_de=
+        		J.template block<gas_pressure_size, temperature_size>(
+        				gas_pressure_index, temperature_index);
+
+        auto drg_dus =
+        		J.template block<gas_pressure_size, displacement_size>(
+        				gas_pressure_index, displacement_index);
+
+        auto drl_dpg =
+        		J.template block<cap_pressure_size, gas_pressure_size>(
+        				cap_pressure_index, gas_pressure_index);
+
+        auto drl_dpc =
+        		J.template block<cap_pressure_size, cap_pressure_size>(
+        				cap_pressure_index, cap_pressure_index);
+
+        auto drl_de=
+        		J.template block<cap_pressure_size, temperature_size>(
+        				cap_pressure_index, temperature_index);
+
+        auto drl_dus =
+        		J.template block<cap_pressure_size, displacement_size>(
+        				cap_pressure_index, displacement_index);
+
+        auto dre_dpg =
+        		J.template block<temperature_size, gas_pressure_size>(
+        				temperature_index, gas_pressure_index);
+
+        auto dre_dpc =
+        		J.template block<temperature_size, cap_pressure_size>(
+        				temperature_index, cap_pressure_index);
+
+        auto dre_de=
+        		J.template block<temperature_size, temperature_size>(
+        				temperature_index, temperature_index);
+
+        auto dre_dus =
+        		J.template block<temperature_size, displacement_size>(
+        				temperature_index, displacement_index);
+
+         SpatialPosition x_position;
+        x_position.setElementID(_element.getID());
+
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+        double const& dt = _process_data.dt;
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            x_position.setIntegrationPoint(ip);
+            auto& ip_data = _ip_data[ip];
+
+            auto const& w = ip_data.integration_weight;
+            auto const& N_u_op = ip_data.N_u_op;
+            auto const& N_u = ip_data.N_u;
+            auto const& dNdx_u = ip_data.dNdx_u;
+            auto const& N_p = ip_data.N_p;
+            auto const& dNdx_p = ip_data.dNdx_p;
+            // auto const& mass_operator = N_p.transpose() * N_p * w;
+            auto const x_coord =
+                interpolateXCoordinate<ShapeFunctionDisplacement,
+                                       ShapeMatricesTypeDisplacement>(_element,
+                                                                      N_u);
+            auto const B = LinearBMatrix::computeBMatrix<
+                DisplacementDim, ShapeFunctionDisplacement::NPOINTS,
+                typename BMatricesType::BMatrixType>(dNdx_u, N_u, x_coord,
+                                                     _is_axially_symmetric);
+            auto& eps = ip_data.eps;
+            auto const& sigma_eff = ip_data.sigma_eff;
+
+            //            double const S = _process_data.specific_storage(t,
+            //            x_position)[0]; double const K_over_mu =
+            //                _process_data.intrinsic_permeability(t,
+            //                x_position)[0] / _process_data.fluid_viscosity(t,
+            //                x_position)[0];
+
+            //            auto const permeability =
+            //            _process_data.intrinsic_permeability(t,
+            //            x_position)[0];
+
+            // get porous medium properties from process data
+            auto& medium = _process_data.medium;
+
+            auto const p_cap = capillary_pressure.dot(N_p);
+            auto const p_cap_dot = capillary_pressure.dot(N_p);
+
+            auto const p_GR = gas_phase_pressure.dot(N_p);
+            auto const p_GR_dot = gas_phase_pressure_dot.dot(N_p);
+
+            auto const T = temperature.dot(N_p);
+            auto const T_dot = temperature_dot.dot(N_p);
+
+            typename ShapeMatricesTypeDisplacement::GlobalDimVectorType u_ip(
+            		DisplacementDim);
+            for (int i = 0; i < u_ip.size(); ++i)
+            {
+            	NumLib::shapeFunctionInterpolate(
+            			displacement.segment(i * ShapeFunctionDisplacement::NPOINTS,
+            					ShapeFunctionDisplacement::NPOINTS),
+								N_u, u_ip.coeffRef(i));
+            }
+
+            // auto const u = N_u_op.transpose().dot(displacement);
+
+            const double p_LR = p_GR - p_cap;
+
+#define nDBG_OUTPUT
+
+#ifdef DBG_OUTPUT
+            std::cout << "= Shape functions: ===============\n";
+
+            std::cout << " N_u_op:\n " << N_u_op << "\n";
+            std::cout << "    N_u:\n " << N_u << "\n";
+            std::cout << " dNdx_u:\n " << dNdx_u << "\n";
+            std::cout << "    N_p:\n " << N_p << "\n";
+            std::cout << " dNdx_p:\n " << dNdx_p << "\n";
+
+            std::cout << "= Primary variables: =============\n";
+            std::cout << " Integration Point:\n";
+            std::cout << " p_cap: " << p_cap << "\n";
+            std::cout << " p_GR: " << p_GR << "\n";
+            std::cout << " T: " << T << "\n";
+            // std::cout << " u: " << u << "\n";
+            std::cout << "----------------------------------\n";
+            std::cout << " Nodal values:\n";
+            std::cout << " p_cap:\n " << capillary_pressure << "\n";
+            std::cout << " p_GR:\n " << gas_phase_pressure << "\n";
+            std::cout << " T:\n " << temperature << "\n";
+             std::cout << " u:\n "  << "???" << "\n";
+
+            std::cout << "= Mass Operator: ===============\n";
+            std::cout << " N_u_op:\n " <<  N_p.transpose() * N_p * w << "\n";
+            std::cout << "==================================\n";
+
+#endif
+
+            // insert all primary variables into one object
+            MPL::VariableArray variables;
+            variables[MPL::Variables::p_cap] = p_cap;
+            variables[MPL::Variables::p_GR] = p_GR;
+            variables[MPL::Variables::p_LR] = p_LR;
+            variables[MPL::Variables::T] = T;
+            // todo: displacement
+
+            // get fluid phase properties
+            auto const& solid_phase = medium.phase(0);
+            auto const& liquid_phase = medium.phase(1);
+            auto const& gas_phase = medium.phase(2);
+
+            // intrinsic permeability
+            double const permeability =
+                MPL::getScalar(medium.property(MPL::permeability));
+#ifdef DBG_OUTPUT
+            std::cout << "   permeability: " << permeability << " \n";
+#endif
+            GlobalDimMatrixType permeability_tensor =
+                GlobalDimMatrixType::Zero(DisplacementDim, DisplacementDim);
+            permeability_tensor.diagonal().setConstant(permeability);
+
+#ifdef DBG_OUTPUT
+            std::cout << "   permeability_tensor: " << permeability_tensor
+                      << " \n";
+            std::cout << "==================================\n";
+#endif
+            auto const alpha_B = MPL::getScalar(
+                    medium.property(MPL::PropertyEnum::biot_coefficient),
+                    variables);
+
+            auto const rho_SR =
+                    MPL::getScalar(solid_phase.property(MPL::PropertyEnum::density),
+                            variables);
+
             auto const rho_LR = MPL::getScalar(
                     liquid_phase.property(MPL::PropertyEnum::density),
                     variables);
@@ -774,30 +1750,33 @@ public:
             std::cout << "=================================\n";
 #endif
 
-            Kgpg.noalias() += rho_GR * k_over_mu_GR * Laplace;
+            Lgpg.noalias() += rho_GR * k_over_mu_GR * Laplace;
+
+            dLgpg_dpg.noalias() += 0.0 * Laplace;
+
 
 #ifdef DBG_OUTPUT
             std::cout << "   Kgpg:\n " << Kgpg << " \n";
             std::cout << "==================================\n";
 #endif
-            Klpg.noalias() += rho_LR * k_over_mu_LR * Laplace;
+   //         Klpg.noalias() += rho_LR * k_over_mu_LR * Laplace;
 #ifdef DBG_OUTPUT
             std::cout << "   Klpg:\n " << Klpg << " \n";
             std::cout << "==================================\n";
 #endif
 
-            Klpc.noalias() -= rho_LR * k_over_mu_LR * Laplace;
+     //       Klpc.noalias() -= rho_LR * k_over_mu_LR * Laplace;
 #ifdef DBG_OUTPUT
             std::cout << "   Klpc:\n " << Klpc << " \n";
             std::cout << "==================================\n";
 #endif
 
-            Aepg.noalias() = - N_p.transpose() *
-                             (phi_G*beta_T_GR*w_GS.transpose() +
-                              phi_L*beta_T_LR*w_LS.transpose()) * T *
-                             dNdx_p * w;
+//            Aepg.noalias() = - N_p.transpose() *
+//                             (phi_G*beta_T_GR*w_GS.transpose() +
+//                              phi_L*beta_T_LR*w_LS.transpose()) * T *
+//                             dNdx_p * w;
 
-            Kepg.noalias() += Aepg;
+//            Kepg.noalias() += Aepg;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Aepg:\n " << Aepg << " \n";
@@ -806,11 +1785,11 @@ public:
             // Aepc(0, 0) = 3.4;
 #endif
 
-            Aepc.noalias() =
-            		N_p.transpose() * (phi_L*beta_T_LR*T*w_LS.transpose())
-					* dNdx_p * w;
-
-            Kepc.noalias() += Aepc;
+//            Aepc.noalias() =
+//            		N_p.transpose() * (phi_L*beta_T_LR*T*w_LS.transpose())
+//					* dNdx_p * w;
+//
+//            Kepc.noalias() += Aepc;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Aepc:\n " << Aepc << " \n";
@@ -848,7 +1827,7 @@ public:
             LeT.noalias() =
                 dNdx_p.transpose() * conductivity_effective * dNdx_p * w;
 
-            KeT.noalias() += AeT + LeT;
+//          KeT.noalias() += AeT + LeT;
 
 #ifdef DBG_OUTPUT
             std::cout << "   LeT:\n " << LeT << " \n";
@@ -869,8 +1848,8 @@ public:
             std::cout << "==================================\n";
 #endif
 
-            Kuu.noalias() +=
-                B.transpose() * C * B * w;
+//            Kuu.noalias() +=
+//                B.transpose() * C * B * w;
 #ifdef DBG_OUTPUT
             std::cout << "   Kuu:\n " << Kupc << " \n";
             std::cout << "==================================\n";
@@ -879,21 +1858,55 @@ public:
             auto const gravity_operator =
                 (dNdx_p.transpose() * permeability_tensor * b * w).eval();
 
-            Bg.noalias() += rho_GR * rho_GR * k_over_mu_GR * gravity_operator;
+            fg.noalias() += rho_GR * rho_GR * k_over_mu_GR * gravity_operator;
+            dfg_dpg += 1.2345 * gravity_operator;
+
+            std::cout << "p_GR_dot : \n\n";
+
+            std::cout << p_GR_dot << "\n\n";
+            std::cout << " p_cap_dot: \n\n";
+            std::cout << p_cap_dot << "\n\n";
+std::cout << " T_dot: \n\n";
+            std::cout <<  T_dot<< "\n\n";
+            std::cout << "u_ip  : \n\n";
+            std::cout <<  u_ip << "\n\n";
+            std::cout << " p_GR: \n\n";
+            std::cout <<  p_GR<< "\n\n";
+
+            std::cout << " N_p: \n\n";
+            std::cout <<  N_p<< "\n\n";
+
+            std::cout << " N_u: \n\n";
+            std::cout <<  N_u<< "\n\n";
+
+            std::cout << " N_u_op: \n\n";
+            std::cout <<  N_u_op<< "\n\n";
+
+            std::cout << " B_u: \n\n";
+            std::cout <<  B<< "\n\n";
+
+            std::cout << " identity2: \n\n";
+            std::cout <<  identity2<< "\n\n";
+
+
+                    std::cout << "identity2.transpose() * B : \n\n";
+                    std::cout <<  identity2.transpose() * B << "\n\n";
+
+
 
 #ifdef DBG_OUTPUT
             std::cout << "   Bg:\n " << Bg << " \n";
             std::cout << "==================================\n";
 #endif
 
-            Bl.noalias() += rho_LR * rho_LR * k_over_mu_LR * gravity_operator;
+//            Bl.noalias() += rho_LR * rho_LR * k_over_mu_LR * gravity_operator;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Bl:\n " << Bl << " \n";
             std::cout << "==================================\n";
 #endif
 
-            Bu.noalias() += N_u_op.transpose() * rho * b * w;
+//            Bu.noalias() += N_u_op.transpose() * rho * b * w;
 
 #ifdef DBG_OUTPUT
             std::cout << "   Bu:\n " << Bu << " \n";
@@ -916,32 +1929,55 @@ public:
                OGS_FATAL ("##########################################");
 #endif
 
-//        for (unsigned row = 0; row < Mgpc.cols(); row++)
-//        {
-//            for (unsigned column = 0; column < Mgpc.cols(); column++)
-//            {
-//                if (row != column)
-//                {
-//                    Mgpc(row, row) += Mgpc(row, column);
-//                    Mgpc(row, column) = 0.0;
-//                    Mgpg(row, row) += Mgpg(row, column);
-//                    Mgpg(row, column) = 0.0;
-//                    Mlpc(row, row) += Mlpc(row, column);
-//                    Mlpc(row, column) = 0.0;
-//                }
-//            }
-  //      }
-    }
 
-    void assembleWithJacobian(double const t,
-                              std::vector<double> const& local_x,
-                              std::vector<double> const& local_xdot,
-                              const double /*dxdot_dx*/, const double /*dx_dx*/,
-                              std::vector<double>& /*local_M_data*/,
-                              std::vector<double>& /*local_K_data*/,
-                              std::vector<double>& local_rhs_data,
-                              std::vector<double>& local_Jac_data) override
-    {
+               drg_dpg = dMgpg_dpg*p_GR_dot + Mgpg/dt + dMgpc_dpg*p_cap_dot
+                                     		+dMgT_dpg*T_dot + dMgus_dpg*u_ip*N_p
+              							+ dLgpg_dpg*p_GR - dfg_dpg*N_p;
+
+               std::cout << " u_dot: \n\n";
+               std::cout << displacement_dot << "\n\n";
+
+               std::cout << " p_dot: \n\n";
+               std::cout << gas_phase_pressure_dot << "\n\n";
+               std::cout << " dMgpg_dpg: \n\n";
+               std::cout << dMgpg_dpg << "\n\n";
+
+               std::cout << "  Mgpg: \n\n";
+               std::cout <<  Mgpg << "\n\n";
+
+               std::cout << " dMgpc_dpg: \n\n";
+               std::cout << dMgpc_dpg << "\n\n";
+
+
+               std::cout << " dMgT_dpg: \n\n";
+               std::cout << dMgT_dpg << "\n\n";
+
+
+
+               std::cout << "dMgus_dpg : \n\n";
+               std::cout << dMgus_dpg << "\n\n";
+
+
+
+               std::cout << " dLgpg_dpg: \n\n";
+               std::cout <<  dLgpg_dpg << "\n\n";
+
+
+
+               std::cout << " dfg_dpg: \n\n";
+               std::cout << dfg_dpg << "\n\n";
+
+               std::cout << " Jacobian (numerical): \n\n";
+               std::cout << J << "\n\n";
+               std::cout << " ====================\n\n";
+               std::cout << " residuum: \n\n";
+               std::cout << r << "\n\n";
+               std::cout << " ====================\n\n";
+
+
+               OGS_FATAL("stop.");
+
+
     }
 
     void preTimestepConcrete(std::vector<double> const& /*local_x*/,

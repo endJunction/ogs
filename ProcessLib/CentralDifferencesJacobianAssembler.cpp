@@ -137,10 +137,10 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         local_Jac.noalias() += local_K * dx_dx;
     }
 
-//
-//      std::cout << " Jacobian (CD): \n\n";
-//      std::cout << local_Jac << "\n\n";
-//      OGS_FATAL("Oh stop it, you!");
+
+      std::cout << " Jacobian (CD): \n\n";
+      std::cout << local_Jac << "\n\n";
+      OGS_FATAL("Oh stop it, you!");
 
 
 #define DOF_PGAS

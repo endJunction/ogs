@@ -1,0 +1,3317 @@
+info: This is OpenGeoSys-6 version 6.1.0-1099-gb7a44ea.
+info: OGS started on 2018-09-17 19:09:57+0200.
+debug: Project configuration from file 'lia_cd.prj' read.
+warning: Consider switching from mesh and geometry input to multiple meshes input. See https://www.opengeosys.org/docs/tools/model-preparation/constructmeshesfromgeometry/ tool for conversion.
+debug: Reading mesh file 'column_1e2_quad8.vtu'.
+debug: Reading geometry file 'column.gml'.
+debug: Project configuration from file 'column.gml' read.
+debug: The search length for mesh "column_1e2_quad8" is 1.000000e-09.
+debug: Creating mesh from geometry column_geometry left.
+debug: Found 30 elements in the mesh
+warning: Found a nonlinear node whose ID (27) is smaller than the number of base node IDs (60). Some functions may not work properly.
+debug: Creating mesh from geometry column_geometry right.
+debug: Found 30 elements in the mesh
+warning: Found a nonlinear node whose ID (31) is smaller than the number of base node IDs (60). Some functions may not work properly.
+debug: Creating mesh from geometry column_geometry bottom.
+debug: Found 1 elements in the mesh
+debug: Creating mesh from geometry column_geometry top.
+debug: Found 1 elements in the mesh
+debug: Reading curves configuration.
+debug: Reading parameters:
+info: ConstantParameter: E
+debug: Using value 1e+10 for constant parameter.
+info: ConstantParameter: nu
+debug: Using value 0.3 for constant parameter.
+info: ConstantParameter: rho_sr
+debug: Using value 2000 for constant parameter.
+info: ConstantParameter: displacement_0
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: displacement_ini
+debug: Using following values for the constant parameter:
+debug: 	0
+debug: 	0
+info: ConstantParameter: T_0
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: p_Cap_ini
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: p_Cap_boundary
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: atmospheric
+debug: Using following values for the constant parameter:
+debug: 	1000
+info: ConstantParameter: Dirichlet_left
+debug: Using value 0 for constant parameter.
+info: ConstantParameter: Dirichlet_bottom
+debug: Using value 0 for constant parameter.
+info: ConstantParameter: Dirichlet_front
+debug: Using value 0 for constant parameter.
+info: ConstantParameter: Dirichlet_top
+debug: Using value 1 for constant parameter.
+info: ConstantParameter: Neumann_force_top
+debug: Using value 0.02 for constant parameter.
+info: ConstantParameter: displacementTop
+debug: Using value -0.05 for constant parameter.
+info: CurveScaledParameter: displacementRamp
+debug: Using curve timeRamp
+debug: Using parameter displacementTop
+debug: Found parameter `displacementTop'.
+debug: Parse process variables:
+debug: Found parameter `displacement_ini'.
+debug: Constructing process variable displacement
+debug: Found mesh 'column_geometry_left' with id 1.
+debug: Found mesh 'column_geometry_bottom' with id 3.
+info: No source terms found.
+debug: Found parameter `T_0'.
+debug: Constructing process variable temperature
+debug: Found mesh 'column_geometry_bottom' with id 3.
+debug: Found mesh 'column_geometry_top' with id 4.
+info: No source terms found.
+debug: Found parameter `atmospheric'.
+debug: Constructing process variable gas_pressure
+debug: Found mesh 'column_geometry_bottom' with id 3.
+debug: Found mesh 'column_geometry_top' with id 4.
+info: No source terms found.
+debug: Found parameter `p_Cap_ini'.
+debug: Constructing process variable capillary_pressure
+debug: Found mesh 'column_geometry_bottom' with id 3.
+info: No source terms found.
+debug: Reading materials:
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+---create a constant scalar value property.
+debug: Reading processes:
+debug: Create TH2MProcess.
+debug: Found process variable 'gas_pressure' for config tag <gas_pressure>.
+debug: Found process variable 'capillary_pressure' for config tag <capillary_pressure>.
+debug: Found process variable 'temperature' for config tag <temperature>.
+debug: Found process variable 'displacement' for config tag <displacement>.
+debug: Associate gas pressure with process variable 'gas_pressure'.
+debug: Associate capillary pressure with process variable 'capillary_pressure'.
+debug: Associate temperature with process variable 'temperature'.
+debug: Associate displacement with process variable 'displacement'.
+debug: Create LinearElasticIsotropic material
+debug: Found parameter `E'.
+debug: Use 'E' as youngs_modulus parameter.
+debug: Found parameter `nu'.
+debug: Use 'nu' as poissons_ratio parameter.
+debug: Reading linear solver configuration.
+debug: Reading linear solver configuration.
+debug: Reading time loop configuration.
+debug: Parse output configuration:
+debug: adding output variable `displacement'
+debug: adding output variable `temperature'
+debug: adding output variable `capillary_pressure'
+debug: adding output variable `gas_pressure'
+debug: adding output variable `sigma_eff'
+debug: adding output variable `epsilon'
+debug: adding output variable `velocity_gas'
+debug: adding output variable `velocity_liquid'
+debug: adding output variable `pressure_gas_linear'
+debug: adding output variable `pressure_cap_linear'
+debug: adding output variable `pressure_wet'
+debug: adding output variable `density_gas'
+debug: adding output variable `density_liquid'
+debug: adding output variable `saturation'
+info: Initialize processes.
+debug: Initialize process.
+debug: Construct dof mappings.
+debug: TH2M dof table construction..
+debug: Compute sparsity pattern
+debug: Initialize the extrapolator
+debug: Create local assemblers.
+debug: Create local assemblers.
+debug: Shapefunction order: 2
+debug: Calling local assembler builder for all mesh elements.
+debug: Initialize boundary conditions.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter atmospheric
+debug: Found parameter `atmospheric'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 0 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter atmospheric
+debug: Found parameter `atmospheric'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 0 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter p_Cap_boundary
+debug: Found parameter `p_Cap_boundary'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 1 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter T_0
+debug: Found parameter `T_0'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 2 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter T_0
+debug: Found parameter `T_0'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 2 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter displacement_0
+debug: Found parameter `displacement_0'.
+debug: Found 61 nodes for Dirichlet BCs for the variable 3 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter displacement_0
+debug: Found parameter `displacement_0'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 3 and component 1
+debug: Construct reduced local to global index map.
+info: Solve processes.
+debug: Set the initial condition of variable gas_pressure of process 0.
+debug: Set the initial condition of variable capillary_pressure of process 0.
+debug: Set the initial condition of variable temperature of process 0.
+debug: Set the initial condition of variable displacement of process 0.
+debug: PreTimestep TH2MProcess.
+debug: Process output data.
+debug:   process variable gas_pressure
+debug:   process variable capillary_pressure
+debug:   process variable temperature
+debug:   process variable displacement
+debug:   secondary variable density_gas
+debug: Computing new singular value decomposition
+debug:   secondary variable density_liquid
+debug:   secondary variable epsilon
+debug:   secondary variable pressure_cap_linear
+debug:   secondary variable pressure_gas_linear
+debug:   secondary variable pressure_wet
+debug:   secondary variable saturation
+debug:   secondary variable sigma_eff
+debug:   secondary variable velocity_gas
+debug:   secondary variable velocity_liquid
+debug: output to result_confined_pcs_0_ts_0_t_0.000000.vtu
+info: [time] Output of timestep 0 took 0.00889897 s.
+debug: Writing output to 'result_confined_pcs_0_ts_0_t_0.000000.vtu'.
+info: === Time stepping at step #1 and time 1 with step size 1
+debug: PreTimestep TH2MProcess.
+debug: Assemble the Jacobian of TH2M for the monolithic scheme.
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+   Mgpg:
+
+ 0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0 
+ Jacobian (CD): 
+
+ 6.17284e-12  2.16049e-12 -3.08642e-12 -5.24691e-12            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+ 2.16049e-12  6.17284e-12 -5.24691e-12 -3.08642e-12            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+-3.08642e-12 -5.24691e-12  6.17284e-12  2.16049e-12            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+-5.24691e-12 -3.08642e-12  2.16049e-12  6.17284e-12            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+ 1.11115e-06   3.8891e-07 -5.55545e-07 -9.44423e-07 -1.11115e-06  -3.8891e-07  5.55545e-07  9.44423e-07            0            0            0            0     -6.48148    -0.925926     -1.85185     -1.85185      7.40741      5.55556       3.7037     -5.55556     -19.4444     -5.55556     -5.55556     -2.77778     -16.6667      11.1111      16.6667      22.2222
+  3.8891e-07  1.11115e-06 -9.44423e-07 -5.55545e-07  -3.8891e-07 -1.11115e-06  9.44423e-07  5.55545e-07            0            0            0            0     0.925926      6.48148      1.85185      1.85185     -7.40741      5.55556      -3.7037     -5.55556     -5.55556     -19.4444     -2.77778     -5.55556     -16.6667      22.2222      16.6667      11.1111
+-5.55545e-07 -9.44423e-07  1.11115e-06   3.8891e-07  5.55545e-07  9.44423e-07 -1.11115e-06  -3.8891e-07            0            0            0            0      1.85185      1.85185      6.48148     0.925926      -3.7037      5.55556     -7.40741     -5.55556      5.55556      2.77778      19.4444      5.55556     -16.6667     -22.2222      16.6667     -11.1111
+-9.44423e-07 -5.55545e-07   3.8891e-07  1.11115e-06  9.44423e-07  5.55545e-07  -3.8891e-07 -1.11115e-06            0            0            0            0     -1.85185     -1.85185    -0.925926     -6.48148       3.7037      5.55556      7.40741     -5.55556      2.77778      5.55556      5.55556      19.4444     -16.6667     -11.1111      16.6667     -22.2222
+           0            0            0            0            0            0            0            0      2222.89      778.111     -1110.94     -1888.56            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+           0            0            0            0            0            0            0            0      778.111      2222.89     -1888.56     -1110.94            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+           0            0            0            0            0            0            0            0     -1110.94     -1888.56      2222.89      778.111            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+           0            0            0            0            0            0            0            0     -1888.56     -1110.94      778.111      2222.89            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0            0
+  0.00648148 -0.000925926  -0.00185185   0.00185185  -0.00648148  0.000925926   0.00185185  -0.00185185            0            0            0            0  9.25926e+09   3.5755e+09  4.09544e+09  4.43732e+09 -3.21937e+09 -5.42735e+09 -2.76353e+09 -9.95726e+09   4.5406e+09 -1.60256e+08  1.86966e+09  1.60256e+08 -1.49573e+09 -1.06838e+09 -1.06838e+09 -2.77778e+09
+ 0.000925926  -0.00648148  -0.00185185   0.00185185 -0.000925926   0.00648148   0.00185185  -0.00185185            0            0            0            0   3.5755e+09  9.25926e+09  4.43732e+09  4.09544e+09 -3.21937e+09 -9.95726e+09 -2.76353e+09 -5.42735e+09  1.60256e+08  -4.5406e+09 -1.60256e+08 -1.86966e+09  1.49573e+09  2.77778e+09  1.06838e+09  1.06838e+09
+  0.00185185  -0.00185185  -0.00648148  0.000925926  -0.00185185   0.00185185   0.00648148 -0.000925926            0            0            0            0  4.09544e+09  4.43732e+09  9.25926e+09   3.5755e+09 -2.76353e+09 -9.95726e+09 -3.21937e+09 -5.42735e+09  1.86966e+09  1.60256e+08   4.5406e+09 -1.60256e+08 -1.06838e+09 -2.77778e+09 -1.49573e+09 -1.06838e+09
+  0.00185185  -0.00185185 -0.000925926   0.00648148  -0.00185185   0.00185185  0.000925926  -0.00648148            0            0            0            0  4.43732e+09  4.09544e+09   3.5755e+09  9.25926e+09 -2.76353e+09 -5.42735e+09 -3.21937e+09 -9.95726e+09 -1.60256e+08 -1.86966e+09  1.60256e+08  -4.5406e+09  1.06838e+09  1.06838e+09  1.49573e+09  2.77778e+09
+ -0.00740741   0.00740741    0.0037037   -0.0037037   0.00740741  -0.00740741   -0.0037037    0.0037037            0            0            0            0 -3.21937e+09 -3.21937e+09 -2.76353e+09 -2.76353e+09  1.41311e+10   1.3113e-06 -2.16524e+09  -3.8743e-07 -2.77778e+09  2.77778e+09 -1.06838e+09  1.06838e+09  -1.3262e-06  -4.2735e+09 -2.68221e-07   4.2735e+09
+ -0.00555556  -0.00555556  -0.00555556  -0.00555556   0.00555556   0.00555556   0.00555556   0.00555556            0            0            0            0 -5.42735e+09 -9.95726e+09 -9.95726e+09 -5.42735e+09  1.43051e-06   2.2906e+10 -1.66893e-06  7.86325e+09 -1.06838e+09  1.49573e+09 -1.49573e+09  1.06838e+09  -4.2735e+09 -9.53674e-07   4.2735e+09 -1.19209e-07
+  -0.0037037    0.0037037   0.00740741  -0.00740741    0.0037037   -0.0037037  -0.00740741   0.00740741            0            0            0            0 -2.76353e+09 -2.76353e+09 -3.21937e+09 -3.21937e+09 -2.16524e+09 -1.43051e-06  1.41311e+10 -7.45058e-07 -1.06838e+09  1.06838e+09 -2.77778e+09  2.77778e+09 -4.76837e-07   4.2735e+09 -8.34465e-07  -4.2735e+09
+  0.00555556   0.00555556   0.00555556   0.00555556  -0.00555556  -0.00555556  -0.00555556  -0.00555556            0            0            0            0 -9.95726e+09 -5.42735e+09 -5.42735e+09 -9.95726e+09 -5.06639e-07  7.86325e+09 -4.47035e-07   2.2906e+10 -1.49573e+09  1.06838e+09 -1.06838e+09  1.49573e+09   4.2735e+09 -1.78814e-07  -4.2735e+09 -6.25849e-07
+   0.0194444   0.00555556  -0.00555556  -0.00277778   -0.0194444  -0.00555556   0.00555556   0.00277778            0            0            0            0   4.5406e+09  1.60256e+08  1.86966e+09 -1.60256e+08 -2.77778e+09 -1.06838e+09 -1.06838e+09 -1.49573e+09  2.40741e+10  8.02707e+09  1.06481e+10  1.28063e+10  1.55271e+09 -1.80342e+10 -3.26211e+09  -3.5812e+10
+  0.00555556    0.0194444  -0.00277778  -0.00555556  -0.00555556   -0.0194444   0.00277778   0.00555556            0            0            0            0 -1.60256e+08  -4.5406e+09  1.60256e+08 -1.86966e+09  2.77778e+09  1.49573e+09  1.06838e+09  1.06838e+09  8.02707e+09  2.40741e+10  1.28063e+10  1.06481e+10  1.55271e+09  -3.5812e+10 -3.26211e+09 -1.80342e+10
+  0.00555556   0.00277778   -0.0194444  -0.00555556  -0.00555556  -0.00277778    0.0194444   0.00555556            0            0            0            0  1.86966e+09 -1.60256e+08   4.5406e+09  1.60256e+08 -1.06838e+09 -1.49573e+09 -2.77778e+09 -1.06838e+09  1.06481e+10  1.28063e+10  2.40741e+10  8.02707e+09 -3.26211e+09  -3.5812e+10  1.55271e+09 -1.80342e+10
+  0.00277778   0.00555556  -0.00555556   -0.0194444  -0.00277778  -0.00555556   0.00555556    0.0194444            0            0            0            0  1.60256e+08 -1.86966e+09 -1.60256e+08  -4.5406e+09  1.06838e+09  1.06838e+09  2.77778e+09  1.49573e+09  1.28063e+10  1.06481e+10  8.02707e+09  2.40741e+10 -3.26211e+09 -1.80342e+10  1.55271e+09  -3.5812e+10
+   0.0166667    0.0166667    0.0166667    0.0166667   -0.0166667   -0.0166667   -0.0166667   -0.0166667            0            0            0            0 -1.49573e+09  1.49573e+09 -1.06838e+09  1.06838e+09 -1.19209e-06  -4.2735e+09 -4.17233e-07   4.2735e+09  1.55271e+09  1.55271e+09 -3.26211e+09 -3.26211e+09  2.38177e+10  4.29153e-06 -2.03989e+10  1.19209e-07
+  -0.0111111   -0.0222222    0.0222222    0.0111111    0.0111111    0.0222222   -0.0222222   -0.0111111            0            0            0            0 -1.06838e+09  2.77778e+09 -2.77778e+09  1.06838e+09  -4.2735e+09 -7.15256e-07   4.2735e+09 -1.19209e-07 -1.80342e+10  -3.5812e+10  -3.5812e+10 -1.80342e+10  4.29153e-06  7.24786e+10 -4.29153e-06  3.52137e+10
+  -0.0166667   -0.0166667   -0.0166667   -0.0166667    0.0166667    0.0166667    0.0166667    0.0166667            0            0            0            0 -1.06838e+09  1.06838e+09 -1.49573e+09  1.49573e+09 -4.47035e-07   4.2735e+09 -9.53674e-07  -4.2735e+09 -3.26211e+09 -3.26211e+09  1.55271e+09  1.55271e+09 -2.03989e+10 -4.29153e-06  2.38177e+10 -5.96046e-07
+  -0.0222222   -0.0111111    0.0111111    0.0222222    0.0222222    0.0111111   -0.0111111   -0.0222222            0            0            0            0 -2.77778e+09  1.06838e+09 -1.06838e+09  2.77778e+09   4.2735e+09 -1.78814e-07  -4.2735e+09 -6.25849e-07  -3.5812e+10 -1.80342e+10 -1.80342e+10  -3.5812e+10  2.38419e-07  3.52137e+10 -1.66893e-06  7.24786e+10
+
