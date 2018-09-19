@@ -160,7 +160,7 @@ namespace ProcessLib
 				vars[static_cast<int>(MaterialLib::Fluid::PropertyVariableType::T)] = 298.15;
 				vars[static_cast<int>(MaterialLib::Fluid::PropertyVariableType::p)] = 101325.0;
 
-				BHE::BHE_CXC * m_bhe_CXC = m_bhe_CXC = new BHE::BHE_CXC(
+				BHE::BHE_CXC * m_bhe_CXC = new BHE::BHE_CXC(
 					bhe_ply_name,
 					bhe_bound_type,
 					curves,
