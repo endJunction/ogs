@@ -56,9 +56,6 @@
 #ifdef OGS_BUILD_PROCESS_HEATTRANSPORTBHE
 #include "ProcessLib/HeatTransportBHE/CreateHeatTransportBHEProcess.h"
 #endif
-#ifdef OGS_BUILD_PROCESS_PIPENETWORK
-#include "ProcessLib/PipeNetwork/CreatePipeNetworkProcess.h"
-#endif
 #ifdef OGS_BUILD_PROCESS_HYDROMECHANICS
 #include "ProcessLib/HydroMechanics/CreateHydroMechanicsProcess.h"
 #endif
@@ -381,16 +378,6 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
             if (type == "HEAT_TRANSPORT_BHE")
         {
             process = ProcessLib::HeatTransportBHE::createHeatTransportBHEProcess(
-                *_mesh_vec[0], std::move(jacobian_assembler),
-                _process_variables, _parameters, integration_order,
-                process_config, _curves);
-        }
-        else
-#endif
-#ifdef OGS_BUILD_PROCESS_PIPENETWORK
-        if (type == "PIPE_NETWORK")
-        {
-            process = ProcessLib::PipeNetwork::createPipeNetworkProcess(
                 *_mesh_vec[0], std::move(jacobian_assembler),
                 _process_variables, _parameters, integration_order,
                 process_config, _curves);

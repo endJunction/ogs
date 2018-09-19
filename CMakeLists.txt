@@ -91,7 +91,6 @@ set(ProcessesList
     HT
     HeatConduction
     HeatTransportBHE
-    PipeNetwork
     HydroMechanics
     LiquidFlow
     LIE
