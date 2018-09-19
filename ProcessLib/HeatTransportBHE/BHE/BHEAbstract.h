@@ -138,6 +138,7 @@ namespace ProcessLib
                     */
 
                     double lambda_p;
+
                     /**
                     * thermal conductivity of the inner pipe wall
                     * unit is kg m sec^-3 K^-1

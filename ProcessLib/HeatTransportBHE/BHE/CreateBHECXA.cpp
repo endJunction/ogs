@@ -167,6 +167,7 @@ namespace ProcessLib
 					{ bhe_length, bhe_diameter } /* Borehole Geometry */,
 					{ bhe_pipe_inner_radius, bhe_pipe_outer_radius,
 					  bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness,
+                      bhe_inner_pipe_wall_thermal_conductivity,  /* For CXA type BHE, used inner pipe lambda for wall lambda */
 					  bhe_inner_pipe_wall_thermal_conductivity,
 					  bhe_outer_pipe_wall_thermal_conductivity } /* Pipe Parameters */,
 					{ bhe_refrigerant_viscosity->getValue(vars), bhe_refrigerant_density->getValue(vars),
