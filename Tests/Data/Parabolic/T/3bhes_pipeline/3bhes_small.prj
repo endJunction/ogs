@@ -2,7 +2,7 @@
 <OpenGeoSysProject>
     <mesh>3bhes_small.vtu</mesh>
     <geometry>3bhes_small.gml</geometry>
-
+    <python_script>bcs_laplace_eq.py</python_script>
     <processes>
         <process>
             <name>HeatTransportBHE</name>
