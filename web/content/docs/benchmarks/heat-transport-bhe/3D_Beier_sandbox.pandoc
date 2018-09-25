@@ -1,0 +1,68 @@
++++
+author = "Chaofan Chen, Philipp Hein, Haibing Shao"
+date = "2018-09-25T13:44:00+01:00"
+title = "Benchmark of 3D Beier sandbox"
+weight = 123
+project = "Parabolic/T/3D_Beier_sandbox/beier_sandbox.prj"
+
+[menu]
+  [menu.benchmarks]
+    parent = "heat-transport-bhe"
+
++++
+
+{{< data-link >}}
+
+## Problem description
+
+In this benchmark, the Borehole Heat Exchanger (BHE) feature in the OpenGeoSys (OGS-6) software is validated against experimental results obtained by Beier et al. (2011). In their experiment, a Thermal Response Test (TRT) was conducted under controlled conditions on a single U-tube borehole heat exchanger placed inside a sandbox. Inflow and outflow temperatures of the BHE were monitored together with temperatures at the borehole wall and at different locations in the sandbox.
+
+## Model Setup
+
+The model was built according to the experimental configurations. In OGS-6, the BHE is represented by line elements which are embedded in a 3D prism mesh standing for the sandbox (cf. Figure 1). Thus, there are two material groups in the model distinguishing the soil part and the BHE part. The length of the whole box is 18.5 m with a square cross section of 5 m per side to avoid the impact of boundary conditions on the soil temperature. Detailed parameters for the model configuration are listed in the follwoing table. 
+
+| Parameter                          | Symbol             |  Value              | Unit                        |
+| ---------------------------------- |:------------------ | -------------------:| --------------------------: |
+| Soil thermal conductivity          | $\lambda_{s}$      | 2.78                | $\mathrm{W m^{-1} K^{-1}}$  |
+| Soil heat capacity                 | $(\rho c)_{soil}$  | $3.2\times10^{6}$   | $\mathrm{Jm^{-3}K^{-1}}$    |
+| Length of the BHE                  | $L$                | 18                  | $\mathrm{m}$                |
+| Diameter of the BHE                | $D$                | 13                  | $\mathrm{cm}$               |
+| Diameter of the pipeline           | $d$                | 2.733               | $\mathrm{cm}$               |
+| Wall thickness of the pipeline     | $b$                | 0.3035              | $\mathrm{cm}$               |
+| Distance between pipelines         | $w$                | 5.3                 | $\mathrm{cm}$               |
+| Pipeline wall thermal conductivity | $\lambda_{p}$      | 0.39                | $\mathrm{W m^{-1} K^{-1}}$  |
+| Grout thermal conductivity         | $\lambda_{g}$      | 0.806               | $\mathrm{W m^{-1} K^{-1}}$  |
+| Grout heat capacity                | $(\rho c)_{grout}$ | $3.8\times10^{6}$   | $\mathrm{Jm^{-3}K^{-1}}$    |
+
+
+{{< img src="../3D_Beier_sandbox_figures/numerical_geometry_of_BHE.png" width="200">}}
+
+Figure 1: Sandbox model
+
+In Beier's experiment, there was an aluminum pipe acting as the borehole wall. It cannot be represented by the BHE model itself, therefore the borehole diameter was taken as the aluminum pipe's outer diameter of 0.13 in the numerical model. The grout's thermal conductivity was increased from original 0.73 $\mathrm{W m^{-1} K^{-1}}$ to 0.806 $\mathrm{W m^{-1} K^{-1}}$, in order to include the aluminum pipe's thermal conductivity and its geometry. The BHE is filled with water and thermal properties and viscosity of water are taken, at an average temperature of approx. 309.15 K.
+
+## OGS-6 Input Files
+
+The detailed input file can be seen from the .prj file. The inflow temperature of the BHE, which was imposed as boundary condition of the BHE can be shown in Figure 2. Initial conditions of inflow and outflow temperature for the BHE were directly obtained from the measurements at t=0. For the initial soil temperature, the average value of all sensors placed in the sand and the borehole wall was set in the numerical model. 
+
+{{< img src="../3D_Beier_sandbox_figures/Inflow_temp.png" width="200">}}
+
+Figure 2: Inflow temperature curve as the BHE boundary condition
+
+## Results
+
+The numerical outflow temperature of OGS-5 (Shao et al. (2016)) and OGS-6 was compared with the experimental results, which is presented in the Figure 3. And the soil temperature at different locations among experimental and numerical results were compared and shown in the Figure 4. It can be found that a good match has been achieved between experimental and numerical results. The largest relative error is 0.17\% on the wall temperature. The initial temperature of borehole wall in numerical model was set an average value as mentioned in the above, which has initial error of 0.07 K compared to the experimental data. Besides, considering the error of measuring temperatures, flow rate and thermal conductivity values are in the same range, it can be concluded that the numerical model is fully validated. 
+
+{{< img src="../3D_Beier_sandbox_figures/comparison_with_experiment_data_and_OGS5.png" width="200">}}
+
+Figure 3: Comparison with experiment and OGS-5 results regarding outflow temperature of the BHE
+
+{{< img src="../3D_Beier_sandbox_figures/soil_temp_comparison.png" width="200">}}
+
+Figure 4: Comparison of modelled and measured wall and soil temperatures
+
+## References
+
+[1] Richard A Beier, Marvin D Smith, and Jeffrey D Spitler. Reference data setsfor vertical borehole ground heat exchanger models and thermal responsetest analysis. Geothermics, 40(1):79–85, 2011
+
+[2] Haibing Shao, Philipp Hein, Agnes Sachse, and Olaf Kolditz. GeoenergyModeling II: Shallow Geothermal Systems. Springer, 2016
