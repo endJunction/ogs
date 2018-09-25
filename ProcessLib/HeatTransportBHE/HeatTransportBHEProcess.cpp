@@ -252,7 +252,9 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
         // get the BHE type
         auto bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->get_type();
         // find the variable ID
-        const int variable_id = 1; // TODO
+        // the soil temperature is 0-th variable
+        // the BHE temperature is therefore bhe_i + 1
+        const int variable_id = bhe_i + 1; 
         // find the node in mesh that are at the top
         auto const n_bhe_nodes = _vec_BHE_nodes[bhe_i].size();
         unsigned int idx_top = 0;
