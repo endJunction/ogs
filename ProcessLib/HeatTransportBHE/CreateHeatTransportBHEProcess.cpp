@@ -240,7 +240,13 @@ namespace ProcessLib
                 else if (bhe_type_str == "BHE_TYPE_2U")
                 {
                     // initialize the 2U type BHE
-                    BHE::BHE_2U * m_bhe_2u = BHE::CreateBHE2U(config, bhe_conf, curves);
+                    BHE::BHE_2U * m_bhe_2u = BHE::CreateBHE2U(config,
+                                                              bhe_conf,
+                                                              curves,
+                                                              bhe_refrigerant_density,
+                                                              bhe_refrigerant_viscosity,
+                                                              bhe_refrigerant_heat_capacity,
+                                                              bhe_regrigerant_heat_conductivity);
 
                     vec_BHEs.emplace_back(std::make_unique<BHE_2U>(*m_bhe_2u));
                     // BHE_network.add_bhe_net_elem(m_bhe_2u);
@@ -254,7 +260,13 @@ namespace ProcessLib
                 else if (bhe_type_str == "BHE_TYPE_CXC")
                 {
                     // initialize the CXC type BHE
-                    BHE::BHE_CXC * m_bhe_CXC = BHE::CreateBHECXC(config, bhe_conf, curves);
+                    BHE::BHE_CXC * m_bhe_CXC = BHE::CreateBHECXC(config,
+                                                                 bhe_conf,
+                                                                 curves,
+                                                                 bhe_refrigerant_density,
+                                                                 bhe_refrigerant_viscosity,
+                                                                 bhe_refrigerant_heat_capacity,
+                                                                 bhe_regrigerant_heat_conductivity);
 
                     vec_BHEs.emplace_back(std::make_unique<BHE_CXC>(*m_bhe_CXC));
                     // BHE_network.add_bhe_net_elem(m_bhe_CXC);
@@ -268,7 +280,13 @@ namespace ProcessLib
                 else if (bhe_type_str == "BHE_TYPE_CXA")
                 {
                     // initialize the CXA type BHE
-                    BHE::BHE_CXA * m_bhe_CXA = BHE::CreateBHECXA(config, bhe_conf, curves);
+                    BHE::BHE_CXA * m_bhe_CXA = BHE::CreateBHECXA(config,
+                                                                 bhe_conf,
+                                                                 curves,
+                                                                 bhe_refrigerant_density,
+                                                                 bhe_refrigerant_viscosity,
+                                                                 bhe_refrigerant_heat_capacity,
+                                                                 bhe_regrigerant_heat_conductivity);
 
                     vec_BHEs.emplace_back(std::make_unique<BHE_CXA>(*m_bhe_CXA));
                     // BHE_network.add_bhe_net_elem(m_bhe_CXA);

@@ -24,7 +24,16 @@ namespace ProcessLib
 				CreateBHECXA(BaseLib::ConfigTree const& config,
 					BaseLib::ConfigTree const& bhe_conf,
 					std::map < std::string,
-					std::unique_ptr < MathLib::PiecewiseLinearInterpolation >> const& curves)
+					std::unique_ptr < MathLib::PiecewiseLinearInterpolation >> const& curves,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_refrigerant_density,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_refrigerant_viscosity,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_refrigerant_heat_capacity,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_regrigerant_heat_conductivity) 
+
 			{
 				// read in the parameters
 				const std::string bhe_ply_name = bhe_conf.getConfigParameter<std::string>("bhe_polyline");
@@ -137,25 +146,6 @@ namespace ProcessLib
 					bhe_delta_T_val = bhe_conf.getConfigParameterOptional<double>("bhe_inout_delta_T_value").get();
 				}
 
-				// get the refrigerant properties from fluid property class
-				//! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__fluid}
-				auto const& fluid_config = config.getConfigSubtree("fluid");
-				//! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_density}
-				auto const& rho_conf = fluid_config.getConfigSubtree("refrigerant_density");
-				auto bhe_refrigerant_density =
-					MaterialLib::Fluid::createFluidDensityModel(rho_conf);
-				//! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_viscosity}
-				auto const& mu_conf = fluid_config.getConfigSubtree("refrigerant_viscosity");
-				auto bhe_refrigerant_viscosity =
-					MaterialLib::Fluid::createViscosityModel(mu_conf);
-				//! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_specific_heat_capacity}
-				auto const& cp_conf = fluid_config.getConfigSubtree("refrigerant_specific_heat_capacity");
-				auto bhe_refrigerant_heat_capacity =
-					MaterialLib::Fluid::createSpecificFluidHeatCapacityModel(cp_conf);
-				//! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_thermal_conductivity}
-				auto const& lambda_conf = fluid_config.getConfigSubtree("refrigerant_thermal_conductivity");
-				auto bhe_regrigerant_heat_conductivity =
-					MaterialLib::Fluid::createFluidThermalConductivityModel(lambda_conf);
 
 				MaterialLib::Fluid::FluidProperty::ArrayType vars;
 				vars[static_cast<int>(MaterialLib::Fluid::PropertyVariableType::T)] = 298.15;

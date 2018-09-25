@@ -10,6 +10,7 @@
 #pragma once
 
 #include "ProcessLib/Process.h"
+#include "MaterialLib/Fluid/FluidProperty.h"
 #include "BHE_CXC.h"
 namespace ProcessLib
 {
@@ -21,7 +22,15 @@ namespace ProcessLib
 				CreateBHECXC(BaseLib::ConfigTree const& config,
 					BaseLib::ConfigTree const& bhe_conf,
 					std::map<std::string,
-					std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const& curves);
+					std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const& curves,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_refrigerant_density,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_refrigerant_viscosity,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_refrigerant_heat_capacity,
+                    std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
+                        bhe_regrigerant_heat_conductivity);
 
 
 		}  // end of namespace
