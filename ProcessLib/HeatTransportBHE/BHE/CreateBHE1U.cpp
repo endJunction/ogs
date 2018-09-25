@@ -80,7 +80,8 @@ namespace ProcessLib
                 // if the BHE is using user defined thermal resistance values
                 bool bhe_user_defined_therm_resis = false;
                 if (auto const bhe_user_defined_therm_resis_conf =
-                    config.getConfigParameterOptional<bool>("bhe_user_defined_therm_resis"))
+                        bhe_conf.getConfigParameterOptional<bool>(
+                            "bhe_user_defined_therm_resis"))
                 {
                     DBUG("If appplying user defined thermal resistance values : %s",
                         (*bhe_user_defined_therm_resis_conf) ? "true" : "false");
