@@ -169,6 +169,32 @@ namespace ProcessLib
 
             DBUG("Use \'%s\' as gas phase density parameter.", density_gas.name.c_str());
 
+                            // get the refrigerant properties from fluid property class
+            //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__fluid}
+            auto const& fluid_config = config.getConfigSubtree("fluid");
+            //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_density}
+            auto const& rho_conf =
+                fluid_config.getConfigSubtree("refrigerant_density");
+            auto bhe_refrigerant_density =
+                MaterialLib::Fluid::createFluidDensityModel(rho_conf);
+            //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_viscosity}
+            auto const& mu_conf =
+                fluid_config.getConfigSubtree("refrigerant_viscosity");
+            auto bhe_refrigerant_viscosity =
+                MaterialLib::Fluid::createViscosityModel(mu_conf);
+            //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_specific_heat_capacity}
+            auto const& cp_conf = fluid_config.getConfigSubtree(
+                "refrigerant_specific_heat_capacity");
+            auto bhe_refrigerant_heat_capacity =
+                MaterialLib::Fluid::createSpecificFluidHeatCapacityModel(
+                    cp_conf);
+            //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__material_property__refrigerant_thermal_conductivity}
+            auto const& lambda_conf = fluid_config.getConfigSubtree(
+                "refrigerant_thermal_conductivity");
+            auto bhe_regrigerant_heat_conductivity =
+                MaterialLib::Fluid::createFluidThermalConductivityModel(
+                    lambda_conf);
+
             // reading BHE parameters--------------------------------------------------------------
             std::vector<std::unique_ptr<BHEAbstract>> vec_BHEs;
             // BHE::BHE_Net BHE_network;
@@ -191,7 +217,13 @@ namespace ProcessLib
                 if (bhe_type_str == "BHE_TYPE_1U")
                 {
                     // initialize the 1U type BHE
-                    BHE::BHE_1U * m_bhe_1u = BHE::CreateBHE1U(config, bhe_conf, curves);
+                    BHE::BHE_1U * m_bhe_1u = BHE::CreateBHE1U(config,
+                                                              bhe_conf,
+                                                              curves,
+                                                              bhe_refrigerant_density,
+                                                              bhe_refrigerant_viscosity,
+                                                              bhe_refrigerant_heat_capacity,
+                                                              bhe_regrigerant_heat_conductivity);
 
                     vec_BHEs.emplace_back(std::make_unique<BHE_1U>(*m_bhe_1u));
                     // BHE_network.add_bhe_net_elem(m_bhe_1u);
