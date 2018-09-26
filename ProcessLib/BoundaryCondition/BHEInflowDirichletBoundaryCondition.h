@@ -31,11 +31,7 @@ public:
         int const component_id,
         std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
             pt_bhe)
-        : _variable_id(variable_id),
-          _component_id(component_id),
-          _bulk_mesh_id(bulk_mesh_id),
-          _bc_mesh(bc_mesh),
-          _integration_order(integration_order),
+        : _bc_mesh(bc_mesh),
           _pt_bhe(pt_bhe)
     {
 
@@ -84,23 +80,13 @@ private:
     /// participating number of elements of the boundary condition.
     std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary;
 
-    int const _variable_id;
-    int const _component_id;
-
-    std::size_t const _bulk_mesh_id;
-
     MeshLib::Mesh const & _bc_mesh; 
-
-    /// Integration order for integration over the lower-dimensional elements
-    unsigned const _integration_order;
 
     /// Stores the results of the outflow temperatures per boundary node.
     std::vector<double> _T_out_values;
     std::vector<GlobalIndexType> _T_out_indices;
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
-
-    HeatTransportBHE::BHE::BHEAbstract* _BHE_property;
 
     std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
         _pt_bhe;

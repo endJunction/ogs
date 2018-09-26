@@ -30,12 +30,8 @@ public:
         std::size_t const bulk_mesh_id,
         int const component_id,
         unsigned const bhe_idx)        
-        : _variable_id(variable_id),
-          _component_id(component_id),
-          _bulk_mesh_id(bulk_mesh_id),
-          _bulk_mesh(bulk_mesh),
-          _integration_order(integration_order), 
-          _bhe_idx(bhe_idx)
+        : _bulk_mesh_id(bulk_mesh_id),
+          _bulk_mesh(bulk_mesh)
     {
         DBUG(
             "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d "
@@ -95,9 +91,6 @@ private:
     /// participating number of elements of the boundary condition.
     std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary_T_in;
 
-    int const _variable_id;
-    int const _component_id;
-
     /// id of bulk mesh
     std::size_t const _bulk_mesh_id;
 
@@ -105,16 +98,11 @@ private:
     MeshLib::Mesh const& _bulk_mesh;
 
     /// Integration order for integration over the lower-dimensional elements
-    unsigned const _integration_order;
+    // unsigned const _integration_order;
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 
     NumLib::IndexValueVector<GlobalIndexType> _T_in_values;
-
-    HeatTransportBHE::BHE::BHEAbstract* _BHE_property;
-
-    /// index of the bhe
-    unsigned const _bhe_idx;
 };
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
