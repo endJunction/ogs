@@ -12,8 +12,8 @@
 #include "BoundaryCondition.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/IndexValueVector.h"
-#include "ProcessLib/Parameter/Parameter.h"
 #include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
+#include "ProcessLib/Parameter/Parameter.h"
 
 namespace ProcessLib
 {
@@ -31,17 +31,15 @@ public:
         int const component_id,
         std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
             pt_bhe)
-        : _bc_mesh(bc_mesh),
-          _pt_bhe(pt_bhe)
+        : _bc_mesh(bc_mesh), _pt_bhe(pt_bhe)
     {
-
         DBUG(
             "Found %d nodes for BHE Inflow Dirichlet BCs for the variable %d "
             "and "
             "component %d",
             vec_inflow_bc_nodes.size(), variable_id, component_id);
 
-        MeshLib::MeshSubset bc_mesh_subset{ _bc_mesh, vec_inflow_bc_nodes };
+        MeshLib::MeshSubset bc_mesh_subset{_bc_mesh, vec_inflow_bc_nodes};
 
         // create memory to store Tout values
         _T_out_values.clear();
@@ -51,14 +49,14 @@ public:
         _bc_values.values.clear();
 
         // convert mesh node ids to global index for the given component
-        assert(bc_mesh_subset.getNumberOfNodes() == 1); 
+        assert(bc_mesh_subset.getNumberOfNodes() == 1);
         _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
         _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
 
         // that might be slow, but only done once
         const auto g_idx_T_in = global_idx_T_in_top;
         const auto g_idx_T_out = global_idx_T_out_top;
-            
+
         if (g_idx_T_in >= 0 && g_idx_T_out >= 0)
         {
             _T_out_indices.emplace_back(g_idx_T_out);
@@ -66,7 +64,6 @@ public:
             _bc_values.ids.emplace_back(g_idx_T_in);
             _bc_values.values.emplace_back(320.0 /*using initial value*/);
         }
-        
     }
 
     void getEssentialBCValues(
@@ -80,7 +77,7 @@ private:
     /// participating number of elements of the boundary condition.
     std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary;
 
-    MeshLib::Mesh const & _bc_mesh; 
+    MeshLib::Mesh const& _bc_mesh;
 
     /// Stores the results of the outflow temperatures per boundary node.
     std::vector<double> _T_out_values;
@@ -101,5 +98,4 @@ createBHEInflowDirichletBoundaryCondition(
     std::size_t const bulk_mesh_id, int const component_id,
     std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
         pt_bhe);
-
 }  // namespace ProcessLib

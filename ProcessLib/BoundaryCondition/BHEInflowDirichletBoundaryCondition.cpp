@@ -33,8 +33,8 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
     bc_values.values.resize(_bc_values.values.size());
 
     const size_t n_nodes = _T_out_values.size();
-    double tmp_T_in(320.0); 
-    for (size_t i=0; i<n_nodes; i++)
+    double tmp_T_in(320.0);
+    for (size_t i = 0; i < n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
         // here call the corresponding BHE functions
@@ -42,22 +42,21 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
         tmp_T_in = _pt_bhe->get_Tin_by_Tout(tmp_T_out, t);
         bc_values.values[i] = tmp_T_in;
     }
-
 }
 
 // update new values and corresponding indices.
-void BHEInflowDirichletBoundaryCondition::preTimestep(
-    const double /*t*/, const GlobalVector& x)
+void BHEInflowDirichletBoundaryCondition::preTimestep(const double /*t*/,
+                                                      const GlobalVector& x)
 {
     // for each BHE, the inflow temperature is dependent on
-    // the ouflow temperature of the BHE. 
+    // the ouflow temperature of the BHE.
     // Here the task is to get the outflow temperature and
     // save it locally
     auto const n_nodes = _bc_values.ids.size();
     for (size_t i = 0; i < n_nodes; i++)
     {
         // read the T_out
-        _T_out_values[i] = x[_T_out_indices[i]]; 
+        _T_out_values[i] = x[_T_out_indices[i]];
     }
 }
 
@@ -71,15 +70,12 @@ createBHEInflowDirichletBoundaryCondition(
     std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
         pt_bhe)
 {
-    DBUG(
-        "Constructing BHEInflowDirichletBoundaryCondition.");
+    DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
 
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
-        global_idx_T_in_top, global_idx_T_out_top,
-        bc_mesh, vec_inflow_bc_nodes,
+        global_idx_T_in_top, global_idx_T_out_top, bc_mesh, vec_inflow_bc_nodes,
         variable_id, integration_order, bulk_mesh_id, component_id, pt_bhe);
 }
-
 }  // namespace ProcessLib
