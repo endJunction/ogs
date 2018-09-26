@@ -12,8 +12,7 @@
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
 BHE_Net_ELE_Pipe_Inner_CXC::BHE_Net_ELE_Pipe_Inner_CXC(std::string & name, ProcessLib::HeatTransportBHE::BHE::BHEAbstract * m_BHE)
-    : BHE_Net_ELE_Pipe(name, BHE_NET_ELE::BHE_NET_PIPE_INNER_CXC),
-    _m_BHE(m_BHE)
+    : BHE_Net_ELE_Pipe(name, BHE_NET_ELE::BHE_NET_PIPE_INNER_CXC)
 {
 
     // configure the penalty factor

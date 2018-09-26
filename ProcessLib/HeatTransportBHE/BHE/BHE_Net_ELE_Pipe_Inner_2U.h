@@ -48,11 +48,6 @@ namespace ProcessLib
 				  * the global index at the pipeline outlet
 				  */
 				std::size_t _global_idx_out;
-
-				/**
-				  * the BHE which this pipeline is applied on
-				  */
-				const BHE::BHEAbstract * _m_BHE;
 			};
 
 		}
