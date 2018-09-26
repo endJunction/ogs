@@ -58,16 +58,16 @@ namespace ProcessLib
 				auto const bhe_use_ext_therm_resis_conf = bhe_conf.getConfigParameterOptional<bool>("bhe_use_external_therm_resis");
 
 				// optional parameters
-				double bhe_power_in_watt_val;
-				double bhe_intern_resistance;
-				double bhe_therm_resistance;
-				double bhe_R_fig;
-				double bhe_R_fog;
-				double bhe_R_gg1;
-				double bhe_R_gg2;
-				double bhe_R_gs;
-				double bhe_delta_T_val;
-				double bhe_switch_off_threshold;
+                double bhe_power_in_watt_val = 0.0;
+                double bhe_intern_resistance = 1.0;
+                double bhe_therm_resistance = 1.0;
+                double bhe_R_fig = 1.0;
+                double bhe_R_fog = 1.0;
+                double bhe_R_gg1 = 1.0;
+                double bhe_R_gg2 = 1.0;
+                double bhe_R_gs = 1.0;
+                double bhe_delta_T_val = 0.0;
+                double bhe_switch_off_threshold = 1.0e-6;
 
 				// give default values to optional parameters
 				// if the BHE is using external given thermal resistance values
@@ -145,6 +145,12 @@ namespace ProcessLib
 					bhe_bound_type = BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY;
 					bhe_delta_T_val = bhe_conf.getConfigParameterOptional<double>("bhe_inout_delta_T_value").get();
 				}
+                else
+                {
+                    bhe_bound_type =
+                        BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_BOUNDARY;
+                    ERR("The BHE boundary condition is not correctly set! ");
+                }
 
 
 				MaterialLib::Fluid::FluidProperty::ArrayType vars;

@@ -139,6 +139,12 @@ namespace ProcessLib
                     bhe_bound_type = BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY;
                     bhe_delta_T_val = bhe_conf.getConfigParameterOptional<double>("bhe_inout_delta_temperature").get();
                 }
+                else
+                {
+                    bhe_bound_type =
+                        BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_BOUNDARY;
+                    ERR("The BHE boundary condition is not correctly set! ");
+                }
 
                 MaterialLib::Fluid::FluidProperty::ArrayType vars;
                 vars[static_cast<int>(MaterialLib::Fluid::PropertyVariableType::T)] = 298.15;
