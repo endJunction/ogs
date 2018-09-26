@@ -262,7 +262,7 @@ namespace ProcessLib
                 /**
                   * constructor
                   */
-                BHEAbstract(BHE_TYPE my_type,
+                BHEAbstract(
                     const std::string name,
                     Borehole_Geometry borehole_geometry_,
                     Pipe_Parameters pipe_param_,
@@ -279,7 +279,6 @@ namespace ProcessLib
                     int n_T_out = 1)
                     : BHE_Net_ELE_Abstract(name,
                         BHE::BHE_NET_ELE::BHE_NET_BOREHOLE, n_T_in, n_T_out),
-                    type(my_type),
                     _name(name),
                     bound_type(my_bound_type),
                     borehole_geometry(borehole_geometry_),
@@ -491,11 +490,6 @@ namespace ProcessLib
                 double get_ply_eps(void) { return _ply_eps; }
 
             private:
-                /**
-                 * the type of the BHE
-                 */
-                const BHE_TYPE type;
-
                 /**
                  * name of the borehole heat exchanger
                  */

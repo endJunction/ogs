@@ -69,7 +69,7 @@ namespace ProcessLib
 					// double my_ext_Rgs = 0.0            /* external defined borehole thermal resistance */,
 					bool if_flowrate_curve = false     /* whether flowrate curve is used*/,
 					double my_threshold = 0.0)         /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/
-					: BHEAbstract(BHE_TYPE::TYPE_CXC, name, borehole_geometry, pipe_geometry, refrigerant_param, grout_param,
+					: BHEAbstract(name, borehole_geometry, pipe_geometry, refrigerant_param, grout_param,
 						extern_Ra_Rb, extern_def_thermal_resistances, std::move(bhe_curves), bound_type, if_flowrate_curve)
 				{
 					_u = Eigen::Vector2d::Zero();
