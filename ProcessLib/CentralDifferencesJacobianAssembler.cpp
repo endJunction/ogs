@@ -138,9 +138,14 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     }
 
 
-      std::cout << " Jacobian (CD): \n\n";
-      std::cout << local_Jac << "\n\n";
-      OGS_FATAL("Oh stop it, you!");
+    std::cout << "#####################\n";
+    std::cout << " Jacobian (numerical): \n";
+    std::cout << local_Jac << "\n\n";
+    std::cout << "=====================\n";
+    std::cout << " residuum: \n\n";
+
+    std::cout << "=====================\n";
+    OGS_FATAL("Oh stop it, you!");
 
 
 #define DOF_PGAS

@@ -94,7 +94,7 @@ struct IntegrationPointData final
         double const dt,
         DisplacementVectorType const& /*u*/,
         double const T,
-        double const p)
+        double const /*p*/)
     {
         auto&& solution = solid_material.integrateStress(
             t, x_position, dt, eps_prev, eps, sigma_eff_prev,
