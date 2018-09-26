@@ -24,7 +24,7 @@
             <thermal_conductivity_gas>K_g</thermal_conductivity_gas>
             <heat_capacity_gas>Cp_g</heat_capacity_gas>
             <density_gas>rho_g</density_gas>
-            
+
             <borehole_heat_exchangers>
                 <borehole_heat_exchanger id="0">
                     <bhe_polyline>BHE_1</bhe_polyline>

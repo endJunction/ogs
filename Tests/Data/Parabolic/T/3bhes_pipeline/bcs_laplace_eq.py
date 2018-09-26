@@ -13,7 +13,7 @@ def solution(t):
     # cycle closer (from consumer)
     fc_in = cmp.source('from consumer inflow')
     fc_out = cmp.sink('from consumer outflow')
-    
+
     p1 = cmp.pump('pump')
 
     sp = cmp.splitter('splitter')
@@ -41,12 +41,12 @@ def solution(t):
     fc_p1 = con.connection(fc_in, 'out1', p1, 'in1')
 
     p1_sp = con.connection(p1, 'out1', sp, 'in1')
-    
+
     sp_bhe1 = con.connection(sp, 'out1', bhe1, 'in1')
     sp_bhe2 = con.connection(sp, 'out2', bhe2, 'in1')
 
     bhe2_bhe3 = con.connection(bhe2, 'out1', bhe3, 'in1')
-    
+
     bhe1_mg = con.connection(bhe1, 'out1', mg, 'in1')
     bhe3_mg = con.connection(bhe3, 'out1', mg, 'in2')
 
@@ -90,7 +90,7 @@ def solution(t):
     # flow_char creates a look-up-table, linear interpolation inbetween the points
     # you need to import hlp for this to work. dc_cc is a data container class
     # with all required properties for characteristic functions
-    
+
     f = hlp.dc_cc(x=x, y=y, is_set=True)
     p1.set_attr( flow_char=f)
 
