@@ -34,7 +34,6 @@ public:
 
     //! \name ODESystem interface
     //! @{
-
     bool isLinear() const override { return false; }
 
     void computeSecondaryVariableConcrete(double const t,
@@ -57,7 +56,8 @@ private:
         const double dxdot_dx, const double dx_dx, GlobalMatrix& M,
         GlobalMatrix& K, GlobalVector& b, GlobalMatrix& Jac) override;
 
-    std::vector<std::unique_ptr<BoundaryCondition>> createBHEBoundaryConditionTopBottom(); 
+    std::vector<std::unique_ptr<BoundaryCondition>>
+    createBHEBoundaryConditionTopBottom();
 
     HeatTransportBHEProcessData _process_data;
 
@@ -94,6 +94,5 @@ private:
         _mesh_subset_soil_nodes_connected_with_BHE;
     std::vector<int> _vec_BHE_mat_IDs;
 };
-
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

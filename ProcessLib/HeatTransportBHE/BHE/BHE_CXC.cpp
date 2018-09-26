@@ -1,42 +1,41 @@
 /**
-* \copyright
-* Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
-*            Distributed under a Modified BSD License.
-*              See accompanying file LICENSE.txt or
-*              http://www.opengeosys.org/project/license
-*
-*/
+ * \copyright
+ * Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
+ *            Distributed under a Modified BSD License.
+ *              See accompanying file LICENSE.txt or
+ *              http://www.opengeosys.org/project/license
+ *
+ */
 
 #include "BHE_CXC.h"
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 /**
-* return the thermal resistance for the inlet pipline
-* idx is the index, when 2U case,
-* 0 - the first u-tube
-* 1 - the second u-tube
-*/
+ * return the thermal resistance for the inlet pipline
+ * idx is the index, when 2U case,
+ * 0 - the first u-tube
+ * 1 - the second u-tube
+ */
 double BHE_CXC::get_thermal_resistance_fig(std::size_t /*idx = 0*/)
 {
     // notice there is no R_fog value for co-axial BHE
     return 0.0;
-    
 }
 
 /**
-* return the thermal resistance for the outlet pipline
-* idx is the index, when 2U case,
-* 0 - the first u-tube
-* 1 - the second u-tube
-*/
+ * return the thermal resistance for the outlet pipline
+ * idx is the index, when 2U case,
+ * 0 - the first u-tube
+ * 1 - the second u-tube
+ */
 double BHE_CXC::get_thermal_resistance_fog(std::size_t /*idx = 0*/)
 {
     return _R_fog;
 }
 
 /**
-* return the thermal resistance
-*/
+ * return the thermal resistance
+ */
 double BHE_CXC::get_thermal_resistance(std::size_t /*idx = 0*/)
 {
     // TODO
@@ -45,7 +44,6 @@ double BHE_CXC::get_thermal_resistance(std::size_t /*idx = 0*/)
 
 void BHE_CXC::set_T_in_out_global_idx(std::size_t start_idx)
 {
-    // 
     this->set_T_in_global_index(start_idx);
     this->set_T_out_global_index(start_idx + 1);
 }
@@ -57,17 +55,17 @@ void BHE_CXC::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
 
     // calculating
     start_idx = this->get_T_in_global_index();
-    global_idx_T_in_bottom = start_idx + dof_bhe - 3; // CXC BHE, the order is: T_in, T_out, T_g. 
-
-                                                      // T_in at the bottom
+    global_idx_T_in_bottom =
+        start_idx + dof_bhe - 3;  // CXC BHE, the order is: T_in, T_out, T_g.
+                                  // T_in at the bottom
     this->set_T_in_bottom_global_index(global_idx_T_in_bottom);
     // T_out at the bottom
     this->set_T_out_bottom_global_index(global_idx_T_in_bottom + 1);
 }
 
 /**
-* calculate thermal resistance
-*/
+ * calculate thermal resistance
+ */
 void BHE_CXC::calc_thermal_resistances()
 {
     double Nu_in, Nu_out;
@@ -79,7 +77,7 @@ void BHE_CXC::calc_thermal_resistances()
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
     double const& b_out = pipe_param.b_out;
-    double const& lambda_r = refrigerant_param.lambda_r; 
+    double const& lambda_r = refrigerant_param.lambda_r;
     double const& lambda_g = grout_param.lambda_g;
     double const& lambda_p_i = pipe_param.lambda_p_i;
     double const& lambda_p_o = pipe_param.lambda_p_o;
@@ -104,7 +102,8 @@ void BHE_CXC::calc_thermal_resistances()
     // thermal resistance due to the grout transition
     d_o1 = 2.0 * (r_outer + b_out);
     // Eq. 68
-    chi = std::log(std::sqrt(D*D + d_o1*d_o1) / std::sqrt(2) / d_o1) / std::log(D / d_o1);
+    chi = std::log(std::sqrt(D * D + d_o1 * d_o1) / std::sqrt(2) / d_o1) /
+          std::log(D / d_o1);
     if (extern_Ra_Rb.use_extern_Ra_Rb)
     {
         _R_g = extern_Ra_Rb.ext_Rb - _R_adv_b_o1 - _R_con_o1;
@@ -122,34 +121,38 @@ void BHE_CXC::calc_thermal_resistances()
     }
     else if (extern_def_thermal_resistances.if_use_defined_therm_resis)
     {
-        _R_ff = extern_def_thermal_resistances.ext_Rgg1; // Attention! Here ext_Rgg1 is treated as Rff for coaxial type
+        _R_ff = extern_def_thermal_resistances
+                    .ext_Rgg1;  // Attention! Here ext_Rgg1 is treated as Rff
+                                // for coaxial type
     }
     else
     {
-        // Eq. 56 
+        // Eq. 56
         _R_ff = _R_adv_i1 + _R_adv_a_o1 + _R_con_i1;
     }
     // Eq. 57
     if (extern_def_thermal_resistances.if_use_defined_therm_resis)
         _R_fog = extern_def_thermal_resistances.ext_Rfog;
     else
-    _R_fog = _R_adv_b_o1 + _R_con_o1 + _R_con_b;
+        _R_fog = _R_adv_b_o1 + _R_con_o1 + _R_con_b;
 
     // thermal resistance due to grout-soil exchange
     if (extern_def_thermal_resistances.if_use_defined_therm_resis)
         _R_gs = extern_def_thermal_resistances.ext_Rgs;
     else
-        _R_gs = (1 - chi)*_R_g;
+        _R_gs = (1 - chi) * _R_g;
 
     if (!std::isfinite(_R_gs))
     {
-        OGS_FATAL("Error!!! Grout Thermal Resistance is an infinite number! The simulation will be stopped! ");
+        OGS_FATAL(
+            "Error!!! Grout Thermal Resistance is an infinite number! The "
+            "simulation will be stopped! ");
     }
 }
 
 /**
-* Nusselt number calculation
-*/
+ * Nusselt number calculation
+ */
 void BHE_CXC::calc_Nu()
 {
     // see Eq. 32 in Diersch_2011_CG
@@ -176,13 +179,18 @@ void BHE_CXC::calc_Nu()
         gamma = (_Re_i1 - 2300) / (10000 - 2300);
 
         Nu_in = (1.0 - gamma) * 4.364;
-        Nu_in += gamma * ((0.0308 / 8.0 * 1.0e4 * _Pr) / (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) * (std::pow(_Pr, 2.0 / 3.0) - 1.0)) * (1.0 + std::pow(d_i1 / L, 2.0 / 3.0)));
-
+        Nu_in += gamma * ((0.0308 / 8.0 * 1.0e4 * _Pr) /
+                          (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
+                                     (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                          (1.0 + std::pow(d_i1 / L, 2.0 / 3.0)));
     }
     else if (_Re_i1 > 10000.0)
     {
         xi = pow(1.8 * std::log10(_Re_i1) - 1.5, -2.0);
-        Nu_in = (xi / 8.0 * _Re_i1 * _Pr) / (1.0 + 12.7 * std::sqrt(xi / 8.0) * (std::pow(_Pr, 2.0 / 3.0) - 1.0)) * (1.0 + std::pow(d_i1 / L, 2.0 / 3.0));
+        Nu_in = (xi / 8.0 * _Re_i1 * _Pr) /
+                (1.0 + 12.7 * std::sqrt(xi / 8.0) *
+                           (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                (1.0 + std::pow(d_i1 / L, 2.0 / 3.0));
     }
 
     // then calculating Nu_out
@@ -197,14 +205,26 @@ void BHE_CXC::calc_Nu()
     {
         gamma = (_Re_o1 - 2300) / (10000 - 2300);
 
-        Nu_out = (1.0 - gamma) * (3.66 + (4.0 - 0.102 / (d_i1 / d_o1 + 0.02))) * pow(d_i1 / d_o1, 0.04);
-        Nu_out += gamma * ((0.0308 / 8.0 * 1.0e4 * _Pr) / (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) * (std::pow(_Pr, 2.0 / 3.0) - 1.0)) * (1.0 + std::pow(d_h / L, 2.0 / 3.0)) * ((0.86 * std::pow(d_i1 / d_o1, 0.84) + 1.0 - 0.14*std::pow(d_i1 / d_o1, 0.6)) / (1.0 + d_i1 / d_o1)));
-
+        Nu_out = (1.0 - gamma) * (3.66 + (4.0 - 0.102 / (d_i1 / d_o1 + 0.02))) *
+                 pow(d_i1 / d_o1, 0.04);
+        Nu_out += gamma * ((0.0308 / 8.0 * 1.0e4 * _Pr) /
+                           (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
+                                      (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                           (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
+                           ((0.86 * std::pow(d_i1 / d_o1, 0.84) + 1.0 -
+                             0.14 * std::pow(d_i1 / d_o1, 0.6)) /
+                            (1.0 + d_i1 / d_o1)));
     }
     else if (_Re_o1 > 10000.0)
     {
         xi = pow(1.8 * std::log10(_Re_o1) - 1.5, -2.0);
-        Nu_out = (xi / 8.0 * _Re_o1 * _Pr) / (1.0 + 12.7 * std::sqrt(xi / 8.0) * (std::pow(_Pr, 2.0 / 3.0) - 1.0)) * (1.0 + std::pow(d_h / L, 2.0 / 3.0)) * ((0.86 * std::pow(d_i1 / d_o1, 0.84) + 1.0 - 0.14*std::pow(d_i1 / d_o1, 0.6)) / (1.0 + d_i1 / d_o1));
+        Nu_out = (xi / 8.0 * _Re_o1 * _Pr) /
+                 (1.0 + 12.7 * std::sqrt(xi / 8.0) *
+                            (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                 (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
+                 ((0.86 * std::pow(d_i1 / d_o1, 0.84) + 1.0 -
+                   0.14 * std::pow(d_i1 / d_o1, 0.6)) /
+                  (1.0 + d_i1 / d_o1));
     }
 
     // _Nu(0) is Nu_in, and _Nu(1) is Nu_out
@@ -213,8 +233,8 @@ void BHE_CXC::calc_Nu()
 }
 
 /**
-* Renolds number calculation
-*/
+ * Renolds number calculation
+ */
 void BHE_CXC::calc_Re()
 {
     double d_i1, d_h;
@@ -225,7 +245,7 @@ void BHE_CXC::calc_Re()
     double const& rho_r = refrigerant_param.rho_r;
 
     // inner diameter of the pipeline
-    d_i1 = 2.0 * r_inner; 
+    d_i1 = 2.0 * r_inner;
     d_h = 2.0 * (r_outer - (r_inner + b_in));
 
     // _u(0) is u_in, and _u(1) is u_out
@@ -234,8 +254,8 @@ void BHE_CXC::calc_Re()
 }
 
 /**
-* Prandtl number calculation
-*/
+ * Prandtl number calculation
+ */
 void BHE_CXC::calc_Pr()
 {
     double const& mu_r = refrigerant_param.mu_r;
@@ -246,18 +266,18 @@ void BHE_CXC::calc_Pr()
 }
 
 /**
-* calculate heat transfer coefficient
-*/
+ * calculate heat transfer coefficient
+ */
 void BHE_CXC::calc_heat_transfer_coefficients()
 {
-    _PHI_fog = 1.0 / _R_fog ;
-    _PHI_ff = 1.0 / _R_ff ;
-    _PHI_gs = 1.0 / _R_gs ;
+    _PHI_fog = 1.0 / _R_fog;
+    _PHI_ff = 1.0 / _R_ff;
+    _PHI_gs = 1.0 / _R_gs;
 }
 
 /**
-* flow velocity inside the pipeline
-*/
+ * flow velocity inside the pipeline
+ */
 void BHE_CXC::calc_u()
 {
     double u_in, u_out;
@@ -266,8 +286,9 @@ void BHE_CXC::calc_u()
     double const& b_in = pipe_param.b_in;
 
     u_in = Q_r / (PI * r_inner * r_inner);
-    u_out = Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));
-    
+    u_out =
+        Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));
+
     _u(0) = u_in;
     _u(1) = u_out;
 }
@@ -276,63 +297,68 @@ double BHE_CXC::get_mass_coeff(std::size_t idx_unknown)
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    double const& porosity_g = grout_param.porosity_g; 
-    double const& rho_g = grout_param.rho_g; 
-    double const& heat_cap_g = grout_param.heat_cap_g; 
+    double const& porosity_g = grout_param.porosity_g;
+    double const& rho_g = grout_param.rho_g;
+    double const& heat_cap_g = grout_param.heat_cap_g;
 
     double mass_coeff = 0.0;
 
     switch (idx_unknown)
     {
-    case 0:  // i1
-        mass_coeff = rho_r * heat_cap_r * CSA_i;
-        break;
-    case 1:  // o1
-        mass_coeff = rho_r * heat_cap_r * CSA_o;
-        break;
-    case 2:  // grout
-        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g;
-        break;
-    default:
-        break;
+        case 0:  // i1
+            mass_coeff = rho_r * heat_cap_r * CSA_i;
+            break;
+        case 1:  // o1
+            mass_coeff = rho_r * heat_cap_r * CSA_o;
+            break;
+        case 2:  // grout
+            mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g;
+            break;
+        default:
+            break;
     }
 
     return mass_coeff;
 }
 
-void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_laplace)
+void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown,
+                                 Eigen::MatrixXd& mat_laplace)
 {
     double const& lambda_r = refrigerant_param.lambda_r;
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
     double const& alpha_L = refrigerant_param.alpha_L;
-    double const& porosity_g = grout_param.porosity_g; 
-    double const& lambda_g = grout_param.lambda_g; 
+    double const& porosity_g = grout_param.porosity_g;
+    double const& lambda_g = grout_param.lambda_g;
 
-    // Here we calculates the laplace coefficients in the governing 
-    // equations of BHE. These governing equations can be found in 
+    // Here we calculates the laplace coefficients in the governing
+    // equations of BHE. These governing equations can be found in
     // 1) Diersch (2013) FEFLOW book on page 952, M.120-122, or
-    // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 26-28. 
+    // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 26-28.
     double laplace_coeff(0.0);
     mat_laplace.setZero();
 
     switch (idx_unknown)
     {
-    case 0:
-        // pipe i1, Eq. 26
-        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
-        break;
-    case 1:
-        // pipe o1, Eq. 27
-        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
-        break;
-    case 2:
-        // pipe g1, Eq. 28
-        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g;
-        break;
-    default:
-        OGS_FATAL("Error !!! The index passed to get_laplace_coeff for BHE is not correct. ");
-        break;
+        case 0:
+            // pipe i1, Eq. 26
+            laplace_coeff =
+                (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
+            break;
+        case 1:
+            // pipe o1, Eq. 27
+            laplace_coeff =
+                (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
+            break;
+        case 2:
+            // pipe g1, Eq. 28
+            laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g;
+            break;
+        default:
+            OGS_FATAL(
+                "Error !!! The index passed to get_laplace_coeff for BHE is "
+                "not correct. ");
+            break;
     }
 
     mat_laplace(0, 0) = laplace_coeff;
@@ -340,7 +366,8 @@ void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_
     mat_laplace(2, 2) = laplace_coeff;
 }
 
-void BHE_CXC::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & vec_advection)
+void BHE_CXC::get_advection_vector(std::size_t idx_unknown,
+                                   Eigen::VectorXd& vec_advection)
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
@@ -349,55 +376,59 @@ void BHE_CXC::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & ve
 
     switch (idx_unknown)
     {
-    case 0:
-        // pipe i1, Eq. 26
-        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
-        // z direction 
-        vec_advection(2) = -1.0 * advection_coeff;
-        break;
-    case 1:
-        // pipe o1, Eq. 27
-        advection_coeff = rho_r * heat_cap_r * _u(1) * CSA_o;
-        // z direction 
-        vec_advection(2) = advection_coeff;
-        break;
-    case 2:
-        // pipe g1, Eq. 28
-        advection_coeff = 0.0;
-        break;
-    default:
-        OGS_FATAL("Error !!! The index passed to get_advection_coeff for BHE is not correct. ");
-        break;
+        case 0:
+            // pipe i1, Eq. 26
+            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
+            // z direction
+            vec_advection(2) = -1.0 * advection_coeff;
+            break;
+        case 1:
+            // pipe o1, Eq. 27
+            advection_coeff = rho_r * heat_cap_r * _u(1) * CSA_o;
+            // z direction
+            vec_advection(2) = advection_coeff;
+            break;
+        case 2:
+            // pipe g1, Eq. 28
+            advection_coeff = 0.0;
+            break;
+        default:
+            OGS_FATAL(
+                "Error !!! The index passed to get_advection_coeff for BHE is "
+                "not correct. ");
+            break;
     }
 }
 
 double BHE_CXC::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
 {
-    // Here we calculates the boundary heat exchange coefficients 
-    // in the governing equations of BHE. 
-    // These governing equations can be found in 
+    // Here we calculates the boundary heat exchange coefficients
+    // in the governing equations of BHE.
+    // These governing equations can be found in
     // 1) Diersch (2013) FEFLOW book on page 958, M.3, or
-    // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97. 
+    // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97.
 
     double exchange_coeff(0);
 
     switch (idx_unknown)
     {
-    case 0:
-        // PHI_fog
-        exchange_coeff = _PHI_fog;
-        break;
-    case 1:
-        // PHI_ff
-        exchange_coeff = _PHI_ff;
-        break;
-    case 2:
-        // PHI_gs
-        exchange_coeff = _PHI_gs;
-        break;
-    default:
-        OGS_FATAL("Error !!! The index passed to get_boundary_heat_exchange_coeff for BHE is not correct. ");
-        break;
+        case 0:
+            // PHI_fog
+            exchange_coeff = _PHI_fog;
+            break;
+        case 1:
+            // PHI_ff
+            exchange_coeff = _PHI_ff;
+            break;
+        case 2:
+            // PHI_gs
+            exchange_coeff = _PHI_gs;
+            break;
+        default:
+            OGS_FATAL(
+                "Error !!! The index passed to "
+                "get_boundary_heat_exchange_coeff for BHE is not correct. ");
+            break;
     }
     return exchange_coeff;
 }
@@ -426,52 +457,54 @@ double BHE_CXC::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 
     switch (this->get_bound_type())
     {
-    case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
-        T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;
-        break;
-    case BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY:
-        T_in = T_out + delta_T_val;
-        break;
-    case BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY:
-        // get the power value in the curve
-        // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
-        power_tmp = _power_in_watt_curve->getValue(current_time);
-
-        // if power value exceeds threshold, calculate new values
-        if (fabs(power_tmp) > threshold)
-        {
-            // calculate the corresponding flow rate needed
-            // using the defined delta_T value
-            Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
-            // update all values dependent on the flow rate
-            update_flow_rate(Q_r_tmp);
-            // calculate the new T_in
+        case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
+            T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;
+            break;
+        case BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY:
             T_in = T_out + delta_T_val;
-        }
-        else
-        {
-            Q_r_tmp = 1.0e-06; // this has to be a small value to avoid division by zero
-            // update all values dependent on the flow rate
-            update_flow_rate(Q_r_tmp);
-            // calculate the new T_in
-            T_in = T_out;
-        }
-        break;
-    case BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_FLOW_RATE_BOUNDARY:
-        // get the power value in the curve
-        // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
-        power_tmp = _power_in_watt_curve->getValue(current_time);
+            break;
+        case BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY:
+            // get the power value in the curve
+            // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
+            // current_time, &flag_valid);
+            power_tmp = _power_in_watt_curve->getValue(current_time);
 
-        // calculate the dT value based on fixed flow rate
-        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
-        // calcuate the new T_in 
-        T_in = T_out + delta_T_val;
-        break;
-    default:
-        T_in = T_out;
-        break;
+            // if power value exceeds threshold, calculate new values
+            if (fabs(power_tmp) > threshold)
+            {
+                // calculate the corresponding flow rate needed
+                // using the defined delta_T value
+                Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
+                // update all values dependent on the flow rate
+                update_flow_rate(Q_r_tmp);
+                // calculate the new T_in
+                T_in = T_out + delta_T_val;
+            }
+            else
+            {
+                Q_r_tmp = 1.0e-06;  // this has to be a small value to avoid
+                                    // division by zero
+                // update all values dependent on the flow rate
+                update_flow_rate(Q_r_tmp);
+                // calculate the new T_in
+                T_in = T_out;
+            }
+            break;
+        case BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_FLOW_RATE_BOUNDARY:
+            // get the power value in the curve
+            // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
+            // current_time, &flag_valid);
+            power_tmp = _power_in_watt_curve->getValue(current_time);
+
+            // calculate the dT value based on fixed flow rate
+            delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
+            // calcuate the new T_in
+            T_in = T_out + delta_T_val;
+            break;
+        default:
+            T_in = T_out;
+            break;
     }
 
     return T_in;
 }
-

@@ -284,7 +284,7 @@ public:
                 }
             }
         }
-        
+
         data_ptr = it->second(mesh_item, varIDs.size(), n_local_dof,
                               dofIndex_to_localIndex,
                               std::forward<ConstructorArgs>(args)...);
@@ -342,30 +342,29 @@ private:
                   std::size_t const local_matrix_size,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) {
-
-            if (e.getDimension() == GlobalDim) // soil elements
+            if (e.getDimension() == GlobalDim)  // soil elements
             {
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
                     e, local_matrix_size,
                     std::forward<ConstructorArgs>(args)...}};
             }
 
-            return LADataIntfPtr{new LADataBHE<ShapeFunction>{ // BHE elements
-                   e, local_matrix_size, dofIndex_to_localIndex,
-                   std::forward<ConstructorArgs>(args)...}};
+            return LADataIntfPtr{new LADataBHE<ShapeFunction>{
+                // BHE elements
+                e, local_matrix_size, dofIndex_to_localIndex,
+                std::forward<ConstructorArgs>(args)...}};
         };
     }
 
-/// Returns nullptr for shape functions whose dimensions are less than the
-/// global dimension.
-template <typename ShapeFunction>
-static LADataBuilder makeLocalAssemblerBuilder(std::false_type*)
-{
-    return nullptr;
-}
+    /// Returns nullptr for shape functions whose dimensions are less than the
+    /// global dimension.
+    template <typename ShapeFunction>
+    static LADataBuilder makeLocalAssemblerBuilder(std::false_type*)
+    {
+        return nullptr;
+    }
 };  // namespace HeatTransportBHE
-
-}  // namespace ProcessLib
+}  // namespace HeatTransportBHE
 }  // namespace ProcessLib
 
 #undef ENABLED_ELEMENT_TYPE_SIMPLEX

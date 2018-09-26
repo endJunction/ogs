@@ -32,7 +32,6 @@ BHE::BHE_1U* CreateBHE1U(
         bhe_refrigerant_heat_capacity,
     std::unique_ptr<MaterialLib::Fluid::FluidProperty> const&
         bhe_regrigerant_heat_conductivity);
-
 }  // namespace BHE
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

@@ -1,11 +1,11 @@
 /**
-* \copyright
-* Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
-*            Distributed under a Modified BSD License.
-*              See accompanying file LICENSE.txt or
-*              http://www.opengeosys.org/project/license
-*
-*/
+ * \copyright
+ * Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
+ *            Distributed under a Modified BSD License.
+ *              See accompanying file LICENSE.txt or
+ *              http://www.opengeosys.org/project/license
+ *
+ */
 
 #pragma once
 
@@ -15,113 +15,100 @@
 
 #include "ProcessLib/HeatTransportBHE/HeatTransportBHEProcessData.h"
 
+#include "HeatTransportBHEProcessAssemblerInterface.h"
 #include "IntegrationPointDataBHE.h"
 #include "SecondaryData.h"
-#include "HeatTransportBHEProcessAssemblerInterface.h"
 
 namespace ProcessLib
 {
-    namespace HeatTransportBHE
+namespace HeatTransportBHE
+{
+template <typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
+class HeatTransportBHELocalAssemblerBHE
+    : public HeatTransportBHELocalAssemblerInterface
+{
+public:
+    using ShapeMatricesType = ShapeMatrixPolicyType<ShapeFunction, BHE_Dim>;
+    using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
+    using NodalVectorType = typename ShapeMatricesType::NodalVectorType;
+    using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
+
+    HeatTransportBHELocalAssemblerBHE(
+        HeatTransportBHELocalAssemblerBHE const&) = delete;
+    HeatTransportBHELocalAssemblerBHE(HeatTransportBHELocalAssemblerBHE&&) =
+        delete;
+
+    HeatTransportBHELocalAssemblerBHE(
+        MeshLib::Element const& e,
+        std::size_t const local_matrix_size,
+        std::vector<unsigned> const& dofIndex_to_localIndex,
+        bool const is_axially_symmetric,
+        unsigned const integration_order,
+        HeatTransportBHEProcessData& process_data);
+
+    void assemble(double const /*t*/, std::vector<double> const& /*local_x*/,
+                  std::vector<double>& /*local_M_data*/,
+                  std::vector<double>& /*local_K_data*/,
+                  std::vector<double>& /*local_b_data*/) override;
+
+    void assembleWithJacobian(double const /*t*/,
+                              Eigen::VectorXd const& /*local_u*/,
+                              Eigen::VectorXd& /*local_b*/,
+                              Eigen::MatrixXd& /*local_J*/) override
     {
-        template <typename ShapeFunction, typename IntegrationMethod,
-            int BHE_Dim>
-        class HeatTransportBHELocalAssemblerBHE
-            : public HeatTransportBHELocalAssemblerInterface
-        {
-        public:
-            using ShapeMatricesType =
-                ShapeMatrixPolicyType<ShapeFunction, BHE_Dim>;
-            using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
-            using NodalVectorType = typename ShapeMatricesType::NodalVectorType;
-            using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
+        OGS_FATAL(
+            "HeatTransportBHELocalAssembler: assembly with jacobian is not "
+            "implemented.");
+    }
 
-            HeatTransportBHELocalAssemblerBHE(
-                HeatTransportBHELocalAssemblerBHE const&) = delete;
-            HeatTransportBHELocalAssemblerBHE(
-                HeatTransportBHELocalAssemblerBHE&&) = delete;
+    void preTimestepConcrete(std::vector<double> const& /*local_x*/,
+                             double const /*t*/,
+                             double const /*delta_t*/) override
+    {
+    }
 
-            HeatTransportBHELocalAssemblerBHE(
-                MeshLib::Element const& e,
-                std::size_t const local_matrix_size,
-                std::vector<unsigned> const& dofIndex_to_localIndex,
-                bool const is_axially_symmetric,
-                unsigned const integration_order,
-                HeatTransportBHEProcessData& process_data);
+    void postTimestepConcrete(std::vector<double> const& /*local_x*/) override;
 
-            void assemble(double const /*t*/, std::vector<double> const& /*local_x*/,
-                std::vector<double>& /*local_M_data*/,
-                std::vector<double>& /*local_K_data*/,
-                std::vector<double>& /*local_b_data*/) override;
+    Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
+        const unsigned integration_point) const override
+    {
+        auto const& N = _secondary_data.N[integration_point];
 
-            void assembleWithJacobian(double const /*t*/,
-                Eigen::VectorXd const& /*local_u*/,
-                Eigen::VectorXd& /*local_b*/,
-                Eigen::MatrixXd& /*local_J*/) override
-            {
-                OGS_FATAL(
-                    "HeatTransportBHELocalAssembler: assembly with jacobian is not "
-                    "implemented.");
-            }
+        // assumes N is stored contiguously in memory
+        return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
+    }
 
-            void preTimestepConcrete(std::vector<double> const& /*local_x*/,
-                double const /*t*/,
-                double const /*delta_t*/) override
-            {
-            }
+    Eigen::MatrixXd& get_R_matrix() { return _R_matrix; }
 
-            void postTimestepConcrete(std::vector<double> const& /*local_x*/) override;
+    Eigen::MatrixXd& R_s_matrix() { return _R_s_matrix; }
 
-            Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
-                const unsigned integration_point) const override
-            {
-                auto const& N = _secondary_data.N[integration_point];
+    Eigen::MatrixXd& R_pi_s_matrix() { return _R_pi_s_matrix; }
 
-                // assumes N is stored contiguously in memory
-                return Eigen::Map<const Eigen::RowVectorXd>(N.data(), N.size());
-            }
+private:
+    HeatTransportBHEProcessData& _process_data;
+    // BHEElementProperty const* _BHE_element_property = nullptr;
 
-            Eigen::MatrixXd& get_R_matrix()
-            {
-                return _R_matrix;
-            }
-
-            Eigen::MatrixXd& R_s_matrix()
-            {
-                return _R_s_matrix;
-            }
-
-            Eigen::MatrixXd& R_pi_s_matrix()
-            {
-                return _R_pi_s_matrix;
-            }
-
-        private:
-
-            HeatTransportBHEProcessData& _process_data;
-            // BHEElementProperty const* _BHE_element_property = nullptr;
-
-            std::vector<IntegrationPointDataBHE,
+    std::vector<IntegrationPointDataBHE,
                 Eigen::aligned_allocator<IntegrationPointDataBHE>>
-                _ip_data;
+        _ip_data;
 
-            IntegrationMethod _integration_method;
+    IntegrationMethod _integration_method;
 
-            std::vector<ShapeMatrices, Eigen::aligned_allocator<
-                typename ShapeMatricesType::ShapeMatrices>>
-                _shape_matrices;
+    std::vector<ShapeMatrices, Eigen::aligned_allocator<
+                                   typename ShapeMatricesType::ShapeMatrices>>
+        _shape_matrices;
 
-            MeshLib::Element const& _element;
+    MeshLib::Element const& _element;
 
-            SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
+    SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 
-            Eigen::MatrixXd _R_matrix;
+    Eigen::MatrixXd _R_matrix;
 
-            Eigen::MatrixXd _R_s_matrix;
+    Eigen::MatrixXd _R_s_matrix;
 
-            Eigen::MatrixXd _R_pi_s_matrix;
-
-        };
-    }  // namespace HeatTransportBHE
+    Eigen::MatrixXd _R_pi_s_matrix;
+};
+}  // namespace HeatTransportBHE
 }  // namespace ProcessLib
 
 #include "HeatTransportBHELocalAssemblerBHE_impl.h"

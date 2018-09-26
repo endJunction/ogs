@@ -254,31 +254,33 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
         // find the variable ID
         // the soil temperature is 0-th variable
         // the BHE temperature is therefore bhe_i + 1
-        const int variable_id = bhe_i + 1; 
+        const int variable_id = bhe_i + 1;
         // find the node in mesh that are at the top
         auto const n_bhe_nodes = _vec_BHE_nodes[bhe_i].size();
         unsigned int idx_top = 0;
-        unsigned int idx_bottom = _vec_BHE_nodes[bhe_i].size()-1;
+        unsigned int idx_bottom = _vec_BHE_nodes[bhe_i].size() - 1;
         double top_z_coord = _vec_BHE_nodes[bhe_i].at(idx_top)->getCoords()[2];
-        double bottom_z_coord = _vec_BHE_nodes[bhe_i].at(idx_bottom)->getCoords()[2];
-        for (unsigned bhe_node_i = 0; bhe_node_i < n_bhe_nodes; bhe_node_i++ )
+        double bottom_z_coord =
+            _vec_BHE_nodes[bhe_i].at(idx_bottom)->getCoords()[2];
+        for (unsigned bhe_node_i = 0; bhe_node_i < n_bhe_nodes; bhe_node_i++)
         {
-            if (_vec_BHE_nodes[bhe_i].at(bhe_node_i)->getCoords()[2] >= top_z_coord)
+            if (_vec_BHE_nodes[bhe_i].at(bhe_node_i)->getCoords()[2] >=
+                top_z_coord)
                 idx_top = bhe_node_i;
 
-            if (_vec_BHE_nodes[bhe_i].at(bhe_node_i)->getCoords()[2] <= bottom_z_coord)
+            if (_vec_BHE_nodes[bhe_i].at(bhe_node_i)->getCoords()[2] <=
+                bottom_z_coord)
                 idx_bottom = bhe_node_i;
-
         }
         bc_top_nodes.clear();
-        bc_top_nodes.emplace_back( _vec_BHE_nodes[bhe_i].at(idx_top) );
+        bc_top_nodes.emplace_back(_vec_BHE_nodes[bhe_i].at(idx_top));
         bc_bottom_nodes.clear();
         bc_bottom_nodes.emplace_back(_vec_BHE_nodes[bhe_i].at(idx_bottom));
 
-        MeshLib::MeshSubset bc_mesh_subset_top{_mesh, bc_top_nodes };
+        MeshLib::MeshSubset bc_mesh_subset_top{_mesh, bc_top_nodes};
         MeshLib::Mesh const& bc_mesh_top = bc_mesh_subset_top.getMesh();
 
-        MeshLib::MeshSubset bc_mesh_subset_bottom{ _mesh, bc_bottom_nodes };
+        MeshLib::MeshSubset bc_mesh_subset_bottom{_mesh, bc_bottom_nodes};
         MeshLib::Mesh const& bc_mesh_bottom = bc_mesh_subset_bottom.getMesh();
 
         // depending on the BHE type
@@ -295,21 +297,20 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                 // get the global index for T_in
                 auto const global_index_T_in_top =
                     dof_table_bulk.getGlobalIndex(
-                    {bc_mesh_top.getID(), MeshLib::MeshItemType::Node,
-                     bc_top_nodes.at(0)->getID()},
-                    variable_id, component_id_T_in);
+                        {bc_mesh_top.getID(), MeshLib::MeshItemType::Node,
+                         bc_top_nodes.at(0)->getID()},
+                        variable_id, component_id_T_in);
                 auto const global_index_T_out_top =
                     dof_table_bulk.getGlobalIndex(
-                    {bc_mesh_top.getID(), MeshLib::MeshItemType::Node,
-                     bc_top_nodes.at(0)->getID()},
-                    variable_id, component_id_T_out);
+                        {bc_mesh_top.getID(), MeshLib::MeshItemType::Node,
+                         bc_top_nodes.at(0)->getID()},
+                        variable_id, component_id_T_out);
 
                 std::unique_ptr<BHEInflowDirichletBoundaryCondition> bc_top =
                     ProcessLib::createBHEInflowDirichletBoundaryCondition(
                         global_index_T_in_top, global_index_T_out_top, _mesh,
-                        bc_top_nodes, variable_id,
-                        _integration_order, bc_mesh_top.getID(),
-                        component_id_T_in,
+                        bc_top_nodes, variable_id, _integration_order,
+                        bc_mesh_top.getID(), component_id_T_in,
                         _process_data._vec_BHE_property.at(bhe_i));
 
                 // there is also one BC on the bottom node
@@ -326,14 +327,13 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                 std::unique_ptr<BHEBottomDirichletBoundaryCondition> bc_bottom =
                     ProcessLib::createBHEBottomDirichletBoundaryCondition(
                         global_index_T_in_bottom, global_index_T_out_bottom,
-                        _mesh, bc_bottom_nodes, variable_id,
-                        _integration_order, bc_mesh_bottom.getID(),
-                        component_id_T_out, bhe_i);
+                        _mesh, bc_bottom_nodes, variable_id, _integration_order,
+                        bc_mesh_bottom.getID(), component_id_T_out, bhe_i);
                 // add bc_top and bc_bottom to the vector
                 bcs.push_back(std::move(bc_top));
                 bcs.push_back(std::move(bc_bottom));
             }
-                break;
+            break;
             case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_CXC:
                 // TODO
                 break;
@@ -344,9 +344,8 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                 break;
         }
     }
-    
-    return std::move(bcs); 
-}
 
+    return std::move(bcs);
+}
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

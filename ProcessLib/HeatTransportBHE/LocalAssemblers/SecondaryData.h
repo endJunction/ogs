@@ -26,6 +26,5 @@ struct SecondaryData
 {
     std::vector<ShapeMatrixType, Eigen::aligned_allocator<ShapeMatrixType>> N;
 };
-
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
