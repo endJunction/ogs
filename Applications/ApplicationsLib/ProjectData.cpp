@@ -384,7 +384,7 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
         }
         else
 #endif
-#ifdef OGS_BUILD_PROCESS_HYDRO_MECHANICS
+#ifdef OGS_BUILD_PROCESS_HYDROMECHANICS
             if (type == "HYDRO_MECHANICS")
         {
             //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS__dimension}
