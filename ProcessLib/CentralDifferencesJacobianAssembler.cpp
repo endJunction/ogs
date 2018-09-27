@@ -56,6 +56,12 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     std::vector<double> local_b_data_;
     std::vector<double> local_x_perturbed_data_(local_x_data);
 
+
+//    local_assembler.assemble(t, local_x_data, local_M_data,
+//                                     local_K_data, local_b_data);
+//
+//    OGS_FATAL("XXX");
+
     auto const num_dofs_per_component =
         local_x_data.size() / _absolute_epsilons.size();
 
@@ -142,9 +148,9 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     std::cout << " Jacobian (numerical): \n";
     std::cout << local_Jac << "\n\n";
     std::cout << "=====================\n";
-    std::cout << " residuum: \n\n";
-
-    std::cout << "=====================\n";
+//    std::cout << " residuum: \n\n";
+//
+//    std::cout << "=====================\n";
     OGS_FATAL("Oh stop it, you!");
 
 
