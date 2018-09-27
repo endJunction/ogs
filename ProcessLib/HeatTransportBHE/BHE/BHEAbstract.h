@@ -471,13 +471,13 @@ public:
     /**
      * return the number of grout zones in this BHE.
      */
-    virtual std::size_t get_n_grout_zones(void) = 0;
+    virtual std::size_t getNumGroutZones(void) = 0;
 
     /**
      * return the inflow temperature based on outflow temperature and fixed
      * power.
      */
-    virtual double get_Tin_by_Tout(double T_in, double current_time) = 0;
+    virtual double getTinByTout(double T_in, double current_time) = 0;
 
     /**
      * get the polyline geometry
@@ -591,22 +591,22 @@ public:
     /**
      * power in watt curve
      */
-    MathLib::PiecewiseLinearInterpolation* _power_in_watt_curve;
+    MathLib::PiecewiseLinearInterpolation* power_in_watt_curve;
 
     /**
      * heating COP curve
      */
-    MathLib::PiecewiseLinearInterpolation* _heating_cop_curve;
+    MathLib::PiecewiseLinearInterpolation* heating_cop_curve;
 
     /**
      * cooling COP curve
      */
-    MathLib::PiecewiseLinearInterpolation* _cooling_cop_curve;
+    MathLib::PiecewiseLinearInterpolation* cooling_cop_curve;
 
     /**
      * refrigerant flow rate curve
      */
-    MathLib::PiecewiseLinearInterpolation* _flowrate_curve;
+    MathLib::PiecewiseLinearInterpolation* flowrate_curve;
 
     /**
      * inflow temperature curve

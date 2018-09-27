@@ -200,13 +200,15 @@ void BHE_1U::calc_thermal_resistances()
         count++;
     }
 
-    // print R and phi values
+    // kleep the following lines------------------------------------------------
+    // when debugging the code, printing the R and phi values are needed--------
     // std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" <<
     // _R_gg << " Rgs =" << _R_gs << "\n"; double phi_fig = 1.0 / (_R_fig *
     // S_i); double phi_fog = 1.0 / (_R_fog * S_o); double phi_gg = 1.0 / (_R_gg
     // * S_g1); double phi_gs = 1.0 / (_R_gs * S_gs); std::cout << "phi_fig ="
     // << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << "
     // phi_gs =" << phi_gs << "\n";
+    // -------------------------------------------------------------------------
 }
 
 /**
@@ -472,7 +474,7 @@ int BHE_1U::get_loc_shift_by_pv(BHE_PRIMARY_VARS pv_name)
     return idx;
 }
 
-double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
+double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
 {
     double T_in(0.0);
     double power_tmp(0.0);
@@ -494,7 +496,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
             if (use_flowrate_curve)
             {
-                Q_r_tmp = _flowrate_curve->getValue(current_time);
+                Q_r_tmp = flowrate_curve->getValue(current_time);
 
                 update_flow_rate(Q_r_tmp);
             }
@@ -505,7 +507,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
         case BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY:
             if (use_flowrate_curve)
             {
-                Q_r_tmp = _flowrate_curve->getValue(current_time);
+                Q_r_tmp = flowrate_curve->getValue(current_time);
 
                 update_flow_rate(Q_r_tmp);
             }
@@ -515,7 +517,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // get the power value in the curve
             // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            power_tmp = _power_in_watt_curve->getValue(current_time);
+            power_tmp = power_in_watt_curve->getValue(current_time);
 
             if (power_tmp < 0)
                 fac_dT = -1.0;
@@ -551,12 +553,12 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // get the building power value in the curve
             // building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            building_power_tmp = _power_in_watt_curve->getValue(current_time);
+            building_power_tmp = power_in_watt_curve->getValue(current_time);
 
             if (building_power_tmp <= 0.0)
             {
                 // get COP value based on T_out in the curve
-                COP_tmp = _heating_cop_curve->getValue(T_out);
+                COP_tmp = heating_cop_curve->getValue(T_out);
 
                 // now calculate how much power needed from BHE
                 power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
@@ -570,7 +572,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             else
             {
                 // get COP value based on T_out in the curve
-                COP_tmp = _cooling_cop_curve->getValue(T_out);
+                COP_tmp = cooling_cop_curve->getValue(T_out);
 
                 // now calculate how much power needed from BHE
                 power_tmp = building_power_tmp * (COP_tmp + 1.0) / COP_tmp;
@@ -612,12 +614,12 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // get the building power value in the curve
             // building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            building_power_tmp = _power_in_watt_curve->getValue(current_time);
+            building_power_tmp = power_in_watt_curve->getValue(current_time);
 
             if (building_power_tmp <= 0)
             {
                 // get COP value based on T_out in the curve
-                COP_tmp = _heating_cop_curve->getValue(T_out);
+                COP_tmp = heating_cop_curve->getValue(T_out);
                 // now calculate how much power needed from BHE
                 power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
                 // also how much power from electricity
@@ -629,7 +631,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             else
             {
                 // get COP value based on T_out in the curve
-                COP_tmp = _cooling_cop_curve->getValue(T_out);
+                COP_tmp = cooling_cop_curve->getValue(T_out);
                 // now calculate how much power needed from BHE
                 power_tmp = building_power_tmp * (COP_tmp + 1.0) / COP_tmp;
                 // also how much power from electricity
@@ -643,7 +645,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             {
                 // Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time,
                 // &flag_valid);
-                Q_r_tmp = _flowrate_curve->getValue(current_time);
+                Q_r_tmp = flowrate_curve->getValue(current_time);
                 update_flow_rate(Q_r_tmp);
             }
             else
@@ -673,14 +675,14 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // get the power value in the curve
             // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            power_tmp = _power_in_watt_curve->getValue(current_time);
+            power_tmp = power_in_watt_curve->getValue(current_time);
 
             // Assign Qr whether from curve or fixed value
             if (use_flowrate_curve)
             {
                 // Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time,
                 // &flag_valid);
-                Q_r_tmp = _flowrate_curve->getValue(current_time);
+                Q_r_tmp = flowrate_curve->getValue(current_time);
                 update_flow_rate(Q_r_tmp);
             }
             else

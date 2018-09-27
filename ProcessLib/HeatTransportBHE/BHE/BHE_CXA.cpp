@@ -447,7 +447,7 @@ int BHE_CXA::get_loc_shift_by_pv(BHE_PRIMARY_VARS pv_name)
     return idx;
 }
 
-double BHE_CXA::get_Tin_by_Tout(double T_out, double current_time = -1.0)
+double BHE_CXA::getTinByTout(double T_out, double current_time = -1.0)
 {
     double T_in(0.0);
     double power_tmp(0.0);
@@ -467,7 +467,7 @@ double BHE_CXA::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // get the power value in the curve
             // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            power_tmp = _power_in_watt_curve->getValue(current_time);
+            power_tmp = power_in_watt_curve->getValue(current_time);
 
             // if power value exceeds threshold, calculate new values
             if (fabs(power_tmp) > threshold)
@@ -494,7 +494,7 @@ double BHE_CXA::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // get the power value in the curve
             // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            power_tmp = _power_in_watt_curve->getValue(current_time);
+            power_tmp = power_in_watt_curve->getValue(current_time);
 
             // calculate the dT value based on fixed flow rate
             delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;

@@ -73,7 +73,7 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
         // here call the corresponding BHE functions
         auto const tmp_T_out = x[_T_out_indices[i]];
         bc_values.values[i] =
-            _pt_bhe->get_Tin_by_Tout(tmp_T_out, t);
+            _pt_bhe->getTinByTout(tmp_T_out, t);
     }
 }
 

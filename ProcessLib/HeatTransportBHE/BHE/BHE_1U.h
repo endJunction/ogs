@@ -109,7 +109,7 @@ public:
             }
 
             // curve successfully found
-            _power_in_watt_curve = it->second.get();
+            power_in_watt_curve = it->second.get();
         }
 
         if (if_flowrate_curve)
@@ -125,7 +125,7 @@ public:
             }
 
             // curve successfully found
-            _flowrate_curve = it->second.get();
+            flowrate_curve = it->second.get();
         }
         if (bound_type == BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
         {
@@ -192,7 +192,7 @@ public:
         if (use_flowrate_curve)
         {
             double Q_r_tmp(0.0);
-            Q_r_tmp = _flowrate_curve->getValue(current_time);
+            Q_r_tmp = flowrate_curve->getValue(current_time);
             update_flow_rate(Q_r_tmp);
         }
     };
@@ -282,13 +282,13 @@ public:
     /**
      * return the number of grout zones in this BHE.
      */
-    std::size_t get_n_grout_zones(void) { return 2; };
+    std::size_t getNumGroutZones(void) { return 2; };
 
     /**
      * return the inflow temperature based on outflow temperature and fixed
      * power.
      */
-    double get_Tin_by_Tout(double T_out, double current_time);
+    double getTinByTout(double T_out, double current_time);
 
     /**
      * required by eigen library,
