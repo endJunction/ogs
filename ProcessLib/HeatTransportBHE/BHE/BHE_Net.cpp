@@ -114,7 +114,7 @@ void BHE_Net::count_n_unknowns()
     }
 }
 
-int BHE_Net::get_n_unknowns()
+int BHE_Net::getNumUnknowns()
 {
     // first count
     count_n_unknowns();

@@ -16,7 +16,7 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
  * 0 - the first u-tube
  * 1 - the second u-tube
  */
-double BHE_CXC::get_thermal_resistance_fig(std::size_t /*idx = 0*/)
+double BHE_CXC::getThermalResistanceFig(std::size_t /*idx = 0*/)
 {
     // notice there is no R_fog value for co-axial BHE
     return 0.0;
@@ -28,7 +28,7 @@ double BHE_CXC::get_thermal_resistance_fig(std::size_t /*idx = 0*/)
  * 0 - the first u-tube
  * 1 - the second u-tube
  */
-double BHE_CXC::get_thermal_resistance_fog(std::size_t /*idx = 0*/)
+double BHE_CXC::getThermalResistanceFog(std::size_t /*idx = 0*/)
 {
     return _R_fog;
 }
@@ -36,37 +36,16 @@ double BHE_CXC::get_thermal_resistance_fog(std::size_t /*idx = 0*/)
 /**
  * return the thermal resistance
  */
-double BHE_CXC::get_thermal_resistance(std::size_t /*idx = 0*/)
+double BHE_CXC::getThermalResistance(std::size_t /*idx = 0*/)
 {
     // TODO
     return 0.0;
 }
 
-void BHE_CXC::set_T_in_out_global_idx(std::size_t start_idx)
-{
-    this->set_T_in_global_index(start_idx);
-    this->set_T_out_global_index(start_idx + 1);
-}
-
-void BHE_CXC::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
-{
-    std::size_t start_idx;
-    std::size_t global_idx_T_in_bottom;
-
-    // calculating
-    start_idx = this->get_T_in_global_index();
-    global_idx_T_in_bottom =
-        start_idx + dof_bhe - 3;  // CXC BHE, the order is: T_in, T_out, T_g.
-                                  // T_in at the bottom
-    this->set_T_in_bottom_global_index(global_idx_T_in_bottom);
-    // T_out at the bottom
-    this->set_T_out_bottom_global_index(global_idx_T_in_bottom + 1);
-}
-
 /**
  * calculate thermal resistance
  */
-void BHE_CXC::calc_thermal_resistances()
+void BHE_CXC::calcThermalResistances()
 {
     double Nu_in, Nu_out;
     double d_o1, d_i1, d_h;
@@ -153,7 +132,7 @@ void BHE_CXC::calc_thermal_resistances()
 /**
  * Nusselt number calculation
  */
-void BHE_CXC::calc_Nu()
+void BHE_CXC::calcNusseltNum()
 {
     // see Eq. 32 in Diersch_2011_CG
 
@@ -235,7 +214,7 @@ void BHE_CXC::calc_Nu()
 /**
  * Renolds number calculation
  */
-void BHE_CXC::calc_Re()
+void BHE_CXC::calcRenoldsNum()
 {
     double d_i1, d_h;
     double const& r_outer = pipe_param.r_outer;
@@ -256,7 +235,7 @@ void BHE_CXC::calc_Re()
 /**
  * Prandtl number calculation
  */
-void BHE_CXC::calc_Pr()
+void BHE_CXC::calcPrandtlNum()
 {
     double const& mu_r = refrigerant_param.mu_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
@@ -268,7 +247,7 @@ void BHE_CXC::calc_Pr()
 /**
  * calculate heat transfer coefficient
  */
-void BHE_CXC::calc_heat_transfer_coefficients()
+void BHE_CXC::calcHeatTransferCoefficients()
 {
     _PHI_fog = 1.0 / _R_fog;
     _PHI_ff = 1.0 / _R_ff;
@@ -278,7 +257,7 @@ void BHE_CXC::calc_heat_transfer_coefficients()
 /**
  * flow velocity inside the pipeline
  */
-void BHE_CXC::calc_u()
+void BHE_CXC::calcPipeFlowVelocity()
 {
     double u_in, u_out;
     double const& r_outer = pipe_param.r_outer;
@@ -293,7 +272,7 @@ void BHE_CXC::calc_u()
     _u(1) = u_out;
 }
 
-double BHE_CXC::get_mass_coeff(std::size_t idx_unknown)
+double BHE_CXC::getMassCoeff(std::size_t idx_unknown)
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
@@ -321,7 +300,7 @@ double BHE_CXC::get_mass_coeff(std::size_t idx_unknown)
     return mass_coeff;
 }
 
-void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown,
+void BHE_CXC::getLaplaceMatrix(std::size_t idx_unknown,
                                  Eigen::MatrixXd& mat_laplace)
 {
     double const& lambda_r = refrigerant_param.lambda_r;
@@ -366,7 +345,7 @@ void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown,
     mat_laplace(2, 2) = laplace_coeff;
 }
 
-void BHE_CXC::get_advection_vector(std::size_t idx_unknown,
+void BHE_CXC::getAdvectionVector(std::size_t idx_unknown,
                                    Eigen::VectorXd& vec_advection)
 {
     double const& rho_r = refrigerant_param.rho_r;
@@ -400,7 +379,7 @@ void BHE_CXC::get_advection_vector(std::size_t idx_unknown,
     }
 }
 
-double BHE_CXC::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
+double BHE_CXC::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown)
 {
     // Here we calculates the boundary heat exchange coefficients
     // in the governing equations of BHE.
@@ -427,24 +406,10 @@ double BHE_CXC::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
         default:
             OGS_FATAL(
                 "Error !!! The index passed to "
-                "get_boundary_heat_exchange_coeff for BHE is not correct. ");
+                "getBoundaryHeatExchangeCoeff for BHE is not correct. ");
             break;
     }
     return exchange_coeff;
-}
-
-int BHE_CXC::get_loc_shift_by_pv(BHE_PRIMARY_VARS pv_name)
-{
-    int idx(0);
-
-    if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
-        idx = 0;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
-        idx = 1;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_1)
-        idx = 2;
-
-    return idx;
 }
 
 double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
@@ -455,7 +420,7 @@ double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
     double power_tmp(0.0);
     double Q_r_tmp(0.0);
 
-    switch (this->get_bound_type())
+    switch (this->getBoundaryType())
     {
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
             T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;
@@ -476,7 +441,7 @@ double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
                 // using the defined delta_T value
                 Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
                 // update all values dependent on the flow rate
-                update_flow_rate(Q_r_tmp);
+                updateFlowRate(Q_r_tmp);
                 // calculate the new T_in
                 T_in = T_out + delta_T_val;
             }
@@ -485,7 +450,7 @@ double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp = 1.0e-06;  // this has to be a small value to avoid
                                     // division by zero
                 // update all values dependent on the flow rate
-                update_flow_rate(Q_r_tmp);
+                updateFlowRate(Q_r_tmp);
                 // calculate the new T_in
                 T_in = T_out;
             }

@@ -45,7 +45,7 @@ public:
     /**
      * get the number of unknowns
      */
-    int get_n_unknowns();
+    int getNumUnknowns();
 
     /**
      * get the number of elements in the network

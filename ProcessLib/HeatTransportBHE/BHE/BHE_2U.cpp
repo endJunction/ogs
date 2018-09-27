@@ -17,7 +17,7 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
  * 0 - the first u-tube
  * 1 - the second u-tube
  */
-double BHE_2U::get_thermal_resistance_fig(std::size_t /*idx = 0*/)
+double BHE_2U::getThermalResistanceFig(std::size_t /*idx = 0*/)
 {
     return _R_fig;
 }
@@ -28,7 +28,7 @@ double BHE_2U::get_thermal_resistance_fig(std::size_t /*idx = 0*/)
  * 0 - the first u-tube
  * 1 - the second u-tube
  */
-double BHE_2U::get_thermal_resistance_fog(std::size_t /*idx = 0*/)
+double BHE_2U::getThermalResistanceFog(std::size_t /*idx = 0*/)
 {
     return _R_fog;
 }
@@ -36,49 +36,16 @@ double BHE_2U::get_thermal_resistance_fog(std::size_t /*idx = 0*/)
 /**
  * return the thermal resistance
  */
-double BHE_2U::get_thermal_resistance(std::size_t /*idx = 0*/)
+double BHE_2U::getThermalResistance(std::size_t /*idx = 0*/)
 {
     // TODO
     return 0.0;
 }
 
-void BHE_2U::set_T_in_out_global_idx(std::size_t start_idx)
-{
-    // T_in_1
-    this->set_T_in_global_index(start_idx, 0);
-    // T_out_1
-    this->set_T_out_global_index(start_idx + 1, 0);  // TO CHECK
-    // T_in_2
-    this->set_T_in_global_index(start_idx + 2, 1);  // TO CHECK
-    // T_out_2
-    this->set_T_out_global_index(start_idx + 3, 1);  // TO CHECK
-}
-
-void BHE_2U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
-{
-    std::size_t start_idx;
-    std::size_t global_idx_T_in_bottom;
-
-    // calculating
-    start_idx = this->get_T_in_global_index();
-    global_idx_T_in_bottom =
-        start_idx + dof_bhe - 8;  // 2U BHE, the order is: T_in_1, T_out_1,
-                                  // T_in_2, T_out_2, T_g1, T_g2, T_g3, T_g4.
-
-    // T_in_1 at the bottom
-    this->set_T_in_bottom_global_index(global_idx_T_in_bottom, 0);
-    // T_out_1 at the bottom
-    this->set_T_out_bottom_global_index(global_idx_T_in_bottom + 1, 0);
-    // T_in_2 at the bottom
-    this->set_T_in_bottom_global_index(global_idx_T_in_bottom + 2, 1);
-    // T_out_2 at the bottom
-    this->set_T_out_bottom_global_index(global_idx_T_in_bottom + 3, 1);
-}
-
 /**
  * calculate thermal resistance
  */
-void BHE_2U::calc_thermal_resistances()
+void BHE_2U::calcThermalResistances()
 {
     // thermal resistance due to the grout transition
     double chi;
@@ -237,7 +204,7 @@ void BHE_2U::calc_thermal_resistances()
 /**
  * Nusselt number calculation
  */
-void BHE_2U::calc_Nu()
+void BHE_2U::calcNusseltNum()
 {
     // see Eq. 32 in Diersch_2011_CG
 
@@ -282,7 +249,7 @@ void BHE_2U::calc_Nu()
 /**
  * Renolds number calculation
  */
-void BHE_2U::calc_Re()
+void BHE_2U::calcRenoldsNum()
 {
     double u_norm, d;
     double const& mu_r = refrigerant_param.mu_r;
@@ -299,7 +266,7 @@ void BHE_2U::calc_Re()
 /**
  * Prandtl number calculation
  */
-void BHE_2U::calc_Pr()
+void BHE_2U::calcPrandtlNum()
 {
     double const& mu_r = refrigerant_param.mu_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
@@ -311,7 +278,7 @@ void BHE_2U::calc_Pr()
 /**
  * calculate heat transfer coefficient
  */
-void BHE_2U::calc_heat_transfer_coefficients()
+void BHE_2U::calcHeatTransferCoefficients()
 {
     _PHI_fig = 1.0 / _R_fig;
     _PHI_fog = 1.0 / _R_fog;
@@ -323,7 +290,7 @@ void BHE_2U::calc_heat_transfer_coefficients()
 /**
  * flow velocity inside the pipeline
  */
-void BHE_2U::calc_u()
+void BHE_2U::calcPipeFlowVelocity()
 {
     double tmp_u;
     // double const& r_outer = pipe_param.r_outer;
@@ -345,7 +312,7 @@ void BHE_2U::calc_u()
     _u(3) = tmp_u;
 }
 
-double BHE_2U::get_mass_coeff(std::size_t idx_unknown)
+double BHE_2U::getMassCoeff(std::size_t idx_unknown)
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
@@ -387,7 +354,7 @@ double BHE_2U::get_mass_coeff(std::size_t idx_unknown)
     return mass_coeff;
 }
 
-void BHE_2U::get_laplace_matrix(std::size_t idx_unknown,
+void BHE_2U::getLaplaceMatrix(std::size_t idx_unknown,
                                 Eigen::MatrixXd& mat_laplace)
 {
     double const& lambda_r = refrigerant_param.lambda_r;
@@ -454,7 +421,7 @@ void BHE_2U::get_laplace_matrix(std::size_t idx_unknown,
     mat_laplace(2, 2) = laplace_coeff;
 }
 
-void BHE_2U::get_advection_vector(std::size_t idx_unknown,
+void BHE_2U::getAdvectionVector(std::size_t idx_unknown,
                                   Eigen::VectorXd& vec_advection)
 {
     double const& rho_r = refrigerant_param.rho_r;
@@ -512,7 +479,7 @@ void BHE_2U::get_advection_vector(std::size_t idx_unknown,
     }
 }
 
-double BHE_2U::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
+double BHE_2U::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown)
 {
     // Here we calculates the boundary heat exchange coefficients
     // in the governing equations of BHE.
@@ -547,34 +514,10 @@ double BHE_2U::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
         default:
             OGS_FATAL(
                 "Error !!! The index passed to "
-                "get_boundary_heat_exchange_coeff for BHE is not correct. ");
+                "getBoundaryHeatExchangeCoeff for BHE is not correct. ");
             break;
     }
     return exchange_coeff;
-}
-
-int BHE_2U::get_loc_shift_by_pv(BHE_PRIMARY_VARS pv_name)
-{
-    int idx(0);
-
-    if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_IN_1)
-        idx = 0;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_IN_2)
-        idx = 1;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
-        idx = 2;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_OUT_1)
-        idx = 3;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_1)
-        idx = 4;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_2)
-        idx = 5;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_3)
-        idx = 6;
-    else if (pv_name == BHE_PRIMARY_VARS::BHE_TEMP_G_4)
-        idx = 7;
-
-    return idx;
 }
 
 double BHE_2U::getTinByTout(double T_out, double current_time = -1.0)
@@ -584,7 +527,7 @@ double BHE_2U::getTinByTout(double T_out, double current_time = -1.0)
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
 
-    switch (this->get_bound_type())
+    switch (this->getBoundaryType())
     {
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
             T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;

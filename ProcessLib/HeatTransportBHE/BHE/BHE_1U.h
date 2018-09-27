@@ -162,38 +162,22 @@ public:
     /**
      * return the number of unknowns needed for 1U BHE
      */
-    std::size_t get_n_unknowns() { return 4; }
+    std::size_t getNumUnknowns() { return 4; }
 
     /**
      * return the type of this BHE
      */
-    BHE_TYPE get_type() { return BHE_TYPE::TYPE_1U; }
-
-    /**
-     * return the number of boundary heat exchange terms for this BHE
-     * abstract function, need to be realized.
-     */
-    std::size_t get_n_heat_exchange_terms() { return 4; }
-
-    /**
-     * set the global index of T_in and T_out
-     */
-    void set_T_in_out_global_idx(std::size_t start_idx);
-
-    /**
-     * set the global index of T_in and T_out at the bottom of the BHE
-     */
-    void set_T_in_out_bottom_global_idx(std::size_t dof_bhe);
+    BHE_TYPE getBheType() { return BHE_TYPE::TYPE_1U; }
 
     double get_flowrate() { return Q_r; }
 
-    void update_flowrate_from_curve(double current_time)
+    void updateFlowRateFromCurve(double current_time)
     {
         if (use_flowrate_curve)
         {
             double Q_r_tmp(0.0);
             Q_r_tmp = flowrate_curve->getValue(current_time);
-            update_flow_rate(Q_r_tmp);
+            updateFlowRate(Q_r_tmp);
         }
     };
 
@@ -203,7 +187,7 @@ public:
      * 0 - the first u-tube
      * 1 - the second u-tube
      */
-    double get_thermal_resistance_fig(std::size_t idx);
+    double getThermalResistanceFig(std::size_t idx);
 
     /**
      * return the thermal resistance for the outlet pipline
@@ -211,73 +195,68 @@ public:
      * 0 - the first u-tube
      * 1 - the second u-tube
      */
-    double get_thermal_resistance_fog(std::size_t idx);
+    double getThermalResistanceFog(std::size_t idx);
 
     /**
      * return the thermal resistance
      */
-    double get_thermal_resistance(std::size_t idx);
+    double getThermalResistance(std::size_t idx);
 
     /**
      * calculate thermal resistance
      */
-    void calc_thermal_resistances();
+    void calcThermalResistances();
 
     /**
      * Nusselt number calculation
      */
-    void calc_Nu();
+    void calcNusseltNum();
 
     /**
      * Renolds number calculation
      */
-    void calc_Re();
+    void calcRenoldsNum();
 
     /**
      * Prandtl number calculation
      */
-    void calc_Pr();
+    void calcPrandtlNum();
 
     /**
      * flow velocity inside the pipeline
      */
-    void calc_u();
+    void calcPipeFlowVelocity();
 
     /**
      * calculate heat transfer coefficient
      */
-    void calc_heat_transfer_coefficients();
+    void calcHeatTransferCoefficients();
 
     /**
      * return the coeff of mass matrix,
      * depending on the index of unknown.
      */
-    double get_mass_coeff(std::size_t idx_unknown);
+    double getMassCoeff(std::size_t idx_unknown);
 
     /**
      * return the coeff of laplace matrix,
      * depending on the index of unknown.
      */
-    void get_laplace_matrix(std::size_t idx_unknown,
+    void getLaplaceMatrix(std::size_t idx_unknown,
                             Eigen::MatrixXd& mat_laplace);
 
     /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */
-    void get_advection_vector(std::size_t idx_unknown,
-                              Eigen::VectorXd& vec_advection);
+    void getAdvectionVector(std::size_t idx_unknown,
+                            Eigen::VectorXd& vec_advection);
 
     /**
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.
      */
-    double get_boundary_heat_exchange_coeff(std::size_t idx_unknown);
-
-    /**
-     * return the shift index based on primary variable value
-     */
-    int get_loc_shift_by_pv(BHE::BHE_PRIMARY_VARS pv_name);
+    double getBoundaryHeatExchangeCoeff(std::size_t idx_unknown);
 
     /**
      * return the number of grout zones in this BHE.

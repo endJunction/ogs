@@ -77,7 +77,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
         _secondary_data.N[ip] = sm.N;
     }
 
-    const int BHE_n_unknowns = _ip_data[0]._bhe_instance.get_n_unknowns();
+    const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
     _R_matrix.setZero(nnodes * BHE_n_unknowns, nnodes * BHE_n_unknowns);
     _R_pi_s_matrix.setZero(nnodes * BHE_n_unknowns, nnodes);
     _R_s_matrix.setZero(nnodes, nnodes);
@@ -99,7 +99,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
             // get coefficient of R matrix for corresponding BHE.
             auto R_coeff =
                 _process_data._vec_BHE_property[BHE_id]
-                    ->get_boundary_heat_exchange_coeff(idx_bhe_unknowns);
+                    ->getBoundaryHeatExchangeCoeff(idx_bhe_unknowns);
 
             // calculate mass matrix for current unknown
             matBHE_loc_R += sm.N.transpose() * R_coeff * sm.N * sm.detJ *
@@ -108,7 +108,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
 
         // The following assembly action is according to Diersch (2013) FEFLOW
         // book please refer to M.127 and M.128 on page 955 and 956
-        switch (_process_data._vec_BHE_property[BHE_id]->get_type())
+        switch (_process_data._vec_BHE_property[BHE_id]->getBheType())
         {
             case BHE::BHE_TYPE::TYPE_1U:
                 switch (idx_bhe_unknowns)
@@ -368,7 +368,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     // BHE must be assembled with one dimentional element
     assert(_element.getDimension() == 1);
     auto const local_matrix_size = local_x.size();
-    const int BHE_n_unknowns = _ip_data[0]._bhe_instance.get_n_unknowns();
+    const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
     // plus one because the soil temperature is included in local_x
     assert(local_matrix_size == ShapeFunction::NPOINTS * (BHE_n_unknowns + 1));
     const int nnodes = _element.getNumberOfNodes();

@@ -25,7 +25,7 @@ struct IntegrationPointDataBHE final
         : _bhe_instance(bhe_instance)
     {
         // depending on the type of BHE
-        const int unknown_size = _bhe_instance.get_n_unknowns();
+        const int unknown_size = _bhe_instance.getNumUnknowns();
         // initialization
         _vec_mass_coefficients.resize(unknown_size);
         for (int i = 0; i < unknown_size; i++)
@@ -42,11 +42,11 @@ struct IntegrationPointDataBHE final
         for (int j = 0; j < unknown_size; j++)
         {
             // mass matrix coefficients
-            _vec_mass_coefficients[j] = _bhe_instance.get_mass_coeff(j);
+            _vec_mass_coefficients[j] = _bhe_instance.getMassCoeff(j);
             // laplace matrix
-            _bhe_instance.get_laplace_matrix(j, _vec_mat_Laplace[j]);
+            _bhe_instance.getLaplaceMatrix(j, _vec_mat_Laplace[j]);
             // advection vector
-            _bhe_instance.get_advection_vector(j, _vec_Advection_vectors[j]);
+            _bhe_instance.getAdvectionVector(j, _vec_Advection_vectors[j]);
         }
     }
 

@@ -271,7 +271,7 @@ public:
      * constructor
      */
     BHEAbstract(
-        const std::string name,
+        const std::string name_,
         BoreholeGeometry borehole_geometry_,
         PipeParameters pipe_param_,
         RefrigerantParameters refrigerant_param_,
@@ -288,9 +288,10 @@ public:
         bool if_flowrate_curve = false,
         int n_T_in = 1,
         int n_T_out = 1)
-        : BHE_Net_ELE_Abstract(name, BHE::BHE_NET_ELE::BHE_NET_BOREHOLE, n_T_in,
+        : BHE_Net_ELE_Abstract(name_, BHE::BHE_NET_ELE::BHE_NET_BOREHOLE,
+                               n_T_in,
                                n_T_out),
-          _name(name),
+          _name(name_),
           _boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
@@ -312,39 +313,23 @@ public:
      * return the number of unknowns needed for this BHE
      * abstract function, need to be realized.
      */
-    virtual std::size_t get_n_unknowns() = 0;
+    virtual std::size_t getNumUnknowns() = 0;
 
     /**
      * return the type of this BHE
      * abstract function, need to be realized.
      */
-    virtual BHE_TYPE get_type() = 0;
-
-    /**
-     * return the number of boundary heat exchange terms for this BHE
-     * abstract function, need to be realized.
-     */
-    virtual std::size_t get_n_heat_exchange_terms() = 0;
-
-    /**
-     *
-     */
-    virtual void set_T_in_out_global_idx(std::size_t start_idx) = 0;
-
-    /**
-     *
-     */
-    virtual void set_T_in_out_bottom_global_idx(std::size_t dof_BHE) = 0;
+    virtual BHE_TYPE getBheType() = 0;
 
     /**
      * return the type of boundary condition on this BHE
      */
-    BHE_BOUNDARY_TYPE get_bound_type() { return _boundary_type; };
+    BHE_BOUNDARY_TYPE getBoundaryType() { return _boundary_type; };
 
     /**
      * return the name of the BHE
      */
-    const std::string get_name() { return _name; };
+    const std::string getName() { return _name; };
 
     /**
      * return the thermal resistance for the inlet pipline
@@ -353,7 +338,7 @@ public:
      * 1 - the second u-tube
      * needs to be overwritten
      */
-    virtual double get_thermal_resistance_fig(std::size_t idx = 0) = 0;
+    virtual double getThermalResistanceFig(std::size_t idx = 0) = 0;
 
     /**
      * return the thermal resistance for the outlet pipline
@@ -362,12 +347,12 @@ public:
      * 1 - the second u-tube
      * needs to be overwritten
      */
-    virtual double get_thermal_resistance_fog(std::size_t idx = 0) = 0;
+    virtual double getThermalResistanceFog(std::size_t idx = 0) = 0;
 
     /**
      * return the thermal resistance
      */
-    virtual double get_thermal_resistance(std::size_t idx = 0) = 0;
+    virtual double getThermalResistance(std::size_t idx = 0) = 0;
 
     /**
      * initialization calcultion,
@@ -375,98 +360,93 @@ public:
      */
     virtual void initialize()
     {
-        calc_u();
-        calc_Re();
-        calc_Pr();
-        calc_Nu();
-        calc_thermal_resistances();
-        calc_heat_transfer_coefficients();
+        calcPipeFlowVelocity();
+        calcRenoldsNum();
+        calcPrandtlNum();
+        calcNusseltNum();
+        calcThermalResistances();
+        calcHeatTransferCoefficients();
     };
 
     /**
      * update all parameters based on the new flow rate
      * not necessarily needs to be overwritten.
      */
-    virtual void update_flow_rate(double new_flow_rate)
+    virtual void updateFlowRate(double new_flow_rate)
     {
         Q_r = new_flow_rate;
-        calc_u();
-        calc_Re();
-        calc_Pr();
-        calc_Nu();
-        calc_thermal_resistances();
-        calc_heat_transfer_coefficients();
+        calcPipeFlowVelocity();
+        calcRenoldsNum();
+        calcPrandtlNum();
+        calcNusseltNum();
+        calcThermalResistances();
+        calcHeatTransferCoefficients();
     };
 
-    virtual void update_flowrate_from_curve(double current_time) = 0;
+    virtual void updateFlowRateFromCurve(double current_time) = 0;
 
     /**
      * thermal resistance calculation,
      * need to be overwritten.
      */
-    virtual void calc_thermal_resistances() = 0;
+    virtual void calcThermalResistances() = 0;
 
     /**
      * Nusselt number calculation,
      * need to be overwritten.
      */
-    virtual void calc_Nu() = 0;
+    virtual void calcNusseltNum() = 0;
 
     /**
      * Renolds number calculation,
      * need to be overwritten.
      */
-    virtual void calc_Re() = 0;
+    virtual void calcRenoldsNum() = 0;
 
     /**
      * Prandtl number calculation,
      * need to be overwritten.
      */
-    virtual void calc_Pr() = 0;
+    virtual void calcPrandtlNum() = 0;
 
     /**
      * flow velocity inside the pipeline
      * need to be overwritten.
      */
-    virtual void calc_u() = 0;
+    virtual void calcPipeFlowVelocity() = 0;
 
     /**
      * heat transfer coefficient,
      * need to be overwritten.
      */
-    virtual void calc_heat_transfer_coefficients() = 0;
+    virtual void calcHeatTransferCoefficients() = 0;
 
     /**
      * return the coeff of mass matrix,
      * depending on the index of unknown.
      */
-    virtual double get_mass_coeff(std::size_t idx_unknown) = 0;
+    virtual double getMassCoeff(std::size_t idx_unknown) = 0;
 
     /**
      * return the coeff of laplace matrix,
      * depending on the index of unknown.
      */
-    virtual void get_laplace_matrix(std::size_t idx_unknown,
+    virtual void getLaplaceMatrix(std::size_t idx_unknown,
                                     Eigen::MatrixXd& mat_laplace) = 0;
 
     /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */
-    virtual void get_advection_vector(std::size_t idx_unknown,
+    virtual void getAdvectionVector(std::size_t idx_unknown,
                                       Eigen::VectorXd& vec_advection) = 0;
 
     /**
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.
      */
-    virtual double get_boundary_heat_exchange_coeff(
+    virtual double getBoundaryHeatExchangeCoeff(
         std::size_t idx_unknown) = 0;
-
-    /**
-     * return the shift index based on primary variable value
-     */
-    virtual int get_loc_shift_by_pv(BHE::BHE_PRIMARY_VARS pv_name) = 0;
 
     /**
      * return the number of grout zones in this BHE.

@@ -106,7 +106,7 @@ void HeatTransportBHEProcess::constructDofTable()
             std::make_unique<MeshLib::MeshSubset const>(_mesh,
                                                         _vec_BHE_nodes[i]));
         std::size_t n_BHE_unknowns =
-            _process_data._vec_BHE_property[i]->get_n_unknowns();
+            _process_data._vec_BHE_property[i]->getNumUnknowns();
         vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
     }
 
@@ -248,9 +248,9 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
     for (unsigned bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
         // get the BHE name
-        auto bhe_name = _process_data._vec_BHE_property.at(bhe_i)->get_name();
+        auto bhe_name = _process_data._vec_BHE_property.at(bhe_i)->getName();
         // get the BHE type
-        auto bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->get_type();
+        auto bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->getBheType();
         // find the variable ID
         // the soil temperature is 0-th variable
         // the BHE temperature is therefore bhe_i + 1
