@@ -59,21 +59,3 @@ double BHE_Net_ELE_HeatPump::set_BC(double T_in, double /*current_time*/)
 
     return T_out;
 }
-
-double BHE_Net_ELE_HeatPump::get_RHS_value()
-{
-    double rt_RHS_val = 0.0;
-
-    // depending on the boundary condition,
-    // calculate the RHS value
-    switch (_heat_pump_BC_type)
-    {
-        case HEAT_PUMP_BOUND_POWER_FIXED_DT:
-            rt_RHS_val = _delta_T_val;
-            break;
-        case HEAT_PUMP_BOUND_POWER_FIXED_FLOWRATE:
-            // TODO
-            break;
-    }
-    return rt_RHS_val;
-}

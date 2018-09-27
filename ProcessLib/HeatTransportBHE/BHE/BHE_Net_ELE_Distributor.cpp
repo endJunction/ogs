@@ -20,8 +20,3 @@ BHE_Net_ELE_Distributor::BHE_Net_ELE_Distributor(
     _vec_inlet_ratio = vec_Inlet_Ratio;
     _vec_outlet_ratio = vec_Outlet_Ratio;
 }
-
-double BHE_Net_ELE_Distributor::get_RHS_value()
-{
-    return 0;
-}

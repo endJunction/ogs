@@ -573,11 +573,6 @@ public:
      * whether external R values are supplied by the user
      */
     const bool user_defined_R_vals;
-
-    /**
-     * for BHEs, the RHS value is zero
-     */
-    double get_RHS_value() { return 0; }
 };
 }  // end of namespace BHE
 }  // end of namespace HeatTransportBHE

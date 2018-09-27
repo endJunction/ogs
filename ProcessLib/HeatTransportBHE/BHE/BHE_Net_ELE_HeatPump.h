@@ -31,8 +31,6 @@ public:
 
     double get_flowrate() { return _flowrate; }
 
-    double get_RHS_value();
-
     void set_delta_T_val(double new_T_val) { _delta_T_val = new_T_val; }
 
     double get_delta_T_val() { return _delta_T_val; }

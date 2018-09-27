@@ -267,8 +267,6 @@ public:
 
     double get_penalty_factor() { return _penalty_factor; }
 
-    virtual double get_flowrate() = 0;
-
 protected:
     /**
      * how the inlet flow rate is determined.
