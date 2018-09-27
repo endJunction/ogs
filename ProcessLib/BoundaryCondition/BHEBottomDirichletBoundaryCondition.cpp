@@ -28,9 +28,9 @@ void BHEBottomDirichletBoundaryCondition::getEssentialBCValues(
     bc_values.ids.resize(_bc_values.ids.size());
     bc_values.values.resize(_bc_values.values.size());
 
-    const size_t n_nodes = _T_in_values.ids.size();
+    const std::size_t n_nodes = _T_in_values.ids.size();
     double tmp_T_out(300.0);
-    for (size_t i = 0; i < n_nodes; i++)
+    for (std::size_t i = 0; i < n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
         // here, the outflow temperature is always
@@ -65,14 +65,12 @@ createBHEBottomDirichletBoundaryCondition(
     GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, unsigned const integration_order,
-    std::size_t const bulk_mesh_id, int const component_id,
-    unsigned const bhe_id)
+    int const component_id, unsigned const bhe_id)
 {
     DBUG("Constructing BHEBottomDirichletBoundaryCondition from config.");
 
     return std::make_unique<BHEBottomDirichletBoundaryCondition>(
         global_idx_T_in_bottom, global_idx_T_out_bottom, bulk_mesh,
-        vec_outflow_bc_nodes, variable_id, integration_order, bulk_mesh_id,
-        component_id, bhe_id);
+        vec_outflow_bc_nodes, variable_id, integration_order, component_id, bhe_id);
 }
 }  // namespace ProcessLib

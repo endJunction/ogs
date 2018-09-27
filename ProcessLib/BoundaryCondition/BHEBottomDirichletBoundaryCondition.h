@@ -27,10 +27,9 @@ public:
         std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
         int const variable_id,
         unsigned const integration_order,
-        std::size_t const bulk_mesh_id,
         int const component_id,
         unsigned const bhe_idx)
-        : _bulk_mesh_id(bulk_mesh_id), _bulk_mesh(bulk_mesh)
+        : _bulk_mesh(bulk_mesh)
     {
         DBUG(
             "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d "
@@ -54,9 +53,6 @@ public:
         _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
         for (auto const* const node : bc_mesh_subset.getNodes())
         {
-            pos.setNodeID(node->getID());
-            MeshLib::Location l(_bulk_mesh_id, MeshLib::MeshItemType::Node,
-                                node->getID());
             // that might be slow, but only done once
             const auto g_T_out_idx = global_idx_T_out_bottom;
             if (g_T_out_idx >= 0)
@@ -90,9 +86,6 @@ private:
     /// participating number of elements of the boundary condition.
     std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary_T_in;
 
-    /// id of bulk mesh
-    std::size_t const _bulk_mesh_id;
-
     /// the bulk mesh
     MeshLib::Mesh const& _bulk_mesh;
 
@@ -110,6 +103,5 @@ createBHEBottomDirichletBoundaryCondition(
     GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, unsigned const integration_order,
-    std::size_t const bulk_mesh_id, int const component_id,
-    unsigned const bhe_id);
+    int const component_id, unsigned const bhe_id);
 }  // namespace ProcessLib

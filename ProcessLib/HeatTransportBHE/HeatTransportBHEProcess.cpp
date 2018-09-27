@@ -310,7 +310,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                     ProcessLib::createBHEInflowDirichletBoundaryCondition(
                         global_index_T_in_top, global_index_T_out_top, _mesh,
                         bc_top_nodes, variable_id, _integration_order,
-                        bc_mesh_top.getID(), component_id_T_in,
+                        component_id_T_in,
                         _process_data._vec_BHE_property.at(bhe_i));
 
                 // there is also one BC on the bottom node
@@ -328,7 +328,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                     ProcessLib::createBHEBottomDirichletBoundaryCondition(
                         global_index_T_in_bottom, global_index_T_out_bottom,
                         _mesh, bc_bottom_nodes, variable_id, _integration_order,
-                        bc_mesh_bottom.getID(), component_id_T_out, bhe_i);
+                        component_id_T_out, bhe_i);
                 // add bc_top and bc_bottom to the vector
                 bcs.push_back(std::move(bc_top));
                 bcs.push_back(std::move(bc_bottom));
