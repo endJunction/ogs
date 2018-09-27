@@ -490,7 +490,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
     {
         case BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY:
         {
-            T_in = _inflow_temp_curve->getValue(current_time);
+            T_in = inflow_temperature_curve->getValue(current_time);
         }
         break;
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:

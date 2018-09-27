@@ -138,7 +138,7 @@ public:
             }
 
             // curve successfully found
-            _inflow_temp_curve = it->second.get();
+            inflow_temperature_curve = it->second.get();
         }
 
         // Table 1 in Diersch_2011_CG

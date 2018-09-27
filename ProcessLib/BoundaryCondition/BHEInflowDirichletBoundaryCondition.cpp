@@ -66,14 +66,13 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
     NumLib::IndexValueVector<GlobalIndexType>& bc_values) const
 {
     const std::size_t n_nodes = _T_out_values.size();
-  
+
     for (std::size_t i = 0; i < n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
         // here call the corresponding BHE functions
         auto const tmp_T_out = x[_T_out_indices[i]];
-        bc_values.values[i] =
-            _pt_bhe->getTinByTout(tmp_T_out, t);
+        bc_values.values[i] = _pt_bhe->getTinByTout(tmp_T_out, t);
     }
 }
 

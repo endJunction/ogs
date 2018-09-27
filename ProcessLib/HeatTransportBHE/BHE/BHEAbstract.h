@@ -479,30 +479,6 @@ public:
      */
     virtual double getTinByTout(double T_in, double current_time) = 0;
 
-    /**
-     * get the polyline geometry
-     * that is representing this BHE.
-     */
-    const GeoLib::Polyline* get_geo_ply() { return _geo_ply; }
-
-    /**
-     * set the polyline geometry
-     * that is representing this BHE.
-     */
-    void set_geo_ply(const GeoLib::Polyline* ply) { _geo_ply = ply; }
-
-    /**
-     * set the polyline geometry
-     * that is representing this BHE.
-     */
-    void set_ply_eps(double eps) { _ply_eps = eps; }
-
-    /**
-     * set the polyline geometry
-     * that is representing this BHE.
-     */
-    double get_ply_eps(void) { return _ply_eps; }
-
 private:
     /**
      * name of the borehole heat exchanger
@@ -513,16 +489,6 @@ private:
      * the type of the boundary condition on this BHE
      */
     const BHE_BOUNDARY_TYPE _boundary_type;
-
-    /**
-     * the polyline geometry representing the BHE
-     */
-    const GeoLib::Polyline* _geo_ply;
-
-    /**
-     * epsilon value of the BHE polyline
-     */
-    double _ply_eps;
 
 public:
     /**
@@ -611,7 +577,7 @@ public:
     /**
      * inflow temperature curve
      */
-    MathLib::PiecewiseLinearInterpolation* _inflow_temp_curve;
+    MathLib::PiecewiseLinearInterpolation* inflow_temperature_curve;
 
     /**
      * use refrigerant flow rate curve
