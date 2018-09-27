@@ -72,7 +72,7 @@ void BHE_CXC::calc_thermal_resistances()
     double d_o1, d_i1, d_h;
     double chi;
     double _R_con_i1, _R_con_o1;
-    double const& D = borehole_geometry.D;
+    double const& D = borehole_geometry.diameter;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
@@ -160,7 +160,7 @@ void BHE_CXC::calc_Nu()
     double Nu_in(0.0), Nu_out(0.0);
     double gamma, xi;
     double d_o1, d_i1, d_h;
-    double const& L = borehole_geometry.L;
+    double const& L = borehole_geometry.length;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;

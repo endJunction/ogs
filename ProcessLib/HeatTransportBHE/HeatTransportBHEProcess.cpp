@@ -97,7 +97,7 @@ void HeatTransportBHEProcess::constructDofTable()
     _mesh_subset_pure_soil_nodes =
         std::make_unique<MeshLib::MeshSubset>(_mesh, _vec_pure_soil_nodes);
 
-    std::vector<size_t> vec_n_BHE_unknowns;
+    std::vector<std::size_t> vec_n_BHE_unknowns;
     vec_n_BHE_unknowns.reserve(_vec_BHE_nodes.size());
     // the BHE nodes need to be cherry-picked from the vector
     for (unsigned i = 0; i < _vec_BHE_nodes.size(); i++)
@@ -105,7 +105,7 @@ void HeatTransportBHEProcess::constructDofTable()
         _mesh_subset_BHE_nodes.push_back(
             std::make_unique<MeshLib::MeshSubset const>(_mesh,
                                                         _vec_BHE_nodes[i]));
-        size_t n_BHE_unknowns =
+        std::size_t n_BHE_unknowns =
             _process_data._vec_BHE_property[i]->get_n_unknowns();
         vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
     }

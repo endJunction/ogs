@@ -65,15 +65,15 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
     const double t, GlobalVector const& x,
     NumLib::IndexValueVector<GlobalIndexType>& bc_values) const
 {
-    const size_t n_nodes = _T_out_values.size();
-    double tmp_T_in(320.0);
-    for (size_t i = 0; i < n_nodes; i++)
+    const std::size_t n_nodes = _T_out_values.size();
+  
+    for (std::size_t i = 0; i < n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
         // here call the corresponding BHE functions
-        auto tmp_T_out = x[_T_out_indices[i]];
-        tmp_T_in = _pt_bhe->get_Tin_by_Tout(tmp_T_out, t);
-        bc_values.values[i] = tmp_T_in;
+        auto const tmp_T_out = x[_T_out_indices[i]];
+        bc_values.values[i] =
+            _pt_bhe->get_Tin_by_Tout(tmp_T_out, t);
     }
 }
 
@@ -86,7 +86,7 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(const double /*t*/,
     // Here the task is to get the outflow temperature and
     // save it locally
     auto const n_nodes = _bc_values.ids.size();
-    for (size_t i = 0; i < n_nodes; i++)
+    for (std::size_t i = 0; i < n_nodes; i++)
     {
         // read the T_out
         _T_out_values[i] = x[_T_out_indices[i]];

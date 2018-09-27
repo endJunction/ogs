@@ -74,7 +74,7 @@ void BHE_CXA::calc_thermal_resistances()
     double d_o1, d_i1, d_h;
     double chi;
     double _R_con_i1, _R_con_o1;
-    double const& D = borehole_geometry.D;
+    double const& D = borehole_geometry.diameter;
     double const& lambda_r = refrigerant_param.lambda_r;
     double const& lambda_g = grout_param.lambda_g;
     double const& r_outer = pipe_param.r_outer;
@@ -162,7 +162,7 @@ void BHE_CXA::calc_Nu()
     double Nu_in(0.0), Nu_out(0.0);
     double gamma, xi;
     double d_o1, d_i1, d_h;
-    double const& L = borehole_geometry.L;
+    double const& L = borehole_geometry.length;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;

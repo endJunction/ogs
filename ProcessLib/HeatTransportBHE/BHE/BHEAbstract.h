@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "BHE_Net_ELE_Abstract.h"
 #include "GeoLib/Polyline.h"
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
@@ -94,22 +93,22 @@ static const double PI = boost::math::constants::pi<double>();
 class BHEAbstract : public BHE_Net_ELE_Abstract
 {
 public:
-    struct Borehole_Geometry
+    struct BoreholeGeometry
     {
         /**
          * length/depth of the BHE
          * unit is m
          */
-        double L;
+        double length;
 
         /**
          * diameter of the BHE
          * unit is m
          */
-        double D;
+        double diameter;
     };
 
-    struct Pipe_Parameters
+    struct PipeParameters
     {
         /**
          * radius of the pipline inner side
@@ -155,7 +154,7 @@ public:
         double lambda_p_o;
     };
 
-    struct Refrigerant_Parameters
+    struct RefrigerantParameters
     {
         /**
          * dynamics viscosity of the refrigerant
@@ -188,7 +187,7 @@ public:
         double alpha_L;
     };
 
-    struct Grout_Parameters
+    struct GroutParameters
     {
         /**
          * density of the grout
@@ -215,7 +214,7 @@ public:
         double lambda_g;
     };
 
-    struct Extern_Ra_Rb
+    struct ExternallyDefinedRaRb
     {
         /**
          * whether or not using external given borehole thermal resistance
@@ -234,7 +233,7 @@ public:
         double ext_Rb;
     };
 
-    struct Extern_def_Thermal_Resistances
+    struct ExternallyDefinedThermalResistances
     {
         /**
          * whether or not using user defined borehole thermal resistance Rfig,
@@ -273,15 +272,15 @@ public:
      */
     BHEAbstract(
         const std::string name,
-        Borehole_Geometry borehole_geometry_,
-        Pipe_Parameters pipe_param_,
-        Refrigerant_Parameters refrigerant_param_,
-        Grout_Parameters grout_param_,
-        Extern_Ra_Rb extern_Ra_Rb_,
-        Extern_def_Thermal_Resistances extern_def_thermal_resistances_,
+        BoreholeGeometry borehole_geometry_,
+        PipeParameters pipe_param_,
+        RefrigerantParameters refrigerant_param_,
+        GroutParameters grout_param_,
+        ExternallyDefinedRaRb extern_Ra_Rb_,
+        ExternallyDefinedThermalResistances extern_def_thermal_resistances_,
         std::map<std::string,
                  std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
-            bhe_curves,
+            bhe_curves_,
         BHE_BOUNDARY_TYPE my_bound_type =
             BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_BOUNDARY,
         bool if_use_ext_Ra_Rb = false,
@@ -292,14 +291,14 @@ public:
         : BHE_Net_ELE_Abstract(name, BHE::BHE_NET_ELE::BHE_NET_BOREHOLE, n_T_in,
                                n_T_out),
           _name(name),
-          bound_type(my_bound_type),
+          _boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
           refrigerant_param(refrigerant_param_),
           grout_param(grout_param_),
           extern_Ra_Rb(extern_Ra_Rb_),
           extern_def_thermal_resistances(extern_def_thermal_resistances_),
-          _bhe_curves(bhe_curves),
+          bhe_curves(bhe_curves_),
           use_flowrate_curve(if_flowrate_curve),
           if_use_ext_Ra_Rb(if_use_ext_Ra_Rb),
           user_defined_R_vals(user_defined_R_vals){};
@@ -307,7 +306,7 @@ public:
     /**
      * destructor
      */
-    virtual ~BHEAbstract(){};
+    virtual ~BHEAbstract() = default;
 
     /**
      * return the number of unknowns needed for this BHE
@@ -340,7 +339,7 @@ public:
     /**
      * return the type of boundary condition on this BHE
      */
-    BHE_BOUNDARY_TYPE get_bound_type() { return bound_type; };
+    BHE_BOUNDARY_TYPE get_bound_type() { return _boundary_type; };
 
     /**
      * return the name of the BHE
@@ -513,7 +512,7 @@ private:
     /**
      * the type of the boundary condition on this BHE
      */
-    const BHE_BOUNDARY_TYPE bound_type;
+    const BHE_BOUNDARY_TYPE _boundary_type;
 
     /**
      * the polyline geometry representing the BHE
@@ -535,32 +534,32 @@ public:
     /**
      * geometry of the borehole
      */
-    Borehole_Geometry const borehole_geometry;
+    BoreholeGeometry const borehole_geometry;
 
     /**
      * geometry of the pipes in the borehole
      */
-    Pipe_Parameters const pipe_param;
+    PipeParameters const pipe_param;
 
     /**
      * parameters of the refrigerant
      */
-    Refrigerant_Parameters const refrigerant_param;
+    RefrigerantParameters const refrigerant_param;
 
     /**
      * parameters of the grout
      */
-    Grout_Parameters const grout_param;
+    GroutParameters const grout_param;
 
     /**
      * Ra Rb values defined by the user externally
      */
-    Extern_Ra_Rb const extern_Ra_Rb;
+    ExternallyDefinedRaRb const extern_Ra_Rb;
 
     /**
      * thermal resistance values defined by the user externally
      */
-    Extern_def_Thermal_Resistances const extern_def_thermal_resistances;
+    ExternallyDefinedThermalResistances const extern_def_thermal_resistances;
 
     /**
      * power extracted from or injected into the BHE
@@ -587,7 +586,7 @@ public:
      */
     std::map<std::string,
              std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
-        _bhe_curves;
+        bhe_curves;
 
     /**
      * power in watt curve

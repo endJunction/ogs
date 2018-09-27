@@ -29,8 +29,8 @@ public:
         std::map<std::string,
                  std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
             bhe_curves /* bhe related curves */,
-        Borehole_Geometry borehole_geometry = {100, 0.013},
-        Pipe_Parameters pipe_geometry =
+        BoreholeGeometry borehole_geometry = {100, 0.013},
+        PipeParameters pipe_geometry =
             {0.016 /* inner radius of the pipline */,
              0.016 /* outer radius of the pipline */,
              0.0029 /* pipe-in wall thickness*/,
@@ -38,21 +38,21 @@ public:
              0.38 /* thermal conductivity of the pipe wall */,
              0.38 /* thermal conductivity of the inner pipe wall */,
              0.38 /* thermal conductivity of the outer pipe wall */},
-        Refrigerant_Parameters refrigerant_param =
+        RefrigerantParameters refrigerant_param =
             {
                 0.00054741 /* dynamic viscosity of the refrigerant */,
                 988.1 /* density of the refrigerant */,
                 0.6405 /* thermal conductivity of the refrigerant */,
                 4180 /* specific heat capacity of the refrigerant */, 1.0e-4 /* longitudinal dispersivity of the refrigerant in the pipeline */},
-        Grout_Parameters grout_param =
+        GroutParameters grout_param =
             {2190 /* density of the grout */, 0.5 /* porosity of the grout */,
              1000 /* specific heat capacity of the grout */,
              2.3 /* thermal conductivity of the grout */},
-        Extern_Ra_Rb extern_Ra_Rb =
+        ExternallyDefinedRaRb extern_Ra_Rb =
             {false /* whether Ra and Rb values are used */,
              0.0 /* external defined borehole internal thermal resistance */,
              0.0 /* external defined borehole thermal resistance */},
-        Extern_def_Thermal_Resistances extern_def_thermal_resistances =
+        ExternallyDefinedThermalResistances extern_def_thermal_resistances =
             {false /* whether user defined R values are used */,
              0.0 /* external defined borehole thermal resistance */,
              0.0 /* external defined borehole thermal resistance */,
@@ -99,8 +99,8 @@ public:
                 BHE_BOUNDARY_TYPE::
                     BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE_BOUNDARY)
         {
-            it = _bhe_curves.find("power_in_watt_curve");
-            if (it == _bhe_curves.end())
+            it = bhe_curves.find("power_in_watt_curve");
+            if (it == bhe_curves.end())
             {
                 // curve not found, fatal error
                 OGS_FATAL(
@@ -116,8 +116,8 @@ public:
         {
             use_flowrate_curve = true;
 
-            it = _bhe_curves.find("flow_rate_curve");
-            if (it == _bhe_curves.end())
+            it = bhe_curves.find("flow_rate_curve");
+            if (it == bhe_curves.end())
             {
                 OGS_FATAL(
                     "Required flow_rate_curve annot be found in the BHE "
@@ -129,8 +129,8 @@ public:
         }
         if (bound_type == BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
         {
-            it = _bhe_curves.find("inflow_temp_curve");
-            if (it == _bhe_curves.end())
+            it = bhe_curves.find("inflow_temp_curve");
+            if (it == bhe_curves.end())
             {
                 OGS_FATAL(
                     "Required inflow_temp_curve annot be found in the BHE "
@@ -144,15 +144,15 @@ public:
         // Table 1 in Diersch_2011_CG
         S_i = PI * 2.0 * pipe_geometry.r_inner;
         S_o = PI * 2.0 * pipe_geometry.r_inner;
-        S_g1 = borehole_geometry.D;
+        S_g1 = borehole_geometry.diameter;
         S_gs = 0.5 * PI *
-               borehole_geometry.D;  // Corrected value according to FEFLOW
+               borehole_geometry.diameter;  // Corrected value according to FEFLOW
                                      // White Papers Vol V, Table 1-71
 
         // cross section area calculation
         CSA_i = CSA_o = PI * pipe_geometry.r_inner * pipe_geometry.r_inner;
         CSA_g1 = CSA_g2 =
-            PI * (0.125 * borehole_geometry.D * borehole_geometry.D -
+            PI * (0.125 * borehole_geometry.diameter * borehole_geometry.diameter -
                   pipe_geometry.r_outer * pipe_geometry.r_outer);
 
         // initialization calculation

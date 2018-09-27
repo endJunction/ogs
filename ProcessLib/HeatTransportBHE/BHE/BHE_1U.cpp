@@ -79,7 +79,7 @@ void BHE_1U::calc_thermal_resistances()
     double d0;  // the average outer diameter of the pipes
     // double s; // diagonal distances of pipes
     double R_adv, R_con;
-    double const& D = borehole_geometry.D;
+    double const& D = borehole_geometry.diameter;
     // double const& L = borehole_geometry.L;
     double const& lambda_r = refrigerant_param.lambda_r;
     double const& lambda_g = grout_param.lambda_g;
@@ -219,7 +219,7 @@ void BHE_1U::calc_Nu()
     double tmp_Nu = 0.0;
     double gamma, xi;
     double d;
-    double const& L = borehole_geometry.L;
+    double const& L = borehole_geometry.length;
 
     d = 2.0 * pipe_param.r_inner;
 

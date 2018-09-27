@@ -39,8 +39,6 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     _T_in_values.ids.clear();
     _T_in_values.values.clear();
 
-    SpatialPosition pos;
-
     _bc_values.ids.clear();
     _bc_values.values.clear();
 
@@ -85,7 +83,7 @@ void BHEBottomDirichletBoundaryCondition::getEssentialBCValues(
         // here, the outflow temperature is always
         // the same as the inflow temperature
         // get the inflow temperature from here.
-        tmp_T_out = x[_T_in_values.ids.at(i)];
+        tmp_T_out = x[_T_in_values.ids[i]];
         bc_values.values[i] = tmp_T_out;
     }
 }
@@ -99,12 +97,12 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(const double /*t*/,
     // Here the task is to get the inflow temperature and
     // save it locally
     auto const n_nodes = _bc_values.ids.size();
-    for (size_t i = 0; i < n_nodes; i++)
+    for (std::size_t i = 0; i < n_nodes; i++)
     {
         auto g_idx = _T_in_values.ids[i];
 
         // read the T_out
-        _T_in_values.values.at(i) = x[g_idx];
+        _T_in_values.values[i] = x[g_idx];
     }
 }
 

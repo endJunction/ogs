@@ -38,9 +38,6 @@ public:
     void preTimestep(const double t, const GlobalVector& x) override;
 
 private:
-    /// Local dof table, a subset of the global one restricted to the
-    /// participating number of elements of the boundary condition.
-    std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary;
 
     MeshLib::Mesh const& _bc_mesh;
 

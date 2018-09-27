@@ -37,19 +37,7 @@ public:
     void preTimestep(const double t, const GlobalVector& x) override;
 
 private:
-    /// Local dof table, a subset of the global one restricted to the
-    /// participating number of elements of the boundary condition.
-    std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary;
-
-    /// Local dof table, a subset of the global one restricted to the
-    /// participating number of elements of the boundary condition.
-    std::unique_ptr<NumLib::LocalToGlobalIndexMap> _dof_table_boundary_T_in;
-
-    /// the bulk mesh
     MeshLib::Mesh const& _bulk_mesh;
-
-    /// Integration order for integration over the lower-dimensional elements
-    // unsigned const _integration_order;
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 
