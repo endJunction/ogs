@@ -28,48 +28,7 @@ public:
         int const variable_id,
         unsigned const integration_order,
         int const component_id,
-        unsigned const bhe_idx)
-        : _bulk_mesh(bulk_mesh)
-    {
-        DBUG(
-            "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d "
-            "and "
-            "component %d",
-            vec_outflow_bc_nodes.size(), variable_id, component_id);
-
-        MeshLib::MeshSubset bc_mesh_subset{_bulk_mesh, vec_outflow_bc_nodes};
-
-        // create memory to store Tout values
-        _T_in_values.ids.clear();
-        _T_in_values.values.clear();
-
-        SpatialPosition pos;
-
-        _bc_values.ids.clear();
-        _bc_values.values.clear();
-
-        // convert mesh node ids to global index for the given component
-        _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
-        _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
-        for (auto const* const node : bc_mesh_subset.getNodes())
-        {
-            // that might be slow, but only done once
-            const auto g_T_out_idx = global_idx_T_out_bottom;
-            if (g_T_out_idx >= 0)
-            {
-                _bc_values.ids.emplace_back(g_T_out_idx);
-                _bc_values.values.emplace_back(298.15);
-            }
-
-            const auto g_T_in_idx = global_idx_T_in_bottom;
-
-            if (g_T_in_idx >= 0)
-            {
-                _T_in_values.ids.emplace_back(g_T_in_idx);
-                _T_in_values.values.emplace_back(298.15);
-            }
-        }
-    }
+        unsigned const bhe_idx);
 
     void getEssentialBCValues(
         const double t, GlobalVector const& x,
