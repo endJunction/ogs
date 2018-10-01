@@ -14,7 +14,6 @@
 #include "BHE/BHE_2U.h"
 #include "BHE/BHE_CXA.h"
 #include "BHE/BHE_CXC.h"
-#include "BHE/BHE_Net.h"
 #include "BHE/CreateBHE1U.h"
 #include "BHE/CreateBHE2U.h"
 #include "BHE/CreateBHECXA.h"

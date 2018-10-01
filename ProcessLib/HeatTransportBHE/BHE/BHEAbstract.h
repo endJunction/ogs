@@ -28,7 +28,9 @@
 
 #pragma once
 
-#include "BHE_Net_ELE_Abstract.h"
+#include <map>
+#include "Eigen/Eigen"
+#include "ProcessLib/Utils/ProcessUtils.h"
 #include "GeoLib/Polyline.h"
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
 #include "boost/math/constants/constants.hpp"
@@ -90,7 +92,7 @@ enum class BHE_DISCHARGE_TYPE
 using namespace boost::math::constants;
 static const double PI = boost::math::constants::pi<double>();
 
-class BHEAbstract : public BHE_Net_ELE_Abstract
+class BHEAbstract
 {
 public:
     struct BoreholeGeometry
@@ -288,10 +290,7 @@ public:
         bool if_flowrate_curve = false,
         int n_T_in = 1,
         int n_T_out = 1)
-        : BHE_Net_ELE_Abstract(name_, BHE::BHE_NET_ELE::BHE_NET_BOREHOLE,
-                               n_T_in,
-                               n_T_out),
-          _name(name_),
+        : _name(name_),
           _boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
@@ -432,21 +431,20 @@ public:
      * depending on the index of unknown.
      */
     virtual void getLaplaceMatrix(std::size_t idx_unknown,
-                                    Eigen::MatrixXd& mat_laplace) = 0;
+                                  Eigen::MatrixXd& mat_laplace) = 0;
 
     /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */
     virtual void getAdvectionVector(std::size_t idx_unknown,
-                                      Eigen::VectorXd& vec_advection) = 0;
+                                    Eigen::VectorXd& vec_advection) = 0;
 
     /**
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.
      */
-    virtual double getBoundaryHeatExchangeCoeff(
-        std::size_t idx_unknown) = 0;
+    virtual double getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) = 0;
 
     /**
      * return the number of grout zones in this BHE.
