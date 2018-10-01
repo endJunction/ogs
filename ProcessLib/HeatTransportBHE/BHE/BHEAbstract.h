@@ -29,7 +29,7 @@
 #pragma once
 
 #include <map>
-#include "Eigen/Eigen"
+#include <Eigen/Eigen>
 #include "ProcessLib/Utils/ProcessUtils.h"
 #include "GeoLib/Polyline.h"
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
