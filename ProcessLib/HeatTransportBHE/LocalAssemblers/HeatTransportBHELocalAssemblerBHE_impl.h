@@ -441,11 +441,11 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     local_K.block(0, 0, shift_start, shift_start) += 2.0 * _R_s_matrix;
 
     // debugging
-    std::string sep =
-        "\n----------------------------------------\n";
-    Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-    std::cout << local_K.format(CleanFmt) << sep;
-    std::cout << local_M.format(CleanFmt) << sep;
+    // std::string sep =
+    //     "\n----------------------------------------\n";
+    // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+    // std::cout << local_K.format(CleanFmt) << sep;
+    // std::cout << local_M.format(CleanFmt) << sep;
 }
 
 template <typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>

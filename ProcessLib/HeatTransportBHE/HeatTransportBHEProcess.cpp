@@ -59,7 +59,8 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
     // create a map from a material ID to a BHE ID
     auto max_BHE_mat_id =
         std::max_element(_vec_BHE_mat_IDs.begin(), _vec_BHE_mat_IDs.end());
-    _process_data._map_materialID_to_BHE_ID.resize(*max_BHE_mat_id + 1);
+    const std::size_t nBHEmatIDs = *max_BHE_mat_id + 1;
+    _process_data._map_materialID_to_BHE_ID.resize(nBHEmatIDs);
     for (std::size_t i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
         // by default, it is assumed that the soil compartment takes material ID
@@ -79,8 +80,8 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
     }
     */
 
-    MeshLib::PropertyVector<std::size_t> const* material_ids(
-        mesh.getProperties().getPropertyVector<std::size_t>("MaterialIDs"));
+    MeshLib::PropertyVector<int> const* material_ids(
+        mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
     _process_data._mesh_prop_materialIDs = material_ids;
 }
 
@@ -156,7 +157,7 @@ void HeatTransportBHEProcess::constructDofTable()
             NumLib::ComponentOrder::BY_COMPONENT);
 
     // in case of debugging the dof table, activate the following line
-    std::cout << *_local_to_global_index_map << "\n";
+    // std::cout << *_local_to_global_index_map << "\n";
 }
 
 void HeatTransportBHEProcess::initializeConcreteProcess(
