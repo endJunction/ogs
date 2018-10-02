@@ -92,7 +92,7 @@ private:
     std::unique_ptr<MeshLib::MeshSubset const> _mesh_subset_pure_soil_nodes;
     std::unique_ptr<MeshLib::MeshSubset const>
         _mesh_subset_soil_nodes_connected_with_BHE;
-    std::vector<std::size_t> _vec_BHE_mat_IDs;
+    std::vector<int> _vec_BHE_mat_IDs;
 };
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
