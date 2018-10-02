@@ -57,9 +57,64 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     std::vector<double> local_x_perturbed_data_(local_x_data);
 
 
-//    local_assembler.assemble(t, local_x_data, local_M_data,
-//                                     local_K_data, local_b_data);
 //
+//    std::vector<double> M_vect;
+//    std::vector<double> M_vect_p;
+//    std::vector<double> M_vect_m;
+//
+//    std::vector<double> K_vect;
+//    std::vector<double> K_vect_p;
+//    std::vector<double> K_vect_m;
+//
+//    std::vector<double> b_vect;
+//    std::vector<double> b_vect_p;
+//    std::vector<double> b_vect_m;
+
+//    local_x_perturbed_data_[9] += 0;
+//    local_assembler.assemble(t, local_x_perturbed_data_, M_vect, K_vect, b_vect);
+//
+//    auto const local_M = MathLib::toMatrix(M_vect, num_r_c, num_r_c);
+//    auto const local_K = MathLib::toMatrix(K_vect, num_r_c, num_r_c);
+//    auto const local_b = MathLib::toVector<Eigen::VectorXd>(b_vect, num_r_c);
+//    auto const local_x_pert = MathLib::toVector<Eigen::VectorXd>(local_x_perturbed_data_, num_r_c);
+//    std::cout << "\n=======================\n";
+//    std::cout << " local_x:\n" << local_x_pert << "\n";
+//    std::cout << "\n=======================\n";
+//    std::cout << " local_M_data: \n" << local_M << "\n";
+//    std::cout << " local_K_data: \n" << local_K << "\n";
+//    std::cout << " local_b_data: \n" << local_b << "\n";
+//    std::cout << "\n=======================\n";
+//
+//    local_x_perturbed_data_[9] += 1e-3;
+//    local_assembler.assemble(t, local_x_perturbed_data_, M_vect_p, K_vect_p, b_vect_p);
+//
+//    auto const local_M_p = MathLib::toMatrix(M_vect_p, num_r_c, num_r_c);
+//    auto const local_K_p = MathLib::toMatrix(K_vect_p, num_r_c, num_r_c);
+//    auto const local_b_p = MathLib::toVector<Eigen::VectorXd>(b_vect_p, num_r_c);
+//    auto const local_x_pert_p = MathLib::toVector<Eigen::VectorXd>(local_x_perturbed_data_, num_r_c);
+//
+//    std::cout << "\n Plus EPS\n";
+//    std::cout << " local_x:\n" << local_x_pert_p << "\n";
+//    std::cout << "\n=======================\n";
+//    std::cout << " local_M_data: \n" << local_M_p << "\n";
+//    std::cout << " local_K_data: \n" << local_K_p << "\n";
+//    std::cout << " local_b_data: \n" << local_b_p << "\n";
+//    std::cout << "\n=======================\n";
+//    local_x_perturbed_data_[9] -= 2*1e-3;
+//    local_assembler.assemble(t, local_x_perturbed_data_, M_vect_m, K_vect_m, b_vect_m);
+//
+//    auto const local_M_m = MathLib::toMatrix(M_vect_m, num_r_c, num_r_c);
+//    auto const local_K_m = MathLib::toMatrix(K_vect_m, num_r_c, num_r_c);
+//    auto const local_b_m = MathLib::toVector<Eigen::VectorXd>(b_vect_m, num_r_c);
+//    auto const local_x_pert_m = MathLib::toVector<Eigen::VectorXd>(local_x_perturbed_data_, num_r_c);
+//
+//    std::cout << "\n Minus EPS\n";
+//    std::cout << " local_x:\n" << local_x_pert_m << "\n";
+//    std::cout << "\n=======================\n";
+//    std::cout << " local_M_data: \n" << local_M_m << "\n";
+//    std::cout << " local_K_data: \n" << local_K_m << "\n";
+//    std::cout << " local_b_data: \n" << local_b_m << "\n";
+//    std::cout << "\n=======================\n";
 //    OGS_FATAL("XXX");
 
     auto const num_dofs_per_component =

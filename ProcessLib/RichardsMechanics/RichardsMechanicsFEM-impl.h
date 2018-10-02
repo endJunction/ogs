@@ -548,6 +548,9 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
             .noalias() += N_p.transpose() * rho_LR * p_cap_dot_ip *
                           dspecific_storage_dp_cap * N_p * w;
 
+
+
+
         /* In the derivation there is a div(du/dt) term in the Jacobian, but
          * this implementation increases the total runtime by 1%. Maybe a very
          * large step is needed to see the increase of efficiency.

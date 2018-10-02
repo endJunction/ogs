@@ -134,7 +134,7 @@
                         <property>
                             <name>compressibility</name>
                             <type>Constant</type>
-                            <value>0</value>
+                            <value>1e-4</value>
                         </property>                          
                         <property>
                             <name>specific_heat_capacity</name>
@@ -226,7 +226,7 @@
                         <pair><repeat>10</repeat><delta_t>0.1</delta_t></pair>                        
                         <pair><repeat>10</repeat><delta_t>0.2</delta_t></pair>                        
                         <pair><repeat>10</repeat><delta_t>0.5</delta_t></pair>   -->                     
-                        <pair><repeat>10</repeat><delta_t>1</delta_t></pair>                        
+                        <pair><repeat>10</repeat><delta_t>0.1</delta_t></pair>                        
                         <pair><repeat>10</repeat><delta_t>2</delta_t></pair>                        
                         <pair><repeat>10</repeat><delta_t>5</delta_t></pair>                        
                         <pair><repeat>10</repeat><delta_t>10</delta_t></pair>    
@@ -288,7 +288,7 @@
         <parameter>
             <name>p_Cap_ini</name>
             <type>Constant</type>
-            <values>0.0</values>
+            <values>100</values>
         </parameter>
 
         <parameter>
