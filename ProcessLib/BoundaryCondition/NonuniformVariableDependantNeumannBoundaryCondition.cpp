@@ -12,6 +12,33 @@
 #include "MeshLib/IO/readMeshFromFile.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
 
+namespace
+{
+MeshLib::PropertyVector<double> const* yyy(std::string const& name,
+                                           MeshLib::Mesh const& mesh)
+{
+    auto const* const property_vector =
+        mesh.getProperties().getPropertyVector<double>(name);
+    if (property_vector == nullptr)
+    {
+        OGS_FATAL("A property with name `%s' does not exist in `%s'.",
+                  name.c_str(), mesh.getName().c_str());
+    }
+    if (property_vector->getMeshItemType() != MeshLib::MeshItemType::Node)
+    {
+        OGS_FATAL(
+            "Only nodal fields are supported for non-uniform fields. Field "
+            "`%s' is not nodal.",
+            name.c_str());
+    }
+    if (property_vector->getNumberOfComponents() != 1)
+    {
+        OGS_FATAL("`%s' is not a one-component field.", name.c_str());
+    }
+    return property_vector;
+};
+}  // namespace
+
 namespace ProcessLib
 {
 std::unique_ptr<NonuniformVariableDependantNeumannBoundaryCondition>
@@ -30,120 +57,50 @@ createNonuniformVariableDependantNeumannBoundaryCondition(
             "NonuniformVariableDependantNeumann BC only implemented for 2 "
             "variable processes.");
     }
+
+    auto xxx = [&boundary_mesh](std::string const& name) {
+        auto const* const property_vector =
+            boundary_mesh.getProperties().getPropertyVector<double>(name);
+        if (property_vector == nullptr)
+        {
+            OGS_FATAL("A property with name `%s' does not exist in `%s'.",
+                      name.c_str(), boundary_mesh.getName().c_str());
+        }
+        if (property_vector->getMeshItemType() != MeshLib::MeshItemType::Node)
+        {
+            OGS_FATAL(
+                "Only nodal fields are supported for non-uniform fields. Field "
+                "`%s' is not nodal.",
+                name.c_str());
+        }
+        if (property_vector->getNumberOfComponents() != 1)
+        {
+            OGS_FATAL("`%s' is not a one-component field.", name.c_str());
+        }
+        return property_vector;
+    };
+
     // TODO finally use ProcessLib::Parameter here
     auto const constant_name =
         //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__NonuniformNeumann__constant_name}
         config.getConfigParameter<std::string>("constant_name");
-
-    auto const* const constant =
-        boundary_mesh.getProperties().getPropertyVector<double>(constant_name);
+    auto const* const constant = xxx(constant_name);
+    // auto const* const constant = yyy(constant_name, boundary_mesh);
 
     auto const prefac1_name =
         //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__NonuniformNeumann__prefac1_name}
         config.getConfigParameter<std::string>("prefac1_name");
-
-    auto const* const prefac1 =
-        boundary_mesh.getProperties().getPropertyVector<double>(prefac1_name);
+    auto const* const prefac1 = xxx(prefac1_name);
 
     auto const prefac2_name =
         //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__NonuniformNeumann__prefac2_name}
         config.getConfigParameter<std::string>("prefac2_name");
+    auto const* const prefac2 = xxx(prefac2_name);
 
-    auto const* const prefac2 =
-        boundary_mesh.getProperties().getPropertyVector<double>(prefac2_name);
-    
     auto const prefac3_name =
         //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__NonuniformNeumann__prefac2_name}
         config.getConfigParameter<std::string>("prefac3_name");
-
-    auto const* const prefac3 =
-        boundary_mesh.getProperties().getPropertyVector<double>(prefac3_name);
-
-    if (!constant || !prefac1 || !prefac2|| !prefac3)
-    {
-        if (!constant)
-        {
-            OGS_FATAL("A property with name `%s' does not exist in `%s'.",
-                      constant_name.c_str(), boundary_mesh.getName().c_str());
-        }
-        if (!prefac1)
-        {
-            OGS_FATAL("A property with name `%s' does not exist in `%s'.",
-                      prefac1_name.c_str(), boundary_mesh.getName().c_str());
-        }
-        if (!prefac2)
-        {
-            OGS_FATAL("A property with name `%s' does not exist in `%s'.",
-                      prefac2_name.c_str(), boundary_mesh.getName().c_str());
-        }
-        if (!prefac3)
-        {
-            OGS_FATAL("A property with name `%s' does not exist in `%s'.",
-                      prefac3_name.c_str(), boundary_mesh.getName().c_str());
-        }
-    }
-
-    if (constant->getMeshItemType() != MeshLib::MeshItemType::Node ||
-        prefac1->getMeshItemType() != MeshLib::MeshItemType::Node ||
-        prefac2->getMeshItemType() != MeshLib::MeshItemType::Node||
-        prefac3->getMeshItemType() != MeshLib::MeshItemType::Node)
-    {
-        if (constant->getMeshItemType() != MeshLib::MeshItemType::Node)
-        {
-            OGS_FATAL(
-                "Only nodal fields are supported for non-uniform fields. Field "
-                "`%s' is not nodal.",
-                constant_name.c_str());
-        }
-        if (prefac1->getMeshItemType() != MeshLib::MeshItemType::Node)
-        {
-            OGS_FATAL(
-                "Only nodal fields are supported for non-uniform fields. Field "
-                "`%s' is not nodal.",
-                prefac1_name.c_str());
-        }
-        if (prefac2->getMeshItemType() != MeshLib::MeshItemType::Node)
-        {
-            OGS_FATAL(
-                "Only nodal fields are supported for non-uniform fields. Field "
-                "`%s' is not nodal.",
-                prefac2_name.c_str());
-        }
-        if (prefac3->getMeshItemType() != MeshLib::MeshItemType::Node)
-        {
-            OGS_FATAL(
-                "Only nodal fields are supported for non-uniform fields. Field "
-                "`%s' is not nodal.",
-                prefac3_name.c_str());
-        }
-    }
-
-    if (constant->getNumberOfComponents() != 1 ||
-        prefac1->getNumberOfComponents() != 1 ||
-        prefac2->getNumberOfComponents() != 1 ||
-        prefac3->getNumberOfComponents() != 1)
-    {
-        if (constant->getNumberOfComponents() != 1)
-        {
-            OGS_FATAL("`%s' is not a one-component field.",
-                      constant_name.c_str());
-        }
-        if (prefac1->getNumberOfComponents() != 1)
-        {
-            OGS_FATAL("`%s' is not a one-component field.",
-                      prefac1_name.c_str());
-        }
-        if (prefac2->getNumberOfComponents() != 1)
-        {
-            OGS_FATAL("`%s' is not a one-component field.",
-                      prefac2_name.c_str());
-        }
-        if (prefac3->getNumberOfComponents() != 1)
-        {
-            OGS_FATAL("`%s' is not a one-component field.",
-                      prefac3_name.c_str());
-        }
-    }
+    auto const* const prefac3 = xxx(prefac3_name);
 
     std::string const mapping_to_bulk_nodes_property = "bulk_node_ids";
     auto const* const mapping_to_bulk_nodes =
