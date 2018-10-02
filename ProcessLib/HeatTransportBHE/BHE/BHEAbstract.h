@@ -287,9 +287,7 @@ public:
             BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_BOUNDARY,
         bool if_use_ext_Ra_Rb = false,
         bool user_defined_R_vals = false,
-        bool if_flowrate_curve = false,
-        int n_T_in = 1,
-        int n_T_out = 1)
+        bool if_flowrate_curve = false)
         : _name(name_),
           _boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),

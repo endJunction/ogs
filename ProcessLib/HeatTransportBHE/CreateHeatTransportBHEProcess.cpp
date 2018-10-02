@@ -226,8 +226,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         {
             // initialize the 1U type BHE
             BHE::BHE_1U* m_bhe_1u =
-                BHE::CreateBHE1U(config,
-                                 bhe_conf,
+                BHE::CreateBHE1U(bhe_conf,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
@@ -240,8 +239,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         {
             // initialize the 2U type BHE
             BHE::BHE_2U* m_bhe_2u =
-                BHE::CreateBHE2U(config,
-                                 bhe_conf,
+                BHE::CreateBHE2U(bhe_conf,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
@@ -254,8 +252,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         {
             // initialize the CXC type BHE
             BHE::BHE_CXC* m_bhe_CXC =
-                BHE::CreateBHECXC(config,
-                                  bhe_conf,
+                BHE::CreateBHECXC(bhe_conf,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,
@@ -268,8 +265,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         {
             // initialize the CXA type BHE
             BHE::BHE_CXA* m_bhe_CXA =
-                BHE::CreateBHECXA(config,
-                                  bhe_conf,
+                BHE::CreateBHECXA(bhe_conf,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,

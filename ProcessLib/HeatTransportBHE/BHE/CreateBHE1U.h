@@ -19,7 +19,6 @@ namespace HeatTransportBHE
 namespace BHE  // namespace of borehole heat exchanger
 {
 BHE::BHE_1U* CreateBHE1U(
-    BaseLib::ConfigTree const& config,
     BaseLib::ConfigTree const& bhe_conf,
     std::map<std::string,
              std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&

@@ -22,9 +22,7 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id,
-    unsigned const integration_order,
-    int const component_id,
-    unsigned const bhe_idx)
+    int const component_id)
     : _bulk_mesh(bulk_mesh)
 {
     DBUG(
@@ -45,6 +43,8 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     // convert mesh node ids to global index for the given component
     _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
     _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
+    // TODO BEFORE MERGE (haibing) rethink the algorithm used here; no need to
+    // loop over the nodes.
     for (auto const* const node : bc_mesh_subset.getNodes())
     {
         // that might be slow, but only done once
@@ -111,14 +111,12 @@ createBHEBottomDirichletBoundaryCondition(
     GlobalIndexType global_idx_T_in_bottom,
     GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
-    int const variable_id, unsigned const integration_order,
-    int const component_id, unsigned const bhe_id)
+    int const variable_id, int const component_id)
 {
     DBUG("Constructing BHEBottomDirichletBoundaryCondition from config.");
 
     return std::make_unique<BHEBottomDirichletBoundaryCondition>(
         global_idx_T_in_bottom, global_idx_T_out_bottom, bulk_mesh,
-        vec_outflow_bc_nodes, variable_id, integration_order, component_id,
-        bhe_id);
+        vec_outflow_bc_nodes, variable_id, component_id);
 }
 }  // namespace ProcessLib

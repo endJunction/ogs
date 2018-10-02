@@ -26,9 +26,7 @@ public:
         MeshLib::Mesh const& bulk_mesh,
         std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
         int const variable_id,
-        unsigned const integration_order,
-        int const component_id,
-        unsigned const bhe_idx);
+        int const component_id);
 
     void getEssentialBCValues(
         const double t, GlobalVector const& x,
@@ -49,6 +47,5 @@ createBHEBottomDirichletBoundaryCondition(
     GlobalIndexType global_idx_T_in_bottom,
     GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
-    int const variable_id, unsigned const integration_order,
-    int const component_id, unsigned const bhe_id);
+    int const variable_id, int const component_id);
 }  // namespace ProcessLib

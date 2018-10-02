@@ -22,7 +22,6 @@ BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id,
-    unsigned const integration_order,
     int const component_id,
     std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
         pt_bhe)
@@ -103,8 +102,7 @@ createBHEInflowDirichletBoundaryCondition(
     GlobalIndexType global_idx_T_in_top, GlobalIndexType global_idx_T_out_top,
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
-    int const variable_id, unsigned const integration_order,
-    int const component_id,
+    int const variable_id, int const component_id,
     std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
         pt_bhe)
 {
@@ -114,6 +112,6 @@ createBHEInflowDirichletBoundaryCondition(
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
         global_idx_T_in_top, global_idx_T_out_top, bc_mesh, vec_inflow_bc_nodes,
-        variable_id, integration_order, component_id, pt_bhe);
+        variable_id, component_id, pt_bhe);
 }
 }  // namespace ProcessLib
