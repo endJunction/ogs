@@ -49,7 +49,6 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
 
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
-    const int nnodes = _element.getNumberOfNodes();
 
     _ip_data.reserve(n_integration_points);
     _secondary_data.N.resize(n_integration_points);
@@ -78,11 +77,14 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
     }
 
     const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
-    _R_matrix.setZero(nnodes * BHE_n_unknowns, nnodes * BHE_n_unknowns);
-    _R_pi_s_matrix.setZero(nnodes * BHE_n_unknowns, nnodes);
-    _R_s_matrix.setZero(nnodes, nnodes);
+    _R_matrix.setZero(ShapeFunction::NPOINTS * BHE_n_unknowns,
+                      ShapeFunction::NPOINTS * BHE_n_unknowns);
+    _R_pi_s_matrix.setZero(ShapeFunction::NPOINTS * BHE_n_unknowns,
+                           ShapeFunction::NPOINTS);
+    _R_s_matrix.setZero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
     // formulate the local BHE R matrix
-    Eigen::MatrixXd matBHE_loc_R = Eigen::MatrixXd::Zero(nnodes, nnodes);
+    Eigen::MatrixXd matBHE_loc_R =
+        Eigen::MatrixXd::Zero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
     for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < BHE_n_unknowns;
          idx_bhe_unknowns++)
     {
@@ -114,39 +116,64 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
                 switch (idx_bhe_unknowns)
                 {
                     case 0:  // PHI_fig
-                        _R_matrix.block(0, 2 * nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(0, 2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS, 0,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(0, 0, nnodes, nnodes) +=
+                        _R_matrix.block(0, 0, ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_i1
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS,
+                                        2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_ig
                         break;
                     case 1:  // PHI_fog
-                        _R_matrix.block(nnodes, 3 * nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, 3 * ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(3 * nnodes, nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            3 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(nnodes, nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_o1
-                        _R_matrix.block(3 * nnodes, 3 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(3 * ShapeFunction::NPOINTS,
+                                        3 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_og
                         break;
                     case 2:  // PHI_gg
-                        _R_matrix.block(2 * nnodes, 3 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(3 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            2 * ShapeFunction::NPOINTS,
+                            3 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            3 * ShapeFunction::NPOINTS,
+                            2 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) +=
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS,
+                                        2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_ig  // notice we only have
                                                  // 1 PHI_gg term here.
-                        _R_matrix.block(3 * nnodes, 3 * nnodes, nnodes,
-                                        nnodes) +=
+                        _R_matrix.block(3 * ShapeFunction::NPOINTS,
+                                        3 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             1.0 *
                             matBHE_loc_R;  // K_og  // see Diersch 2013 FEFLOW
                                            // book page 954 Table M.2
@@ -154,14 +181,24 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
                     case 3:  // PHI_gs
                         _R_s_matrix += 1.0 * matBHE_loc_R;
 
-                        _R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(2 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(3 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_ig
-                        _R_matrix.block(3 * nnodes, 3 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS,
+                                        2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(3 * ShapeFunction::NPOINTS,
+                                        3 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_og
                         break;
                 }
                 break;
@@ -169,105 +206,202 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
                 switch (idx_bhe_unknowns)
                 {
                     case 0:  // R i1 i2
-                        _R_matrix.block(0, 4 * nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(0, 4 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(4 * nnodes, 0, nnodes, nnodes) +=
+                        _R_matrix.block(4 * ShapeFunction::NPOINTS, 0,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(nnodes, 5 * nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, 5 * ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(5 * nnodes, nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            5 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(0, 0, nnodes, nnodes) +=
+                        _R_matrix.block(0, 0, ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_i1
-                        _R_matrix.block(nnodes, nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_i2
-                        _R_matrix.block(4 * nnodes, 4 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_ig
-                        _R_matrix.block(5 * nnodes, 5 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(4 * ShapeFunction::NPOINTS,
+                                        4 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(5 * ShapeFunction::NPOINTS,
+                                        5 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_ig
                         break;
                     case 1:  // R o1 o2
-                        _R_matrix.block(2 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(6 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(3 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(7 * nnodes, 3 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            2 * ShapeFunction::NPOINTS,
+                            6 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            6 * ShapeFunction::NPOINTS,
+                            2 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            3 * ShapeFunction::NPOINTS,
+                            7 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            7 * ShapeFunction::NPOINTS,
+                            3 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_o1
-                        _R_matrix.block(3 * nnodes, 3 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_o2
-                        _R_matrix.block(6 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_og
-                        _R_matrix.block(7 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS,
+                                        2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_o1
+                        _R_matrix.block(3 * ShapeFunction::NPOINTS,
+                                        3 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_o2
+                        _R_matrix.block(6 * ShapeFunction::NPOINTS,
+                                        6 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(7 * ShapeFunction::NPOINTS,
+                                        7 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_og
                         break;
                     case 2:  // R g1
-                        _R_matrix.block(4 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(6 * nnodes, 4 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(4 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(7 * nnodes, 4 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(5 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(6 * nnodes, 5 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(5 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(7 * nnodes, 5 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            4 * ShapeFunction::NPOINTS,
+                            6 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            6 * ShapeFunction::NPOINTS,
+                            4 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            4 * ShapeFunction::NPOINTS,
+                            7 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            7 * ShapeFunction::NPOINTS,
+                            4 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            5 * ShapeFunction::NPOINTS,
+                            6 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            6 * ShapeFunction::NPOINTS,
+                            5 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            5 * ShapeFunction::NPOINTS,
+                            7 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            7 * ShapeFunction::NPOINTS,
+                            5 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(4 * nnodes, 4 * nnodes, nnodes,
-                                        nnodes) += 2.0 * matBHE_loc_R;  // K_ig
-                        _R_matrix.block(5 * nnodes, 5 * nnodes, nnodes,
-                                        nnodes) += 2.0 * matBHE_loc_R;  // K_ig
-                        _R_matrix.block(6 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += 2.0 * matBHE_loc_R;  // K_og
-                        _R_matrix.block(7 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += 2.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(4 * ShapeFunction::NPOINTS,
+                                        4 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            2.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(5 * ShapeFunction::NPOINTS,
+                                        5 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            2.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(6 * ShapeFunction::NPOINTS,
+                                        6 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            2.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(7 * ShapeFunction::NPOINTS,
+                                        7 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            2.0 * matBHE_loc_R;  // K_og
                         break;
                     case 3:  // R g2
-                        _R_matrix.block(6 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
-                        _R_matrix.block(7 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            6 * ShapeFunction::NPOINTS,
+                            7 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            7 * ShapeFunction::NPOINTS,
+                            6 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(4 * nnodes, 4 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_ig
-                        _R_matrix.block(5 * nnodes, 5 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_ig
-                        _R_matrix.block(6 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_og
-                        _R_matrix.block(7 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(4 * ShapeFunction::NPOINTS,
+                                        4 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(5 * ShapeFunction::NPOINTS,
+                                        5 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(6 * ShapeFunction::NPOINTS,
+                                        6 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(7 * ShapeFunction::NPOINTS,
+                                        7 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_og
                         break;
                     case 4:  // R s
                         _R_s_matrix += 1.0 * matBHE_loc_R;
 
-                        _R_pi_s_matrix.block(4 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(4 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_pi_s_matrix.block(5 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(5 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_pi_s_matrix.block(6 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(6 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_pi_s_matrix.block(7 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(7 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(4 * nnodes, 4 * nnodes, nnodes,
-                                        nnodes) += matBHE_loc_R;  // K_gs
-                        _R_matrix.block(5 * nnodes, 5 * nnodes, nnodes,
-                                        nnodes) += matBHE_loc_R;  // K_gs
-                        _R_matrix.block(6 * nnodes, 6 * nnodes, nnodes,
-                                        nnodes) += matBHE_loc_R;  // K_gs
-                        _R_matrix.block(7 * nnodes, 7 * nnodes, nnodes,
-                                        nnodes) += matBHE_loc_R;  // K_gs
+                        _R_matrix.block(
+                            4 * ShapeFunction::NPOINTS,
+                            4 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += matBHE_loc_R;  // K_gs
+                        _R_matrix.block(
+                            5 * ShapeFunction::NPOINTS,
+                            5 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += matBHE_loc_R;  // K_gs
+                        _R_matrix.block(
+                            6 * ShapeFunction::NPOINTS,
+                            6 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += matBHE_loc_R;  // K_gs
+                        _R_matrix.block(
+                            7 * ShapeFunction::NPOINTS,
+                            7 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += matBHE_loc_R;  // K_gs
                         break;
                 }
                 break;
@@ -275,35 +409,52 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
                 switch (idx_bhe_unknowns)
                 {
                     case 0:  // R i1
-                        _R_matrix.block(0, 2 * nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(0, 2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS, 0,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(0, 0, nnodes, nnodes) +=
+                        _R_matrix.block(0, 0, ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_i1
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_ig
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS,
+                                        2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_ig
                         break;
                     case 1:  // R io
-                        _R_matrix.block(0, nnodes, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
-                        _R_matrix.block(nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            0, ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, 0, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(0, 0, nnodes, nnodes) +=
+                        _R_matrix.block(0, 0, ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_i1
-                        _R_matrix.block(nnodes, nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_o1
                         break;
                     case 2:  // R s
                         _R_s_matrix += matBHE_loc_R;
 
-                        _R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(2 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += matBHE_loc_R;  // K_gs
+                        _R_matrix.block(
+                            2 * ShapeFunction::NPOINTS,
+                            2 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += matBHE_loc_R;  // K_gs
                         break;
                 }
                 break;
@@ -311,35 +462,53 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
                 switch (idx_bhe_unknowns)
                 {
                     case 0:  // R o1
-                        _R_matrix.block(0, 2 * nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(0, 2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
-                        _R_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS, 0,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(nnodes, nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_o1
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += 1.0 * matBHE_loc_R;  // K_og
+                        _R_matrix.block(2 * ShapeFunction::NPOINTS,
+                                        2 * ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
+                            1.0 * matBHE_loc_R;  // K_og
                         break;
                     case 1:  // R io
-                        _R_matrix.block(0, nnodes, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
-                        _R_matrix.block(nnodes, 0, nnodes, nnodes) +=
-                            -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            0, ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, 0, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(0, 0, nnodes, nnodes) +=
+                        _R_matrix.block(0, 0, ShapeFunction::NPOINTS,
+                                        ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_i1
-                        _R_matrix.block(nnodes, nnodes, nnodes, nnodes) +=
+                        _R_matrix.block(
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS, ShapeFunction::NPOINTS) +=
                             1.0 * matBHE_loc_R;  // K_o1
                         break;
                     case 2:  // R s
                         _R_s_matrix += matBHE_loc_R;
 
-                        _R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) +=
+                        _R_pi_s_matrix.block(2 * ShapeFunction::NPOINTS, 0,
+                                             ShapeFunction::NPOINTS,
+                                             ShapeFunction::NPOINTS) +=
                             -1.0 * matBHE_loc_R;
 
-                        _R_matrix.block(2 * nnodes, 2 * nnodes, nnodes,
-                                        nnodes) += matBHE_loc_R;  // K_gs
+                        _R_matrix.block(
+                            2 * ShapeFunction::NPOINTS,
+                            2 * ShapeFunction::NPOINTS, ShapeFunction::NPOINTS,
+                            ShapeFunction::NPOINTS) += matBHE_loc_R;  // K_gs
                         break;
                 }
                 break;
@@ -371,7 +540,6 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
     // plus one because the soil temperature is included in local_x
     assert(local_matrix_size == ShapeFunction::NPOINTS * (BHE_n_unknowns + 1));
-    const int nnodes = _element.getNumberOfNodes();
 
     auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
         local_M_data, local_matrix_size, local_matrix_size);
@@ -385,8 +553,9 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     x_position.setElementID(_element.getID());
 
     int shift = 0;
-    const int local_BHE_matrix_size = ShapeFunction::NPOINTS * BHE_n_unknowns;
-    const int shift_start = local_matrix_size - local_BHE_matrix_size;
+    static const int local_BHE_matrix_size =
+        ShapeFunction::NPOINTS * BHE_n_unknowns;
+    static const int shift_start = ShapeFunction::NPOINTS;
 
     // the mass and conductance matrix terms
     for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -409,21 +578,28 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
                 ip_data._vec_Advection_vectors[idx_bhe_unknowns];
 
             // calculate shift.
-            shift = shift_start + nnodes * idx_bhe_unknowns;
+            shift = shift_start + ShapeFunction::NPOINTS * idx_bhe_unknowns;
             // local M
-            local_M.block(shift, shift, nnodes, nnodes).noalias() +=
-                sm.N.transpose() * mass_coeff * sm.N * sm.detJ *
-                wp.getWeight() * sm.integralMeasure;
+            local_M
+                .block(shift, shift, ShapeFunction::NPOINTS,
+                       ShapeFunction::NPOINTS)
+                .noalias() += sm.N.transpose() * mass_coeff * sm.N * sm.detJ *
+                              wp.getWeight() * sm.integralMeasure;
 
             // local K
             // laplace part
-            local_K.block(shift, shift, nnodes, nnodes).noalias() +=
-                sm.dNdx.transpose() * laplace_mat * sm.dNdx * sm.detJ *
-                wp.getWeight() * sm.integralMeasure;
+            local_K
+                .block(shift, shift, ShapeFunction::NPOINTS,
+                       ShapeFunction::NPOINTS)
+                .noalias() += sm.dNdx.transpose() * laplace_mat * sm.dNdx *
+                              sm.detJ * wp.getWeight() * sm.integralMeasure;
             // advection part
-            local_K.block(shift, shift, nnodes, nnodes).noalias() +=
-                sm.N.transpose() * advection_vec.transpose() * sm.dNdx *
-                sm.detJ * wp.getWeight() * sm.integralMeasure;
+            local_K
+                .block(shift, shift, ShapeFunction::NPOINTS,
+                       ShapeFunction::NPOINTS)
+                .noalias() += sm.N.transpose() * advection_vec.transpose() *
+                              sm.dNdx * sm.detJ * wp.getWeight() *
+                              sm.integralMeasure;
         }
     }
 
