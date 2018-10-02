@@ -346,7 +346,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
         }
     }
 
-    return std::move(bcs);
+    return bcs;
 }
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
