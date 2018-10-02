@@ -72,23 +72,22 @@ public:
                                                  _data.prefac3};
         // Get element nodes for the interpolation from nodes to
         // integration point.
-        NodalVectorType constant_node_values =
+        NodalVectorType const constant_node_values =
             constant_values.getNodalValuesOnElement(Base::_element, t);
-        NodalVectorType prefac1_node_values =
+        NodalVectorType const prefac1_node_values =
             prefac1_values.getNodalValuesOnElement(Base::_element, t);
-        NodalVectorType prefac2_node_values =
+        NodalVectorType const prefac2_node_values =
             prefac2_values.getNodalValuesOnElement(Base::_element, t);
-        NodalVectorType prefac3_node_values =
+        NodalVectorType const prefac3_node_values =
             prefac3_values.getNodalValuesOnElement(Base::_element, t);
         unsigned const n_integration_points =
             Base::_integration_method.getNumberOfPoints();
-        NodalVectorType neumann_node_values;
         auto const indices_v1 =
             NumLib::getIndices(mesh_item_id, dof_table_boundary);
         auto const indices_v2 =
             NumLib::getIndices(mesh_item_id, _data.dof_table_boundary_v2);
-        std::vector<double> local_v1 = x.get(indices_v1);
-        std::vector<double> local_v2 = x.get(indices_v2);
+        std::vector<double> const local_v1 = x.get(indices_v1);
+        std::vector<double> const local_v2 = x.get(indices_v2);
 
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
@@ -101,10 +100,10 @@ public:
 
             NumLib::shapeFunctionInterpolate(local_v1, N, v1_int_pt);
             NumLib::shapeFunctionInterpolate(local_v2, N, v2_int_pt);
-            neumann_node_values = constant_node_values +
-                                  prefac1_node_values * v1_int_pt +
-                                  prefac2_node_values * v2_int_pt +
-                                  prefac3_node_values * v1_int_pt * v2_int_pt;
+            NodalVectorType const neumann_node_values =
+                constant_node_values + prefac1_node_values * v1_int_pt +
+                prefac2_node_values * v2_int_pt +
+                prefac3_node_values * v1_int_pt * v2_int_pt;
 
             _local_rhs.noalias() += N * neumann_node_values.dot(N) * w;
         }

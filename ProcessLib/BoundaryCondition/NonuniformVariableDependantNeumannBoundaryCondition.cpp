@@ -57,6 +57,7 @@ createNonuniformVariableDependantNeumannBoundaryCondition(
             "NonuniformVariableDependantNeumann BC only implemented for 2 "
             "variable processes.");
     }
+    assert(variable_id == 0 || variable_id == 1);
 
     auto xxx = [&boundary_mesh](std::string const& name) {
         auto const* const property_vector =
@@ -117,7 +118,7 @@ createNonuniformVariableDependantNeumannBoundaryCondition(
 
     std::vector<MeshLib::Node*> const& bc_nodes = boundary_mesh.getNodes();
     MeshLib::MeshSubset bc_mesh_subset(boundary_mesh, bc_nodes);
-    auto const* const dof_table_boundary_v2 =
+    auto const* const dof_table_boundary_other_variable =
         dof_table.deriveBoundaryConstrainedMap(
             (variable_id + 1) % 2, {component_id}, std::move(bc_mesh_subset));
 
@@ -141,7 +142,8 @@ createNonuniformVariableDependantNeumannBoundaryCondition(
         integration_order, shapefunction_order, dof_table, variable_id,
         component_id, bulk_mesh.getDimension(), boundary_mesh,
         NonuniformVariableDependantNeumannBoundaryConditionData{
-            *constant, *prefac1, *prefac2, *prefac3, *dof_table_boundary_v2});
+            *constant, *prefac1, *prefac2, *prefac3,
+            *dof_table_boundary_other_variable});
 }
 
 }  // namespace ProcessLib
