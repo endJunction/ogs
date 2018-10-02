@@ -134,7 +134,7 @@ void HeatTransportBHEProcess::constructDofTable()
     // temperature.
     vec_n_components.push_back(1);
     // now the BHE subsets
-    for (auto i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+    for (std::size_t i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
         // Here the number of components equals to
         // the number of unknowns on the BHE
