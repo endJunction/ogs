@@ -129,9 +129,9 @@ void HeatTransportBHEProcess::constructDofTable()
     }
 
     std::vector<int> vec_n_components;
-    // this is the soil temperature for first mesh subset
-    // 1 because for the soil part ther is just one var which is the soile
-    // temperatrure
+    // This is the soil temperature for first mesh subset.
+    // 1, because for the soil part there is just one variable which is the soil
+    // temperature.
     vec_n_components.push_back(1);
     // now the BHE subsets
     for (auto i = 0; i < _vec_BHE_mat_IDs.size(); i++)
