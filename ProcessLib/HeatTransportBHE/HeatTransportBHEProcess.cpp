@@ -97,7 +97,7 @@ void HeatTransportBHEProcess::constructDofTable()
     _mesh_subset_pure_soil_nodes =
         std::make_unique<MeshLib::MeshSubset>(_mesh, _vec_pure_soil_nodes);
 
-    std::vector<std::size_t> vec_n_BHE_unknowns;
+    std::vector<int> vec_n_BHE_unknowns;
     vec_n_BHE_unknowns.reserve(_vec_BHE_nodes.size());
     // the BHE nodes need to be cherry-picked from the vector
     for (unsigned i = 0; i < _vec_BHE_nodes.size(); i++)
@@ -105,7 +105,7 @@ void HeatTransportBHEProcess::constructDofTable()
         _mesh_subset_BHE_nodes.push_back(
             std::make_unique<MeshLib::MeshSubset const>(_mesh,
                                                         _vec_BHE_nodes[i]));
-        std::size_t n_BHE_unknowns =
+        int n_BHE_unknowns =
             _process_data._vec_BHE_property[i]->getNumUnknowns();
         vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
     }
@@ -127,13 +127,13 @@ void HeatTransportBHEProcess::constructDofTable()
         count++;
     }
 
-    std::vector<std::size_t> vec_n_components;
+    std::vector<int> vec_n_components;
     // this is the soil temperature for first mesh subset
     // 1 because for the soil part ther is just one var which is the soile
     // temperatrure
     vec_n_components.push_back(1);
     // now the BHE subsets
-    for (std::size_t i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+    for (auto i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
         // Here the number of components equals to
         // the number of unknowns on the BHE
