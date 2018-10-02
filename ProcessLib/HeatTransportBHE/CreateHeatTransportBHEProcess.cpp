@@ -202,7 +202,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
 
     // reading BHE
     // parameters--------------------------------------------------------------
-    std::vector<std::unique_ptr<BHEAbstract>> vec_BHEs;
+    std::vector<std::unique_ptr<BHE::BHEAbstract>> vec_BHEs;
     // BHE::BHE_Net BHE_network;
 
     // now read the BHE configurations

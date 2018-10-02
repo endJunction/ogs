@@ -10,7 +10,7 @@
 #include "HeatTransportBHEProcess.h"
 
 #include <cassert>
-
+#include <iostream>
 #include "ProcessLib/HeatTransportBHE/BHE/MeshUtils.h"
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/CreateLocalAssemblers.h"
 
@@ -60,7 +60,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
     auto max_BHE_mat_id =
         std::max_element(_vec_BHE_mat_IDs.begin(), _vec_BHE_mat_IDs.end());
     _process_data._map_materialID_to_BHE_ID.resize(*max_BHE_mat_id + 1);
-    for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+    for (std::size_t i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
         // by default, it is assumed that the soil compartment takes material ID
         // 0 and the BHE take the successive material group.
@@ -79,8 +79,8 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
     }
     */
 
-    MeshLib::PropertyVector<int> const* material_ids(
-        mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
+    MeshLib::PropertyVector<std::size_t> const* material_ids(
+        mesh.getProperties().getPropertyVector<std::size_t>("MaterialIDs"));
     _process_data._mesh_prop_materialIDs = material_ids;
 }
 
@@ -116,7 +116,7 @@ void HeatTransportBHEProcess::constructDofTable()
         *_mesh_subset_pure_soil_nodes};
 
     // All the BHE nodes have additinal variables
-    int count = 0;
+    std::size_t count = 0;
     for (auto& ms : _mesh_subset_BHE_nodes)
     {
         std::generate_n(std::back_inserter(all_mesh_subsets),
@@ -127,13 +127,13 @@ void HeatTransportBHEProcess::constructDofTable()
         count++;
     }
 
-    std::vector<int> vec_n_components;
+    std::vector<std::size_t> vec_n_components;
     // this is the soil temperature for first mesh subset
     // 1 because for the soil part ther is just one var which is the soile
     // temperatrure
     vec_n_components.push_back(1);
     // now the BHE subsets
-    for (unsigned i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+    for (std::size_t i = 0; i < _vec_BHE_mat_IDs.size(); i++)
     {
         // Here the number of components equals to
         // the number of unknowns on the BHE
@@ -143,7 +143,7 @@ void HeatTransportBHEProcess::constructDofTable()
     std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
     // vec_var_elements.push_back(&_vec_pure_soil_elements);
     vec_var_elements.push_back(&(_mesh.getElements()));
-    for (unsigned i = 0; i < _vec_BHE_elements.size(); i++)
+    for (std::size_t i = 0; i < _vec_BHE_elements.size(); i++)
     {
         vec_var_elements.push_back(&_vec_BHE_elements[i]);
     }
@@ -156,7 +156,7 @@ void HeatTransportBHEProcess::constructDofTable()
             NumLib::ComponentOrder::BY_COMPONENT);
 
     // in case of debugging the dof table, activate the following line
-    // std::cout << *_local_to_global_index_map << "\n";
+    std::cout << *_local_to_global_index_map << "\n";
 }
 
 void HeatTransportBHEProcess::initializeConcreteProcess(

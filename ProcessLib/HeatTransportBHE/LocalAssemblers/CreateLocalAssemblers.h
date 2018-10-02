@@ -13,7 +13,7 @@
 #include <logog/include/logog.hpp>
 
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
-
+#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 #include "LocalDataInitializer.h"
 
 namespace ProcessLib
@@ -31,8 +31,8 @@ void createLocalAssemblers(
     NumLib::LocalToGlobalIndexMap const& dof_table,
     std::vector<MeshLib::Element*> const& mesh_elements,
     std::vector<std::unique_ptr<LocalAssemblerInterface>>& local_assemblers,
-    const std::vector<std::vector<int>>& vec_ele_connected_BHE_IDs,
-    const std::vector<std::unique_ptr<BHEAbstract>>& vec_BHE_property,
+    const std::vector<std::vector<std::size_t>>& vec_ele_connected_BHE_IDs,
+    const std::vector<std::unique_ptr<BHE::BHEAbstract>>& vec_BHE_property,
     ExtraCtorArgs&&... extra_ctor_args)
 {
     // Shape matrices initializer
