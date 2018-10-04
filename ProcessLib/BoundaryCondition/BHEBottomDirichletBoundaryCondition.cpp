@@ -43,25 +43,20 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     // convert mesh node ids to global index for the given component
     _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
     _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
-    // TODO BEFORE MERGE (haibing) rethink the algorithm used here; no need to
-    // loop over the nodes.
-    for (auto const* const node : bc_mesh_subset.getNodes())
+
+    const auto g_T_out_idx = global_idx_T_out_bottom;
+    if (g_T_out_idx >= 0)
     {
-        // that might be slow, but only done once
-        const auto g_T_out_idx = global_idx_T_out_bottom;
-        if (g_T_out_idx >= 0)
-        {
-            _bc_values.ids.emplace_back(g_T_out_idx);
-            _bc_values.values.emplace_back(298.15);
-        }
+        _bc_values.ids.emplace_back(g_T_out_idx);
+        _bc_values.values.emplace_back(298.15);
+    }
 
-        const auto g_T_in_idx = global_idx_T_in_bottom;
+    const auto g_T_in_idx = global_idx_T_in_bottom;
 
-        if (g_T_in_idx >= 0)
-        {
-            _T_in_values.ids.emplace_back(g_T_in_idx);
-            _T_in_values.values.emplace_back(298.15);
-        }
+    if (g_T_in_idx >= 0)
+    {
+        _T_in_values.ids.emplace_back(g_T_in_idx);
+        _T_in_values.values.emplace_back(298.15);
     }
 }
 
