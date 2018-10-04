@@ -37,12 +37,6 @@ public:
     using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
     using NodalVectorType = typename ShapeMatricesType::NodalVectorType;
     using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
-    using BMatricesType = BMatrixPolicyType<ShapeFunction, GlobalDim>;
-
-    using StiffnessMatrixType = typename BMatricesType::StiffnessMatrixType;
-    using NodalForceVectorType = typename BMatricesType::NodalForceVectorType;
-    using NodalDisplacementVectorType =
-        typename BMatricesType::NodalForceVectorType;
 
     HeatTransportBHELocalAssemblerSoil(
         HeatTransportBHELocalAssemblerSoil const&) = delete;
@@ -97,9 +91,9 @@ private:
     HeatTransportBHEProcessData& _process_data;
 
     std::vector<
-        IntegrationPointDataSoil<ShapeMatricesType, BMatricesType, GlobalDim>,
+        IntegrationPointDataSoil<ShapeMatricesType, GlobalDim>,
         Eigen::aligned_allocator<IntegrationPointDataSoil<
-            ShapeMatricesType, BMatricesType, GlobalDim>>>
+            ShapeMatricesType, GlobalDim>>>
         _ip_data;
 
     IntegrationMethod const _integration_method;

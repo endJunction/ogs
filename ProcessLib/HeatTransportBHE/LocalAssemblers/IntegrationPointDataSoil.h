@@ -18,7 +18,7 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-template <typename ShapeMatricesType, typename BMatricesType, int GlobalDim>
+template <typename ShapeMatricesType, int GlobalDim>
 struct IntegrationPointDataSoil final
 {
     explicit IntegrationPointDataSoil(

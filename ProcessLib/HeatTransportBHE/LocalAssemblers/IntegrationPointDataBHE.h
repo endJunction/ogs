@@ -64,16 +64,8 @@ struct IntegrationPointDataBHE final
     // Advection vectors
     std::vector<Eigen::VectorXd> _vec_Advection_vectors;
 
-    //
-    // std::vector<Eigen::MatrixXd>  _R_matrix;
-    // std::vector<Eigen::MatrixXd>  R_s_matrix;
-    // std::vector<Eigen::MatrixXd>  R_pi_s_matrix;
-
     void pushBackState()
     {
-        // _w_prev = _w;
-        // _sigma_prev = _sigma;
-        // _aperture_prev = _aperture;
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

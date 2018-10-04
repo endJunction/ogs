@@ -9,15 +9,11 @@
 
 #pragma once
 
-#include "HeatTransportBHELocalAssemblerBHE.h"
-
 #include <Eigen/Eigen>
-
+#include "HeatTransportBHELocalAssemblerBHE.h"
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
-#include <iostream>
-#include "ProcessLib/Utils/InitShapeMatrices.h"
-
 #include "ProcessLib/HeatTransportBHE/LocalAssemblers/IntegrationPointDataBHE.h"
+#include "ProcessLib/Utils/InitShapeMatrices.h"
 
 namespace ProcessLib
 {
@@ -77,10 +73,9 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
     }
 
     const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
-    _R_matrix.setZero(ShapeFunction::NPOINTS * BHE_n_unknowns,
-                      ShapeFunction::NPOINTS * BHE_n_unknowns);
-    _R_pi_s_matrix.setZero(ShapeFunction::NPOINTS * BHE_n_unknowns,
-                           ShapeFunction::NPOINTS);
+    const int NumRMatrixRows = ShapeFunction::NPOINTS * BHE_n_unknowns;
+    _R_matrix.setZero(NumRMatrixRows, NumRMatrixRows);
+    _R_pi_s_matrix.setZero(NumRMatrixRows, ShapeFunction::NPOINTS);
     _R_s_matrix.setZero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
     // formulate the local BHE R matrix
     Eigen::MatrixXd matBHE_loc_R =
@@ -93,15 +88,13 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
-            // auto& ip_data = _ip_data[ip];
 
             auto const& sm = _shape_matrices[ip];
             auto const& wp = _integration_method.getWeightedPoint(ip);
 
             // get coefficient of R matrix for corresponding BHE.
-            auto R_coeff =
-                _process_data._vec_BHE_property[BHE_id]
-                    ->getBoundaryHeatExchangeCoeff(idx_bhe_unknowns);
+            auto R_coeff = _process_data._vec_BHE_property[BHE_id]
+                               ->getBoundaryHeatExchangeCoeff(idx_bhe_unknowns);
 
             // calculate mass matrix for current unknown
             matBHE_loc_R += sm.N.transpose() * R_coeff * sm.N * sm.detJ *
@@ -629,15 +622,6 @@ void HeatTransportBHELocalAssemblerBHE<
     ShapeFunction, IntegrationMethod,
     BHE_Dim>::postTimestepConcrete(std::vector<double> const& /*local_x*/)
 {
-    // double ele_b = 0;
-    unsigned const n_integration_points =
-        _integration_method.getNumberOfPoints();
-    for (unsigned ip = 0; ip < n_integration_points; ip++)
-    {
-        // ele_b += _ip_data[ip]._aperture;
-    }
-    // ele_b /= n_integration_points;
-    // (*_process_data._mesh_prop_b)[_element.getID()] = ele_b;
 }
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
