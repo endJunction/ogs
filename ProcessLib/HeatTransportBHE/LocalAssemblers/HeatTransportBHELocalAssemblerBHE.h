@@ -33,6 +33,11 @@ public:
     using NodalVectorType = typename ShapeMatricesType::NodalVectorType;
     using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
 
+    // Using dynamic size, because the number of unknowns in the BHE is runtime
+    // value.
+    using BheLocalMatrixType =
+        typename ShapeMatricesType::template MatrixType<Eigen::Dynamic,
+                                                        Eigen::Dynamic>;
     HeatTransportBHELocalAssemblerBHE(
         HeatTransportBHELocalAssemblerBHE const&) = delete;
     HeatTransportBHELocalAssemblerBHE(HeatTransportBHELocalAssemblerBHE&&) =
@@ -102,11 +107,11 @@ private:
 
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 
-    Eigen::MatrixXd _R_matrix;
+    BheLocalMatrixType _R_matrix;
 
-    Eigen::MatrixXd _R_s_matrix;
+    BheLocalMatrixType _R_s_matrix;
 
-    Eigen::MatrixXd _R_pi_s_matrix;
+    BheLocalMatrixType _R_pi_s_matrix;
 };
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

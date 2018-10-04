@@ -541,9 +541,9 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     // plus one because the soil temperature is included in local_x
     assert(local_matrix_size == ShapeFunction::NPOINTS * (BHE_n_unknowns + 1));
 
-    auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
+    auto local_M = MathLib::createZeroedMatrix<BheLocalMatrixType>(
         local_M_data, local_matrix_size, local_matrix_size);
-    auto local_K = MathLib::createZeroedMatrix<NodalMatrixType>(
+    auto local_K = MathLib::createZeroedMatrix<BheLocalMatrixType>(
         local_K_data, local_matrix_size, local_matrix_size);
 
     unsigned const n_integration_points =
