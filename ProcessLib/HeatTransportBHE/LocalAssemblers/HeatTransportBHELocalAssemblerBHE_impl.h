@@ -176,8 +176,8 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
             shift = shift_start + ShapeFunction::NPOINTS * idx_bhe_unknowns;
             // local M
             local_M
-                .block(shift, shift, ShapeFunction::NPOINTS,
-                       ShapeFunction::NPOINTS)
+                .template block<ShapeFunction::NPOINTS, ShapeFunction::NPOINTS>(
+                    shift, shift)
                 .noalias() += N.transpose() * mass_coeff * N * w;
 
             // local K
