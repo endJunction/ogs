@@ -451,7 +451,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                 bcs.push_back(std::move(bc_top));
                 bcs.push_back(std::move(bc_bottom));
             }
-            break;                
+            break;
             case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_CXA:
             {
                 unsigned const component_id_T_in = 0;

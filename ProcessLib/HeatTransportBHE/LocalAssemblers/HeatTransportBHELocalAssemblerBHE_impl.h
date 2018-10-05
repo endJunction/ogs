@@ -105,7 +105,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
         // book please refer to M.127 and M.128 on page 955 and 956
         _process_data._vec_BHE_property[BHE_id]->setRMatrices(
             idx_bhe_unknowns, ShapeFunction::NPOINTS, matBHE_loc_R, _R_matrix,
-            _R_pi_s_matrix, _R_s_matrix); 
+            _R_pi_s_matrix, _R_s_matrix);
 
     }  // end of loop over BHE unknowns
 
