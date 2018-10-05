@@ -363,6 +363,65 @@ void BHE_1U::getAdvectionVector(std::size_t idx_unknown,
     }
 }
 
+void ProcessLib::HeatTransportBHE::BHE::BHE_1U::setRMatrices(
+    const int idx_bhe_unknowns, const int NumNodes,
+    Eigen::MatrixXd& matBHE_loc_R,
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+        R_matrix,
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+        R_pi_s_matrix,
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+        R_s_matrix) const
+{
+    switch (idx_bhe_unknowns)
+    {
+        case 0:  // PHI_fig
+            R_matrix.block(0, 2 * NumNodes, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+            R_matrix.block(2 * NumNodes, 0, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+
+            R_matrix.block(0, 0, NumNodes, NumNodes) += 1.0 * matBHE_loc_R;  // K_i1
+            R_matrix.block(2 * NumNodes, 2 * NumNodes,
+                           NumNodes, NumNodes) += 1.0 * matBHE_loc_R;  // K_ig
+            break;
+        case 1:  // PHI_fog
+            R_matrix.block(NumNodes, 3 * NumNodes, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+            R_matrix.block(3 * NumNodes, NumNodes, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+
+            R_matrix.block(NumNodes, NumNodes, NumNodes, NumNodes) +=
+                1.0 * matBHE_loc_R;  // K_o1
+            R_matrix.block(3 * NumNodes, 3 * NumNodes,
+                           NumNodes, NumNodes) += 1.0 * matBHE_loc_R;  // K_og
+            break;
+        case 2:  // PHI_gg
+            R_matrix.block(2 * NumNodes, 3 * NumNodes, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+            R_matrix.block(3 * NumNodes, 2 * NumNodes, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+
+            R_matrix.block(2 * NumNodes, 2 * NumNodes, NumNodes, NumNodes) +=
+                1.0 * matBHE_loc_R;  // K_ig  // notice we only have
+                                     // 1 PHI_gg term here.
+            R_matrix.block(3 * NumNodes, 3 * NumNodes, NumNodes, NumNodes) +=
+                1.0 * matBHE_loc_R;  // K_og  // see Diersch 2013 FEFLOW
+                                     // book page 954 Table M.2
+            break;
+        case 3:  // PHI_gs
+            R_s_matrix += 1.0 * matBHE_loc_R;
+
+            R_pi_s_matrix.block(2 * NumNodes, 0, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+            R_pi_s_matrix.block(3 * NumNodes, 0, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+            R_matrix.block(2 * NumNodes, 2 * NumNodes, NumNodes, NumNodes) += 1.0 * matBHE_loc_R;  // K_ig
+            R_matrix.block(3 * NumNodes, 3 * NumNodes, NumNodes, NumNodes) += 1.0 * matBHE_loc_R;  // K_og
+            break;
+    }
+}
+
 double BHE_1U::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown)
 {
     // Here we calculates the boundary heat exchange coefficients

@@ -346,6 +346,54 @@ void BHE_CXA::getAdvectionVector(std::size_t idx_unknown,
     }
 }
 
+void ProcessLib::HeatTransportBHE::BHE::BHE_CXA::setRMatrices(
+    const int idx_bhe_unknowns, const int NumNodes,
+    Eigen::MatrixXd& matBHE_loc_R,
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+        R_matrix,
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+        R_pi_s_matrix,
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+        R_s_matrix) const
+{
+    switch (idx_bhe_unknowns)
+    {
+        case 0:  // R i1
+            R_matrix.block(0, 2 * NumNodes, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+            R_matrix.block(2 * NumNodes, 0, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+
+            R_matrix.block(0, 0, NumNodes,
+                           NumNodes) += 1.0 * matBHE_loc_R;  // K_i1
+            R_matrix.block(2 * NumNodes,
+                           2 * NumNodes,
+                           NumNodes,
+                           NumNodes) += 1.0 * matBHE_loc_R;  // K_ig
+            break;
+        case 1:  // R io
+            R_matrix.block(0, NumNodes, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+            R_matrix.block(NumNodes, 0, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+
+            R_matrix.block(0, 0, NumNodes,
+                           NumNodes) += 1.0 * matBHE_loc_R;  // K_i1
+            R_matrix.block(NumNodes, NumNodes, NumNodes, NumNodes) +=
+                1.0 * matBHE_loc_R;  // K_o1
+            break;
+        case 2:  // R s
+            R_s_matrix += matBHE_loc_R;
+
+            R_pi_s_matrix.block(2 * NumNodes, 0, NumNodes, NumNodes) +=
+                -1.0 * matBHE_loc_R;
+
+            R_matrix.block(2 * NumNodes, 2 * NumNodes, NumNodes,
+                           NumNodes) += matBHE_loc_R;  // K_gs
+            break;
+    }
+}
+
 double BHE_CXA::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown)
 {
     // Here we calculates the boundary heat exchange coefficients

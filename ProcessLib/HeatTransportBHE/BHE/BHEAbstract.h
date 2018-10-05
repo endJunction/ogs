@@ -28,11 +28,11 @@
 
 #pragma once
 
-#include <map>
 #include <Eigen/Eigen>
-#include "ProcessLib/Utils/ProcessUtils.h"
+#include <map>
 #include "GeoLib/Polyline.h"
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
+#include "ProcessLib/Utils/ProcessUtils.h"
 #include "boost/math/constants/constants.hpp"
 
 namespace ProcessLib
@@ -255,7 +255,7 @@ public:
      */
     BHEAbstract(
         const std::string name_,
-        const BHE_TYPE bhe_type_, 
+        const BHE_TYPE bhe_type_,
         BoreholeGeometry borehole_geometry_,
         PipeParameters pipe_param_,
         RefrigerantParameters refrigerant_param_,
@@ -271,7 +271,7 @@ public:
         bool user_defined_R_vals = false,
         bool if_flowrate_curve = false)
         : name(name_),
-          bhe_type(bhe_type_), 
+          bhe_type(bhe_type_),
           boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
@@ -283,9 +283,7 @@ public:
           use_flowrate_curve(if_flowrate_curve),
           if_use_ext_Ra_Rb(if_use_ext_Ra_Rb),
           user_defined_R_vals(user_defined_R_vals),
-          PI(boost::math::constants::pi<double>())
-    {      
-    };
+          PI(boost::math::constants::pi<double>()){};
 
     /**
      * destructor
@@ -396,6 +394,19 @@ public:
      * power.
      */
     virtual double getTinByTout(double T_in, double current_time) = 0;
+
+    /**
+     * return the _R_matrix, _R_pi_s_matrix, _R_s_matrix
+     */
+    virtual void setRMatrices(
+        const int idx_bhe_unknowns, const int NumNodes,
+        Eigen::MatrixXd& matBHE_loc_R,
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+            R_matrix,
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+            R_pi_s_matrix,
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+            R_s_matrix) const = 0;
 
 public:
     /**

@@ -217,6 +217,19 @@ public:
                             Eigen::VectorXd& vec_advection);
 
     /**
+     * return the _R_matrix, _R_pi_s_matrix, _R_s_matrix
+     */
+    void setRMatrices(
+        const int idx_bhe_unknowns, const int NumNodes,
+        Eigen::MatrixXd& matBHE_loc_R,
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+            R_matrix,
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+            R_pi_s_matrix,
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
+            R_s_matrix) const;
+
+    /**
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.
      */
