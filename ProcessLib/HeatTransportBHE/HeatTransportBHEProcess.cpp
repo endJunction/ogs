@@ -68,18 +68,6 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
         _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] = i;
     }
 
-    /*
-    // create a table of connected BHE IDs for each element
-    _process_data._vec_ele_connected_BHE_IDs.resize(mesh.getNumberOfElements());
-    for (unsigned i = 0; i < _vec_BHE_soil_elements.size(); i++)
-    {
-        for (auto e : _vec_BHE_soil_elements[i])
-        {
-            _process_data._vec_ele_connected_BHE_IDs[e->getID()].push_back(i);
-        }
-    }
-    */
-
     MeshLib::PropertyVector<int> const* material_ids(
         mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
     _process_data._mesh_prop_materialIDs = material_ids;
