@@ -90,7 +90,7 @@ private:
 
     IntegrationMethod _integration_method;
 
-    MeshLib::Element const& _element;
+    std::size_t const element_id;
 
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 

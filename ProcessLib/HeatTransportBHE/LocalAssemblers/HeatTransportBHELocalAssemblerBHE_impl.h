@@ -35,10 +35,10 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
           dofIndex_to_localIndex),
       _process_data(process_data),
       _integration_method(integration_order),
-      _element(e)
+      element_id(e.getID())
 {
     // need to make sure that the BHE elements are one-dimensional
-    assert(_element.getDimension() == 1);
+    assert(e.getDimension() == 1);
 
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
@@ -55,7 +55,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
     auto BHE_id = _process_data._map_materialID_to_BHE_ID[mat_id];
 
     SpatialPosition x_position;
-    x_position.setElementID(_element.getID());
+    x_position.setElementID(element_id);
 
     // ip data initialization
     for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -147,7 +147,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
         _integration_method.getNumberOfPoints();
 
     SpatialPosition x_position;
-    x_position.setElementID(_element.getID());
+    x_position.setElementID(element_id);
 
     int shift = 0;
     static const int local_BHE_matrix_size =
