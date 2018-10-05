@@ -131,8 +131,6 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
         std::vector<double>& local_M_data, std::vector<double>& local_K_data,
         std::vector<double>& /*local_b_data*/)  // local b vector is not touched
 {
-    // BHE must be assembled with one dimentional element
-    assert(_element.getDimension() == 1);
     auto const local_matrix_size = local_x.size();
     const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
     // plus one because the soil temperature is included in local_x
