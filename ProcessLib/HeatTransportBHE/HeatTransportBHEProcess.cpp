@@ -486,7 +486,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
             }
                 break;
             default:
-                break;
+                OGS_FATAL("WRONG BHE TYPE");
         }
     }
 
