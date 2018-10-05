@@ -225,8 +225,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
      */
     std::vector<std::unique_ptr<BoundaryCondition>> bcs;
 
-    auto const n_BHEs =
-        static_cast<int>(_process_data._vec_BHE_property.size());
+    int const n_BHEs = static_cast<int>(_process_data._vec_BHE_property.size());
 
     // bulk dof table
     NumLib::LocalToGlobalIndexMap dof_table_bulk = *_local_to_global_index_map;
