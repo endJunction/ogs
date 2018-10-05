@@ -17,8 +17,8 @@
 namespace ProcessLib
 {
 BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_bottom,
-    GlobalIndexType global_idx_T_out_bottom,
+    GlobalIndexType const global_idx_T_in_bottom,
+    GlobalIndexType const global_idx_T_out_bottom,
     MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id,
@@ -71,15 +71,13 @@ void BHEBottomDirichletBoundaryCondition::getEssentialBCValues(
     bc_values.values.resize(_bc_values.values.size());
 
     const std::size_t n_nodes = _T_in_values.ids.size();
-    double tmp_T_out(300.0);
     for (std::size_t i = 0; i < n_nodes; i++)
     {
         bc_values.ids[i] = _bc_values.ids[i];
         // here, the outflow temperature is always
         // the same as the inflow temperature
         // get the inflow temperature from here.
-        tmp_T_out = x[_T_in_values.ids[i]];
-        bc_values.values[i] = tmp_T_out;
+        bc_values.values[i] = x[_T_in_values.ids[i]];
     }
 }
 
@@ -94,10 +92,8 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(const double /*t*/,
     auto const n_nodes = _bc_values.ids.size();
     for (std::size_t i = 0; i < n_nodes; i++)
     {
-        auto g_idx = _T_in_values.ids[i];
-
         // read the T_out
-        _T_in_values.values[i] = x[g_idx];
+        _T_in_values.values[i] = x[_T_in_values.ids[i]];
     }
 }
 
