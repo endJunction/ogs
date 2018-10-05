@@ -294,7 +294,7 @@ public:
      * return the number of unknowns needed for this BHE
      * abstract function, need to be realized.
      */
-    virtual std::size_t getNumUnknowns() = 0;
+    virtual std::size_t getNumUnknowns() const = 0;
 
     /**
      * initialization calcultion,

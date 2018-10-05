@@ -154,7 +154,7 @@ public:
     /**
      * return the number of unknowns needed for CXA BHE
      */
-    std::size_t getNumUnknowns() { return 3; }
+    std::size_t getNumUnknowns() const { return 3; }
 
     void updateFlowRateFromCurve(double current_time)
     {

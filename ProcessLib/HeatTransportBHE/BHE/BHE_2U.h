@@ -165,7 +165,7 @@ public:
     /**
      * return the number of unknowns needed for 2U BHE
      */
-    std::size_t getNumUnknowns() { return 8; }
+    std::size_t getNumUnknowns() const { return 8; }
 
     void updateFlowRateFromCurve(double current_time)
     {
