@@ -65,22 +65,6 @@ enum class BHE_BOUNDARY_TYPE
 };
 
 /**
- * list the possible primary variables for the HEAT_TRANSPORT_BHE process
- */
-enum class BHE_PRIMARY_VARS
-{
-    BHE_TEMP_SOIL,
-    BHE_TEMP_IN_1,
-    BHE_TEMP_IN_2,
-    BHE_TEMP_OUT_1,
-    BHE_TEMP_OUT_2,
-    BHE_TEMP_G_1,
-    BHE_TEMP_G_2,
-    BHE_TEMP_G_3,
-    BHE_TEMP_G_4
-};
-
-/**
  * discharge type of the 2U BHE
  */
 enum class BHE_DISCHARGE_TYPE
@@ -88,9 +72,6 @@ enum class BHE_DISCHARGE_TYPE
     BHE_DISCHARGE_TYPE_PARALLEL,  // parallel discharge
     BHE_DISCHARGE_TYPE_SERIAL     // serial discharge
 };
-
-using namespace boost::math::constants;
-static const double PI = boost::math::constants::pi<double>();
 
 class BHEAbstract
 {
@@ -301,7 +282,10 @@ public:
           bhe_curves(bhe_curves_),
           use_flowrate_curve(if_flowrate_curve),
           if_use_ext_Ra_Rb(if_use_ext_Ra_Rb),
-          user_defined_R_vals(user_defined_R_vals){};
+          user_defined_R_vals(user_defined_R_vals),
+          PI(boost::math::constants::pi<double>())
+    {      
+    };
 
     /**
      * destructor
@@ -532,6 +516,8 @@ protected:
      * unit is m^3/sec
      */
     double Q_r;
+
+    const double PI;
 };
 }  // end of namespace BHE
 }  // end of namespace HeatTransportBHE
