@@ -225,7 +225,8 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
      */
     std::vector<std::unique_ptr<BoundaryCondition>> bcs;
 
-    auto const n_BHEs = _process_data._vec_BHE_property.size();
+    auto const n_BHEs =
+        static_cast<int>(_process_data._vec_BHE_property.size());
 
     // bulk dof table
     NumLib::LocalToGlobalIndexMap dof_table_bulk = *_local_to_global_index_map;
@@ -234,7 +235,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
     std::vector<MeshLib::Node*> bc_bottom_nodes;
 
     // for each BHE
-    for (unsigned bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
+    for (int bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
         // get the BHE type
         auto const& bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->bhe_type;
