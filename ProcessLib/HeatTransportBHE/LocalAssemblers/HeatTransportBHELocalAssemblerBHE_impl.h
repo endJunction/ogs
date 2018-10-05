@@ -103,7 +103,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
 
         // The following assembly action is according to Diersch (2013) FEFLOW
         // book please refer to M.127 and M.128 on page 955 and 956
-        switch (_process_data._vec_BHE_property[BHE_id]->getBheType())
+        switch (_process_data._vec_BHE_property[BHE_id]->bhe_type)
         {
             case BHE::BHE_TYPE::TYPE_1U:
                 switch (idx_bhe_unknowns)

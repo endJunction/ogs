@@ -527,7 +527,7 @@ double BHE_2U::getTinByTout(double T_out, double current_time = -1.0)
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
 
-    switch (this->getBoundaryType())
+    switch (this->boundary_type)
     {
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
             T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;

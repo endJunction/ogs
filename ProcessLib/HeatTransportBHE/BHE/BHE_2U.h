@@ -80,9 +80,10 @@ public:
         ,
         BHE_DISCHARGE_TYPE type =
             BHE_DISCHARGE_TYPE::BHE_DISCHARGE_TYPE_PARALLEL)
-        : BHEAbstract(name, borehole_geometry, pipe_geometry, refrigerant_param,
-                      grout_param, extern_Ra_Rb, extern_def_thermal_resistances,
-                      std::move(bhe_curves), bound_type, if_flowrate_curve),
+        : BHEAbstract(name, BHE_TYPE::TYPE_2U, borehole_geometry, pipe_geometry,
+                      refrigerant_param, grout_param, extern_Ra_Rb,
+                      extern_def_thermal_resistances, std::move(bhe_curves),
+                      bound_type, if_flowrate_curve),
           _discharge_type(type)
     {
         _u = Eigen::Vector4d::Zero();
@@ -166,11 +167,6 @@ public:
      */
     std::size_t getNumUnknowns() { return 8; }
 
-    /**
-     * return the type of this BHE
-     */
-    BHE_TYPE getBheType() { return BHE_TYPE::TYPE_2U; }
-
     double get_flowrate() { return Q_r; }
 
     void updateFlowRateFromCurve(double current_time)
@@ -245,14 +241,14 @@ public:
      * depending on the index of unknown.
      */
     void getLaplaceMatrix(std::size_t idx_unknown,
-                            Eigen::MatrixXd& mat_laplace);
+                          Eigen::MatrixXd& mat_laplace);
 
     /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */
     void getAdvectionVector(std::size_t idx_unknown,
-                              Eigen::VectorXd& vec_advection);
+                            Eigen::VectorXd& vec_advection);
 
     /**
      * return the coeff of boundary heat exchange matrix,

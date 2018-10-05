@@ -274,6 +274,7 @@ public:
      */
     BHEAbstract(
         const std::string name_,
+        const BHE_TYPE bhe_type_, 
         BoreholeGeometry borehole_geometry_,
         PipeParameters pipe_param_,
         RefrigerantParameters refrigerant_param_,
@@ -288,8 +289,9 @@ public:
         bool if_use_ext_Ra_Rb = false,
         bool user_defined_R_vals = false,
         bool if_flowrate_curve = false)
-        : _name(name_),
-          _boundary_type(my_bound_type),
+        : name(name_),
+          bhe_type(bhe_type_), 
+          boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
           refrigerant_param(refrigerant_param_),
@@ -311,22 +313,6 @@ public:
      * abstract function, need to be realized.
      */
     virtual std::size_t getNumUnknowns() = 0;
-
-    /**
-     * return the type of this BHE
-     * abstract function, need to be realized.
-     */
-    virtual BHE_TYPE getBheType() = 0;
-
-    /**
-     * return the type of boundary condition on this BHE
-     */
-    BHE_BOUNDARY_TYPE getBoundaryType() { return _boundary_type; };
-
-    /**
-     * return the name of the BHE
-     */
-    const std::string getName() { return _name; };
 
     /**
      * return the thermal resistance for the inlet pipline
@@ -455,18 +441,22 @@ public:
      */
     virtual double getTinByTout(double T_in, double current_time) = 0;
 
-private:
+public:
     /**
      * name of the borehole heat exchanger
      */
-    const std::string _name;
+    const std::string name;
+
+    /**
+     * the type of this BHE
+     */
+    const BHE_TYPE bhe_type;
 
     /**
      * the type of the boundary condition on this BHE
      */
-    const BHE_BOUNDARY_TYPE _boundary_type;
+    const BHE_BOUNDARY_TYPE boundary_type;
 
-public:
     /**
      * total refrigerant flow discharge of BHE
      * unit is m^3/sec

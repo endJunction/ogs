@@ -249,9 +249,9 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
     for (unsigned bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
         // get the BHE name
-        auto bhe_name = _process_data._vec_BHE_property.at(bhe_i)->getName();
+        auto bhe_name = _process_data._vec_BHE_property.at(bhe_i)->name;
         // get the BHE type
-        auto bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->getBheType();
+        auto bhe_typ = _process_data._vec_BHE_property.at(bhe_i)->boundary_type;
         // find the variable ID
         // the soil temperature is 0-th variable
         // the BHE temperature is therefore bhe_i + 1

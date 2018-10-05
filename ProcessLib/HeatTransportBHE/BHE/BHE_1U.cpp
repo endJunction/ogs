@@ -443,7 +443,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
 
-    switch (this->getBoundaryType())
+    switch (this->boundary_type)
     {
         case BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY:
         {

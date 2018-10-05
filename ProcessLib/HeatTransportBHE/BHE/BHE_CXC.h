@@ -77,13 +77,10 @@ public:
         bool if_flowrate_curve = false /* whether flowrate curve is used*/,
         double my_threshold = 0.0) /* Threshold Q value for switching off the
                                       BHE when using Q_Curve_fixed_dT B.C.*/
-                                   : BHEAbstract(name, borehole_geometry,
-                                                 pipe_geometry,
-                                                 refrigerant_param, grout_param,
-                                                 extern_Ra_Rb,
-                                                 extern_def_thermal_resistances,
-                                                 std::move(bhe_curves),
-                                                 bound_type, if_flowrate_curve)
+    : BHEAbstract(name, BHE_TYPE::TYPE_1U, borehole_geometry, pipe_geometry,
+                  refrigerant_param, grout_param, extern_Ra_Rb,
+                  extern_def_thermal_resistances, std::move(bhe_curves),
+                  bound_type, if_flowrate_curve)
     {
         _u = Eigen::Vector2d::Zero();
         _Nu = Eigen::Vector2d::Zero();
@@ -145,7 +142,8 @@ public:
         CSA_o = PI * (pipe_geometry.r_outer * pipe_geometry.r_outer -
                       (pipe_geometry.r_inner + pipe_geometry.b_in) *
                           (pipe_geometry.r_inner + pipe_geometry.b_in));
-        CSA_g = PI * (0.25 * borehole_geometry.diameter * borehole_geometry.diameter -
+        CSA_g = PI * (0.25 * borehole_geometry.diameter *
+                          borehole_geometry.diameter -
                       (pipe_geometry.r_outer + pipe_geometry.b_out) *
                           (pipe_geometry.r_outer + pipe_geometry.b_out));
 
@@ -157,11 +155,6 @@ public:
      * return the number of unknowns needed for CXA BHE
      */
     std::size_t getNumUnknowns() { return 3; }
-
-    /**
-     * return the type of this BHE
-     */
-    BHE_TYPE getBheType() { return BHE_TYPE::TYPE_CXC; }
 
     double get_flowrate() { return Q_r; }
 
@@ -237,14 +230,14 @@ public:
      * depending on the index of unknown.
      */
     void getLaplaceMatrix(std::size_t idx_unknown,
-                            Eigen::MatrixXd& mat_laplace);
+                          Eigen::MatrixXd& mat_laplace);
 
     /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */
     void getAdvectionVector(std::size_t idx_unknown,
-                              Eigen::VectorXd& vec_advection);
+                            Eigen::VectorXd& vec_advection);
 
     /**
      * return the coeff of boundary heat exchange matrix,
