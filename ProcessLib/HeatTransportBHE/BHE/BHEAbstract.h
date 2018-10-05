@@ -367,21 +367,21 @@ public:
      * return the coeff of mass matrix,
      * depending on the index of unknown.
      */
-    virtual double getMassCoeff(std::size_t idx_unknown) = 0;
+    virtual double getMassCoeff(std::size_t idx_unknown) const = 0;
 
     /**
      * return the coeff of laplace matrix,
      * depending on the index of unknown.
      */
     virtual void getLaplaceMatrix(std::size_t idx_unknown,
-                                  Eigen::MatrixXd& mat_laplace) = 0;
+                                  Eigen::MatrixXd& mat_laplace) const = 0;
 
     /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */
     virtual void getAdvectionVector(std::size_t idx_unknown,
-                                    Eigen::VectorXd& vec_advection) = 0;
+                                    Eigen::VectorXd& vec_advection) const = 0;
 
     /**
      * return the coeff of boundary heat exchange matrix,

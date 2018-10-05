@@ -199,21 +199,21 @@ public:
      * return the coeff of mass matrix,
      * depending on the index of unknown.
      */
-    double getMassCoeff(std::size_t idx_unknown);
+    double getMassCoeff(std::size_t idx_unknown) const;
 
     /**
      * return the coeff of laplace matrix,
      * depending on the index of unknown.
      */
     void getLaplaceMatrix(std::size_t idx_unknown,
-                          Eigen::MatrixXd& mat_laplace);
+                          Eigen::MatrixXd& mat_laplace) const;
 
     /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */
     void getAdvectionVector(std::size_t idx_unknown,
-                            Eigen::VectorXd& vec_advection);
+                            Eigen::VectorXd& vec_advection) const;
 
     /**
      * return the _R_matrix, _R_pi_s_matrix, _R_s_matrix

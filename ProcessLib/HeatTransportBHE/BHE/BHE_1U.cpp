@@ -245,7 +245,7 @@ void BHE_1U::calcPipeFlowVelocity()
     _u(1) = tmp_u;
 }
 
-double BHE_1U::getMassCoeff(std::size_t idx_unknown)
+double BHE_1U::getMassCoeff(std::size_t idx_unknown) const
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
@@ -277,7 +277,7 @@ double BHE_1U::getMassCoeff(std::size_t idx_unknown)
 }
 
 void BHE_1U::getLaplaceMatrix(std::size_t idx_unknown,
-                              Eigen::MatrixXd& mat_laplace)
+                              Eigen::MatrixXd& mat_laplace) const
 {
     double const& lambda_r = refrigerant_param.lambda_r;
     double const& rho_r = refrigerant_param.rho_r;
@@ -326,7 +326,7 @@ void BHE_1U::getLaplaceMatrix(std::size_t idx_unknown,
 }
 
 void BHE_1U::getAdvectionVector(std::size_t idx_unknown,
-                                Eigen::VectorXd& vec_advection)
+                                Eigen::VectorXd& vec_advection) const
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
