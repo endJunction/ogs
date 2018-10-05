@@ -10,37 +10,6 @@
 #include "BHE_CXC.h"
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
-/**
- * return the thermal resistance for the inlet pipline
- * idx is the index, when 2U case,
- * 0 - the first u-tube
- * 1 - the second u-tube
- */
-double BHE_CXC::getThermalResistanceFig(std::size_t /*idx = 0*/)
-{
-    // notice there is no R_fog value for co-axial BHE
-    return 0.0;
-}
-
-/**
- * return the thermal resistance for the outlet pipline
- * idx is the index, when 2U case,
- * 0 - the first u-tube
- * 1 - the second u-tube
- */
-double BHE_CXC::getThermalResistanceFog(std::size_t /*idx = 0*/)
-{
-    return _R_fog;
-}
-
-/**
- * return the thermal resistance
- */
-double BHE_CXC::getThermalResistance(std::size_t /*idx = 0*/)
-{
-    // TODO
-    return 0.0;
-}
 
 /**
  * calculate thermal resistance

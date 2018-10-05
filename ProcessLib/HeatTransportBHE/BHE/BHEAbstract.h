@@ -315,29 +315,6 @@ public:
     virtual std::size_t getNumUnknowns() = 0;
 
     /**
-     * return the thermal resistance for the inlet pipline
-     * idx is the index, when 2U case,
-     * 0 - the first u-tube
-     * 1 - the second u-tube
-     * needs to be overwritten
-     */
-    virtual double getThermalResistanceFig(std::size_t idx = 0) = 0;
-
-    /**
-     * return the thermal resistance for the outlet pipline
-     * idx is the index, when 2U case,
-     * 0 - the first u-tube
-     * 1 - the second u-tube
-     * needs to be overwritten
-     */
-    virtual double getThermalResistanceFog(std::size_t idx = 0) = 0;
-
-    /**
-     * return the thermal resistance
-     */
-    virtual double getThermalResistance(std::size_t idx = 0) = 0;
-
-    /**
      * initialization calcultion,
      * need to be overwritten.
      */

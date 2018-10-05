@@ -180,27 +180,6 @@ public:
     };
 
     /**
-     * return the thermal resistance for the inlet pipline
-     * idx is the index, when 2U case,
-     * 0 - the first u-tube
-     * 1 - the second u-tube
-     */
-    double getThermalResistanceFig(std::size_t idx);
-
-    /**
-     * return the thermal resistance for the outlet pipline
-     * idx is the index, when 2U case,
-     * 0 - the first u-tube
-     * 1 - the second u-tube
-     */
-    double getThermalResistanceFog(std::size_t idx);
-
-    /**
-     * return the thermal resistance
-     */
-    double getThermalResistance(std::size_t idx);
-
-    /**
      * calculate thermal resistance
      */
     void calcThermalResistances();

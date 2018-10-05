@@ -12,37 +12,6 @@
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
 /**
- * return  the thermal resistance for the inlet pipline
- * idx is the index, when 2U case,
- * 0 - the first u-tube
- * 1 - the second u-tube
- */
-double BHE_1U::getThermalResistanceFig(std::size_t /*idx = 0*/)
-{
-    return _R_fig;
-}
-
-/**
- * return the thermal resistance for the outlet pipline
- * idx is the index, when 2U case,
- * 0 - the first u-tube
- * 1 - the second u-tube
- */
-double BHE_1U::getThermalResistanceFog(std::size_t /*idx = 0*/)
-{
-    return _R_fog;
-}
-
-/**
- * return the thermal resistance
- */
-double BHE_1U::getThermalResistance(std::size_t /*idx = 0*/)
-{
-    // TODO
-    return 0.0;
-}
-
-/**
  * calculate thermal resistance
  */
 void BHE_1U::calcThermalResistances()

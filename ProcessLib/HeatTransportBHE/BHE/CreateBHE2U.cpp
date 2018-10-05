@@ -53,8 +53,6 @@ BHE::BHE_2U* CreateBHE2U(
         bhe_conf.getConfigParameter<double>("bhe_pipe_in_wall_thickness");
     const double bhe_pipe_out_wall_thickness =
         bhe_conf.getConfigParameter<double>("bhe_pipe_out_wall_thickness");
-    // const std::size_t bhe_fluid_idx =
-    // bhe_conf.getConfigParameter<std::size_t>("bhe_fluid_idx");
     const double bhe_fluid_longitudinal_dispsion_length =
         bhe_conf.getConfigParameter<double>(
             "bhe_fluid_longitudinal_dispsion_length");
