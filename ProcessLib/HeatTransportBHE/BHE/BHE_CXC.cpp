@@ -396,7 +396,7 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::setRMatrices(
     }
 }
 
-double BHE_CXC::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown)
+double BHE_CXC::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const
 {
     // Here we calculates the boundary heat exchange coefficients
     // in the governing equations of BHE.

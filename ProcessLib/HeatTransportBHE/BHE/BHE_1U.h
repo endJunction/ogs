@@ -239,7 +239,7 @@ public:
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.
      */
-    double getBoundaryHeatExchangeCoeff(std::size_t idx_unknown);
+    double getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const;
 
     /**
      * return the inflow temperature based on outflow temperature and fixed
