@@ -19,6 +19,7 @@ namespace HeatTransportBHE
 {
 using namespace BHE;
 
+template <typename ShapeMatrixType>
 struct IntegrationPointDataBHE final
 {
     explicit IntegrationPointDataBHE(BHEAbstract& bhe_instance)
@@ -52,7 +53,8 @@ struct IntegrationPointDataBHE final
 
     BHEAbstract& _bhe_instance;
 
-    // Eigen::MatrixXd _C;
+    typename ShapeMatrixType::NodalRowVectorType N;
+    typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
     double integration_weight;
 
     // mass coefficients, length depending on the type of BHE

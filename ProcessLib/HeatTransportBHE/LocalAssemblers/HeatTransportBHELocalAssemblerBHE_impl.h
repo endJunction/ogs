@@ -35,9 +35,6 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
           dofIndex_to_localIndex),
       _process_data(process_data),
       _integration_method(integration_order),
-      _shape_matrices(initShapeMatrices<ShapeFunction, ShapeMatricesType,
-                                        IntegrationMethod, BHE_Dim>(
-          e, is_axially_symmetric, _integration_method)),
       _element(e)
 {
     // need to make sure that the BHE elements are one-dimensional
@@ -48,6 +45,11 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
 
     _ip_data.reserve(n_integration_points);
     _secondary_data.N.resize(n_integration_points);
+
+    auto const shape_matrices =
+        initShapeMatrices<ShapeFunction, ShapeMatricesType, IntegrationMethod,
+                          BHE_Dim>(e, is_axially_symmetric,
+                                   _integration_method);
 
     auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
     auto BHE_id = _process_data._map_materialID_to_BHE_ID[mat_id];
@@ -60,14 +62,16 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
     {
         x_position.setIntegrationPoint(ip);
 
-        IntegrationPointDataBHE int_Point_Data_BHE(
+        IntegrationPointDataBHE<ShapeMatricesType> int_Point_Data_BHE(
             *(_process_data._vec_BHE_property[BHE_id]));
         _ip_data.emplace_back(int_Point_Data_BHE);
-        auto const& sm = _shape_matrices[ip];
+        auto const& sm = shape_matrices[ip];
         auto& ip_data = _ip_data[ip];
         ip_data.integration_weight =
             _integration_method.getWeightedPoint(ip).getWeight() *
             sm.integralMeasure * sm.detJ;
+        ip_data.N = sm.N;
+        ip_data.dNdx = sm.dNdx;
 
         _secondary_data.N[ip] = sm.N;
     }
@@ -89,16 +93,15 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
         {
             x_position.setIntegrationPoint(ip);
 
-            auto const& sm = _shape_matrices[ip];
-            auto const& wp = _integration_method.getWeightedPoint(ip);
+            auto const& N = _ip_data[ip].N;
+            auto const& w = _ip_data[ip].integration_weight;
 
             // get coefficient of R matrix for corresponding BHE.
             auto R_coeff = _process_data._vec_BHE_property[BHE_id]
                                ->getBoundaryHeatExchangeCoeff(idx_bhe_unknowns);
 
             // calculate mass matrix for current unknown
-            matBHE_loc_R += sm.N.transpose() * R_coeff * sm.N * sm.detJ *
-                            wp.getWeight() * sm.integralMeasure;
+            matBHE_loc_R += N.transpose() * R_coeff * N * w;
         }  // end of loop over integration point
 
         // The following assembly action is according to Diersch (2013) FEFLOW
@@ -157,9 +160,9 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
         x_position.setIntegrationPoint(ip);
         auto& ip_data = _ip_data[ip];
 
-        // auto const& integration_weight = ip_data.integration_weight;
-        auto const& sm = _shape_matrices[ip];
-        auto const& wp = _integration_method.getWeightedPoint(ip);
+        auto const& w = ip_data.integration_weight;
+        auto const& N = ip_data.N;
+        auto const& dNdx = ip_data.dNdx;
 
         // looping over all unknowns.
         for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < BHE_n_unknowns;
@@ -177,23 +180,20 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
             local_M
                 .block(shift, shift, ShapeFunction::NPOINTS,
                        ShapeFunction::NPOINTS)
-                .noalias() += sm.N.transpose() * mass_coeff * sm.N * sm.detJ *
-                              wp.getWeight() * sm.integralMeasure;
+                .noalias() += N.transpose() * mass_coeff * N * w;
 
             // local K
             // laplace part
             local_K
                 .block(shift, shift, ShapeFunction::NPOINTS,
                        ShapeFunction::NPOINTS)
-                .noalias() += sm.dNdx.transpose() * laplace_mat * sm.dNdx *
-                              sm.detJ * wp.getWeight() * sm.integralMeasure;
+                .noalias() += dNdx.transpose() * laplace_mat * dNdx * w;
             // advection part
             local_K
                 .block(shift, shift, ShapeFunction::NPOINTS,
                        ShapeFunction::NPOINTS)
-                .noalias() += sm.N.transpose() * advection_vec.transpose() *
-                              sm.dNdx * sm.detJ * wp.getWeight() *
-                              sm.integralMeasure;
+                .noalias() +=
+                N.transpose() * advection_vec.transpose() * dNdx * w;
         }
     }
 
