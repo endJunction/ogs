@@ -234,11 +234,6 @@ public:
     double getBoundaryHeatExchangeCoeff(std::size_t idx_unknown);
 
     /**
-     * return the number of grout zones in this BHE.
-     */
-    std::size_t getNumGroutZones(void) { return 4; };
-
-    /**
      * return the inflow temperature based on outflow temperature and fixed
      * power.
      */

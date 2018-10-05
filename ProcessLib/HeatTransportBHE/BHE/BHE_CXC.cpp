@@ -270,7 +270,7 @@ double BHE_CXC::getMassCoeff(std::size_t idx_unknown)
 }
 
 void BHE_CXC::getLaplaceMatrix(std::size_t idx_unknown,
-                                 Eigen::MatrixXd& mat_laplace)
+                               Eigen::MatrixXd& mat_laplace)
 {
     double const& lambda_r = refrigerant_param.lambda_r;
     double const& rho_r = refrigerant_param.rho_r;
@@ -315,7 +315,7 @@ void BHE_CXC::getLaplaceMatrix(std::size_t idx_unknown,
 }
 
 void BHE_CXC::getAdvectionVector(std::size_t idx_unknown,
-                                   Eigen::VectorXd& vec_advection)
+                                 Eigen::VectorXd& vec_advection)
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
