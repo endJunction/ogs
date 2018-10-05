@@ -435,12 +435,6 @@ public:
     const BHE_BOUNDARY_TYPE boundary_type;
 
     /**
-     * total refrigerant flow discharge of BHE
-     * unit is m^3/sec
-     */
-    double Q_r;
-
-    /**
      * geometry of the borehole
      */
     BoreholeGeometry const borehole_geometry;
@@ -536,6 +530,13 @@ public:
      * whether external R values are supplied by the user
      */
     const bool user_defined_R_vals;
+
+protected:
+    /**
+     * total refrigerant flow discharge of BHE
+     * unit is m^3/sec
+     */
+    double Q_r;
 };
 }  // end of namespace BHE
 }  // end of namespace HeatTransportBHE

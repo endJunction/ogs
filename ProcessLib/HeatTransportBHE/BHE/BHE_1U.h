@@ -162,8 +162,6 @@ public:
      */
     std::size_t getNumUnknowns() { return 4; }
 
-    double get_flowrate() { return Q_r; }
-
     void updateFlowRateFromCurve(double current_time)
     {
         if (use_flowrate_curve)
