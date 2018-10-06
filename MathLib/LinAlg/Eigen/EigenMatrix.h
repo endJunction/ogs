@@ -153,6 +153,7 @@ public:
     /// printout this matrix for debugging
     void write(std::ostream &os) const
     {
+        os.precision(14);
         for (int k=0; k<_mat.outerSize(); ++k)
           for (RawMatrixType::InnerIterator it(_mat,k); it; ++it)
               os << it.row() << " " << it.col() << ": " << it.value() << "\n";
