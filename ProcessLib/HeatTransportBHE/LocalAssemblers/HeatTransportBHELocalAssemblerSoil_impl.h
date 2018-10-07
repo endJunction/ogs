@@ -38,13 +38,16 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
     HeatTransportBHELocalAssemblerSoil(
         MeshLib::Element const& e,
         std::size_t const /*local_matrix_size*/,
+        std::vector<unsigned> const& dofIndex_to_localIndex,
         bool const is_axially_symmetric,
         unsigned const integration_order,
         HeatTransportBHEProcessData& process_data)
-    : _process_data(process_data),
-      _integration_method(integration_order),
-      element_id(e.getID()),
-      _is_axially_symmetric(is_axially_symmetric)
+    : HeatTransportBHELocalAssemblerInterface(
+          ShapeFunction::NPOINTS * GlobalDim, dofIndex_to_localIndex),
+    _process_data(process_data),
+    _integration_method(integration_order),
+    element_id(e.getID()),
+    _is_axially_symmetric(is_axially_symmetric)
 {
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();

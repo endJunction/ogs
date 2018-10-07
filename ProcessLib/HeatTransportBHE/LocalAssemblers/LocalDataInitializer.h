@@ -345,7 +345,7 @@ private:
             if (e.getDimension() == GlobalDim)  // soil elements
             {
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
-                    e, local_matrix_size,
+                    e, local_matrix_size, dofIndex_to_localIndex,
                     std::forward<ConstructorArgs>(args)...}};
             }
 
