@@ -29,6 +29,7 @@ void getBHEDataInMesh(
     // get vectors of matrix elements and BHE elements
     vec_soil_elements.reserve(mesh.getNumberOfElements());
     std::vector<MeshLib::Element*> all_BHE_elements;
+    // TODO (haibing) This is essentially a std::partition or std::partition_copy.
     for (MeshLib::Element* e : mesh.getElements())
     {
         // As for the first step, all elements are counted as a soil element
@@ -41,6 +42,7 @@ void getBHEDataInMesh(
     }
 
     // get BHE material IDs
+    // TODO (haibing) Use MeshLib::materialIDs(), Explicitly abort on error.
     auto opt_material_ids(
         mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
     for (MeshLib::Element* e : all_BHE_elements)
@@ -89,6 +91,7 @@ void getBHEDataInMesh(
         vec_soil_nodes.push_back(n);
     }
 
+    // TODO (haibing) Drop erroneous comment.
     // final count of 3 types of elements
     // They are
     // (i)  soil,
@@ -96,6 +99,9 @@ void getBHEDataInMesh(
     DBUG("-> found total %d soil elements and %d BHE elements",
          vec_soil_elements.size(),
          all_BHE_elements.size());
+
+    // TODO (haibing) return a struct with proper names of the result, don't
+    // change the input arguments.
 }
 }  // end of namespace HeatTransportBHE
 }  // namespace ProcessLib
