@@ -43,11 +43,6 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
         HeatTransportBHEProcessData& process_data)
     : _process_data(process_data),
       _integration_method(integration_order),
-      _shape_matrices(initShapeMatrices<ShapeFunction,
-                                        ShapeMatricesType,
-                                        IntegrationMethod,
-                                        GlobalDim>(
-          e, is_axially_symmetric, _integration_method)),
       element_id(e.getID()),
       _is_axially_symmetric(is_axially_symmetric)
 {
@@ -56,6 +51,13 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
 
     _ip_data.reserve(n_integration_points);
     _secondary_data.N.resize(n_integration_points);
+
+    _shape_matrices = initShapeMatrices<ShapeFunction,
+                                        ShapeMatricesType,
+                                        IntegrationMethod,
+                                        GlobalDim>(
+        e, is_axially_symmetric, _integration_method);
+
 }
 
 template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>

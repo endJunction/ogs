@@ -97,6 +97,7 @@ private:
         _ip_data;
 
     IntegrationMethod const _integration_method;
+
     std::vector<ShapeMatrices, Eigen::aligned_allocator<ShapeMatrices>>
         _shape_matrices;
 
