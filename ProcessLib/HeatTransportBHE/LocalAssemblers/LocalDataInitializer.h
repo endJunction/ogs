@@ -251,7 +251,6 @@ public:
                 type_idx.name());
         }
 
-        auto const varIDs = _dof_table.getElementVariableIDs(id);
         std::vector<unsigned> dofIndex_to_localIndex;
 
         if (mesh_item.getDimension() < GlobalDim)
@@ -261,7 +260,7 @@ public:
             dofIndex_to_localIndex.resize(n_local_dof);
             unsigned dof_id = 0;
             unsigned local_id = 0;
-            for (auto const i : varIDs)
+            for (auto const i : _dof_table.getElementVariableIDs(id))
             {
                 auto const n_global_components =
                     _dof_table.getNumberOfElementComponents(i);
@@ -286,14 +285,13 @@ public:
             }
         }
 
-        data_ptr = it->second(mesh_item, varIDs.size(), dofIndex_to_localIndex,
+        data_ptr = it->second(mesh_item, dofIndex_to_localIndex,
                               std::forward<ConstructorArgs>(args)...);
     }
 
 private:
     using LADataBuilder = std::function<LADataIntfPtr(
         MeshLib::Element const& e,
-        std::size_t const n_variables,
         std::vector<unsigned> const& dofIndex_to_localIndex,
         ConstructorArgs&&...)>;
 
@@ -337,8 +335,8 @@ private:
     static LADataBuilder makeLocalAssemblerBuilder(std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::size_t const /*n_variables*/,
-                  std::vector<unsigned> const& dofIndex_to_localIndex,
+                  std::vector<unsigned> const&
+                      dofIndex_to_localIndex /*TODO remove it for soil asm.*/,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             if (e.getDimension() == GlobalDim)  // soil elements
             {
@@ -356,7 +354,6 @@ private:
         std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::size_t const /*n_variables*/,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine2>{
@@ -371,7 +368,6 @@ private:
         std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::size_t const /*n_variables*/,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine3>{
