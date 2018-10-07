@@ -156,6 +156,8 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     const int process_id = 0;
 
     // this process can only run with 3-dimensional mesh
+    // TODO (haibing) Move check (and OGS_FATAL) to ProjectData; Don't
+    // instantiate assemblers for 2D.
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
         3, /*mesh.getDimension(),*/
         HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(

@@ -26,6 +26,7 @@ class HeatTransportBHELocalAssemblerInterface
       public NumLib::ExtrapolatableElement
 {
 public:
+    // TODO (haibing) Is the default ctor needed? Needed with empty body?
     HeatTransportBHELocalAssemblerInterface() : _dofIndex_to_localIndex{} {}
     HeatTransportBHELocalAssemblerInterface(
         std::size_t n_local_size, std::vector<unsigned> dofIndex_to_localIndex)
@@ -35,6 +36,8 @@ public:
 
 private:
 
+    // TODO (haibing) Move the member to BHE assembler, then remove this class
+    // entirely.
     std::vector<unsigned> const _dofIndex_to_localIndex;
 };
 }  // namespace HeatTransportBHE

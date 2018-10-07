@@ -253,6 +253,7 @@ public:
 
         std::vector<unsigned> dofIndex_to_localIndex;
 
+        // TODO (haibing) The check must be strict == with OGS_FATAL on error.
         if (mesh_item.getDimension() < GlobalDim)
         {
             // this is a BHE element
