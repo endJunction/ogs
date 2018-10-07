@@ -285,8 +285,7 @@ public:
             }
         }
 
-        data_ptr = it->second(mesh_item, varIDs.size(), n_local_dof,
-                              dofIndex_to_localIndex,
+        data_ptr = it->second(mesh_item, varIDs.size(), dofIndex_to_localIndex,
                               std::forward<ConstructorArgs>(args)...);
     }
 
@@ -294,7 +293,6 @@ private:
     using LADataBuilder = std::function<LADataIntfPtr(
         MeshLib::Element const& e,
         std::size_t const n_variables,
-        std::size_t const local_matrix_size,
         std::vector<unsigned> const& dofIndex_to_localIndex,
         ConstructorArgs&&...)>;
 
@@ -339,13 +337,12 @@ private:
     {
         return [](MeshLib::Element const& e,
                   std::size_t const /*n_variables*/,
-                  std::size_t const local_matrix_size,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             if (e.getDimension() == GlobalDim)  // soil elements
             {
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
-                    e, local_matrix_size, dofIndex_to_localIndex,
+                    e, dofIndex_to_localIndex,
                     std::forward<ConstructorArgs>(args)...}};
             }
 
@@ -359,12 +356,11 @@ private:
     {
         return [](MeshLib::Element const& e,
                   std::size_t const /*n_variables*/,
-                  std::size_t const local_matrix_size,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine2>{
                 // BHE elements
-                e, local_matrix_size, dofIndex_to_localIndex,
+                e, dofIndex_to_localIndex,
                 std::forward<ConstructorArgs>(args)...}};
         };
     }
@@ -375,12 +371,11 @@ private:
     {
         return [](MeshLib::Element const& e,
                   std::size_t const /*n_variables*/,
-                  std::size_t const local_matrix_size,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine3>{
                 // BHE elements
-                e, local_matrix_size, dofIndex_to_localIndex,
+                e, dofIndex_to_localIndex,
                 std::forward<ConstructorArgs>(args)...}};
         };
     }

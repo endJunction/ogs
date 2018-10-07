@@ -45,7 +45,6 @@ public:
 
     HeatTransportBHELocalAssemblerSoil(
         MeshLib::Element const& e,
-        std::size_t const local_matrix_size,
         std::vector<unsigned> const& dofIndex_to_localIndex,
         bool is_axially_symmetric,
         unsigned const integration_order,
