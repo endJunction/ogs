@@ -91,9 +91,8 @@ private:
     HeatTransportBHEProcessData& _process_data;
 
     std::vector<
-        IntegrationPointDataSoil<ShapeMatricesType, GlobalDim>,
-        Eigen::aligned_allocator<IntegrationPointDataSoil<
-            ShapeMatricesType, GlobalDim>>>
+        IntegrationPointDataSoil<ShapeMatricesType>,
+        Eigen::aligned_allocator<IntegrationPointDataSoil<ShapeMatricesType>>>
         _ip_data;
 
     IntegrationMethod const _integration_method;
