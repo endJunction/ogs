@@ -251,17 +251,17 @@ public:
                 type_idx.name());
         }
 
-        auto varIDs = _dof_table.getElementVariableIDs(id);
-        auto n_local_dof = _dof_table.getNumberOfElementDOF(id);
+        auto const varIDs = _dof_table.getElementVariableIDs(id);
         std::vector<unsigned> dofIndex_to_localIndex;
 
         if (mesh_item.getDimension() < GlobalDim)
         {
             // this is a BHE element
+            auto const n_local_dof = _dof_table.getNumberOfElementDOF(id);
             dofIndex_to_localIndex.resize(n_local_dof);
             unsigned dof_id = 0;
             unsigned local_id = 0;
-            for (auto i : varIDs)
+            for (auto const i : varIDs)
             {
                 auto const n_global_components =
                     _dof_table.getNumberOfElementComponents(i);
@@ -274,7 +274,8 @@ public:
                         MeshLib::Location l(mesh_id,
                                             MeshLib::MeshItemType::Node,
                                             mesh_item.getNodeIndex(k));
-                        auto global_index = _dof_table.getGlobalIndex(l, i, j);
+                        auto const global_index =
+                            _dof_table.getGlobalIndex(l, i, j);
                         if (global_index != NumLib::MeshComponentMap::nop)
                         {
                             dofIndex_to_localIndex[dof_id++] = local_id;
