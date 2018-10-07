@@ -53,16 +53,6 @@ public:
                   std::vector<double>& /*local_K_data*/,
                   std::vector<double>& /*local_b_data*/) override;
 
-    void assembleWithJacobian(double const /*t*/,
-                              Eigen::VectorXd const& /*local_u*/,
-                              Eigen::VectorXd& /*local_b*/,
-                              Eigen::MatrixXd& /*local_J*/) override
-    {
-        OGS_FATAL(
-            "HeatTransportBHELocalAssembler: assembly with jacobian is not "
-            "implemented.");
-    }
-
     void preTimestepConcrete(std::vector<double> const& /*local_x*/,
                              double const /*t*/,
                              double const /*delta_t*/) override

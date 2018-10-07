@@ -33,30 +33,6 @@ public:
     {
     }
 
-    void assembleWithJacobian(double const /*t*/,
-                              std::vector<double> const& /*local_x_*/,
-                              std::vector<double> const& /*local_xdot*/,
-                              const double /*dxdot_dx*/, const double /*dx_dx*/,
-                              std::vector<double>& /*local_M_data*/,
-                              std::vector<double>& /*local_K_data*/,
-                              std::vector<double>& /*local_b_data*/,
-                              std::vector<double>& /*local_Jac_data*/) override
-    {
-        OGS_FATAL(
-            "HeatTransportBHELocalAssemblerInterface::assembleWithJacobian() "
-            "is not implemented");
-    }
-
-    virtual void assembleWithJacobian(double const /*t*/,
-                                      Eigen::VectorXd const& /*local_T*/,
-                                      Eigen::VectorXd& /*local_b*/,
-                                      Eigen::MatrixXd& /*local_A*/)
-    {
-        OGS_FATAL(
-            "HeatTransportBHELocalAssemblerInterface::assembleWithJacobian() "
-            "is not implemented");
-    }
-
 private:
 
     std::vector<unsigned> const _dofIndex_to_localIndex;
