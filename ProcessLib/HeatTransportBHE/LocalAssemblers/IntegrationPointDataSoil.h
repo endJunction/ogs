@@ -18,7 +18,7 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-template <typename ShapeMatricesType, int GlobalDim>
+template <typename ShapeMatrixType, int GlobalDim>
 struct IntegrationPointDataSoil final
 {
     explicit IntegrationPointDataSoil(
@@ -29,10 +29,9 @@ struct IntegrationPointDataSoil final
 
     MaterialLib::Solids::MechanicsBase<GlobalDim>& _solid_material;
 
+    typename ShapeMatrixType::NodalRowVectorType N;
+    typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
     double integration_weight;
-
-    typename ShapeMatricesType::NodalRowVectorType N;
-    typename ShapeMatricesType::GlobalDimNodalMatrixType dNdx;
 
     void pushBackState() {}
 
