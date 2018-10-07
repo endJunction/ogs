@@ -341,7 +341,7 @@ private:
                   std::size_t const /*n_variables*/,
                   std::size_t const local_matrix_size,
                   std::vector<unsigned> const& dofIndex_to_localIndex,
-                  ConstructorArgs&&... args) {
+                  ConstructorArgs&&... args) -> LADataIntfPtr {
             if (e.getDimension() == GlobalDim)  // soil elements
             {
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
@@ -349,7 +349,36 @@ private:
                     std::forward<ConstructorArgs>(args)...}};
             }
 
-            return LADataIntfPtr{new LADataBHE<ShapeFunction>{
+            return nullptr;
+        };
+    }
+
+    template <>
+    static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine2>(
+        std::true_type*)
+    {
+        return [](MeshLib::Element const& e,
+                  std::size_t const /*n_variables*/,
+                  std::size_t const local_matrix_size,
+                  std::vector<unsigned> const& dofIndex_to_localIndex,
+                  ConstructorArgs&&... args) -> LADataIntfPtr {
+            return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine2>{
+                // BHE elements
+                e, local_matrix_size, dofIndex_to_localIndex,
+                std::forward<ConstructorArgs>(args)...}};
+        };
+    }
+
+    template <>
+    static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine3>(
+        std::true_type*)
+    {
+        return [](MeshLib::Element const& e,
+                  std::size_t const /*n_variables*/,
+                  std::size_t const local_matrix_size,
+                  std::vector<unsigned> const& dofIndex_to_localIndex,
+                  ConstructorArgs&&... args) -> LADataIntfPtr {
+            return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine3>{
                 // BHE elements
                 e, local_matrix_size, dofIndex_to_localIndex,
                 std::forward<ConstructorArgs>(args)...}};
