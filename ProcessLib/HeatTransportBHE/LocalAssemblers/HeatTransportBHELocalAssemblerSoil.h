@@ -99,8 +99,11 @@ private:
     IntegrationMethod const _integration_method;
     std::vector<ShapeMatrices, Eigen::aligned_allocator<ShapeMatrices>>
         _shape_matrices;
-    MeshLib::Element const& _element;
+
+    std::size_t const element_id;
+
     bool const _is_axially_symmetric;
+
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 };
 }  // namespace HeatTransportBHE

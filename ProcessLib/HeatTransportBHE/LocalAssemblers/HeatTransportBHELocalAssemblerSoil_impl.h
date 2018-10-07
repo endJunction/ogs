@@ -48,7 +48,7 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
                                         IntegrationMethod,
                                         GlobalDim>(
           e, is_axially_symmetric, _integration_method)),
-      _element(e),
+      element_id(e.getID()),
       _is_axially_symmetric(is_axially_symmetric)
 {
     unsigned const n_integration_points =
@@ -68,8 +68,6 @@ void HeatTransportBHELocalAssemblerSoil<
                          std::vector<double>& local_K_data,
                          std::vector<double>& /*local_b_data*/)
 {
-    assert(_element.getDimension() == GlobalDim);
-
     auto const local_matrix_size = local_x.size();
 
     assert(local_matrix_size == ShapeFunction::NPOINTS * NUM_NODAL_DOF_SOIL);
@@ -83,7 +81,7 @@ void HeatTransportBHELocalAssemblerSoil<
         _integration_method.getNumberOfPoints();
 
     SpatialPosition pos;
-    pos.setElementID(_element.getID());
+    pos.setElementID(element_id);
 
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
