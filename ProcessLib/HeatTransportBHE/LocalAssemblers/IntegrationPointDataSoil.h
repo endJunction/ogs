@@ -21,10 +21,6 @@ namespace HeatTransportBHE
 template <typename ShapeMatrixType>
 struct IntegrationPointDataSoil final
 {
-    // explicit IntegrationPointDataSoil()
-    // {
-    // }
-
     typename ShapeMatrixType::NodalRowVectorType N;
     typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
     double integration_weight;

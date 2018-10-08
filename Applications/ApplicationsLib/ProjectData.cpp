@@ -304,8 +304,8 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                                  std::string const& project_directory,
                                  std::string const& output_directory)
 {
-    (void)project_directory; // to avoid compilation warning
-    (void)output_directory; // to avoid compilation warning
+    (void)project_directory;  // to avoid compilation warning
+    (void)output_directory;   // to avoid compilation warning
 
     DBUG("Reading processes:");
     //! \ogs_file_param{prj__processes__process}
@@ -377,10 +377,16 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
 #ifdef OGS_BUILD_PROCESS_HEATTRANSPORTBHE
             if (type == "HEAT_TRANSPORT_BHE")
         {
-            process = ProcessLib::HeatTransportBHE::createHeatTransportBHEProcess(
-                *_mesh_vec[0], std::move(jacobian_assembler),
-                _process_variables, _parameters, integration_order,
-                process_config, _curves);
+            if (_mesh_vec[0]->getDimension() != 3)
+            {
+                OGS_FATAL("HEAT_TRANSPORT_BHE can only work with a 3-dimentional mesh! "); 
+            }
+
+            process =
+                ProcessLib::HeatTransportBHE::createHeatTransportBHEProcess(
+                    *_mesh_vec[0], std::move(jacobian_assembler),
+                    _process_variables, _parameters, integration_order,
+                    process_config, _curves);
         }
         else
 #endif
@@ -468,17 +474,17 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
             {
                 case 2:
                     process =
-                        ProcessLib::PhaseField::createPhaseFieldProcess<
-                            2>(*_mesh_vec[0], std::move(jacobian_assembler),
-                               _process_variables, _parameters,
-                               integration_order, process_config);
+                        ProcessLib::PhaseField::createPhaseFieldProcess<2>(
+                            *_mesh_vec[0], std::move(jacobian_assembler),
+                            _process_variables, _parameters, integration_order,
+                            process_config);
                     break;
                 case 3:
                     process =
-                        ProcessLib::PhaseField::createPhaseFieldProcess<
-                            3>(*_mesh_vec[0], std::move(jacobian_assembler),
-                               _process_variables, _parameters,
-                               integration_order, process_config);
+                        ProcessLib::PhaseField::createPhaseFieldProcess<3>(
+                            *_mesh_vec[0], std::move(jacobian_assembler),
+                            _process_variables, _parameters, integration_order,
+                            process_config);
                     break;
             }
         }

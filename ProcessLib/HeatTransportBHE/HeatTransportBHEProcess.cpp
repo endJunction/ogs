@@ -68,6 +68,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
         _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] = i;
     }
 
+    // TODO check if materialIDs are there or not.
     MeshLib::PropertyVector<int> const* material_ids(
         mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
     _process_data._mesh_prop_materialIDs = material_ids;
@@ -155,9 +156,6 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
 {
     const int process_id = 0;
 
-    // this process can only run with 3-dimensional mesh
-    // TODO (haibing) Move check (and OGS_FATAL) to ProjectData; Don't
-    // instantiate assemblers for 2D.
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
         3, /*mesh.getDimension(),*/
         HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(
