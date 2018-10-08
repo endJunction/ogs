@@ -59,7 +59,28 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
                                         IntegrationMethod,
                                         GlobalDim>(
         e, is_axially_symmetric, _integration_method);
+    
+    SpatialPosition x_position;
+    x_position.setElementID(element_id);
 
+    // ip data initialization
+    for (unsigned ip = 0; ip < n_integration_points; ip++)
+    {
+        x_position.setIntegrationPoint(ip);
+
+        // create the class IntegrationPointDataBHE in place
+        _ip_data.emplace_back();
+        auto const& sm = _shape_matrices[ip];
+        auto& ip_data = _ip_data[ip];
+        ip_data.integration_weight =
+            _integration_method.getWeightedPoint(ip).getWeight() *
+            sm.integralMeasure * sm.detJ;
+        ip_data.N = sm.N;
+        ip_data.dNdx = sm.dNdx;
+
+        _secondary_data.N[ip] = sm.N;
+    }
+    
 }
 
 template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
@@ -90,9 +111,11 @@ void HeatTransportBHELocalAssemblerSoil<
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
         pos.setIntegrationPoint(ip);
-        auto const& sm = _shape_matrices[ip];
-        auto const& wp = _integration_method.getWeightedPoint(ip);
-
+        auto& ip_data = _ip_data[ip];
+        auto const& w = ip_data.integration_weight;
+        auto const& N = ip_data.N;
+        auto const& dNdx = ip_data.dNdx;
+        
         // auto const k_f = _process_data.thermal_conductivity_fluid(t, pos)[0];
         // auto const k_g = _process_data.thermal_conductivity_gas(t, pos)[0];
         auto const k_s = _process_data.thermal_conductivity_solid(t, pos)[0];
@@ -110,13 +133,11 @@ void HeatTransportBHELocalAssemblerSoil<
         // for now only using the solid phase parameters
 
         // assemble Conductance matrix
-        local_K.noalias() += sm.dNdx.transpose() * k_s * sm.dNdx * sm.detJ *
-                             wp.getWeight() * sm.integralMeasure;
+        local_K.noalias() += dNdx.transpose() * k_s * dNdx * w;
 
         // assemble Mass matrix
-        local_M.noalias() += sm.N.transpose() * density_s * heat_capacity_s *
-                             sm.N * sm.detJ * wp.getWeight() *
-                             sm.integralMeasure;
+        local_M.noalias() += N.transpose() * density_s * heat_capacity_s *
+                             N * w;
     }
 
     // debugging
