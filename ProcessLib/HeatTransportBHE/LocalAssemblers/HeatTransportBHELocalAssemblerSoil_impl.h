@@ -59,7 +59,7 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
                                         IntegrationMethod,
                                         GlobalDim>(
         e, is_axially_symmetric, _integration_method);
-    
+
     SpatialPosition x_position;
     x_position.setElementID(element_id);
 
@@ -80,7 +80,6 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
 
         _secondary_data.N[ip] = sm.N;
     }
-    
 }
 
 template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
@@ -115,7 +114,7 @@ void HeatTransportBHELocalAssemblerSoil<
         auto const& w = ip_data.integration_weight;
         auto const& N = ip_data.N;
         auto const& dNdx = ip_data.dNdx;
-        
+
         // auto const k_f = _process_data.thermal_conductivity_fluid(t, pos)[0];
         // auto const k_g = _process_data.thermal_conductivity_gas(t, pos)[0];
         auto const k_s = _process_data.thermal_conductivity_solid(t, pos)[0];
@@ -136,8 +135,8 @@ void HeatTransportBHELocalAssemblerSoil<
         local_K.noalias() += dNdx.transpose() * k_s * dNdx * w;
 
         // assemble Mass matrix
-        local_M.noalias() += N.transpose() * density_s * heat_capacity_s *
-                             N * w;
+        local_M.noalias() +=
+            N.transpose() * density_s * heat_capacity_s * N * w;
     }
 
     // debugging
