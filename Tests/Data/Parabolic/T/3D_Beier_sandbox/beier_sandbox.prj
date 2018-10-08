@@ -96,9 +96,15 @@
                 <time_stepping>
                     <type>FixedTimeStepping</type>
                     <t_initial> 0.0 </t_initial>
+                    <!-- use the following for full simulation
                     <t_end> 186420 </t_end>
+                    -->
+                    <t_end> 600 </t_end>
                     <timesteps>
+                        <!-- use the following for full simulation
                         <pair><repeat>3107</repeat><delta_t>60</delta_t></pair>
+                        -->
+                        <pair><repeat>10</repeat><delta_t>60</delta_t></pair>
                     </timesteps>
                 </time_stepping>
             </process>
@@ -107,8 +113,11 @@
             <type>VTK</type>
             <prefix>beier_sandbox</prefix>
             <timesteps>
+                <!-- use the following for full simulation
                 <pair><repeat> 10</repeat><each_steps> 1 </each_steps></pair>
                 <pair><repeat> 310</repeat><each_steps> 10 </each_steps></pair>
+                -->
+                <pair><repeat> 1</repeat><each_steps> 10 </each_steps></pair>
             </timesteps>
         </output>
     </time_loop>
