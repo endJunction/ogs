@@ -235,7 +235,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
             [&](auto const& a, auto const& b) {
                 return a->getCoords()[2] < b->getCoords()[2];
             });
-        MeshLib::Node* const bc_bottom_node = *bottom_top_nodes.first;
+        auto const bc_bottom_node_id = (*bottom_top_nodes.first)->getID();
         MeshLib::Node* const bc_top_node = *bottom_top_nodes.second;
 
         auto get_global_bhe_bc_indices =
@@ -263,10 +263,8 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
 
             // Bottom, outflow.
             bcs.push_back(ProcessLib::createBHEBottomDirichletBoundaryCondition(
-                get_global_bhe_bc_indices(bc_bottom_node->getID(),
-                                          in_out_component_id),
-                _mesh, bc_bottom_node, variable_id,
-                in_out_component_id.second));
+                get_global_bhe_bc_indices(bc_bottom_node_id,
+                                          in_out_component_id)));
         }
     }
 
