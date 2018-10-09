@@ -408,6 +408,9 @@ public:
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
             R_s_matrix) const = 0;
 
+    virtual std::vector<std::pair<int, int>> const&
+    inflowOutflowBcComponentIds() const = 0;
+
 public:
     /**
      * name of the borehole heat exchanger

@@ -241,6 +241,12 @@ public:
      */
     double getTinByTout(double T_out, double current_time);
 
+    std::vector<std::pair<int, int>> const& inflowOutflowBcComponentIds()
+        const override
+    {
+        return _inflow_outflow_bc_component_ids;
+    }
+
     /**
      * required by eigen library,
      * to make sure the dynamically allocated class has
@@ -249,6 +255,8 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
+    std::vector<std::pair<int, int>> const _inflow_outflow_bc_component_ids = {
+        {1, 0}};
     /**
      * thermal resistances
      */
