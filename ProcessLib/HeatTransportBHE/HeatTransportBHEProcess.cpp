@@ -229,8 +229,6 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
     // for each BHE
     for (int bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
-        // get the BHE type
-        auto const& bhe_typ = _process_data._vec_BHE_property[bhe_i]->bhe_type;
         // find the variable ID
         // the soil temperature is 0-th variable
         // the BHE temperature is therefore bhe_i + 1
@@ -263,144 +261,57 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
         MeshLib::MeshSubset bc_mesh_subset_bottom{_mesh, bc_bottom_nodes};
         MeshLib::Mesh const& bc_mesh_bottom = bc_mesh_subset_bottom.getMesh();
 
-        auto get_global_bhe_bc_index_top = [&](std::size_t const mesh_id,
-                                               int const component_id) {
+        auto get_global_bhe_bc_index = [&](std::size_t const mesh_id,
+                                           std::size_t const node_id,
+                                           int const component_id) {
             return dof_table_bulk.getGlobalIndex(
-                {mesh_id, MeshLib::MeshItemType::Node,
-                 bc_top_nodes[0]->getID()},
-                variable_id, component_id);
-        };
-        auto get_global_bhe_bc_index_bottom = [&](std::size_t const mesh_id,
-                                                  int const component_id) {
-            return dof_table_bulk.getGlobalIndex(
-                {mesh_id, MeshLib::MeshItemType::Node,
-                 bc_bottom_nodes[0]->getID()},
-                variable_id, component_id);
+                {mesh_id, MeshLib::MeshItemType::Node, node_id}, variable_id,
+                component_id);
         };
 
         // the create_BC function will be repeatedly used
         auto create_BC_top_inflow = [&](std::size_t const mesh_id,
-                             int const component_id_in,
-                             int const component_id_out) {
+                                        int const component_id_in,
+                                        int const component_id_out) {
+            auto const top_node_id = bc_top_nodes[0]->getID();
             auto const global_index_in =
-                get_global_bhe_bc_index_top(mesh_id, component_id_in);
+                get_global_bhe_bc_index(mesh_id, top_node_id, component_id_in);
             auto const global_index_out =
-                get_global_bhe_bc_index_top(mesh_id, component_id_out);
+                get_global_bhe_bc_index(mesh_id, top_node_id, component_id_out);
             return ProcessLib::createBHEInflowDirichletBoundaryCondition(
                 global_index_in, global_index_out, _mesh, bc_top_nodes,
                 variable_id, component_id_in,
                 _process_data._vec_BHE_property[bhe_i]);
         };
         auto create_BC_bottom_outflow = [&](std::size_t const mesh_id,
-                                    int const component_id_in,
-                                    int const component_id_out) {
-            auto const global_index_in =
-                get_global_bhe_bc_index_bottom(mesh_id, component_id_in);
-            auto const global_index_out =
-                get_global_bhe_bc_index_bottom(mesh_id, component_id_out);
+                                            int const component_id_in,
+                                            int const component_id_out) {
+            auto const bottom_node_id = bc_bottom_nodes[0]->getID();
+            auto const global_index_in = get_global_bhe_bc_index(
+                mesh_id, bottom_node_id, component_id_in);
+            auto const global_index_out = get_global_bhe_bc_index(
+                mesh_id, bottom_node_id, component_id_out);
             return ProcessLib::createBHEBottomDirichletBoundaryCondition(
                 global_index_in, global_index_out, _mesh, bc_top_nodes,
                 variable_id, component_id_in);
         };
 
-        // depending on the BHE type
-        switch (bhe_typ)
+        auto create_top_bottom_bhe_BCs =
+            [&](std::pair<int, int> const& in_out_component_id,
+                auto bcs_output_iterator) {
+                *bcs_output_iterator++ = create_BC_top_inflow(
+                    bc_mesh_top.getID(), in_out_component_id.first,
+                    in_out_component_id.second);
+                *bcs_output_iterator++ = create_BC_bottom_outflow(
+                    bc_mesh_bottom.getID(), in_out_component_id.first,
+                    in_out_component_id.second);
+            };
+        for (auto const& in_out_component_id :
+             _process_data._vec_BHE_property[bhe_i]
+                 ->inflowOutflowBcComponentIds())
         {
-            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_2U:
-            {
-                unsigned const component_id_T_in_1 = 0;
-                unsigned const component_id_T_out_1 = 2;
-
-                unsigned const component_id_T_out_2 = 3;
-                unsigned const component_id_T_in_2 = 1;
-
-                // there are 2 BCs on the top node
-                std::unique_ptr<BHEInflowDirichletBoundaryCondition> bc_top_1 =
-                    create_BC_top_inflow(bc_mesh_top.getID(),
-                                         component_id_T_in_1,
-                              component_id_T_out_1);
-                std::unique_ptr<BHEInflowDirichletBoundaryCondition> bc_top_2 =
-                    create_BC_top_inflow(bc_mesh_top.getID(),
-                                         component_id_T_in_2,
-                              component_id_T_out_2);
-
-                // there are also 2 BCs on the bottom node
-                std::unique_ptr<BHEBottomDirichletBoundaryCondition>
-                    bc_bottom_1 = create_BC_bottom_outflow(
-                        bc_mesh_bottom.getID(), component_id_T_in_1,
-                        component_id_T_out_1);
-                std::unique_ptr<BHEBottomDirichletBoundaryCondition>
-                    bc_bottom_2 = create_BC_bottom_outflow(
-                        bc_mesh_bottom.getID(), component_id_T_in_2,
-                              component_id_T_out_2);
-
-                // add bc_top and bc_bottom to the vector
-                bcs.push_back(std::move(bc_top_1));
-                bcs.push_back(std::move(bc_top_2));
-                bcs.push_back(std::move(bc_bottom_1));
-                bcs.push_back(std::move(bc_bottom_2));
-            }
-                break;
-            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_1U:
-            {
-                unsigned const component_id_T_in = 0;
-                unsigned const component_id_T_out = 1;
-                // there is one BC on the top node
-                std::unique_ptr<BHEInflowDirichletBoundaryCondition> bc_top =
-                    create_BC_top_inflow(bc_mesh_top.getID(), component_id_T_in,
-                              component_id_T_out);
-
-                // there is also 1 BC on the bottom node
-                std::unique_ptr<BHEBottomDirichletBoundaryCondition>
-                    bc_bottom = create_BC_bottom_outflow(bc_mesh_bottom.getID(),
-                        component_id_T_in, component_id_T_out);
-
-                // add bc_top and bc_bottom to the vector
-                bcs.push_back(std::move(bc_top));
-                bcs.push_back(std::move(bc_bottom));
-            }
-            break;
-            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_CXC:
-            {
-                unsigned const component_id_T_in = 1;
-                unsigned const component_id_T_out = 0;
-                // there is one BC on the top node
-                std::unique_ptr<BHEInflowDirichletBoundaryCondition> bc_top =
-                    create_BC_top_inflow(bc_mesh_top.getID(), component_id_T_in,
-                              component_id_T_out);
-
-                // there is also 1 BC on the bottom node
-                std::unique_ptr<BHEBottomDirichletBoundaryCondition> bc_bottom =
-                    create_BC_bottom_outflow(bc_mesh_bottom.getID(),
-                                             component_id_T_in,
-                              component_id_T_out);
-
-                // add bc_top and bc_bottom to the vector
-                bcs.push_back(std::move(bc_top));
-                bcs.push_back(std::move(bc_bottom));
-            }
-            break;
-            case ProcessLib::HeatTransportBHE::BHE::BHE_TYPE::TYPE_CXA:
-            {
-                unsigned const component_id_T_in = 0;
-                unsigned const component_id_T_out = 1;
-                // there is one BC on the top node
-                std::unique_ptr<BHEInflowDirichletBoundaryCondition> bc_top =
-                    create_BC_top_inflow(bc_mesh_top.getID(), component_id_T_in,
-                              component_id_T_out);
-
-                // there is also 1 BC on the bottom node
-                std::unique_ptr<BHEBottomDirichletBoundaryCondition> bc_bottom =
-                    create_BC_bottom_outflow(bc_mesh_bottom.getID(),
-                        component_id_T_in, component_id_T_out);
-
-                // add bc_top and bc_bottom to the vector
-                bcs.push_back(std::move(bc_top));
-                bcs.push_back(std::move(bc_bottom));
-            }
-                break;
-            default:
-                OGS_FATAL("WRONG BHE TYPE");
+            create_top_bottom_bhe_BCs(in_out_component_id,
+                                      std::back_inserter(bcs));
         }
     }
 
