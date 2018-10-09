@@ -10,10 +10,7 @@
 #pragma once
 
 #include "BoundaryCondition.h"
-#include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/IndexValueVector.h"
-#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
-#include "ProcessLib/Parameter/Parameter.h"
 
 namespace ProcessLib
 {
@@ -21,27 +18,20 @@ class BHEBottomDirichletBoundaryCondition final : public BoundaryCondition
 {
 public:
     BHEBottomDirichletBoundaryCondition(
-        std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
-        MeshLib::Mesh const& bulk_mesh,
-        MeshLib::Node* const outflow_node,
-        int const variable_id,
-        int const component_id);
+        std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices)
+        : _in_out_global_indices(std::move(in_out_global_indices))
+    {
+    }
 
     void getEssentialBCValues(
         const double t, GlobalVector const& x,
         NumLib::IndexValueVector<GlobalIndexType>& bc_values) const override;
 
-    void preTimestep(const double t, const GlobalVector& x) override;
-
 private:
-    NumLib::IndexValueVector<GlobalIndexType> _bc_values;
-
-    NumLib::IndexValueVector<GlobalIndexType> _T_in_values;
+    std::pair<GlobalIndexType, GlobalIndexType> const _in_out_global_indices;
 };
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
-    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
-    MeshLib::Mesh const& bulk_mesh, MeshLib::Node* const outflow_node,
-    int const variable_id, int const component_id);
+    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices);
 }  // namespace ProcessLib
