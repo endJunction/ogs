@@ -131,11 +131,11 @@ void HeatTransportBHELocalAssemblerSoil<
         // for now only using the solid phase parameters
 
         // assemble Conductance matrix
-        local_K.noalias() += dNdx.transpose() * k_s * dNdx * w;
+        local_K.noalias() += dNdx.transpose() * k_s * w * dNdx;
 
         // assemble Mass matrix
         local_M.noalias() +=
-            N.transpose() * density_s * heat_capacity_s * N * w;
+            N.transpose() * density_s * heat_capacity_s * w * N;
     }
 
     // debugging
