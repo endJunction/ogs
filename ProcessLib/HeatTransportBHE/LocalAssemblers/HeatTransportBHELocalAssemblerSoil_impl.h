@@ -92,14 +92,13 @@ void HeatTransportBHELocalAssemblerSoil<
                          std::vector<double>& local_K_data,
                          std::vector<double>& /*local_b_data*/)
 {
-    auto const local_matrix_size = local_x.size();
-
-    assert(local_matrix_size == ShapeFunction::NPOINTS * NUM_NODAL_DOF_SOIL);
+    assert(local_x.size() == ShapeFunction::NPOINTS);
+    (void)local_x;  // Avoid unused arg warning.
 
     auto local_M = MathLib::createZeroedMatrix<NodalMatrixType>(
-        local_M_data, local_matrix_size, local_matrix_size);
+        local_M_data, ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
     auto local_K = MathLib::createZeroedMatrix<NodalMatrixType>(
-        local_K_data, local_matrix_size, local_matrix_size);
+        local_K_data, ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
 
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();

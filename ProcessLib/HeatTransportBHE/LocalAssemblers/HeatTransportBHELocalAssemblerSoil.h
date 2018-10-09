@@ -26,8 +26,6 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-const unsigned NUM_NODAL_DOF_SOIL = 1;
-
 template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
 class HeatTransportBHELocalAssemblerSoil
     : public HeatTransportBHELocalAssemblerInterface
