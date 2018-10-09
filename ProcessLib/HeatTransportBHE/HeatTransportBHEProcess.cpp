@@ -56,6 +56,10 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
             _vec_BHE_mat_IDs.size());
     }
 
+    // TODO (haibing) The following assumes that the material ids are numbered
+    // consecutively, but this is not checked. Don't assume that the material
+    // ids are numbered in specific way, especially that the soil has material
+    // id 0.
     // create a map from a material ID to a BHE ID
     auto max_BHE_mat_id =
         std::max_element(_vec_BHE_mat_IDs.begin(), _vec_BHE_mat_IDs.end());
@@ -68,7 +72,8 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
         _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] = i;
     }
 
-    // TODO check if materialIDs are there or not.
+    // TODO (haibing) Use MeshLib::materialIds(); check if materialIDs are there
+    // or not.
     MeshLib::PropertyVector<int> const* material_ids(
         mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
     _process_data._mesh_prop_materialIDs = material_ids;
