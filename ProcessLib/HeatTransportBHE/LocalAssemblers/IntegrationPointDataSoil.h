@@ -12,8 +12,6 @@
 #include <memory>
 #include <vector>
 
-#include "MaterialLib/SolidModels/MechanicsBase.h"
-
 namespace ProcessLib
 {
 namespace HeatTransportBHE
@@ -25,7 +23,6 @@ struct IntegrationPointDataSoil final
     typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
     double integration_weight;
 
-    void pushBackState() {}
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
