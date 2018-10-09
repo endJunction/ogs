@@ -154,8 +154,6 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     MeshLib::Mesh const& mesh,
     unsigned const integration_order)
 {
-    const int process_id = 0;
-
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
         3, /*mesh.getDimension(),*/
         HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(
@@ -169,10 +167,13 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     // and one BC at the bottom.
     std::vector<std::unique_ptr<BoundaryCondition>> bc_collections =
         createBHEBoundaryConditionTopBottom();
+
+    const int process_id = 0;
     auto& current_process_BCs = _boundary_conditions[process_id];
-    auto const bc_collections_size = bc_collections.size();
-    for (unsigned i = 0; i < bc_collections_size; i++)
-        current_process_BCs.addCreatedBC(std::move(bc_collections[i]));
+    for (auto& bc_collection : bc_collections)
+    {
+        current_process_BCs.addCreatedBC(std::move(bc_collection));
+    }
 }
 
 void HeatTransportBHEProcess::assembleConcreteProcess(const double t,
