@@ -250,31 +250,23 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                         variable_id, in_out_component_id.second));
             };
 
-        // the create_BC function will be repeatedly used
-        auto create_BC_top_inflow =
-            [&](std::pair<int, int> const& in_out_component_id) {
-                auto const global_indices = get_global_bhe_bc_indices(
-                    bc_top_node->getID(), in_out_component_id);
-                return ProcessLib::createBHEInflowDirichletBoundaryCondition(
-                    global_indices.first, global_indices.second, _mesh,
-                    {bc_top_node}, variable_id, in_out_component_id.first,
-                    _process_data._vec_BHE_property[bhe_i]);
-            };
-        auto create_BC_bottom_outflow =
-            [&](std::pair<int, int> const& in_out_component_id) {
-                auto const global_indices = get_global_bhe_bc_indices(
-                    bc_bottom_node->getID(), in_out_component_id);
-                return ProcessLib::createBHEBottomDirichletBoundaryCondition(
-                    global_indices.first, global_indices.second, _mesh,
-                    {bc_bottom_node}, variable_id, in_out_component_id.second);
-            };
-
         for (auto const& in_out_component_id :
              _process_data._vec_BHE_property[bhe_i]
                  ->inflowOutflowBcComponentIds())
         {
-            bcs.push_back(create_BC_top_inflow(in_out_component_id));
-            bcs.push_back(create_BC_bottom_outflow(in_out_component_id));
+            // Top, inflow.
+            bcs.push_back(ProcessLib::createBHEInflowDirichletBoundaryCondition(
+                get_global_bhe_bc_indices(bc_top_node->getID(),
+                                          in_out_component_id),
+                _mesh, {bc_top_node}, variable_id, in_out_component_id.first,
+                _process_data._vec_BHE_property[bhe_i]));
+
+            // Bottom, outflow.
+            bcs.push_back(ProcessLib::createBHEBottomDirichletBoundaryCondition(
+                get_global_bhe_bc_indices(bc_bottom_node->getID(),
+                                          in_out_component_id),
+                _mesh, {bc_bottom_node}, variable_id,
+                in_out_component_id.second));
         }
     }
 

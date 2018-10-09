@@ -21,8 +21,7 @@ class BHEInflowDirichletBoundaryCondition final : public BoundaryCondition
 {
 public:
     BHEInflowDirichletBoundaryCondition(
-        GlobalIndexType global_idx_T_in_top,
-        GlobalIndexType global_idx_T_out_top,
+        std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
         MeshLib::Mesh const& bc_mesh,
         std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
         int const variable_id,
@@ -52,7 +51,7 @@ private:
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
 createBHEInflowDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_top, GlobalIndexType global_idx_T_out_top,
+    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, int const component_id,

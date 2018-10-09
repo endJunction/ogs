@@ -17,8 +17,7 @@
 namespace ProcessLib
 {
 BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_top,
-    GlobalIndexType global_idx_T_out_top,
+    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id,
@@ -48,8 +47,8 @@ BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
     _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
 
     // that might be slow, but only done once
-    const auto g_idx_T_in = global_idx_T_in_top;
-    const auto g_idx_T_out = global_idx_T_out_top;
+    const auto g_idx_T_in = in_out_global_indices.first;
+    const auto g_idx_T_out = in_out_global_indices.second;
 
     if (g_idx_T_in >= 0 && g_idx_T_out >= 0)
     {
@@ -99,7 +98,7 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(const double /*t*/,
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
 createBHEInflowDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_top, GlobalIndexType global_idx_T_out_top,
+    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id, int const component_id,
@@ -111,7 +110,7 @@ createBHEInflowDirichletBoundaryCondition(
     //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
-        global_idx_T_in_top, global_idx_T_out_top, bc_mesh, vec_inflow_bc_nodes,
+        std::move(in_out_global_indices), bc_mesh, vec_inflow_bc_nodes,
         variable_id, component_id, pt_bhe);
 }
 }  // namespace ProcessLib

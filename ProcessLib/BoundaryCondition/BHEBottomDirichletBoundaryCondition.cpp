@@ -17,8 +17,7 @@
 namespace ProcessLib
 {
 BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
-    GlobalIndexType const global_idx_T_in_bottom,
-    GlobalIndexType const global_idx_T_out_bottom,
+    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
     MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id,
@@ -44,14 +43,14 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
     _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
 
-    const auto g_T_out_idx = global_idx_T_out_bottom;
+    const auto g_T_out_idx = in_out_global_indices.second;
     if (g_T_out_idx >= 0)
     {
         _bc_values.ids.emplace_back(g_T_out_idx);
         _bc_values.values.emplace_back(298.15);
     }
 
-    const auto g_T_in_idx = global_idx_T_in_bottom;
+    const auto g_T_in_idx = in_out_global_indices.first;
 
     if (g_T_in_idx >= 0)
     {
@@ -99,15 +98,15 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(const double /*t*/,
 
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
-    GlobalIndexType global_idx_T_in_bottom,
-    GlobalIndexType global_idx_T_out_bottom, MeshLib::Mesh const& bulk_mesh,
+    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
+    MeshLib::Mesh const& bulk_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, int const component_id)
 {
     DBUG("Constructing BHEBottomDirichletBoundaryCondition from config.");
 
     return std::make_unique<BHEBottomDirichletBoundaryCondition>(
-        global_idx_T_in_bottom, global_idx_T_out_bottom, bulk_mesh,
-        vec_outflow_bc_nodes, variable_id, component_id);
+        std::move(in_out_global_indices), bulk_mesh, vec_outflow_bc_nodes,
+        variable_id, component_id);
 }
 }  // namespace ProcessLib
