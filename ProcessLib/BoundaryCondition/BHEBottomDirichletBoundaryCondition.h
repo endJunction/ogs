@@ -34,8 +34,6 @@ public:
     void preTimestep(const double t, const GlobalVector& x) override;
 
 private:
-    MeshLib::Mesh const& _bulk_mesh;
-
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 
     NumLib::IndexValueVector<GlobalIndexType> _T_in_values;

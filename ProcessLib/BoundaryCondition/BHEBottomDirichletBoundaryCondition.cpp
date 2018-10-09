@@ -22,7 +22,6 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     MeshLib::Node* const outflow_node,
     int const variable_id,
     int const component_id)
-    : _bulk_mesh(bulk_mesh)
 {
     DBUG(
         "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d and "
