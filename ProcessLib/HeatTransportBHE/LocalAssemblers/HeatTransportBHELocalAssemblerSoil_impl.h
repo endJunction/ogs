@@ -145,13 +145,5 @@ void HeatTransportBHELocalAssemblerSoil<
     // std::cout << local_K.format(CleanFmt) << sep;
     // std::cout << local_M.format(CleanFmt) << sep;
 }
-
-template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
-void HeatTransportBHELocalAssemblerSoil<
-    ShapeFunction,
-    IntegrationMethod,
-    GlobalDim>::postTimestepConcrete(std::vector<double> const& /*local_x*/)
-{
-}
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
