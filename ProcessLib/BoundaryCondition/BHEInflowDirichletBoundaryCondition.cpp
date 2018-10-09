@@ -27,8 +27,7 @@ BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
     : _bc_mesh(bc_mesh), _pt_bhe(pt_bhe)
 {
     DBUG(
-        "Found %d nodes for BHE Inflow Dirichlet BCs for the variable %d "
-        "and "
+        "Found %d nodes for BHE Inflow Dirichlet BCs for the variable %d and "
         "component %d",
         vec_inflow_bc_nodes.size(), variable_id, component_id);
 
@@ -106,8 +105,6 @@ createBHEInflowDirichletBoundaryCondition(
         pt_bhe)
 {
     DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
-
-    //! \ogs_file_param{prj__process_variables__process_variable__boundary_conditions__boundary_condition__Dirichlet__parameter}
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
         std::move(in_out_global_indices), bc_mesh, vec_inflow_bc_nodes,

@@ -25,8 +25,7 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     : _bulk_mesh(bulk_mesh)
 {
     DBUG(
-        "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d "
-        "and "
+        "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d and "
         "component %d",
         vec_outflow_bc_nodes.size(), variable_id, component_id);
 
@@ -103,7 +102,7 @@ createBHEBottomDirichletBoundaryCondition(
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, int const component_id)
 {
-    DBUG("Constructing BHEBottomDirichletBoundaryCondition from config.");
+    DBUG("Constructing BHEBottomDirichletBoundaryCondition.");
 
     return std::make_unique<BHEBottomDirichletBoundaryCondition>(
         std::move(in_out_global_indices), bulk_mesh, vec_outflow_bc_nodes,
