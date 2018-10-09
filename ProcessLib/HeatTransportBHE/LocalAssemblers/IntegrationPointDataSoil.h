@@ -16,13 +16,11 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-template <typename ShapeMatrixType>
+template <typename NodalMatrixType>
 struct IntegrationPointDataSoil final
 {
-    typename ShapeMatrixType::NodalRowVectorType N;
-    typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
-    double integration_weight;
-
+    NodalMatrixType NTN_product_times_w;
+    NodalMatrixType dNdxTdNdx_product_times_w;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };

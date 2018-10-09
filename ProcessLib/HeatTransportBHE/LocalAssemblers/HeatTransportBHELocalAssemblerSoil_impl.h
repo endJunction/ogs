@@ -72,11 +72,10 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
         _ip_data.emplace_back();
         auto const& sm = _shape_matrices[ip];
         auto& ip_data = _ip_data[ip];
-        ip_data.integration_weight =
-            _integration_method.getWeightedPoint(ip).getWeight() *
-            sm.integralMeasure * sm.detJ;
-        ip_data.N = sm.N;
-        ip_data.dNdx = sm.dNdx;
+        double const w = _integration_method.getWeightedPoint(ip).getWeight() *
+                         sm.integralMeasure * sm.detJ;
+        ip_data.NTN_product_times_w = sm.N.transpose() * sm.N * w;
+        ip_data.dNdxTdNdx_product_times_w = sm.dNdx.transpose() * sm.dNdx * w;
 
         _secondary_data.N[ip] = sm.N;
     }
@@ -110,9 +109,8 @@ void HeatTransportBHELocalAssemblerSoil<
     {
         pos.setIntegrationPoint(ip);
         auto& ip_data = _ip_data[ip];
-        auto const& w = ip_data.integration_weight;
-        auto const& N = ip_data.N;
-        auto const& dNdx = ip_data.dNdx;
+        auto const& M_ip = ip_data.NTN_product_times_w;
+        auto const& K_ip = ip_data.dNdxTdNdx_product_times_w;
 
         // auto const k_f = _process_data.thermal_conductivity_fluid(t, pos)[0];
         // auto const k_g = _process_data.thermal_conductivity_gas(t, pos)[0];
@@ -131,11 +129,10 @@ void HeatTransportBHELocalAssemblerSoil<
         // for now only using the solid phase parameters
 
         // assemble Conductance matrix
-        local_K.noalias() += dNdx.transpose() * k_s * w * dNdx;
+        local_K.noalias() += K_ip * k_s;
 
         // assemble Mass matrix
-        local_M.noalias() +=
-            N.transpose() * density_s * heat_capacity_s * w * N;
+        local_M.noalias() += M_ip * density_s * heat_capacity_s;
     }
 
     // debugging
