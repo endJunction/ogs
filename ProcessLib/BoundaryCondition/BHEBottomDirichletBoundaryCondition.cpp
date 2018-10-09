@@ -19,7 +19,7 @@ namespace ProcessLib
 BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
     MeshLib::Mesh const& bulk_mesh,
-    std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
+    MeshLib::Node* const outflow_node,
     int const variable_id,
     int const component_id)
     : _bulk_mesh(bulk_mesh)
@@ -27,9 +27,9 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     DBUG(
         "Found %d nodes for BHE bottom Dirichlet BCs for the variable %d and "
         "component %d",
-        vec_outflow_bc_nodes.size(), variable_id, component_id);
+        1, variable_id, component_id);
 
-    MeshLib::MeshSubset bc_mesh_subset{_bulk_mesh, vec_outflow_bc_nodes};
+    MeshLib::MeshSubset bc_mesh_subset{bulk_mesh, {outflow_node}};
 
     // create memory to store Tout values
     _T_in_values.ids.clear();
@@ -39,8 +39,8 @@ BHEBottomDirichletBoundaryCondition::BHEBottomDirichletBoundaryCondition(
     _bc_values.values.clear();
 
     // convert mesh node ids to global index for the given component
-    _bc_values.ids.reserve(bc_mesh_subset.getNumberOfNodes());
-    _bc_values.values.reserve(bc_mesh_subset.getNumberOfNodes());
+    _bc_values.ids.resize(1);
+    _bc_values.values.resize(1);
 
     const auto g_T_out_idx = in_out_global_indices.second;
     if (g_T_out_idx >= 0)
@@ -98,14 +98,13 @@ void BHEBottomDirichletBoundaryCondition::preTimestep(const double /*t*/,
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
     std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
-    MeshLib::Mesh const& bulk_mesh,
-    std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
+    MeshLib::Mesh const& bulk_mesh, MeshLib::Node* const outflow_node,
     int const variable_id, int const component_id)
 {
     DBUG("Constructing BHEBottomDirichletBoundaryCondition.");
 
     return std::make_unique<BHEBottomDirichletBoundaryCondition>(
-        std::move(in_out_global_indices), bulk_mesh, vec_outflow_bc_nodes,
-        variable_id, component_id);
+        std::move(in_out_global_indices), bulk_mesh, outflow_node, variable_id,
+        component_id);
 }
 }  // namespace ProcessLib

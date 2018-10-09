@@ -23,7 +23,7 @@ public:
     BHEBottomDirichletBoundaryCondition(
         std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
         MeshLib::Mesh const& bulk_mesh,
-        std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
+        MeshLib::Node* const outflow_node,
         int const variable_id,
         int const component_id);
 
@@ -44,7 +44,6 @@ private:
 std::unique_ptr<BHEBottomDirichletBoundaryCondition>
 createBHEBottomDirichletBoundaryCondition(
     std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
-    MeshLib::Mesh const& bulk_mesh,
-    std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
+    MeshLib::Mesh const& bulk_mesh, MeshLib::Node* const outflow_node,
     int const variable_id, int const component_id);
 }  // namespace ProcessLib

@@ -265,7 +265,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
             bcs.push_back(ProcessLib::createBHEBottomDirichletBoundaryCondition(
                 get_global_bhe_bc_indices(bc_bottom_node->getID(),
                                           in_out_component_id),
-                _mesh, {bc_bottom_node}, variable_id,
+                _mesh, bc_bottom_node, variable_id,
                 in_out_component_id.second));
         }
     }
