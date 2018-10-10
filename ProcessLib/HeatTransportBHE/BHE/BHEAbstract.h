@@ -37,6 +37,7 @@
 
 #include "BoreholeGeometry.h"
 #include "PipeParameters.h"
+#include "RefrigerantParameters.h"
 
 namespace ProcessLib
 {
@@ -79,39 +80,6 @@ enum class BHE_DISCHARGE_TYPE
 class BHEAbstract
 {
 public:
-    struct RefrigerantParameters
-    {
-        /**
-         * dynamics viscosity of the refrigerant
-         * unit is kg m-1 sec-1
-         */
-        double mu_r;
-
-        /**
-         * density of the refrigerant
-         * unit is kg m-3
-         */
-        double rho_r;
-
-        /**
-         * thermal conductivity of the refrigerant
-         * unit is kg m sec^-3 K^-1
-         */
-        double lambda_r;
-
-        /**
-         * specific heat capacity of the refrigerant
-         * unit is m^2 sec^-2 K^-1
-         */
-        double heat_cap_r;
-
-        /**
-         * longitudinal dispersivity of the
-         * referigerant flow in the pipeline
-         */
-        double alpha_L;
-    };
-
     struct GroutParameters
     {
         /**
