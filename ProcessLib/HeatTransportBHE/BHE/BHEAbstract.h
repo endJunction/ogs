@@ -36,6 +36,7 @@
 #include "boost/math/constants/constants.hpp"
 
 #include "BoreholeGeometry.h"
+#include "GroutParameters.h"
 #include "PipeParameters.h"
 #include "RefrigerantParameters.h"
 
@@ -80,33 +81,6 @@ enum class BHE_DISCHARGE_TYPE
 class BHEAbstract
 {
 public:
-    struct GroutParameters
-    {
-        /**
-         * density of the grout
-         * unit is kg m-3
-         */
-        double rho_g;
-
-        /**
-         * porosity of the grout
-         * unit is [-]
-         */
-        double porosity_g;
-
-        /**
-         * specific heat capacity of the grout
-         * unit is m^2 sec^-2 K^-1
-         */
-        double heat_cap_g;
-
-        /**
-         * thermal conductivity of the grout
-         * unit is kg m sec^-3 K^-1
-         */
-        double lambda_g;
-    };
-
     struct ExternallyDefinedRaRb
     {
         /**
