@@ -2330,13 +2330,13 @@ public:
 //            		rho_GR * rho_GR * dNdx_p * w;
 
             // Gas phase equation, gas pressure part
-            const double c1 = phi*beta_p_GR + Sps;
-            const double c2 = phi*beta_T_GR + STs;
-            const double c3 = phi*dsLdpc + s_G*(s_L + p_cap * dsLdpc) * Sps;
+            const double cG1 = phi*beta_p_GR + Sps;
+            const double cG2 = phi*beta_T_GR + STs;
+            const double cG3 = phi*dsLdpc + s_G*(s_L + p_cap * dsLdpc) * Sps;
 
-            drg_dpg += NpT * s_G * c1 * (drhoGRdpGR * p_GR_dot + rho_GR/dt) * Np * w; // G1
-            drg_dpg -= NpT * s_G * c2 * drhoGRdpGR * T_dot * Np * w; // G2
-            drg_dpg -= NpT * c3 * drhoGRdpGR * p_cap_dot * Np * w; // G3
+            drg_dpg += NpT * s_G * cG1 * (drhoGRdpGR * p_GR_dot + rho_GR/dt) * Np * w; // G1
+            drg_dpg -= NpT * s_G * cG2 * drhoGRdpGR * T_dot * Np * w; // G2
+            drg_dpg -= NpT * cG3 * drhoGRdpGR * p_cap_dot * Np * w; // G3
             drg_dpg += NpT * s_G * drhoGRdpGR * alpha_B * div_u_dot * Np  * w; // G4
             drg_dpg += gradNpT * k_over_mu_GR * permeability_tensor *
             		(drhoGRdpGR - rho_GR/mu_GR * dmuGRdpGR) * grad_p_GR * Np * w; // G5(1)
@@ -2344,12 +2344,13 @@ public:
             drg_dpg += gradNpT * rho_GR * k_over_mu_GR * permeability_tensor *
             		(rho_GR/mu_GR*dmuGRdpGR - 2 * drhoGRdpGR) * b * Np * w; // G6
 
-            double dc3dpc = phi * d2sLdpc2 + Sps *
+            const double dcG3dpc = phi * d2sLdpc2 + Sps *
             		(dsLdpc * (2 - 3 * s_L - p_cap * dsLdpc) + s_G*p_cap*d2sLdpc2);
 
-            drg_dpc -= NpT * dsLdpc * rho_GR * c1 * p_GR_dot * Np * w; // G1
-            drg_dpc += NpT * dsLdpc * rho_GR * c2 * T_dot * Np * w; // G2
-            drg_dpc -= NpT * rho_GR * (c3/dt + dc3dpc * p_cap_dot) * Np * w; // G3
+            // Gas phase equation, capillary pressure part
+            drg_dpc -= NpT * dsLdpc * rho_GR * cG1 * p_GR_dot * Np * w; // G1
+            drg_dpc += NpT * dsLdpc * rho_GR * cG2 * T_dot * Np * w; // G2
+            drg_dpc -= NpT * rho_GR * (cG3/dt + dcG3dpc * p_cap_dot) * Np * w; // G3
             drg_dpc -= NpT * dsLdpc * rho_GR * alpha_B * div_u_dot * Np * w; // G4
             drg_dpc += gradNpT * rho_GR * k_over_mu_GR * permeability_tensor *
             		grad_p_GR * Np * w; // G5
@@ -2357,15 +2358,74 @@ public:
             		permeability_tensor * b * Np * w; // G6
 
 
-            std::cout << "= IP: " << ip << "=================================\n";
-            std::cout << "G1:\n\n" << NpT * dsLdpc * rho_GR * c1 * p_GR_dot * Np * w << "\n\n";
-            std::cout << "G2:\n\n" << NpT * dsLdpc * rho_GR * c2 * T_dot * Np * w << "\n\n";
-            std::cout << "G3:\n\n" << NpT * rho_GR * (c3/dt + dc3dpc * p_cap_dot) * Np * w << "\n\n";
-            std::cout << "G4:\n\n" << NpT * dsLdpc * rho_GR * alpha_B * div_u_dot * Np * w << "\n\n";
-            std::cout << "G5:\n\n" << gradNpT * rho_GR * k_over_mu_GR * permeability_tensor *
-            		grad_p_GR * Np * w << "\n\n";
-            std::cout << "G6:\n\n" << gradNpT * rho_GR * rho_GR * dkrelGdsL * dsLdpc / mu_GR *
-            		permeability_tensor * b * Np * w << "\n\n";
+            // Gas phase equation, displacement part
+            drg_dus +=  NpT * s_G * rho_GR / dt * alpha_B *
+                    identity2.transpose() * B * w;
+
+            // liquid phase equation, gas pressure part
+            const double cL1 = phi * beta_p_LR * Sps;
+            const double cL2 = phi * beta_T_LR * STs;
+            const double cL3 = phi * dsLdpc - phi_L*beta_p_LR -
+                    s_L*(s_L + p_cap * dsLdpc) * Sps;
+
+            drl_dpg += NpT * s_L * cL1 * (rho_LR / dt + drhoLRdpGR * p_GR_dot) *
+                    Np * w; // L1
+            drl_dpg -= NpT * s_L * drhoLRdpGR * cL2 * T_dot * Np * w; // L2
+            drl_dpg += NpT * drhoLRdpGR * cL3 * p_cap_dot * Np * w; // L3
+            drl_dpg += NpT * s_L * drhoLRdpGR * alpha_B * div_u_dot * Np * w; // L4
+            drl_dpg += gradNpT * k_over_mu_LR * permeability_tensor  *
+                    (drhoLRdpGR - rho_LR/mu_LR - dmuLRdpGR) * grad_p_GR *
+                    Np * w; // L5
+            drl_dpg -= gradNpT * k_over_mu_LR * permeability_tensor *
+                    (drhoLRdpGR - rho_LR/mu_LR - dmuLRdpGR) * grad_p_Cap *
+                    Np * w; // L6
+            drl_dpg -= gradNpT * rho_LR * k_over_mu_LR * permeability_tensor *
+                    (2 * drhoLRdpGR - rho_LR/mu_LR * dmuLRdpGR) * b * Np * w; // L7
+
+
+            // liquid phase equation, capillary pressure part
+            const double dcL3dpc = phi * (d2sLdpc2 - dsLdpc) -
+                    Sps * (dsLdpc * (3*s_L+p_cap*dsLdpc) + s_L*p_cap * d2sLdpc2);
+
+            drl_dpc += NpT * (dsLdpc * rho_LR + s_L * drhoLRdpCap) * cL1 *
+                    p_GR_dot * Np * w; // L1
+            drl_dpc -= NpT * (dsLdpc * rho_LR + s_L * drhoLRdpCap) * cL2 *
+                    T_dot * Np * w; // L2
+            drl_dpc += NpT * (( drhoLRdpCap * cL3 + rho_LR * dcL3dpc) *
+                    p_cap_dot + rho_LR * cL3 / dt) * Np * w; // L3
+            drl_dpc += NpT * s_L * drhoLRdpCap * alpha_B * div_u_dot *
+                    Np * w; // L4
+            drl_dpc += gradNpT * permeability_tensor / mu_LR *
+                    (drhoLRdpCap * k_rel_LR + rho_LR * dkrelLdsL * dsLdpc -
+                            rho_LR * k_rel_LR / mu_LR * dmuLRdpCap) *
+                            grad_p_GR * Np * w; // L5
+            drl_dpc -= gradNpT * permeability_tensor / mu_LR *
+                    (drhoLRdpCap * k_rel_LR + rho_LR * dkrelLdsL * dsLdpc -
+                            rho_LR * k_rel_LR / mu_LR * dmuLRdpCap) *
+                            grad_p_Cap * Np * w; // L6a
+            drl_dpc -= gradNpT * rho_LR * k_over_mu_LR * permeability_tensor *
+                    gradNp * w; // L6b
+            drl_dpc -= gradNpT * rho_LR * permeability_tensor / mu_LR *
+                    (2 * drhoLRdpCap * k_rel_LR + rho_LR * dkrelLdsL * dsLdpc -
+                            rho_LR*k_rel_LR / mu_LR * dmuLRdpCap) * b * Np * w;
+
+            // liquid phase equation, displacement part
+            drl_dus += NpT * s_L * rho_LR / dt * alpha_B *
+                    identity2.transpose() * B * w; // L4
+
+            // displacement equation, gas pressure part
+            dru_dpg -= B.transpose() * alpha_B * identity2 *
+                    Np * w; // U2
+            dru_dpg -= NuT * drhodpGR * b * Np * w; // U4
+
+            // displacement equation, capillary pressure part
+            dru_dpc += B.transpose() * alpha_B * (dsLdpc*p_cap + s_L) *
+                    identity2 * Np * w; // U3
+            dru_dpc -= NuT * drhodpCap * b * Np * w; // U4
+
+            dru_dus += B.transpose() * C * B * w; // U1
+
+
 
             std::cout << "==================================\n";
 //            OGS_FATAL("wwwwwwwwwww");
