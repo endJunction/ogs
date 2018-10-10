@@ -36,6 +36,7 @@
 #include "boost/math/constants/constants.hpp"
 
 #include "BoreholeGeometry.h"
+#include "PipeParameters.h"
 
 namespace ProcessLib
 {
@@ -78,52 +79,6 @@ enum class BHE_DISCHARGE_TYPE
 class BHEAbstract
 {
 public:
-    struct PipeParameters
-    {
-        /**
-         * radius of the pipline inner side
-         * unit is m
-         */
-        double r_inner;
-
-        /**
-         * radius of the pipline outer side
-         * unit is m
-         */
-        double r_outer;
-
-        /**
-         * pipe-in wall thickness
-         * unit is m
-         */
-        double b_in;
-
-        /**
-         * pipe-out wall thickness
-         * unit is m
-         */
-        double b_out;
-
-        /**
-         * thermal conductivity of the pipe wall
-         * unit is kg m sec^-3 K^-1
-         */
-
-        double lambda_p;
-
-        /**
-         * thermal conductivity of the inner pipe wall
-         * unit is kg m sec^-3 K^-1
-         */
-        double lambda_p_i;
-
-        /**
-         * thermal conductivity of the outer pipe wall
-         * unit is kg m sec^-3 K^-1
-         */
-        double lambda_p_o;
-    };
-
     struct RefrigerantParameters
     {
         /**
