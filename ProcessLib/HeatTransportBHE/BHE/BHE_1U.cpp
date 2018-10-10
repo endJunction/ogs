@@ -156,6 +156,12 @@ void BHE_1U::calcThermalResistances()
 /**
  * Nusselt number calculation
  */
+// TODO (haibing) all the Nusselt number computations are equal. Extract a
+// single function returning the Nusselt number based on required parameters
+// with the signature double calculateNusseltNumber(double const Re, ...),
+// which is not part of any class.
+// Same goes for the Reynolds number and the Prandl number computations.
+// Copy paste of code is not an option.
 void BHE_1U::calcNusseltNum()
 {
     // see Eq. 32 in Diersch_2011_CG
