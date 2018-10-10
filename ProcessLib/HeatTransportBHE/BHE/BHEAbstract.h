@@ -35,6 +35,8 @@
 #include "ProcessLib/Utils/ProcessUtils.h"
 #include "boost/math/constants/constants.hpp"
 
+#include "BoreholeGeometry.h"
+
 namespace ProcessLib
 {
 namespace HeatTransportBHE
@@ -76,21 +78,6 @@ enum class BHE_DISCHARGE_TYPE
 class BHEAbstract
 {
 public:
-    struct BoreholeGeometry
-    {
-        /**
-         * length/depth of the BHE
-         * unit is m
-         */
-        double length;
-
-        /**
-         * diameter of the BHE
-         * unit is m
-         */
-        double diameter;
-    };
-
     struct PipeParameters
     {
         /**
