@@ -76,6 +76,11 @@
                             <type>Constant</type>
                             <value>0</value>
                         </property>
+                        <property>
+                            <name>thermal_expansivity</name>
+                            <type>Constant</type>
+                            <value>0</value>
+                        </property>
                     </properties>
                 </phase>
                 <phase>
@@ -106,6 +111,11 @@
                             <type>Constant</type>
                             <value>10</value>
                         </property>
+                        <property>
+                            <name>thermal_expansivity</name>
+                            <type>Constant</type>
+                            <value>0</value>
+                        </property>
                     </properties>
                 </phase>
                 <phase>
@@ -135,6 +145,11 @@
                             <name>thermal_conductivity</name>
                             <type>Constant</type>
                             <value>1</value>
+                        </property>
+                        <property>
+                            <name>thermal_expansivity</name>
+                            <type>Constant</type>
+                            <value>0</value>
                         </property>
                     </properties>
                 </phase>
