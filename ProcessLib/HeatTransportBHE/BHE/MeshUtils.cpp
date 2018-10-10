@@ -91,11 +91,8 @@ void getBHEDataInMesh(
         vec_soil_nodes.push_back(n);
     }
 
-    // TODO (haibing) Drop erroneous comment.
-    // final count of 3 types of elements
-    // They are
-    // (i)  soil,
-    // (ii) BHE
+    // finalLy counting two types of elements
+    // They are (i) soil, and (ii) BHE type of elements
     DBUG("-> found total %d soil elements and %d BHE elements",
          vec_soil_elements.size(),
          all_BHE_elements.size());
