@@ -26,20 +26,18 @@ void getBHEDataInMesh(
     std::vector<MeshLib::Node*>& vec_soil_nodes,
     std::vector<std::vector<MeshLib::Node*>>& vec_BHE_nodes)
 {
-    // get vectors of matrix elements and BHE elements
+    // partition all the mesh elements, and copy them into
+    // two seperate vectors, one with only matrix elements
+    // and the other only BHE elements
     vec_soil_elements.reserve(mesh.getNumberOfElements());
     std::vector<MeshLib::Element*> all_BHE_elements;
-    // TODO (haibing) This is essentially a std::partition or std::partition_copy.
-    for (MeshLib::Element* e : mesh.getElements())
-    {
-        // As for the first step, all elements are counted as a soil element
-        // first. Those elements connected with a BHE will picked up and
-        // reorganized into a seperate vector at the end of the function.
-        if (e->getDimension() == mesh.getDimension())
-            vec_soil_elements.push_back(e);
-        else if (e->getDimension() == (unsigned int)1)
-            all_BHE_elements.push_back(e);
-    }
+    auto& const all_mesh_elements = mesh.getElements();
+    std::partition_copy(
+        std::begin(all_mesh_elements),
+        std::end(all_mesh_elements),
+        std::back_inserter(all_BHE_elements),
+        std::back_inserter(vec_soil_elements),
+        [](MeshLib::Element* e) { return e->getDimension() == 1; });
 
     // get BHE material IDs
     // TODO (haibing) Use MeshLib::materialIDs(), Explicitly abort on error.
