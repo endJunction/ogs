@@ -72,10 +72,11 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
         _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] = i;
     }
 
-    // TODO (haibing) Use MeshLib::materialIds(); check if materialIDs are there
-    // or not.
-    MeshLib::PropertyVector<int> const* material_ids(
-        mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
+    auto material_ids = MeshLib::materialIDs(mesh);
+    if (material_ids == nullptr)
+    {
+        OGS_FATAL("Not able to get material IDs! ");
+    }
     _process_data._mesh_prop_materialIDs = material_ids;
 }
 

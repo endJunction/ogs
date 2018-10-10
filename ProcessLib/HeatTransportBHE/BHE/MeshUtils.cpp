@@ -40,9 +40,11 @@ void getBHEDataInMesh(
         [](MeshLib::Element* e) { return e->getDimension() == 1; });
 
     // get BHE material IDs
-    // TODO (haibing) Use MeshLib::materialIDs(), Explicitly abort on error.
-    auto opt_material_ids(
-        mesh.getProperties().getPropertyVector<int>("MaterialIDs"));
+    auto opt_material_ids = MeshLib::materialIDs(mesh);
+    if (opt_material_ids == nullptr)
+    {
+        OGS_FATAL("Not able to get material IDs! ");
+    }
     for (MeshLib::Element* e : all_BHE_elements)
         vec_BHE_mat_IDs.push_back((*opt_material_ids)[e->getID()]);
     BaseLib::makeVectorUnique(vec_BHE_mat_IDs);
