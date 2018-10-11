@@ -48,7 +48,6 @@ namespace HeatTransportBHE
 {
 BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
 {
-    BHEMeshData bheMeshData;
     std::vector<MeshLib::Element*> const all_bhe_elements =
         extractOneDimensionalElements(mesh.getElements());
 
@@ -66,17 +65,17 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
     }
     auto const& material_ids = *opt_material_ids;
 
-    bheMeshData.BHE_mat_IDs =
+    auto const& bhe_material_ids =
         getUniqueMaterialIds(material_ids, all_bhe_elements);
-    DBUG("-> found %d BHE material groups", bheMeshData.BHE_mat_IDs.size());
+    DBUG("-> found %d BHE material groups", bhe_material_ids.size());
 
     // create a vector of BHE elements for each group
-    bheMeshData.BHE_elements.resize(bheMeshData.BHE_mat_IDs.size());
-    for (unsigned bhe_id = 0; bhe_id < bheMeshData.BHE_mat_IDs.size(); bhe_id++)
+    std::vector<std::vector<MeshLib::Element*>> bhe_elements;
+    bhe_elements.resize(bhe_material_ids.size());
+    for (unsigned bhe_id = 0; bhe_id < bhe_material_ids.size(); bhe_id++)
     {
-        const auto bhe_mat_id = bheMeshData.BHE_mat_IDs[bhe_id];
-        std::vector<MeshLib::Element*>& vec_elements =
-            bheMeshData.BHE_elements[bhe_id];
+        const auto bhe_mat_id = bhe_material_ids[bhe_id];
+        std::vector<MeshLib::Element*>& vec_elements = bhe_elements[bhe_id];
         copy_if(begin(all_bhe_elements), end(all_bhe_elements),
                 back_inserter(vec_elements), [&](MeshLib::Element* e) {
                     return material_ids[e->getID()] == bhe_mat_id;
@@ -85,11 +84,12 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
     }
 
     // get a vector of BHE nodes
-    bheMeshData.BHE_nodes.resize(bheMeshData.BHE_mat_IDs.size());
-    for (unsigned bhe_id = 0; bhe_id < bheMeshData.BHE_mat_IDs.size(); bhe_id++)
+    std::vector<std::vector<MeshLib::Node*>> bhe_nodes;
+    bhe_nodes.resize(bhe_material_ids.size());
+    for (unsigned bhe_id = 0; bhe_id < bhe_material_ids.size(); bhe_id++)
     {
-        std::vector<MeshLib::Node*>& vec_nodes = bheMeshData.BHE_nodes[bhe_id];
-        for (MeshLib::Element* e : bheMeshData.BHE_elements[bhe_id])
+        std::vector<MeshLib::Node*>& vec_nodes = bhe_nodes[bhe_id];
+        for (MeshLib::Element* e : bhe_elements[bhe_id])
         {
             for (unsigned i = 0; i < e->getNumberOfNodes(); i++)
             {
@@ -103,7 +103,7 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
         DBUG("-> found %d nodes on the BHE_%d", vec_nodes.size(), bhe_id);
     }
 
-    return bheMeshData;
+    return {bhe_material_ids, bhe_elements, bhe_nodes};
 }
 }  // end of namespace HeatTransportBHE
 }  // namespace ProcessLib
