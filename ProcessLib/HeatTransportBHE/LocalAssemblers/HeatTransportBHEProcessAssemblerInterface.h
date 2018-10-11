@@ -9,11 +9,6 @@
 
 #pragma once
 
-#include <utility>
-#include <vector>
-
-#include "BaseLib/Error.h"
-
 #include "NumLib/Extrapolation/ExtrapolatableElement.h"
 #include "ProcessLib/LocalAssemblerInterface.h"
 
@@ -25,11 +20,6 @@ class HeatTransportBHELocalAssemblerInterface
     : public ProcessLib::LocalAssemblerInterface,
       public NumLib::ExtrapolatableElement
 {
-public:
-    // The following function is necessary, because the BHE or Soil assemblers
-    // create their local_x memory based on the passed on dofIndex_to_localIndex
-    // Please keep it unchanged.
-    HeatTransportBHELocalAssemblerInterface(std::size_t n_local_size) {}
 };
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

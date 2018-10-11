@@ -40,9 +40,7 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
         bool const is_axially_symmetric,
         unsigned const integration_order,
         HeatTransportBHEProcessData& process_data)
-    : HeatTransportBHELocalAssemblerInterface(ShapeFunction::NPOINTS *
-                                              GlobalDim),
-      _process_data(process_data),
+    : _process_data(process_data),
       _integration_method(integration_order),
       element_id(e.getID()),
       _is_axially_symmetric(is_axially_symmetric)
