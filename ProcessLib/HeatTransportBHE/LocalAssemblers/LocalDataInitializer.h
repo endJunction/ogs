@@ -337,7 +337,7 @@ private:
     {
         return [](MeshLib::Element const& e,
                   std::vector<unsigned> const&
-                      dofIndex_to_localIndex /*TODO remove it for soil asm.*/,
+                      dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             if (e.getDimension() == GlobalDim)  // soil elements
             {
