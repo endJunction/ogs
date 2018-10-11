@@ -27,6 +27,19 @@ std::vector<MeshLib::Element*> extractOneDimensionalElements(
 
     return one_dimensional_elements;
 }
+
+std::vector<int> getUniqueMaterialIds(
+    std::vector<int> const& material_ids,
+    std::vector<MeshLib::Element*> const& elements)
+{
+    std::set<int> unique_material_ids;
+    std::transform(begin(elements), end(elements),
+                   inserter(unique_material_ids, end(unique_material_ids)),
+                   [&material_ids](MeshLib::Element const* const e) {
+                       return material_ids[e->getID()];
+                   });
+    return {begin(unique_material_ids), end(unique_material_ids)};
+}
 }  // namespace
 
 namespace ProcessLib
@@ -46,15 +59,15 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
          all_bhe_elements.size());
 
     // get BHE material IDs
-    auto opt_material_ids = MeshLib::materialIDs(mesh);
+    auto const* const opt_material_ids = MeshLib::materialIDs(mesh);
     if (opt_material_ids == nullptr)
     {
         OGS_FATAL("Not able to get material IDs! ");
     }
-    for (MeshLib::Element* e : all_bhe_elements)
-        bheMeshData.BHE_mat_IDs.push_back((*opt_material_ids)[e->getID()]);
+    auto const& material_ids = *opt_material_ids;
 
-    BaseLib::makeVectorUnique(bheMeshData.BHE_mat_IDs);
+    bheMeshData.BHE_mat_IDs =
+        getUniqueMaterialIds(material_ids, all_bhe_elements);
     DBUG("-> found %d BHE material groups", bheMeshData.BHE_mat_IDs.size());
 
     // create a vector of BHE elements for each group
@@ -66,7 +79,7 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
             bheMeshData.BHE_elements[bhe_id];
         copy_if(begin(all_bhe_elements), end(all_bhe_elements),
                 back_inserter(vec_elements), [&](MeshLib::Element* e) {
-                    return (*opt_material_ids)[e->getID()] == bhe_mat_id;
+                    return material_ids[e->getID()] == bhe_mat_id;
                 });
         DBUG("-> found %d elements on the BHE_%d", vec_elements.size(), bhe_id);
     }
