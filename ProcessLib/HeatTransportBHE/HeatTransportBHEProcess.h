@@ -75,9 +75,6 @@ private:
 
     std::unique_ptr<MeshLib::MeshSubset const> _mesh_subset_soil_nodes;
 
-    std::unique_ptr<MeshLib::MeshSubset const>
-        _mesh_subset_soil_nodes_connected_with_BHE;
-
     const BHEMeshData _bheMeshData;
 };
 }  // namespace HeatTransportBHE
