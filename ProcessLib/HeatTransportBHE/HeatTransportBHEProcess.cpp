@@ -37,23 +37,18 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
     : Process(mesh, std::move(jacobian_assembler), parameters,
               integration_order, std::move(process_variables),
               std::move(secondary_variables), std::move(named_function_caller)),
-      _process_data(std::move(process_data))
+      _process_data(std::move(process_data)),
+      _bheMeshData(getBHEDataInMesh(mesh))
 {
-    getBHEDataInMesh(mesh,
-                     _vec_pure_soil_elements,
-                     _vec_BHE_mat_IDs,
-                     _vec_BHE_elements,
-                     _vec_pure_soil_nodes,
-                     _vec_BHE_nodes);
-
-    if (_vec_BHE_mat_IDs.size() != _process_data._vec_BHE_property.size())
+    if (_bheMeshData.BHE_mat_IDs.size() !=
+        _process_data._vec_BHE_property.size())
     {
         OGS_FATAL(
             "The number of the given BHE properties (%d) are not "
             "consistent"
             " with the number of BHE groups in a mesh (%d).",
             _process_data._vec_BHE_property.size(),
-            _vec_BHE_mat_IDs.size());
+            _bheMeshData.BHE_mat_IDs.size());
     }
 
     // TODO (haibing) The following assumes that the material ids are numbered
@@ -61,15 +56,16 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
     // ids are numbered in specific way, especially that the soil has material
     // id 0.
     // create a map from a material ID to a BHE ID
-    auto max_BHE_mat_id =
-        std::max_element(_vec_BHE_mat_IDs.begin(), _vec_BHE_mat_IDs.end());
+    auto max_BHE_mat_id = std::max_element(_bheMeshData.BHE_mat_IDs.begin(),
+                                           _bheMeshData.BHE_mat_IDs.end());
     const std::size_t nBHEmatIDs = *max_BHE_mat_id + 1;
     _process_data._map_materialID_to_BHE_ID.resize(nBHEmatIDs);
-    for (std::size_t i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+    for (std::size_t i = 0; i < _bheMeshData.BHE_mat_IDs.size(); i++)
     {
         // by default, it is assumed that the soil compartment takes material ID
         // 0 and the BHE take the successive material group.
-        _process_data._map_materialID_to_BHE_ID[_vec_BHE_mat_IDs[i]] = i;
+        _process_data._map_materialID_to_BHE_ID[_bheMeshData.BHE_mat_IDs[i]] =
+            i;
     }
 
     auto material_ids = MeshLib::materialIDs(mesh);
@@ -90,17 +86,16 @@ void HeatTransportBHEProcess::constructDofTable()
     // prepare mesh subsets to define DoFs
     //------------------------------------------------------------
     // first all the soil nodes
-    _mesh_subset_pure_soil_nodes =
-        std::make_unique<MeshLib::MeshSubset>(_mesh, _vec_pure_soil_nodes);
+    _mesh_subset_pure_soil_nodes = std::make_unique<MeshLib::MeshSubset>(
+        _mesh, _bheMeshData.soil_nodes);
 
     std::vector<int> vec_n_BHE_unknowns;
-    vec_n_BHE_unknowns.reserve(_vec_BHE_nodes.size());
+    vec_n_BHE_unknowns.reserve(_bheMeshData.BHE_nodes.size());
     // the BHE nodes need to be cherry-picked from the vector
-    for (unsigned i = 0; i < _vec_BHE_nodes.size(); i++)
+    for (unsigned i = 0; i < _bheMeshData.BHE_nodes.size(); i++)
     {
         _mesh_subset_BHE_nodes.push_back(
-            std::make_unique<MeshLib::MeshSubset const>(_mesh,
-                                                        _vec_BHE_nodes[i]));
+            std::make_unique<MeshLib::MeshSubset const>(_mesh, _bheMeshData.BHE_nodes[i]));
         int n_BHE_unknowns =
             _process_data._vec_BHE_property[i]->getNumUnknowns();
         vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
@@ -129,7 +124,7 @@ void HeatTransportBHEProcess::constructDofTable()
     // temperature.
     vec_n_components.push_back(1);
     // now the BHE subsets
-    for (std::size_t i = 0; i < _vec_BHE_mat_IDs.size(); i++)
+    for (std::size_t i = 0; i < _bheMeshData.BHE_mat_IDs.size(); i++)
     {
         // Here the number of components equals to
         // the number of unknowns on the BHE
@@ -139,9 +134,9 @@ void HeatTransportBHEProcess::constructDofTable()
     std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
     // vec_var_elements.push_back(&_vec_pure_soil_elements);
     vec_var_elements.push_back(&(_mesh.getElements()));
-    for (std::size_t i = 0; i < _vec_BHE_elements.size(); i++)
+    for (std::size_t i = 0; i < _bheMeshData.BHE_elements.size(); i++)
     {
-        vec_var_elements.push_back(&_vec_BHE_elements[i]);
+        vec_var_elements.push_back(&_bheMeshData.BHE_elements[i]);
     }
 
     _local_to_global_index_map =
@@ -231,7 +226,7 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
     // for each BHE
     for (int bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
-        auto const& bhe_nodes = _vec_BHE_nodes[bhe_i];
+        auto const& bhe_nodes = _bheMeshData.BHE_nodes[bhe_i];
         // find the variable ID
         // the soil temperature is 0-th variable
         // the BHE temperature is therefore bhe_i + 1
