@@ -155,18 +155,8 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
         mesh.getElements(), dof_table, _local_assemblers,
         mesh.isAxiallySymmetric(), integration_order, _process_data);
 
-    // create BHE boundary conditions
-    // for each BHE, one BC on the top
-    // and one BC at the bottom.
-    std::vector<std::unique_ptr<BoundaryCondition>> bc_collections =
-        createBHEBoundaryConditionTopBottom();
-
-    const int process_id = 0;
-    auto& current_process_BCs = _boundary_conditions[process_id];
-    for (auto& bc_collection : bc_collections)
-    {
-        current_process_BCs.addCreatedBC(std::move(bc_collection));
-    }
+    // Create BHE boundary conditions for each of the BHEs
+    createBHEBoundaryConditionTopBottom(_bheMeshData.BHE_nodes);
 }
 
 void HeatTransportBHEProcess::assembleConcreteProcess(const double t,
@@ -204,20 +194,18 @@ void HeatTransportBHEProcess::computeSecondaryVariableConcrete(
         _coupled_solutions);
 }
 
-std::vector<std::unique_ptr<BoundaryCondition>>
-HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
+void HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom(
+    std::vector<std::vector<MeshLib::Node*>> const& all_bhe_nodes)
 {
-    /**
-     * boundary conditions
-     */
-    std::vector<std::unique_ptr<BoundaryCondition>> bcs;
+    const int process_id = 0;
+    auto& bcs = _boundary_conditions[process_id];
 
     int const n_BHEs = static_cast<int>(_process_data._vec_BHE_property.size());
 
     // for each BHE
     for (int bhe_i = 0; bhe_i < n_BHEs; bhe_i++)
     {
-        auto const& bhe_nodes = _bheMeshData.BHE_nodes[bhe_i];
+        auto const& bhe_nodes = all_bhe_nodes[bhe_i];
         // find the variable ID
         // the soil temperature is 0-th variable
         // the BHE temperature is therefore bhe_i + 1
@@ -249,20 +237,21 @@ HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom()
                  ->inflowOutflowBcComponentIds())
         {
             // Top, inflow.
-            bcs.push_back(ProcessLib::createBHEInflowDirichletBoundaryCondition(
-                get_global_bhe_bc_indices(bc_top_node->getID(),
-                                          in_out_component_id),
-                _mesh, {bc_top_node}, variable_id, in_out_component_id.first,
-                _process_data._vec_BHE_property[bhe_i]));
+            bcs.addCreatedBC(
+                ProcessLib::createBHEInflowDirichletBoundaryCondition(
+                    get_global_bhe_bc_indices(bc_top_node->getID(),
+                                              in_out_component_id),
+                    _mesh, {bc_top_node}, variable_id,
+                    in_out_component_id.first,
+                    _process_data._vec_BHE_property[bhe_i]));
 
             // Bottom, outflow.
-            bcs.push_back(ProcessLib::createBHEBottomDirichletBoundaryCondition(
-                get_global_bhe_bc_indices(bc_bottom_node_id,
-                                          in_out_component_id)));
+            bcs.addCreatedBC(
+                ProcessLib::createBHEBottomDirichletBoundaryCondition(
+                    get_global_bhe_bc_indices(bc_bottom_node_id,
+                                              in_out_component_id)));
         }
     }
-
-    return bcs;
 }
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
