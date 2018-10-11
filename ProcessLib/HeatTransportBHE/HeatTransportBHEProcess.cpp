@@ -75,13 +75,23 @@ void HeatTransportBHEProcess::constructDofTable()
     _mesh_subset_all_nodes =
         std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
 
-    //------------------------------------------------------------
-    // prepare mesh subsets to define DoFs
-    //------------------------------------------------------------
+    //
+    // Soil nodes with temperature variable.
+    //
+
     // all the nodes of the mesh are the soil nodes.
     _mesh_subset_soil_nodes =
         std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
 
+    // Collect the mesh subsets in a vector.
+    // This is the soil temperature for first mesh subset.
+    std::vector<MeshLib::MeshSubset> all_mesh_subsets{*_mesh_subset_soil_nodes};
+    std::vector<int> vec_n_components{
+        1};  // one component for the soil temperature variable.
+
+    //
+    // BHE nodes with BHE type dependend number of variables.
+    //
     std::vector<int> vec_n_BHE_unknowns;
     vec_n_BHE_unknowns.reserve(_bheMeshData.BHE_nodes.size());
     // the BHE nodes need to be cherry-picked from the vector
@@ -93,10 +103,6 @@ void HeatTransportBHEProcess::constructDofTable()
             _process_data._vec_BHE_property[i]->getNumUnknowns();
         vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
     }
-
-    // Collect the mesh subsets in a vector.
-    // All the soil nodes has 1 temperature variable
-    std::vector<MeshLib::MeshSubset> all_mesh_subsets{*_mesh_subset_soil_nodes};
 
     // All the BHE nodes have additinal variables
     std::size_t count = 0;
@@ -110,11 +116,6 @@ void HeatTransportBHEProcess::constructDofTable()
         count++;
     }
 
-    std::vector<int> vec_n_components;
-    // This is the soil temperature for first mesh subset.
-    // 1, because for the soil part there is just one variable which is the soil
-    // temperature.
-    vec_n_components.push_back(1);
     // now the BHE subsets
     for (std::size_t i = 0; i < _bheMeshData.BHE_mat_IDs.size(); i++)
     {
@@ -124,7 +125,6 @@ void HeatTransportBHEProcess::constructDofTable()
     }
 
     std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
-    // vec_var_elements.push_back(&_vec_pure_soil_elements);
     vec_var_elements.push_back(&(_mesh.getElements()));
     for (std::size_t i = 0; i < _bheMeshData.BHE_elements.size(); i++)
     {
