@@ -14,6 +14,21 @@
 #include "MeshLib/MeshSearch/NodeSearch.h"
 #include "MeshLib/Node.h"
 
+namespace
+{
+std::vector<MeshLib::Element*> extractOneDimensionalElements(
+    std::vector<MeshLib::Element*> const& elements)
+{
+    std::vector<MeshLib::Element*> one_dimensional_elements;
+
+    copy_if(begin(elements), end(elements),
+            back_inserter(one_dimensional_elements),
+            [](MeshLib::Element* e) { return e->getDimension() == 1; });
+
+    return one_dimensional_elements;
+}
+}  // namespace
+
 namespace ProcessLib
 {
 namespace HeatTransportBHE
@@ -21,18 +36,14 @@ namespace HeatTransportBHE
 BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
 {
     BHEMeshData bheMeshData;
-    // partition all the mesh elements, and copy them into
-    // two seperate vectors, one with only matrix elements
-    // and the other only BHE elements
-    bheMeshData.soil_elements.reserve(mesh.getNumberOfElements());
-    std::vector<MeshLib::Element*> all_BHE_elements;
-    auto& all_mesh_elements = mesh.getElements();
-    std::partition_copy(
-        std::begin(all_mesh_elements),
-        std::end(all_mesh_elements),
-        std::back_inserter(all_BHE_elements),
-        std::back_inserter(bheMeshData.soil_elements),
-        [](MeshLib::Element* e) { return e->getDimension() == 1; });
+    std::vector<MeshLib::Element*> const all_bhe_elements =
+        extractOneDimensionalElements(mesh.getElements());
+
+    // finally counting two types of elements
+    // They are (i) soil, and (ii) BHE type of elements
+    DBUG("-> found total %d soil elements and %d BHE elements",
+         mesh.getNumberOfElements() - all_bhe_elements.size(),
+         all_bhe_elements.size());
 
     // get BHE material IDs
     auto opt_material_ids = MeshLib::materialIDs(mesh);
@@ -40,8 +51,9 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
     {
         OGS_FATAL("Not able to get material IDs! ");
     }
-    for (MeshLib::Element* e : all_BHE_elements)
+    for (MeshLib::Element* e : all_bhe_elements)
         bheMeshData.BHE_mat_IDs.push_back((*opt_material_ids)[e->getID()]);
+
     BaseLib::makeVectorUnique(bheMeshData.BHE_mat_IDs);
     DBUG("-> found %d BHE material groups", bheMeshData.BHE_mat_IDs.size());
 
@@ -52,11 +64,10 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
         const auto bhe_mat_id = bheMeshData.BHE_mat_IDs[bhe_id];
         std::vector<MeshLib::Element*>& vec_elements =
             bheMeshData.BHE_elements[bhe_id];
-        std::copy_if(all_BHE_elements.begin(), all_BHE_elements.end(),
-                     std::back_inserter(vec_elements),
-                     [&](MeshLib::Element* e) {
-                         return (*opt_material_ids)[e->getID()] == bhe_mat_id;
-                     });
+        copy_if(begin(all_bhe_elements), end(all_bhe_elements),
+                back_inserter(vec_elements), [&](MeshLib::Element* e) {
+                    return (*opt_material_ids)[e->getID()] == bhe_mat_id;
+                });
         DBUG("-> found %d elements on the BHE_%d", vec_elements.size(), bhe_id);
     }
 
@@ -78,20 +89,6 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
             });
         DBUG("-> found %d nodes on the BHE_%d", vec_nodes.size(), bhe_id);
     }
-
-    // get all the nodes into the pure soil nodes vector
-    bheMeshData.soil_nodes.reserve(mesh.getNumberOfNodes());
-    for (MeshLib::Node* n : mesh.getNodes())
-    {
-        // All elements are counted as a soil element
-        bheMeshData.soil_nodes.push_back(n);
-    }
-
-    // finalLy counting two types of elements
-    // They are (i) soil, and (ii) BHE type of elements
-    DBUG("-> found total %d soil elements and %d BHE elements",
-         bheMeshData.soil_elements.size(),
-         bheMeshData.BHE_elements.size());
 
     return bheMeshData;
 }

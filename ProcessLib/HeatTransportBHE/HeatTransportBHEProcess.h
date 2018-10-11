@@ -73,7 +73,7 @@ private:
     std::vector<std::unique_ptr<MeshLib::MeshSubset const>>
         _mesh_subset_BHE_soil_nodes;
 
-    std::unique_ptr<MeshLib::MeshSubset const> _mesh_subset_pure_soil_nodes;
+    std::unique_ptr<MeshLib::MeshSubset const> _mesh_subset_soil_nodes;
 
     std::unique_ptr<MeshLib::MeshSubset const>
         _mesh_subset_soil_nodes_connected_with_BHE;

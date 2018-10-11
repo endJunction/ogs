@@ -79,9 +79,9 @@ void HeatTransportBHEProcess::constructDofTable()
     //------------------------------------------------------------
     // prepare mesh subsets to define DoFs
     //------------------------------------------------------------
-    // first all the soil nodes
-    _mesh_subset_pure_soil_nodes = std::make_unique<MeshLib::MeshSubset>(
-        _mesh, _bheMeshData.soil_nodes);
+    // all the nodes of the mesh are the soil nodes.
+    _mesh_subset_soil_nodes =
+        std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
 
     std::vector<int> vec_n_BHE_unknowns;
     vec_n_BHE_unknowns.reserve(_bheMeshData.BHE_nodes.size());
@@ -97,8 +97,7 @@ void HeatTransportBHEProcess::constructDofTable()
 
     // Collect the mesh subsets in a vector.
     // All the soil nodes has 1 temperature variable
-    std::vector<MeshLib::MeshSubset> all_mesh_subsets{
-        *_mesh_subset_pure_soil_nodes};
+    std::vector<MeshLib::MeshSubset> all_mesh_subsets{*_mesh_subset_soil_nodes};
 
     // All the BHE nodes have additinal variables
     std::size_t count = 0;

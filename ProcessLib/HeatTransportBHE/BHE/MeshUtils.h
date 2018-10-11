@@ -23,10 +23,8 @@ namespace HeatTransportBHE
 {
 struct BHEMeshData
 {
-    std::vector<MeshLib::Element*> soil_elements;
     std::vector<int> BHE_mat_IDs;
     std::vector<std::vector<MeshLib::Element*>> BHE_elements;
-    std::vector<MeshLib::Node*> soil_nodes;
     std::vector<std::vector<MeshLib::Node*>> BHE_nodes;
 };
 
