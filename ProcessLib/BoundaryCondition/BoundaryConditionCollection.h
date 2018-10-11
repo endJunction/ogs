@@ -46,9 +46,9 @@ public:
         NumLib::LocalToGlobalIndexMap const& dof_table,
         unsigned const integration_order, Process const& process);
 
-    void addCreatedBC(std::unique_ptr<BoundaryCondition>&& new_bc)
+    void addBoundaryCondition(std::unique_ptr<BoundaryCondition>&& bc)
     {
-        _boundary_conditions.push_back(std::move(new_bc));
+        _boundary_conditions.push_back(std::move(bc));
     }
 
     void preTimestep(const double t, GlobalVector const& x)
