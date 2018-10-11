@@ -26,8 +26,9 @@ class HeatTransportBHELocalAssemblerInterface
       public NumLib::ExtrapolatableElement
 {
 public:
-    // TODO (haibing) Is the default ctor needed? Needed with empty body?
-    HeatTransportBHELocalAssemblerInterface() : _dofIndex_to_localIndex{} {}
+    // The following function is necessary, because the BHE or Soil assemblers
+    // create their local_x memory based on the passed on dofIndex_to_localIndex
+    // Please keep it unchanged. 
     HeatTransportBHELocalAssemblerInterface(
         std::size_t n_local_size, std::vector<unsigned> dofIndex_to_localIndex)
         : _dofIndex_to_localIndex(std::move(dofIndex_to_localIndex))
