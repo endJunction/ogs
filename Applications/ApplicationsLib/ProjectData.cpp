@@ -379,7 +379,9 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
         {
             if (_mesh_vec[0]->getDimension() != 3)
             {
-                OGS_FATAL("HEAT_TRANSPORT_BHE can only work with a 3-dimentional mesh! "); 
+                OGS_FATAL(
+                    "HEAT_TRANSPORT_BHE can only work with a 3-dimentional "
+                    "mesh! ");
             }
 
             process =
