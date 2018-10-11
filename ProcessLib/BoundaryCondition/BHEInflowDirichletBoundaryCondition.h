@@ -36,7 +36,7 @@ public:
     void preTimestep(const double t, const GlobalVector& x) override;
 
 private:
-
+    // TODO (haibing) re-organize as the bottom BC data structure
     MeshLib::Mesh const& _bc_mesh;
 
     /// Stores the results of the outflow temperatures per boundary node.

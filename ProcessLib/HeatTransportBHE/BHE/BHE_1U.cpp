@@ -211,7 +211,7 @@ void BHE_1U::calcRenoldsNum()
 
     u_norm = std::abs(_u(0));
     d = 2.0 * pipe_param.r_inner;  // inner diameter of the pipeline
-
+    // TODO (haibing)
     _Re = u_norm * d / (mu_r / rho_r);
 }
 
