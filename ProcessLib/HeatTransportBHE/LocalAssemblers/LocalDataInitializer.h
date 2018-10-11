@@ -230,13 +230,10 @@ public:
     /// \attention
     /// The index \c id is not necessarily the mesh item's id. Especially when
     /// having multiple meshes it will differ from the latter.
-    void operator()(
-        std::size_t const /*id*/,
-        MeshLib::Element const& mesh_item,
-        LADataIntfPtr& data_ptr,
-        const std::vector<std::vector<std::size_t>>& /*vec_ele_connected_BHE_IDs*/,
-        const std::vector<std::unique_ptr<BHE::BHEAbstract>>& /*vec_BHE_property*/,
-        ConstructorArgs&&... args) const
+    void operator()(std::size_t const /*id*/,
+                    MeshLib::Element const& mesh_item,
+                    LADataIntfPtr& data_ptr,
+                    ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
         auto const it = _builder.find(type_idx);

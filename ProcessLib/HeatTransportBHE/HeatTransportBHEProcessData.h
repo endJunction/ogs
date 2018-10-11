@@ -82,9 +82,6 @@ struct HeatTransportBHEProcessData
     std::vector<std::size_t> _map_materialID_to_BHE_ID;
 
     std::vector<std::unique_ptr<BHE::BHEAbstract>> _vec_BHE_property;
-
-    // a table of connected BHE IDs for each element
-    std::vector<std::vector<std::size_t>> _vec_ele_connected_BHE_IDs;
 };
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
