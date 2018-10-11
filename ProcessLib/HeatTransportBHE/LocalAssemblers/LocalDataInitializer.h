@@ -292,9 +292,10 @@ private:
 private:
     /// Generates a function that creates a new LocalAssembler of type
     /// LAData<ShapeFunction>. Only functions with shape function's dimension
-    /// less or equal to the global dimension are instantiated, e.g.  following
+    /// less equal to the global dimension or with shape function of a line
+    /// elements are instantiated, e.g.  following
     /// combinations of shape functions and global dimensions: (Line2, 1),
-    /// (Line2, 2), (Line2, 3), (Hex20, 3) but not (Hex20, 2) or (Hex20, 1).
+    /// (Line3, 1), (Hex20, 3) but not (Hex20, 2) or (Hex20, 1) or (Line2, 2).
     template <typename ShapeFunction>
     static LADataBuilder makeLocalAssemblerBuilder(std::true_type*)
     {
@@ -310,6 +311,7 @@ private:
         };
     }
 
+    /// Specialization for BHE elements.
     template <>
     static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine2>(
         std::true_type*)
@@ -317,11 +319,11 @@ private:
         return [](MeshLib::Element const& e,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine2>{
-                // BHE elements
                 e, std::forward<ConstructorArgs>(args)...}};
         };
     }
 
+    /// Specialization for BHE elements.
     template <>
     static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine3>(
         std::true_type*)
@@ -329,7 +331,6 @@ private:
         return [](MeshLib::Element const& e,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine3>{
-                // BHE elements
                 e, std::forward<ConstructorArgs>(args)...}};
         };
     }
