@@ -36,8 +36,9 @@ public:
 
 private:
 
-    // TODO (haibing) Move the member to BHE assembler, then remove this class
-    // entirely.
+    // this dofTalbe must be kept here.
+    // When initializing the assembler, this will be needed to
+    // initialize the memory for local assemblers. 
     std::vector<unsigned> const _dofIndex_to_localIndex;
 };
 }  // namespace HeatTransportBHE
