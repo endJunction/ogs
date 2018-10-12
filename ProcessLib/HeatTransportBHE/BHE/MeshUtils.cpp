@@ -26,7 +26,7 @@ BHEMeshData getBHEDataInMesh(MeshLib::Mesh const& mesh)
     // and the other only BHE elements
     bheMeshData.soil_elements.reserve(mesh.getNumberOfElements());
     std::vector<MeshLib::Element*> all_BHE_elements;
-    auto& const all_mesh_elements = mesh.getElements();
+    auto& all_mesh_elements = mesh.getElements();
     std::partition_copy(
         std::begin(all_mesh_elements),
         std::end(all_mesh_elements),
