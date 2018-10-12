@@ -30,7 +30,7 @@ void BHE_1U::initialize()
 
     // calculate Nusselt number
     double tmp_Nu =
-        calcNusseltNumber(2.0 * pipe_param.r_inner,borehole_geometry.length);
+        calcNusseltNumber(2.0 * pipe_param.r_inner, borehole_geometry.length);
     _Nu(0) = tmp_Nu;
     _Nu(1) = tmp_Nu;
 

@@ -149,8 +149,8 @@ void BHE_CXC::calcNusseltNum()
     {
         xi = pow(1.8 * std::log10(_Re_i1) - 1.5, -2.0);
         Nu_in = (xi / 8.0 * _Re_i1 * Pr) /
-                (1.0 + 12.7 * std::sqrt(xi / 8.0) *
-                           (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
+                (1.0 +
+                 12.7 * std::sqrt(xi / 8.0) * (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                 (1.0 + std::pow(d_i1 / L, 2.0 / 3.0));
     }
 

@@ -193,7 +193,7 @@ public:
     virtual void updateFlowRate(double new_flow_rate)
     {
         Q_r = new_flow_rate;
-        initialize(); 
+        initialize();
     };
 
     virtual void updateFlowRateFromCurve(double current_time) = 0;
@@ -208,7 +208,8 @@ public:
      * flow velocity inside the pipeline
      */
     double calcPipeFlowVelocity(double const& flow_rate,
-                                double const& pipe_diameter) {
+                                double const& pipe_diameter)
+    {
         return 4.0 * flow_rate / (PI * pipe_diameter * pipe_diameter);
     }
 

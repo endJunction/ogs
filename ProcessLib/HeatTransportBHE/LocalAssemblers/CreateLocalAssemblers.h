@@ -12,9 +12,9 @@
 
 #include <logog/include/logog.hpp>
 
+#include "LocalDataInitializer.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
-#include "LocalDataInitializer.h"
 
 namespace ProcessLib
 {

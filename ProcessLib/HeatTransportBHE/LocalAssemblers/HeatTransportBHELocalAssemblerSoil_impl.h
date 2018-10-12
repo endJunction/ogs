@@ -43,10 +43,10 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
         HeatTransportBHEProcessData& process_data)
     : HeatTransportBHELocalAssemblerInterface(
           ShapeFunction::NPOINTS * GlobalDim, dofIndex_to_localIndex),
-    _process_data(process_data),
-    _integration_method(integration_order),
-    element_id(e.getID()),
-    _is_axially_symmetric(is_axially_symmetric)
+      _process_data(process_data),
+      _integration_method(integration_order),
+      element_id(e.getID()),
+      _is_axially_symmetric(is_axially_symmetric)
 {
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();

@@ -22,7 +22,7 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXA::initialize()
                            refrigerant_param.heat_cap_r,
                            refrigerant_param.lambda_r);
 
-    calcNusseltNum(); 
+    calcNusseltNum();
     calcThermalResistances();
     calcHeatTransferCoefficients();
 }
@@ -179,8 +179,8 @@ void BHE_CXA::calcNusseltNum()
     {
         xi = pow(1.8 * std::log10(_Re_i1) - 1.5, -2.0);
         Nu_in = (xi / 8.0 * _Re_i1 * Pr) /
-                (1.0 + 12.7 * std::sqrt(xi / 8.0) *
-                           (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
+                (1.0 +
+                 12.7 * std::sqrt(xi / 8.0) * (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                 (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
                 ((0.86 * std::pow(d_o1 / d_i1, 0.84) + 1.0 -
                   0.14 * std::pow(d_o1 / d_i1, 0.6)) /

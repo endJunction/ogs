@@ -66,9 +66,7 @@ struct IntegrationPointDataBHE final
     // Advection vectors
     std::vector<Eigen::VectorXd> _vec_Advection_vectors;
 
-    void pushBackState()
-    {
-    }
+    void pushBackState() {}
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };

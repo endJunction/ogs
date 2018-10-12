@@ -234,8 +234,10 @@ public:
         std::size_t const id,
         MeshLib::Element const& mesh_item,
         LADataIntfPtr& data_ptr,
-        const std::vector<std::vector<std::size_t>>& /*vec_ele_connected_BHE_IDs*/,
-        const std::vector<std::unique_ptr<BHE::BHEAbstract>>& /*vec_BHE_property*/,
+        const std::vector<
+            std::vector<std::size_t>>& /*vec_ele_connected_BHE_IDs*/,
+        const std::vector<
+            std::unique_ptr<BHE::BHEAbstract>>& /*vec_BHE_property*/,
         ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
@@ -336,8 +338,7 @@ private:
     static LADataBuilder makeLocalAssemblerBuilder(std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::vector<unsigned> const&
-                      dofIndex_to_localIndex,
+                  std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             if (e.getDimension() == GlobalDim)  // soil elements
             {

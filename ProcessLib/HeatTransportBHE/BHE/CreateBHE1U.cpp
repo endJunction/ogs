@@ -219,9 +219,10 @@ BHE::BHE_1U* CreateBHE1U(
         {bhe_pipe_inner_radius, bhe_pipe_outer_radius,
          bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness,
          bhe_pipe_wall_thermal_conductivity, 0.38,
-         0.38 /*lambda_p_i and lambda_p_o will not be used for 1U BHE*/} /* Pipe
-                                                                            Parameters
-                                                                          */
+         0.38 /*lambda_p_i and lambda_p_o will not be used for 1U BHE*/}
+        /* Pipe
+           Parameters
+         */
         ,
         {bhe_refrigerant_viscosity->getValue(vars),
          bhe_refrigerant_density->getValue(vars),

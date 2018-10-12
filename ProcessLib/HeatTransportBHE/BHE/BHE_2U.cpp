@@ -19,8 +19,8 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_2U::initialize()
     {
         tmp_u *= 0.5;
     }
-    // serially connected 2U BHE type does not to do anything. 
-    
+    // serially connected 2U BHE type does not to do anything.
+
     _u(0) = tmp_u;
     _u(1) = tmp_u;
     _u(2) = tmp_u;

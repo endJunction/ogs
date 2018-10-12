@@ -62,7 +62,6 @@ struct PipeParameters
      */
     double const lambda_p_o;
 };
-
 }  // namespace BHE
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
