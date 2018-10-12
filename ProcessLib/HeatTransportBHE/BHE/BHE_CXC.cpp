@@ -93,6 +93,7 @@ void BHE_CXC::calcThermalResistances()
         // Eq. 56
         _R_ff = _R_adv_i1 + _R_adv_a_o1 + _R_con_i1;
     }
+
     // Eq. 57
     if (extern_def_thermal_resistances.if_use_defined_therm_resis)
         _R_fog = extern_def_thermal_resistances.ext_Rfog;
@@ -109,7 +110,7 @@ void BHE_CXC::calcThermalResistances()
     {
         OGS_FATAL(
             "Error!!! Grout Thermal Resistance is an infinite number! The "
-            "simulation will be stopped! ");
+            "simulation will be stopped! \n");
     }
 }
 
@@ -127,7 +128,6 @@ void BHE_CXC::calcNusseltNum(double const Pr)
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
-    // double const& b_out = pipe_param.b_out;
 
     d_o1 = 2.0 * r_outer;
     d_i1 = 2.0 * r_inner;
@@ -200,7 +200,6 @@ void BHE_CXC::calcNusseltNum(double const Pr)
  */
 void BHE_CXC::calcRenoldsNumber()
 {
-    double d_i1, d_h;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
@@ -208,12 +207,12 @@ void BHE_CXC::calcRenoldsNumber()
     double const& rho_r = refrigerant_param.rho_r;
 
     // inner diameter of the pipeline
-    d_i1 = 2.0 * r_inner;
-    d_h = 2.0 * (r_outer - (r_inner + b_in));
+    double const d_i1 = 2.0 * r_inner;
+    double const d_h = 2.0 * (r_outer - (r_inner + b_in));
 
     // _u(0) is u_in, and _u(1) is u_out
-    _Re_o1 = _u(1) * d_h / (mu_r / rho_r);
-    _Re_i1 = _u(0) * d_i1 / (mu_r / rho_r);
+    _Re_o1 = reynoldsNumber(_u(1), d_h, mu_r, rho_r);
+    _Re_i1 = reynoldsNumber(_u(0), d_i1, mu_r, rho_r);
 }
 
 /**
@@ -409,12 +408,11 @@ double BHE_CXC::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const
     // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97.
 
     double exchange_coeff(0);
-
+    double const PHI = _PHI_fog;
     switch (idx_unknown)
     {
         case 0:
-            // PHI_fog
-            exchange_coeff = _PHI_fog;
+            exchange_coeff = PHI;
             break;
         case 1:
             // PHI_ff

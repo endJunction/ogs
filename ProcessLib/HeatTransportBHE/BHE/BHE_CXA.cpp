@@ -35,19 +35,19 @@ void BHE_CXA::calcThermalResistances()
     double chi;
     double _R_con_i1, _R_con_o1;
     double const& D = borehole_geometry.diameter;
-    double const& lambda_r = refrigerant_param.lambda_r;
-    double const& lambda_g = grout_param.lambda_g;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
     double const& b_out = pipe_param.b_out;
+    double const& lambda_r = refrigerant_param.lambda_r;
+    double const& lambda_g = grout_param.lambda_g;
     double const& lambda_p_i = pipe_param.lambda_p_i;
     double const& lambda_p_o = pipe_param.lambda_p_o;
 
     Nu_in = _Nu(0);
     Nu_out = _Nu(1);
-    d_o1 = 2.0 * (r_inner + b_in);
     d_i1 = 2.0 * r_outer;
+    d_o1 = 2.0 * (r_inner + b_in);
     d_h = 2.0 * (r_outer - (r_inner + b_in));
 
     constexpr double PI = boost::math::constants::pi<double>();
@@ -99,6 +99,7 @@ void BHE_CXA::calcThermalResistances()
         _R_fig = extern_def_thermal_resistances.ext_Rfig;
     else
         _R_fig = _R_adv_b_i1 + _R_con_i1 + _R_con_b;
+
     // thermal resistance due to grout-soil exchange
     if (extern_def_thermal_resistances.if_use_defined_therm_resis)
         _R_gs = extern_def_thermal_resistances.ext_Rgs;
@@ -155,9 +156,9 @@ void BHE_CXA::calcNusseltNum(double const Pr)
                  (1.0 + std::pow(d_o1 / L, 2.0 / 3.0));
     }
 
+    // then calculating Nu_in
     d_o1 = 2.0 * (r_inner + b_in);
     d_h = 2.0 * (r_outer - (r_inner + b_in));
-    // then calculating Nu_in
     if (_Re_i1 < 2300.0)
     {
         Nu_in = 3.66;
@@ -199,19 +200,19 @@ void BHE_CXA::calcNusseltNum(double const Pr)
  */
 void BHE_CXA::calcRenoldsNumber()
 {
-    double d_o1, d_h;
-    double const& mu_r = refrigerant_param.mu_r;
-    double const& rho_r = refrigerant_param.rho_r;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
+    double const& mu_r = refrigerant_param.mu_r;
+    double const& rho_r = refrigerant_param.rho_r;
 
-    d_o1 = 2.0 * r_inner;  // inner diameter of the pipeline
-    d_h = 2.0 * (r_outer - (r_inner + b_in));
+    // inner diameter of the pipeline
+    double const d_o1 = 2.0 * r_inner;
+    double const d_h = 2.0 * (r_outer - (r_inner + b_in));
 
     // _u(0) is u_in, and _u(1) is u_out
-    _Re_o1 = _u(1) * d_o1 / (mu_r / rho_r);
-    _Re_i1 = _u(0) * d_h / (mu_r / rho_r);
+    _Re_o1 = reynoldsNumber(_u(1), d_o1, mu_r, rho_r);
+    _Re_i1 = reynoldsNumber(_u(0), d_h, mu_r, rho_r);
 }
 
 /**
@@ -235,9 +236,9 @@ void BHE_CXA::calcPipeFlowVelocity()
     double const& b_in = pipe_param.b_in;
 
     constexpr double PI = boost::math::constants::pi<double>();
+    u_out = Q_r / (PI * r_inner * r_inner);
     u_in =
         Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));
-    u_out = Q_r / (PI * r_inner * r_inner);
 
     _u(0) = u_in;
     _u(1) = u_out;
@@ -368,8 +369,8 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXA::setRMatrices(
             R_matrix.block(2 * NumNodes, 0, NumNodes, NumNodes) +=
                 -1.0 * matBHE_loc_R;
 
-            R_matrix.block(0, 0, NumNodes,
-                           NumNodes) += 1.0 * matBHE_loc_R;  // K_i1
+            R_matrix.block(0, 0, NumNodes, NumNodes) +=
+                1.0 * matBHE_loc_R;  // K_i1
             R_matrix.block(2 * NumNodes,
                            2 * NumNodes,
                            NumNodes,
@@ -407,12 +408,11 @@ double BHE_CXA::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const
     // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97.
 
     double exchange_coeff(0);
-
+    double const PHI = _PHI_fig;
     switch (idx_unknown)
     {
         case 0:
-            // PHI_fig
-            exchange_coeff = _PHI_fig;
+            exchange_coeff = PHI;
             break;
         case 1:
             // PHI_ff
@@ -433,11 +433,11 @@ double BHE_CXA::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const
 
 double BHE_CXA::getTinByTout(double T_out, double current_time = -1.0)
 {
+    double const& rho_r = refrigerant_param.rho_r;
+    double const& heat_cap_r = refrigerant_param.heat_cap_r;
     double T_in(0.0);
     double power_tmp(0.0);
     double Q_r_tmp(0.0);
-    double const& rho_r = refrigerant_param.rho_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
 
     switch (this->boundary_type)
     {
