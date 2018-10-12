@@ -76,16 +76,15 @@ void HeatTransportBHEProcess::constructDofTable()
         std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
 
     //
-    // Soil nodes with temperature variable.
+    // Soil temperature variable defined on the whole mesh.
     //
-
-    // all the nodes of the mesh are the soil nodes.
     _mesh_subset_soil_nodes =
         std::make_unique<MeshLib::MeshSubset>(_mesh, _mesh.getNodes());
-
-    // Collect the mesh subsets in a vector.
-    // This is the soil temperature for first mesh subset.
     std::vector<MeshLib::MeshSubset> all_mesh_subsets{*_mesh_subset_soil_nodes};
+
+    std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
+    vec_var_elements.push_back(&(_mesh.getElements()));
+
     std::vector<int> vec_n_components{
         1};  // one component for the soil temperature variable.
 
@@ -133,8 +132,6 @@ void HeatTransportBHEProcess::constructDofTable()
         vec_n_components.push_back(vec_n_BHE_unknowns[i]);
     }
 
-    std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
-    vec_var_elements.push_back(&(_mesh.getElements()));
     for (int i = 0; i < n_BHEs; i++)
     {
         vec_var_elements.push_back(&_bheMeshData.BHE_elements[i]);
