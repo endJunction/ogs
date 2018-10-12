@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "MeshLib/PropertyVector.h"
 #include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
 
@@ -79,7 +81,7 @@ struct HeatTransportBHEProcessData
     Parameter<double> const& density_gas;
 
     MeshLib::PropertyVector<int> const* _mesh_prop_materialIDs = nullptr;
-    std::vector<std::size_t> _map_materialID_to_BHE_ID;
+    std::unordered_map<int, int> _map_materialID_to_BHE_ID;
 
     std::vector<std::unique_ptr<BHE::BHEAbstract>> _vec_BHE_property;
 };

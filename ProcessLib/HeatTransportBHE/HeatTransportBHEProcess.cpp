@@ -56,10 +56,7 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
         OGS_FATAL("Not able to get material IDs! ");
     }
     // create a map from a material ID to a BHE ID
-    auto max_BHE_mat_id =
-        std::max_element(material_ids->begin(), material_ids->end());
-    _process_data._map_materialID_to_BHE_ID.resize(*max_BHE_mat_id + 1);
-    for (std::size_t i = 0; i < _bheMeshData.BHE_mat_IDs.size(); i++)
+    for (int i = 0; i < static_cast<int>(_bheMeshData.BHE_mat_IDs.size()); i++)
     {
         // fill in the map structure
         _process_data._map_materialID_to_BHE_ID[_bheMeshData.BHE_mat_IDs[i]] =
