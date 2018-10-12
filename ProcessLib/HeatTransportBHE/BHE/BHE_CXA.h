@@ -179,11 +179,6 @@ public:
     void calcNusseltNum(double const Pr, std::pair<double, double> Re);
 
     /**
-     * Renolds number calculation
-     */
-    std::pair<double, double> calcRenoldsNumber() const;
-
-    /**
      * flow velocity inside the pipeline
      */
     void calcPipeFlowVelocity();

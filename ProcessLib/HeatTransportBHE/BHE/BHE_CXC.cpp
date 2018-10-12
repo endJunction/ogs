@@ -12,13 +12,35 @@
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
+namespace {
+std::pair<double, double> calcReynoldsNumber(
+    double const u_out, double const u_in, PipeParameters const& pipe_param,
+    RefrigerantParameters const& refrigerant_param)
+{
+    double const& r_outer = pipe_param.r_outer;
+    double const& r_inner = pipe_param.r_inner;
+    double const& b_in = pipe_param.b_in;
+    double const& mu_r = refrigerant_param.mu_r;
+    double const& rho_r = refrigerant_param.rho_r;
+
+    double const d_i = 2.0 * r_inner;
+    double const d_o = 2.0 * (r_outer - (r_inner + b_in));
+
+    double const Re_o1 = reynoldsNumber(u_out, d_o, mu_r, rho_r);
+    double const Re_i1 = reynoldsNumber(u_in, d_i, mu_r, rho_r);
+    return {Re_o1, Re_i1};
+}
+}  // namespace
+
 /**
  * calculate thermal resistance
  */
 void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 {
     calcPipeFlowVelocity();
-    auto const Re = calcRenoldsNumber();
+    // _u(0) is u_in, and _u(1) is u_out
+    auto const Re =
+        calcReynoldsNumber(_u(1), _u(0), pipe_param, refrigerant_param);
     double const Pr = prandtlNumber(refrigerant_param.mu_r,
                        refrigerant_param.heat_cap_r,
                        refrigerant_param.lambda_r);
@@ -197,27 +219,6 @@ void BHE_CXC::calcNusseltNum(double const Pr,
     // _Nu(0) is Nu_in, and _Nu(1) is Nu_out
     _Nu(0) = Nu_in;
     _Nu(1) = Nu_out;
-}
-
-/**
- * Renolds number calculation
- */
-std::pair<double, double> BHE_CXC::calcRenoldsNumber() const
-{
-    double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-    double const& b_in = pipe_param.b_in;
-    double const& mu_r = refrigerant_param.mu_r;
-    double const& rho_r = refrigerant_param.rho_r;
-
-    // inner diameter of the pipeline
-    double const d_i1 = 2.0 * r_inner;
-    double const d_h = 2.0 * (r_outer - (r_inner + b_in));
-
-    // _u(0) is u_in, and _u(1) is u_out
-    double const Re_o1 = reynoldsNumber(_u(1), d_h, mu_r, rho_r);
-    double const Re_i1 = reynoldsNumber(_u(0), d_i1, mu_r, rho_r);
-    return {Re_o1, Re_i1};
 }
 
 /**
