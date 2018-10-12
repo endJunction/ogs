@@ -146,80 +146,24 @@ void BHE_CXC::calcThermalResistances()
 void BHE_CXC::calcNusseltNum(double const Pr,
                              std::pair<double, double> const Re)
 {
-    double const& Re_o1 = Re.first;
-    double const& Re_i1 = Re.second;
-
     // see Eq. 32 in Diersch_2011_CG
-
-    double Nu_in(0.0), Nu_out(0.0);
-    double gamma, xi;
-    double d_o1, d_i1, d_h;
     double const& L = borehole_geometry.length;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
 
-    d_o1 = 2.0 * r_outer;
-    d_i1 = 2.0 * r_inner;
 
     // first calculating Nu_in
-    if (Re_i1 < 2300.0)
-    {
-        Nu_in = 4.364;
-    }
-    else if (Re_i1 >= 2300.0 && Re_i1 < 10000.0)
-    {
-        gamma = (Re_i1 - 2300) / (10000 - 2300);
-
-        Nu_in = (1.0 - gamma) * 4.364;
-        Nu_in += gamma * ((0.0308 / 8.0 * 1.0e4 * Pr) /
-                          (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
-                                     (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
-                          (1.0 + std::pow(d_i1 / L, 2.0 / 3.0)));
-    }
-    else if (Re_i1 > 10000.0)
-    {
-        xi = pow(1.8 * std::log10(Re_i1) - 1.5, -2.0);
-        Nu_in = (xi / 8.0 * Re_i1 * Pr) /
-                (1.0 +
-                 12.7 * std::sqrt(xi / 8.0) * (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
-                (1.0 + std::pow(d_i1 / L, 2.0 / 3.0));
-    }
+    double const& Re_i1 = Re.second;
+    double const Nu_in = nusseltNumber(Re_i1, Pr, 2 * r_inner, L);
 
     // then calculating Nu_out
-    d_i1 = 2.0 * (r_inner + b_in);
-    d_h = d_o1 - d_i1;
-    if (Re_o1 < 2300.0)
-    {
-        Nu_out = 3.66;
-        Nu_out += (4.0 - 0.102 / (d_i1 / d_o1 + 0.02)) * pow(d_i1 / d_o1, 0.04);
-    }
-    else if (Re_o1 >= 2300.0 && Re_o1 < 10000.0)
-    {
-        gamma = (Re_o1 - 2300) / (10000 - 2300);
+    double const& Re_o1 = Re.first;
 
-        Nu_out = (1.0 - gamma) * (3.66 + (4.0 - 0.102 / (d_i1 / d_o1 + 0.02))) *
-                 pow(d_i1 / d_o1, 0.04);
-        Nu_out += gamma * ((0.0308 / 8.0 * 1.0e4 * Pr) /
-                           (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
-                                      (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
-                           (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
-                           ((0.86 * std::pow(d_i1 / d_o1, 0.84) + 1.0 -
-                             0.14 * std::pow(d_i1 / d_o1, 0.6)) /
-                            (1.0 + d_i1 / d_o1)));
-    }
-    else if (Re_o1 > 10000.0)
-    {
-        xi = pow(1.8 * std::log10(Re_o1) - 1.5, -2.0);
-        Nu_out = (xi / 8.0 * Re_o1 * Pr) /
-                 (1.0 + 12.7 * std::sqrt(xi / 8.0) *
-                            (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
-                 (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
-                 ((0.86 * std::pow(d_i1 / d_o1, 0.84) + 1.0 -
-                   0.14 * std::pow(d_i1 / d_o1, 0.6)) /
-                  (1.0 + d_i1 / d_o1));
-    }
-
+    double const diameter_ratio = (r_inner + b_in) / r_outer;
+    double const pipe_aspect_ratio = (2 * r_outer - 2 * (r_inner + b_in)) / L;
+    double const Nu_out =
+        nusseltNumberAnnulus(Re_o1, Pr, diameter_ratio, pipe_aspect_ratio);
     // _Nu(0) is Nu_in, and _Nu(1) is Nu_out
     _Nu(0) = Nu_in;
     _Nu(1) = Nu_out;
