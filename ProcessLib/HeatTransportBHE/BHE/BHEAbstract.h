@@ -252,7 +252,7 @@ public:
         else if (Re > 10000.0)
         {
             xi = pow(1.8 * std::log10(Re) - 1.5, -2.0);
-            tmp_Nu = (xi / 8.0 * Re * Re) /
+            tmp_Nu = (xi / 8.0 * Re * Pr) /
                      (1.0 + 12.7 * std::sqrt(xi / 8.0) *
                                 (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                      (1.0 + std::pow(pipe_diameter / pipe_length, 2.0 / 3.0));
