@@ -37,10 +37,14 @@ std::pair<double, double> calcReynoldsNumber(
  */
 void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 {
-    calcPipeFlowVelocity();
-    // _u(0) is u_in, and _u(1) is u_out
+    double const u_in = pipeFlowVelocity(Q_r, pipe_param.r_inner);
+    double const u_out = annulusFlowVelocity(
+        Q_r, pipe_param.r_outer, pipe_param.r_inner + pipe_param.b_in);
+    _u(0) = u_in;
+    _u(1) = u_out;
+
     auto const Re =
-        calcReynoldsNumber(_u(1), _u(0), pipe_param, refrigerant_param);
+        calcReynoldsNumber(u_out, u_in, pipe_param, refrigerant_param);
     double const Pr = prandtlNumber(refrigerant_param.mu_r,
                        refrigerant_param.heat_cap_r,
                        refrigerant_param.lambda_r);
@@ -229,25 +233,6 @@ void BHE_CXC::calcHeatTransferCoefficients()
     _PHI_fog = 1.0 / _R_fog;
     _PHI_ff = 1.0 / _R_ff;
     _PHI_gs = 1.0 / _R_gs;
-}
-
-/**
- * flow velocity inside the pipeline
- */
-void BHE_CXC::calcPipeFlowVelocity()
-{
-    double u_in, u_out;
-    double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-    double const& b_in = pipe_param.b_in;
-
-    constexpr double PI = boost::math::constants::pi<double>();
-    u_in = pipeFlowVelocity(Q_r, r_inner);
-    u_out =
-        Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));
-
-    _u(0) = u_in;
-    _u(1) = u_out;
 }
 
 double BHE_CXC::getMassCoeff(std::size_t idx_unknown) const

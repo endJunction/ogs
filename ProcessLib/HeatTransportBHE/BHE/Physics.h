@@ -26,6 +26,14 @@ inline double pipeFlowVelocity(double const& flow_rate,
     return flow_rate / (pi * pipe_radius * pipe_radius);
 }
 
+// Flow velocity in circular annulus defined by r_inner and r_outer.
+inline double annulusFlowVelocity(double const flow_rate, double const r_outer,
+                                  double const r_inner)
+{
+    constexpr double pi = boost::math::constants::pi<double>();
+    return flow_rate / (pi * (r_outer * r_outer - r_inner * r_inner));
+}
+
 inline double prandtlNumber(double const& viscosity,
                             double const& heat_capacity,
                             double const& heat_conductivity)

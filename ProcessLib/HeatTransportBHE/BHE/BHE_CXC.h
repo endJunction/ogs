@@ -180,11 +180,6 @@ public:
     void calcNusseltNum(double Pr, std::pair<double, double> Re);
 
     /**
-     * flow velocity inside the pipeline
-     */
-    void calcPipeFlowVelocity();
-
-    /**
      * calculate heat transfer coefficient
      */
     void calcHeatTransferCoefficients();
