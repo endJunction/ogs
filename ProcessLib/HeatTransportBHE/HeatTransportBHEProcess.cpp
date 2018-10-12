@@ -98,7 +98,8 @@ void HeatTransportBHEProcess::constructDofTable()
     for (unsigned i = 0; i < _bheMeshData.BHE_nodes.size(); i++)
     {
         _mesh_subset_BHE_nodes.push_back(
-            std::make_unique<MeshLib::MeshSubset const>(_mesh, _bheMeshData.BHE_nodes[i]));
+            std::make_unique<MeshLib::MeshSubset const>(
+                _mesh, _bheMeshData.BHE_nodes[i]));
         int n_BHE_unknowns =
             _process_data._vec_BHE_property[i]->getNumUnknowns();
         vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);

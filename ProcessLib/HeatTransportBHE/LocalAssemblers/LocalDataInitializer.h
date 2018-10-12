@@ -120,7 +120,8 @@ namespace HeatTransportBHE
 template <typename LocalAssemblerInterface,
           template <typename, typename, int> class LocalAssemblerDataSoil,
           template <typename, typename, int> class LocalAssemblerDataBHE,
-          int GlobalDim, typename... ConstructorArgs>
+          int GlobalDim,
+          typename... ConstructorArgs>
 class LocalDataInitializer final
 {
 public:
@@ -262,14 +263,14 @@ private:
 
     // local assembler builder implementations.
     template <typename ShapeFunction>
-    using LADataSoil =
-        LocalAssemblerDataSoil<ShapeFunction, IntegrationMethod<ShapeFunction>,
-                               GlobalDim>;
+    using LADataSoil = LocalAssemblerDataSoil<ShapeFunction,
+                                              IntegrationMethod<ShapeFunction>,
+                                              GlobalDim>;
 
     template <typename ShapeFunction>
-    using LADataBHE =
-        LocalAssemblerDataBHE<ShapeFunction, IntegrationMethod<ShapeFunction>,
-                              GlobalDim>;
+    using LADataBHE = LocalAssemblerDataBHE<ShapeFunction,
+                                            IntegrationMethod<ShapeFunction>,
+                                            GlobalDim>;
     /// A helper forwarding to the correct version of makeLocalAssemblerBuilder
     /// depending whether the global dimension is less than the shape function's
     /// dimension or not.
@@ -277,8 +278,10 @@ private:
     static LADataBuilder makeLocalAssemblerBuilder()
     {
         return makeLocalAssemblerBuilder<ShapeFunction>(
-            static_cast<std::integral_constant<
-                bool, (GlobalDim >= ShapeFunction::DIM)>*>(nullptr));
+            static_cast<
+                std::integral_constant<bool,
+                                       (GlobalDim >= ShapeFunction::DIM)>*>(
+                nullptr));
     }
 
     /// Mapping of element types to local assembler constructors.

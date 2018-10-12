@@ -32,7 +32,8 @@ public:
     getKnownSolutions(double const t, GlobalVector const& x) const
     {
         auto const n_bcs = _boundary_conditions.size();
-        for (std::size_t i=0; i<n_bcs; ++i) {
+        for (std::size_t i = 0; i < n_bcs; ++i)
+        {
             auto const& bc = *_boundary_conditions[i];
             auto& dirichlet_storage = _dirichlet_bcs[i];
             bc.getEssentialBCValues(t, x, dirichlet_storage);
@@ -60,10 +61,9 @@ public:
     }
 
 private:
-    mutable std::vector<NumLib::IndexValueVector<GlobalIndexType>> _dirichlet_bcs;
+    mutable std::vector<NumLib::IndexValueVector<GlobalIndexType>>
+        _dirichlet_bcs;
     std::vector<std::unique_ptr<BoundaryCondition>> _boundary_conditions;
     std::vector<std::unique_ptr<ParameterBase>> const& _parameters;
 };
-
-
-}  // ProcessLib
+}  // namespace ProcessLib

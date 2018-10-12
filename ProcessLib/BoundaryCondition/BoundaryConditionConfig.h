@@ -36,5 +36,4 @@ struct BoundaryConditionConfig final
     MeshLib::Mesh const& boundary_mesh;
     boost::optional<int> const component_id;
 };
-
-}  // ProcessLib
+}  // namespace ProcessLib

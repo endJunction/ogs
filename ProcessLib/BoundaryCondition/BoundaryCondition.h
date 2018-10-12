@@ -21,7 +21,7 @@ namespace NumLib
 class LocalToGlobalIndexMap;
 template <typename>
 struct IndexValueVector;
-}
+}  // namespace NumLib
 
 namespace ProcessLib
 {
@@ -58,5 +58,4 @@ public:
 
     virtual ~BoundaryCondition() = default;
 };
-
-}  // ProcessLib
+}  // namespace ProcessLib
