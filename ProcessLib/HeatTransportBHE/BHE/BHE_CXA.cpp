@@ -242,7 +242,7 @@ void BHE_CXA::calcPipeFlowVelocity()
     double const& b_in = pipe_param.b_in;
 
     constexpr double PI = boost::math::constants::pi<double>();
-    u_out = Q_r / (PI * r_inner * r_inner);
+    u_out = pipeFlowVelocity(Q_r, r_inner);
     u_in =
         Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));
 
