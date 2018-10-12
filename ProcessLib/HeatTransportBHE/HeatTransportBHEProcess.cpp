@@ -96,29 +96,27 @@ void HeatTransportBHEProcess::constructDofTable()
     assert(n_BHEs == static_cast<int>(_bheMeshData.BHE_nodes.size()));
     assert(n_BHEs == static_cast<int>(_bheMeshData.BHE_elements.size()));
 
-    std::vector<int> vec_n_BHE_unknowns;
-    vec_n_BHE_unknowns.reserve(n_BHEs);
     // the BHE nodes need to be cherry-picked from the vector
     for (int i = 0; i < n_BHEs; i++)
     {
-        _mesh_subset_BHE_nodes.push_back(
-            std::make_unique<MeshLib::MeshSubset const>(
-                _mesh, _bheMeshData.BHE_nodes[i]));
-        int n_BHE_unknowns =
+        auto const number_of_unknowns =
             _process_data._vec_BHE_property[i]->getNumUnknowns();
-        vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
+        auto const& bhe_nodes = _bheMeshData.BHE_nodes[i];
+        auto const& bhe_elements = _bheMeshData.BHE_elements[i];
 
         // All the BHE nodes have additional variables.
-        auto const& ms = _mesh_subset_BHE_nodes[i];
-        std::generate_n(std::back_inserter(all_mesh_subsets),
-                        // Here the number of components equals to
-                        // the number of unknowns on the BHE
-                        vec_n_BHE_unknowns[i],
-                        [&]() { return *ms; });
-        // Here the number of components equals to
-        // the number of unknowns on the BHE
-        vec_n_components.push_back(vec_n_BHE_unknowns[i]);
-        vec_var_elements.push_back(&_bheMeshData.BHE_elements[i]);
+        _mesh_subset_BHE_nodes.push_back(
+            std::make_unique<MeshLib::MeshSubset const>(_mesh, bhe_nodes));
+
+        std::generate_n(
+            std::back_inserter(all_mesh_subsets),
+            // Here the number of components equals to the
+            // number of unknowns on the BHE
+            number_of_unknowns,
+            [& ms = _mesh_subset_BHE_nodes.back()]() { return *ms; });
+
+        vec_n_components.push_back(number_of_unknowns);
+        vec_var_elements.push_back(&bhe_elements);
     }
 
     _local_to_global_index_map =
