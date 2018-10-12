@@ -379,11 +379,6 @@ protected:
     double Q_r;
 
     /**
-     * Reynolds number
-     */
-    double Re;
-
-    /**
      * Prandtl number
      */
     double Pr;
