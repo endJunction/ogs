@@ -176,7 +176,7 @@ public:
     /**
      * Nusselt number calculation
      */
-    void calcNusseltNum();
+    void calcNusseltNum(double const Pr);
 
     /**
      * Renolds number calculation

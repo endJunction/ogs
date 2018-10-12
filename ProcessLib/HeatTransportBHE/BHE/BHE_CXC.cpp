@@ -19,11 +19,11 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 {
     calcPipeFlowVelocity();
     calcRenoldsNumber();
-    Pr = prandtlNumber(refrigerant_param.mu_r,
+    double const Pr = prandtlNumber(refrigerant_param.mu_r,
                        refrigerant_param.heat_cap_r,
                        refrigerant_param.lambda_r);
 
-    calcNusseltNum();
+    calcNusseltNum(Pr);
     calcThermalResistances();
     calcHeatTransferCoefficients();
 }
@@ -116,7 +116,7 @@ void BHE_CXC::calcThermalResistances()
 /**
  * Nusselt number calculation
  */
-void BHE_CXC::calcNusseltNum()
+void BHE_CXC::calcNusseltNum(double const Pr)
 {
     // see Eq. 32 in Diersch_2011_CG
 

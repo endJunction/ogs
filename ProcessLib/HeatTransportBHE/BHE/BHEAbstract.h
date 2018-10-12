@@ -379,11 +379,6 @@ protected:
     double Q_r;
 
     /**
-     * Prandtl number
-     */
-    double Pr;
-
-    /**
      * pipe distance
      */
     double omega;
