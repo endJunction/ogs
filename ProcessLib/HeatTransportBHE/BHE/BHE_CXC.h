@@ -156,6 +156,8 @@ public:
      */
     std::size_t getNumUnknowns() const { return 3; }
 
+    void initialize();
+
     void updateFlowRateFromCurve(double current_time)
     {
         if (use_flowrate_curve)
@@ -179,12 +181,7 @@ public:
     /**
      * Renolds number calculation
      */
-    void calcRenoldsNum();
-
-    /**
-     * Prandtl number calculation
-     */
-    void calcPrandtlNum();
+    void calcRenoldsNumber();
 
     /**
      * flow velocity inside the pipeline
@@ -291,22 +288,6 @@ private:
      * Reynolds number
      */
     double _Re_o1, _Re_i1;
-
-    /**
-     * Prandtl number
-     */
-    double _Pr;
-
-    /**
-     * Nusselt number
-     */
-    Eigen::Vector2d _Nu;
-
-    /**
-     * flow velocity inside the pipeline
-     */
-    Eigen::Vector2d _u;
-
     /**
      * specific exchange surfaces S
      */
@@ -315,6 +296,14 @@ private:
      * cross section area
      */
     double CSA_i, CSA_o, CSA_g;
+    /**
+     * Nusselt number
+     */
+    Eigen::Vector2d _Nu;
+    /**
+     * flow velocity inside the pipeline
+     */
+    Eigen::Vector2d _u;
 };
 }  // namespace BHE
 }  // namespace HeatTransportBHE

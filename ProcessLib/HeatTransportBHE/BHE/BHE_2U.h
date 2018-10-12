@@ -167,6 +167,8 @@ public:
      */
     std::size_t getNumUnknowns() const { return 8; }
 
+    void initialize();
+
     void updateFlowRateFromCurve(double current_time)
     {
         if (use_flowrate_curve)
@@ -181,26 +183,6 @@ public:
      * calculate thermal resistance
      */
     void calcThermalResistances();
-
-    /**
-     * Nusselt number calculation
-     */
-    void calcNusseltNum();
-
-    /**
-     * Renolds number calculation
-     */
-    void calcRenoldsNum();
-
-    /**
-     * Prandtl number calculation
-     */
-    void calcPrandtlNum();
-
-    /**
-     * flow velocity inside the pipeline
-     */
-    void calcPipeFlowVelocity();
 
     /**
      * calculate heat transfer coefficient
@@ -309,34 +291,9 @@ private:
     double _PHI_fig, _PHI_fog, _PHI_gg_1, _PHI_gg_2, _PHI_gs;
 
     /**
-     * Reynolds number
-     */
-    double _Re;
-
-    /**
-     * Prandtl number
-     */
-    double _Pr;
-
-    /**
-     * Nusselt number
-     */
-    Eigen::Vector4d _Nu;
-
-    /**
-     * flow velocity inside the pipeline
-     */
-    Eigen::Vector4d _u;
-
-    /**
      * discharge type of the 2U BHE
      */
     const BHE_DISCHARGE_TYPE _discharge_type;
-
-    /**
-     * pipe distance
-     */
-    double omega;
 
     /**
      * specific exchange surfaces S
@@ -346,6 +303,14 @@ private:
      * cross section area
      */
     double CSA_i, CSA_o, CSA_g1, CSA_g2;
+    /**
+     * Nusselt number
+     */
+    Eigen::Vector4d _Nu;
+    /**
+     * flow velocity inside the pipeline
+     */
+    Eigen::Vector4d _u;
 };
 }  // namespace BHE
 }  // namespace HeatTransportBHE

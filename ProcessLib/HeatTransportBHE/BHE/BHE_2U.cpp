@@ -11,6 +11,43 @@
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
+void ProcessLib::HeatTransportBHE::BHE::BHE_2U::initialize()
+{
+    double tmp_u = calcPipeFlowVelocity(Q_r, 2.0 * pipe_param.r_inner);
+    // depending on whether it is parallel or serially connected
+    if (_discharge_type == BHE_DISCHARGE_TYPE::BHE_DISCHARGE_TYPE_PARALLEL)
+    {
+        tmp_u *= 0.5;
+    }
+    // serially connected 2U BHE type does not to do anything. 
+    
+    _u(0) = tmp_u;
+    _u(1) = tmp_u;
+    _u(2) = tmp_u;
+    _u(3) = tmp_u;
+
+    // calculate Renolds number
+    Re = calcRenoldsNumber(std::abs(_u(0)),
+                           2.0 * pipe_param.r_inner,
+                           refrigerant_param.mu_r,
+                           refrigerant_param.rho_r);
+    // calculate Prandtl number
+    Pr = calcPrandtlNumber(refrigerant_param.mu_r,
+                           refrigerant_param.heat_cap_r,
+                           refrigerant_param.lambda_r);
+
+    // calculate Nusselt number
+    double tmp_Nu =
+        calcNusseltNumber(2.0 * pipe_param.r_inner, borehole_geometry.length);
+    _Nu(0) = tmp_Nu;
+    _Nu(1) = tmp_Nu;
+    _Nu(2) = tmp_Nu;
+    _Nu(3) = tmp_Nu;
+
+    calcThermalResistances();
+    calcHeatTransferCoefficients();
+}
+
 /**
  * calculate thermal resistance
  */
@@ -171,80 +208,6 @@ void BHE_2U::calcThermalResistances()
 }
 
 /**
- * Nusselt number calculation
- */
-void BHE_2U::calcNusseltNum()
-{
-    // see Eq. 32 in Diersch_2011_CG
-
-    double tmp_Nu = 0.0;
-    double gamma, xi;
-    double d;
-    double const& L = borehole_geometry.length;
-    // double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-
-    d = 2.0 * r_inner;
-
-    if (_Re < 2300.0)
-    {
-        tmp_Nu = 4.364;
-    }
-    else if (_Re >= 2300.0 && _Re < 10000.0)
-    {
-        gamma = (_Re - 2300) / (10000 - 2300);
-
-        tmp_Nu = (1.0 - gamma) * 4.364;
-        tmp_Nu += gamma * ((0.0308 / 8.0 * 1.0e4 * _Pr) /
-                           (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
-                                      (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
-                           (1.0 + std::pow(d / L, 2.0 / 3.0)));
-    }
-    else if (_Re > 10000.0)
-    {
-        xi = pow(1.8 * std::log10(_Re) - 1.5, -2.0);
-        tmp_Nu = (xi / 8.0 * _Re * _Pr) /
-                 (1.0 + 12.7 * std::sqrt(xi / 8.0) *
-                            (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
-                 (1.0 + std::pow(d / L, 2.0 / 3.0));
-    }
-
-    _Nu(0) = tmp_Nu;
-    _Nu(1) = tmp_Nu;
-    _Nu(2) = tmp_Nu;
-    _Nu(3) = tmp_Nu;
-}
-
-/**
- * Renolds number calculation
- */
-void BHE_2U::calcRenoldsNum()
-{
-    double u_norm, d;
-    double const& mu_r = refrigerant_param.mu_r;
-    double const& rho_r = refrigerant_param.rho_r;
-    // double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-
-    u_norm = _u.norm();
-    d = 2.0 * r_inner;  // inner diameter of the pipeline
-
-    _Re = u_norm * d / (mu_r / rho_r);
-}
-
-/**
- * Prandtl number calculation
- */
-void BHE_2U::calcPrandtlNum()
-{
-    double const& mu_r = refrigerant_param.mu_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    double const& lambda_r = refrigerant_param.lambda_r;
-
-    _Pr = mu_r * heat_cap_r / lambda_r;
-}
-
-/**
  * calculate heat transfer coefficient
  */
 void BHE_2U::calcHeatTransferCoefficients()
@@ -254,31 +217,6 @@ void BHE_2U::calcHeatTransferCoefficients()
     _PHI_gg_1 = 1.0 / _R_gg_1;
     _PHI_gg_2 = 1.0 / _R_gg_2;
     _PHI_gs = 1.0 / _R_gs;
-}
-
-/**
- * flow velocity inside the pipeline
- */
-void BHE_2U::calcPipeFlowVelocity()
-{
-    double tmp_u;
-    // double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-
-    // which discharge type it is?
-    if (_discharge_type == BHE_DISCHARGE_TYPE::BHE_DISCHARGE_TYPE_PARALLEL)
-    {
-        tmp_u = Q_r / (2.0 * PI * r_inner * r_inner);
-    }
-    else  // serial discharge type
-    {
-        tmp_u = Q_r / (PI * r_inner * r_inner);
-    }
-
-    _u(0) = tmp_u;
-    _u(1) = tmp_u;
-    _u(2) = tmp_u;
-    _u(3) = tmp_u;
 }
 
 double BHE_2U::getMassCoeff(std::size_t idx_unknown) const
@@ -649,7 +587,6 @@ double BHE_2U::getTinByTout(double T_out, double current_time = -1.0)
             T_in = T_out + delta_T_val;
             break;
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY:
-            // TODO
             OGS_FATAL(
                 "BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT feature has not been "
                 "implemented for BHE_2U yet. ");

@@ -14,6 +14,19 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
 /**
  * calculate thermal resistance
  */
+void ProcessLib::HeatTransportBHE::BHE::BHE_CXA::initialize()
+{
+    calcPipeFlowVelocity();
+    calcRenoldsNumber();
+    Pr = calcPrandtlNumber(refrigerant_param.mu_r,
+                           refrigerant_param.heat_cap_r,
+                           refrigerant_param.lambda_r);
+
+    calcNusseltNum(); 
+    calcThermalResistances();
+    calcHeatTransferCoefficients();
+}
+
 void BHE_CXA::calcThermalResistances()
 {
     double Nu_in, Nu_out;
@@ -126,17 +139,17 @@ void BHE_CXA::calcNusseltNum()
         gamma = (_Re_o1 - 2300) / (10000 - 2300);
 
         Nu_out = (1.0 - gamma) * 4.364;
-        Nu_out += gamma * ((0.0308 / 8.0 * 1.0e4 * _Pr) /
+        Nu_out += gamma * ((0.0308 / 8.0 * 1.0e4 * Pr) /
                            (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
-                                      (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                                      (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                            (1.0 + std::pow(d_o1 / L, 2.0 / 3.0)));
     }
     else if (_Re_o1 > 10000.0)
     {
         xi = pow(1.8 * std::log10(_Re_o1) - 1.5, -2.0);
-        Nu_out = (xi / 8.0 * _Re_o1 * _Pr) /
+        Nu_out = (xi / 8.0 * _Re_o1 * Pr) /
                  (1.0 + 12.7 * std::sqrt(xi / 8.0) *
-                            (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                            (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                  (1.0 + std::pow(d_o1 / L, 2.0 / 3.0));
     }
 
@@ -154,9 +167,9 @@ void BHE_CXA::calcNusseltNum()
 
         Nu_in = (1.0 - gamma) * (3.66 + (4.0 - 0.102 / (d_i1 / d_o1 + 0.02))) *
                 pow(d_i1 / d_o1, 0.04);
-        Nu_in += gamma * ((0.0308 / 8.0 * 1.0e4 * _Pr) /
+        Nu_in += gamma * ((0.0308 / 8.0 * 1.0e4 * Pr) /
                           (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
-                                     (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                                     (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                           (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
                           ((0.86 * std::pow(d_i1 / d_o1, 0.84) + 1.0 -
                             0.14 * std::pow(d_i1 / d_o1, 0.6)) /
@@ -165,9 +178,9 @@ void BHE_CXA::calcNusseltNum()
     else if (_Re_i1 > 10000.0)
     {
         xi = pow(1.8 * std::log10(_Re_i1) - 1.5, -2.0);
-        Nu_in = (xi / 8.0 * _Re_i1 * _Pr) /
+        Nu_in = (xi / 8.0 * _Re_i1 * Pr) /
                 (1.0 + 12.7 * std::sqrt(xi / 8.0) *
-                           (std::pow(_Pr, 2.0 / 3.0) - 1.0)) *
+                           (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                 (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
                 ((0.86 * std::pow(d_o1 / d_i1, 0.84) + 1.0 -
                   0.14 * std::pow(d_o1 / d_i1, 0.6)) /
@@ -182,7 +195,7 @@ void BHE_CXA::calcNusseltNum()
 /**
  * Renolds number calculation
  */
-void BHE_CXA::calcRenoldsNum()
+void BHE_CXA::calcRenoldsNumber()
 {
     double d_o1, d_h;
     double const& mu_r = refrigerant_param.mu_r;
@@ -197,18 +210,6 @@ void BHE_CXA::calcRenoldsNum()
     // _u(0) is u_in, and _u(1) is u_out
     _Re_o1 = _u(1) * d_o1 / (mu_r / rho_r);
     _Re_i1 = _u(0) * d_h / (mu_r / rho_r);
-}
-
-/**
- * Prandtl number calculation
- */
-void BHE_CXA::calcPrandtlNum()
-{
-    double const& mu_r = refrigerant_param.mu_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    double const& lambda_r = refrigerant_param.lambda_r;
-
-    _Pr = mu_r * heat_cap_r / lambda_r;
 }
 
 /**

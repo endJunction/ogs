@@ -184,15 +184,7 @@ public:
      * initialization calcultion,
      * need to be overwritten.
      */
-    virtual void initialize()
-    {
-        calcPipeFlowVelocity();
-        calcRenoldsNum();
-        calcPrandtlNum();
-        calcNusseltNum();
-        calcThermalResistances();
-        calcHeatTransferCoefficients();
-    };
+    virtual void initialize() = 0;
 
     /**
      * update all parameters based on the new flow rate
@@ -201,12 +193,7 @@ public:
     virtual void updateFlowRate(double new_flow_rate)
     {
         Q_r = new_flow_rate;
-        calcPipeFlowVelocity();
-        calcRenoldsNum();
-        calcPrandtlNum();
-        calcNusseltNum();
-        calcThermalResistances();
-        calcHeatTransferCoefficients();
+        initialize(); 
     };
 
     virtual void updateFlowRateFromCurve(double current_time) = 0;
@@ -218,28 +205,60 @@ public:
     virtual void calcThermalResistances() = 0;
 
     /**
-     * Nusselt number calculation,
-     * need to be overwritten.
-     */
-    virtual void calcNusseltNum() = 0;
-
-    /**
-     * Renolds number calculation,
-     * need to be overwritten.
-     */
-    virtual void calcRenoldsNum() = 0;
-
-    /**
-     * Prandtl number calculation,
-     * need to be overwritten.
-     */
-    virtual void calcPrandtlNum() = 0;
-
-    /**
      * flow velocity inside the pipeline
-     * need to be overwritten.
      */
-    virtual void calcPipeFlowVelocity() = 0;
+    double calcPipeFlowVelocity(double const& flow_rate,
+                                double const& pipe_diameter) {
+        return 4.0 * flow_rate / (PI * pipe_diameter * pipe_diameter);
+    }
+
+    double calcPrandtlNumber(double const& viscosity,
+                             double const& heat_capacity,
+                             double const& heat_conductivity)
+    {
+        return viscosity * heat_capacity / heat_conductivity;
+    }
+
+    double calcRenoldsNumber(double const velocity_norm,
+                             double const pipe_diameter,
+                             double const viscosity,
+                             double const density)
+    {
+        return velocity_norm * pipe_diameter / (viscosity / density);
+    };
+    double calcNusseltNumber(double const pipe_diameter,
+                             double const pipe_length)
+    {
+        double tmp_Nu(0.0);
+        double gamma(0.0), xi(0.0);
+
+        if (Re < 2300.0)
+        {
+            tmp_Nu = 4.364;
+        }
+        else if (Re >= 2300.0 && Re < 10000.0)
+        {
+            gamma = (Re - 2300) / (10000 - 2300);
+
+            tmp_Nu = (1.0 - gamma) * 4.364;
+            tmp_Nu +=
+                gamma *
+                ((0.0308 / 8.0 * 1.0e4 * Pr) /
+                 (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
+                            (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
+                 (1.0 + std::pow(pipe_diameter / pipe_length, 2.0 / 3.0)));
+        }
+        else if (Re > 10000.0)
+        {
+            xi = pow(1.8 * std::log10(Re) - 1.5, -2.0);
+            tmp_Nu = (xi / 8.0 * Re * Re) /
+                     (1.0 + 12.7 * std::sqrt(xi / 8.0) *
+                                (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
+                     (1.0 + std::pow(pipe_diameter / pipe_length, 2.0 / 3.0));
+        }
+
+        return tmp_Nu;
+    };
 
     /**
      * heat transfer coefficient,
@@ -271,7 +290,8 @@ public:
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.
      */
-    virtual double getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const = 0;
+    virtual double getBoundaryHeatExchangeCoeff(
+        std::size_t idx_unknown) const = 0;
 
     /**
      * return the inflow temperature based on outflow temperature and fixed
@@ -416,6 +436,21 @@ protected:
     double Q_r;
 
     const double PI;
+
+    /**
+     * Reynolds number
+     */
+    double Re;
+
+    /**
+     * Prandtl number
+     */
+    double Pr;
+
+    /**
+     * pipe distance
+     */
+    double omega;
 };
 }  // end of namespace BHE
 }  // end of namespace HeatTransportBHE
