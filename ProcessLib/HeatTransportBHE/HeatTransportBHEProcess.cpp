@@ -92,10 +92,15 @@ void HeatTransportBHEProcess::constructDofTable()
     //
     // BHE nodes with BHE type dependend number of variables.
     //
+    int const n_BHEs = _process_data._vec_BHE_property.size();
+    assert(n_BHEs == static_cast<int>(_bheMeshData.BHE_mat_IDs.size()));
+    assert(n_BHEs == static_cast<int>(_bheMeshData.BHE_nodes.size()));
+    assert(n_BHEs == static_cast<int>(_bheMeshData.BHE_elements.size()));
+
     std::vector<int> vec_n_BHE_unknowns;
-    vec_n_BHE_unknowns.reserve(_bheMeshData.BHE_nodes.size());
+    vec_n_BHE_unknowns.reserve(n_BHEs);
     // the BHE nodes need to be cherry-picked from the vector
-    for (unsigned i = 0; i < _bheMeshData.BHE_nodes.size(); i++)
+    for (int i = 0; i < n_BHEs; i++)
     {
         _mesh_subset_BHE_nodes.push_back(
             std::make_unique<MeshLib::MeshSubset const>(
@@ -107,8 +112,11 @@ void HeatTransportBHEProcess::constructDofTable()
 
     // All the BHE nodes have additinal variables
     std::size_t count = 0;
-    for (auto& ms : _mesh_subset_BHE_nodes)
+
+    assert(n_BHEs == static_cast<int>(_mesh_subset_BHE_nodes.size()));
+    for (int i = 0; i < n_BHEs; i++)
     {
+        auto const& ms = _mesh_subset_BHE_nodes[i];
         std::generate_n(std::back_inserter(all_mesh_subsets),
                         // Here the number of components equals to
                         // the number of unknowns on the BHE
@@ -118,7 +126,7 @@ void HeatTransportBHEProcess::constructDofTable()
     }
 
     // now the BHE subsets
-    for (std::size_t i = 0; i < _bheMeshData.BHE_mat_IDs.size(); i++)
+    for (int i = 0; i < n_BHEs; i++)
     {
         // Here the number of components equals to
         // the number of unknowns on the BHE
@@ -127,7 +135,7 @@ void HeatTransportBHEProcess::constructDofTable()
 
     std::vector<std::vector<MeshLib::Element*> const*> vec_var_elements;
     vec_var_elements.push_back(&(_mesh.getElements()));
-    for (std::size_t i = 0; i < _bheMeshData.BHE_elements.size(); i++)
+    for (int i = 0; i < n_BHEs; i++)
     {
         vec_var_elements.push_back(&_bheMeshData.BHE_elements[i]);
     }
