@@ -51,28 +51,22 @@ HeatTransportBHEProcess::HeatTransportBHEProcess(
             _bheMeshData.BHE_mat_IDs.size());
     }
 
-    // TODO (haibing) The following assumes that the material ids are numbered
-    // consecutively, but this is not checked. Don't assume that the material
-    // ids are numbered in specific way, especially that the soil has material
-    // id 0.
-    // create a map from a material ID to a BHE ID
-    auto max_BHE_mat_id = std::max_element(_bheMeshData.BHE_mat_IDs.begin(),
-                                           _bheMeshData.BHE_mat_IDs.end());
-    const std::size_t nBHEmatIDs = *max_BHE_mat_id + 1;
-    _process_data._map_materialID_to_BHE_ID.resize(nBHEmatIDs);
-    for (std::size_t i = 0; i < _bheMeshData.BHE_mat_IDs.size(); i++)
-    {
-        // by default, it is assumed that the soil compartment takes material ID
-        // 0 and the BHE take the successive material group.
-        _process_data._map_materialID_to_BHE_ID[_bheMeshData.BHE_mat_IDs[i]] =
-            i;
-    }
-
     auto material_ids = MeshLib::materialIDs(mesh);
     if (material_ids == nullptr)
     {
         OGS_FATAL("Not able to get material IDs! ");
     }
+    // create a map from a material ID to a BHE ID
+    auto max_BHE_mat_id =
+        std::max_element(material_ids->begin(), material_ids->end());
+    _process_data._map_materialID_to_BHE_ID.resize(*max_BHE_mat_id + 1);
+    for (std::size_t i = 0; i < _bheMeshData.BHE_mat_IDs.size(); i++)
+    {
+        // fill in the map structure
+        _process_data._map_materialID_to_BHE_ID[_bheMeshData.BHE_mat_IDs[i]] =
+            i;
+    }
+
     _process_data._mesh_prop_materialIDs = material_ids;
 }
 
