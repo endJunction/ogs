@@ -107,33 +107,17 @@ void HeatTransportBHEProcess::constructDofTable()
         int n_BHE_unknowns =
             _process_data._vec_BHE_property[i]->getNumUnknowns();
         vec_n_BHE_unknowns.emplace_back(n_BHE_unknowns);
-    }
 
-    // All the BHE nodes have additinal variables
-    std::size_t count = 0;
-
-    assert(n_BHEs == static_cast<int>(_mesh_subset_BHE_nodes.size()));
-    for (int i = 0; i < n_BHEs; i++)
-    {
+        // All the BHE nodes have additional variables.
         auto const& ms = _mesh_subset_BHE_nodes[i];
         std::generate_n(std::back_inserter(all_mesh_subsets),
                         // Here the number of components equals to
                         // the number of unknowns on the BHE
-                        vec_n_BHE_unknowns[count],
+                        vec_n_BHE_unknowns[i],
                         [&]() { return *ms; });
-        count++;
-    }
-
-    // now the BHE subsets
-    for (int i = 0; i < n_BHEs; i++)
-    {
         // Here the number of components equals to
         // the number of unknowns on the BHE
         vec_n_components.push_back(vec_n_BHE_unknowns[i]);
-    }
-
-    for (int i = 0; i < n_BHEs; i++)
-    {
         vec_var_elements.push_back(&_bheMeshData.BHE_elements[i]);
     }
 
