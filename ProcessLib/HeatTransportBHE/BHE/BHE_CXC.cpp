@@ -50,6 +50,7 @@ void BHE_CXC::calcThermalResistances()
     d_i1 = 2.0 * (r_inner + b_in);
     d_h = d_o1 - d_i1;
 
+    constexpr double PI = boost::math::constants::pi<double>();
     // thermal resistance due to advective flow of refrigerant in the pipes
     // Eq. 58, 59, and 60 in Diersch_2011_CG
     _R_adv_i1 = 1.0 / (Nu_in * lambda_r * PI);
@@ -235,6 +236,7 @@ void BHE_CXC::calcPipeFlowVelocity()
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
 
+    constexpr double PI = boost::math::constants::pi<double>();
     u_in = Q_r / (PI * r_inner * r_inner);
     u_out =
         Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));

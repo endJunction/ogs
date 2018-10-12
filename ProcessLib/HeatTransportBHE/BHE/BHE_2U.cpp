@@ -65,6 +65,7 @@ void BHE_2U::calcThermalResistances()
     double const& r_inner = pipe_param.r_inner;
     double const& lambda_p = pipe_param.lambda_p;
 
+    constexpr double PI = boost::math::constants::pi<double>();
     // thermal resistance due to advective flow of refrigerant in the pipes
     // Eq. 31 in Diersch_2011_CG
     _R_adv_i1 = 1.0 / (_Nu(0) * lambda_r * PI);

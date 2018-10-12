@@ -132,6 +132,7 @@ public:
             flowrate_curve = it->second.get();
         }
 
+        constexpr double PI = boost::math::constants::pi<double>();
         // Table 1 in Diersch_2011_CG
         S_o = PI * 2.0 * pipe_geometry.r_outer;
         S_io = PI * 2.0 * pipe_geometry.r_inner;

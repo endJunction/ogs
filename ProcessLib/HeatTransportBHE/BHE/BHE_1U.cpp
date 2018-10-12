@@ -53,6 +53,7 @@ void BHE_1U::calcThermalResistances()
     double const& lambda_g = grout_param.lambda_g;
     double const& lambda_p = pipe_param.lambda_p;
 
+    constexpr double PI = boost::math::constants::pi<double>();
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 36 in Diersch_2011_CG
     _R_adv_i1 = 1.0 / (_Nu(0) * lambda_r * PI);

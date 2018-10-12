@@ -33,7 +33,6 @@
 #include "GeoLib/Polyline.h"
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
-#include "boost/math/constants/constants.hpp"
 
 #include "BoreholeGeometry.h"
 #include "GroutParameters.h"
@@ -167,8 +166,7 @@ public:
           bhe_curves(bhe_curves_),
           use_flowrate_curve(if_flowrate_curve),
           if_use_ext_Ra_Rb(if_use_ext_Ra_Rb),
-          user_defined_R_vals(user_defined_R_vals),
-          PI(boost::math::constants::pi<double>()){};
+          user_defined_R_vals(user_defined_R_vals){};
 
     /**
      * destructor
@@ -379,8 +377,6 @@ protected:
      * unit is m^3/sec
      */
     double Q_r;
-
-    const double PI;
 
     /**
      * Reynolds number

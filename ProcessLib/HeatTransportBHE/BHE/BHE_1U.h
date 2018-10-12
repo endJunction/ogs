@@ -140,6 +140,8 @@ public:
         }
 
         // Table 1 in Diersch_2011_CG
+        constexpr double PI = boost::math::constants::pi<double>();
+
         S_i = PI * 2.0 * pipe_geometry.r_inner;
         S_o = PI * 2.0 * pipe_geometry.r_inner;
         S_g1 = borehole_geometry.diameter;
