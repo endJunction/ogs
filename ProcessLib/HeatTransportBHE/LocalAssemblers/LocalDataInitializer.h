@@ -253,8 +253,8 @@ public:
 
         std::vector<unsigned> dofIndex_to_localIndex;
 
-        // TODO (haibing) The check must be strict == with OGS_FATAL on error.
-        if (mesh_item.getDimension() < GlobalDim)
+        // Create customed dof table when it is a BHE element.
+        if (mesh_item.getDimension() == 1)
         {
             // this is a BHE element
             auto const n_local_dof = _dof_table.getNumberOfElementDOF(id);
