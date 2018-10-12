@@ -20,10 +20,10 @@ namespace HeatTransportBHE
 namespace BHE  // namespace of borehole heat exchanger
 {
 inline double pipeFlowVelocity(double const& flow_rate,
-                               double const& pipe_diameter)
+                               double const& pipe_radius)
 {
     constexpr double pi = boost::math::constants::pi<double>();
-    return 4.0 * flow_rate / (pi * pipe_diameter * pipe_diameter);
+    return flow_rate / (pi * pipe_radius * pipe_radius);
 }
 
 inline double prandtlNumber(double const& viscosity,

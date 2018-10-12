@@ -15,7 +15,7 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
 void BHE_1U::initialize()
 
 {
-    double tmp_u = pipeFlowVelocity(Q_r, 2.0 * pipe_param.r_inner);
+    double tmp_u = pipeFlowVelocity(Q_r, pipe_param.r_inner);
     _u(0) = tmp_u;
     _u(1) = tmp_u;
 

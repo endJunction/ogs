@@ -14,7 +14,7 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
 
 void ProcessLib::HeatTransportBHE::BHE::BHE_2U::initialize()
 {
-    double tmp_u = pipeFlowVelocity(Q_r, 2.0 * pipe_param.r_inner);
+    double tmp_u = pipeFlowVelocity(Q_r, pipe_param.r_inner);
     // depending on whether it is parallel or serially connected
     if (_discharge_type == BHE_DISCHARGE_TYPE::BHE_DISCHARGE_TYPE_PARALLEL)
     {
