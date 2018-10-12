@@ -8,6 +8,7 @@
  */
 
 #include "BHE_CXC.h"
+#include "Physics.h"
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
@@ -18,9 +19,9 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 {
     calcPipeFlowVelocity();
     calcRenoldsNumber();
-    Pr = calcPrandtlNumber(refrigerant_param.mu_r,
-                           refrigerant_param.heat_cap_r,
-                           refrigerant_param.lambda_r);
+    Pr = prandtlNumber(refrigerant_param.mu_r,
+                       refrigerant_param.heat_cap_r,
+                       refrigerant_param.lambda_r);
 
     calcNusseltNum();
     calcThermalResistances();

@@ -8,12 +8,13 @@
  */
 
 #include "BHE_2U.h"
+#include "Physics.h"
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
 void ProcessLib::HeatTransportBHE::BHE::BHE_2U::initialize()
 {
-    double tmp_u = calcPipeFlowVelocity(Q_r, 2.0 * pipe_param.r_inner);
+    double tmp_u = pipeFlowVelocity(Q_r, 2.0 * pipe_param.r_inner);
     // depending on whether it is parallel or serially connected
     if (_discharge_type == BHE_DISCHARGE_TYPE::BHE_DISCHARGE_TYPE_PARALLEL)
     {
@@ -26,19 +27,18 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_2U::initialize()
     _u(2) = tmp_u;
     _u(3) = tmp_u;
 
-    // calculate Renolds number
-    Re = calcRenoldsNumber(std::abs(_u(0)),
-                           2.0 * pipe_param.r_inner,
-                           refrigerant_param.mu_r,
-                           refrigerant_param.rho_r);
+    double const Re = reynoldsNumber(std::abs(_u(0)),
+                                     2.0 * pipe_param.r_inner,
+                                     refrigerant_param.mu_r,
+                                     refrigerant_param.rho_r);
     // calculate Prandtl number
-    Pr = calcPrandtlNumber(refrigerant_param.mu_r,
-                           refrigerant_param.heat_cap_r,
-                           refrigerant_param.lambda_r);
+    double const Pr = prandtlNumber(refrigerant_param.mu_r,
+                                    refrigerant_param.heat_cap_r,
+                                    refrigerant_param.lambda_r);
 
     // calculate Nusselt number
-    double tmp_Nu =
-        calcNusseltNumber(2.0 * pipe_param.r_inner, borehole_geometry.length);
+    double tmp_Nu = nusseltNumber(Re, Pr, 2.0 * pipe_param.r_inner,
+                                  borehole_geometry.length);
     _Nu(0) = tmp_Nu;
     _Nu(1) = tmp_Nu;
     _Nu(2) = tmp_Nu;

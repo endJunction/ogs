@@ -206,63 +206,6 @@ public:
     virtual void calcThermalResistances() = 0;
 
     /**
-     * flow velocity inside the pipeline
-     */
-    double calcPipeFlowVelocity(double const& flow_rate,
-                                double const& pipe_diameter)
-    {
-        return 4.0 * flow_rate / (PI * pipe_diameter * pipe_diameter);
-    }
-
-    double calcPrandtlNumber(double const& viscosity,
-                             double const& heat_capacity,
-                             double const& heat_conductivity)
-    {
-        return viscosity * heat_capacity / heat_conductivity;
-    }
-
-    double calcRenoldsNumber(double const velocity_norm,
-                             double const pipe_diameter,
-                             double const viscosity,
-                             double const density)
-    {
-        return velocity_norm * pipe_diameter / (viscosity / density);
-    };
-    double calcNusseltNumber(double const pipe_diameter,
-                             double const pipe_length)
-    {
-        double tmp_Nu(0.0);
-        double gamma(0.0), xi(0.0);
-
-        if (Re < 2300.0)
-        {
-            tmp_Nu = 4.364;
-        }
-        else if (Re >= 2300.0 && Re < 10000.0)
-        {
-            gamma = (Re - 2300) / (10000 - 2300);
-
-            tmp_Nu = (1.0 - gamma) * 4.364;
-            tmp_Nu +=
-                gamma *
-                ((0.0308 / 8.0 * 1.0e4 * Pr) /
-                 (1.0 + 12.7 * std::sqrt(0.0308 / 8.0) *
-                            (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
-                 (1.0 + std::pow(pipe_diameter / pipe_length, 2.0 / 3.0)));
-        }
-        else if (Re > 10000.0)
-        {
-            xi = pow(1.8 * std::log10(Re) - 1.5, -2.0);
-            tmp_Nu = (xi / 8.0 * Re * Pr) /
-                     (1.0 + 12.7 * std::sqrt(xi / 8.0) *
-                                (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
-                     (1.0 + std::pow(pipe_diameter / pipe_length, 2.0 / 3.0));
-        }
-
-        return tmp_Nu;
-    };
-
-    /**
      * heat transfer coefficient,
      * need to be overwritten.
      */
