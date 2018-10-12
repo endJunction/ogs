@@ -18,12 +18,12 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
 void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 {
     calcPipeFlowVelocity();
-    calcRenoldsNumber();
+    auto const Re = calcRenoldsNumber();
     double const Pr = prandtlNumber(refrigerant_param.mu_r,
                        refrigerant_param.heat_cap_r,
                        refrigerant_param.lambda_r);
 
-    calcNusseltNum(Pr);
+    calcNusseltNum(Pr, Re);
     calcThermalResistances();
     calcHeatTransferCoefficients();
 }
@@ -117,8 +117,12 @@ void BHE_CXC::calcThermalResistances()
 /**
  * Nusselt number calculation
  */
-void BHE_CXC::calcNusseltNum(double const Pr)
+void BHE_CXC::calcNusseltNum(double const Pr,
+                             std::pair<double, double> const Re)
 {
+    double const& Re_o1 = Re.first;
+    double const& Re_i1 = Re.second;
+
     // see Eq. 32 in Diersch_2011_CG
 
     double Nu_in(0.0), Nu_out(0.0);
@@ -133,13 +137,13 @@ void BHE_CXC::calcNusseltNum(double const Pr)
     d_i1 = 2.0 * r_inner;
 
     // first calculating Nu_in
-    if (_Re_i1 < 2300.0)
+    if (Re_i1 < 2300.0)
     {
         Nu_in = 4.364;
     }
-    else if (_Re_i1 >= 2300.0 && _Re_i1 < 10000.0)
+    else if (Re_i1 >= 2300.0 && Re_i1 < 10000.0)
     {
-        gamma = (_Re_i1 - 2300) / (10000 - 2300);
+        gamma = (Re_i1 - 2300) / (10000 - 2300);
 
         Nu_in = (1.0 - gamma) * 4.364;
         Nu_in += gamma * ((0.0308 / 8.0 * 1.0e4 * Pr) /
@@ -147,10 +151,10 @@ void BHE_CXC::calcNusseltNum(double const Pr)
                                      (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                           (1.0 + std::pow(d_i1 / L, 2.0 / 3.0)));
     }
-    else if (_Re_i1 > 10000.0)
+    else if (Re_i1 > 10000.0)
     {
-        xi = pow(1.8 * std::log10(_Re_i1) - 1.5, -2.0);
-        Nu_in = (xi / 8.0 * _Re_i1 * Pr) /
+        xi = pow(1.8 * std::log10(Re_i1) - 1.5, -2.0);
+        Nu_in = (xi / 8.0 * Re_i1 * Pr) /
                 (1.0 +
                  12.7 * std::sqrt(xi / 8.0) * (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                 (1.0 + std::pow(d_i1 / L, 2.0 / 3.0));
@@ -159,14 +163,14 @@ void BHE_CXC::calcNusseltNum(double const Pr)
     // then calculating Nu_out
     d_i1 = 2.0 * (r_inner + b_in);
     d_h = d_o1 - d_i1;
-    if (_Re_o1 < 2300.0)
+    if (Re_o1 < 2300.0)
     {
         Nu_out = 3.66;
         Nu_out += (4.0 - 0.102 / (d_i1 / d_o1 + 0.02)) * pow(d_i1 / d_o1, 0.04);
     }
-    else if (_Re_o1 >= 2300.0 && _Re_o1 < 10000.0)
+    else if (Re_o1 >= 2300.0 && Re_o1 < 10000.0)
     {
-        gamma = (_Re_o1 - 2300) / (10000 - 2300);
+        gamma = (Re_o1 - 2300) / (10000 - 2300);
 
         Nu_out = (1.0 - gamma) * (3.66 + (4.0 - 0.102 / (d_i1 / d_o1 + 0.02))) *
                  pow(d_i1 / d_o1, 0.04);
@@ -178,10 +182,10 @@ void BHE_CXC::calcNusseltNum(double const Pr)
                              0.14 * std::pow(d_i1 / d_o1, 0.6)) /
                             (1.0 + d_i1 / d_o1)));
     }
-    else if (_Re_o1 > 10000.0)
+    else if (Re_o1 > 10000.0)
     {
-        xi = pow(1.8 * std::log10(_Re_o1) - 1.5, -2.0);
-        Nu_out = (xi / 8.0 * _Re_o1 * Pr) /
+        xi = pow(1.8 * std::log10(Re_o1) - 1.5, -2.0);
+        Nu_out = (xi / 8.0 * Re_o1 * Pr) /
                  (1.0 + 12.7 * std::sqrt(xi / 8.0) *
                             (std::pow(Pr, 2.0 / 3.0) - 1.0)) *
                  (1.0 + std::pow(d_h / L, 2.0 / 3.0)) *
@@ -198,7 +202,7 @@ void BHE_CXC::calcNusseltNum(double const Pr)
 /**
  * Renolds number calculation
  */
-void BHE_CXC::calcRenoldsNumber()
+std::pair<double, double> BHE_CXC::calcRenoldsNumber() const
 {
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
@@ -211,8 +215,9 @@ void BHE_CXC::calcRenoldsNumber()
     double const d_h = 2.0 * (r_outer - (r_inner + b_in));
 
     // _u(0) is u_in, and _u(1) is u_out
-    _Re_o1 = reynoldsNumber(_u(1), d_h, mu_r, rho_r);
-    _Re_i1 = reynoldsNumber(_u(0), d_i1, mu_r, rho_r);
+    double const Re_o1 = reynoldsNumber(_u(1), d_h, mu_r, rho_r);
+    double const Re_i1 = reynoldsNumber(_u(0), d_i1, mu_r, rho_r);
+    return {Re_o1, Re_i1};
 }
 
 /**

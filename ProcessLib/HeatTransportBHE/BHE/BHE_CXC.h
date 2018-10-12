@@ -177,12 +177,12 @@ public:
     /**
      * Nusselt number calculation
      */
-    void calcNusseltNum(double Pr);
+    void calcNusseltNum(double Pr, std::pair<double, double> Re);
 
     /**
      * Renolds number calculation
      */
-    void calcRenoldsNumber();
+    std::pair<double, double> calcRenoldsNumber() const;
 
     /**
      * flow velocity inside the pipeline
@@ -285,10 +285,6 @@ private:
      */
     double _PHI_fog, _PHI_ff, _PHI_gs;
 
-    /**
-     * Reynolds number
-     */
-    double _Re_o1, _Re_i1;
     /**
      * specific exchange surfaces S
      */
