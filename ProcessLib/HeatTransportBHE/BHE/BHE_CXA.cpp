@@ -49,7 +49,18 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXA::initialize()
                        refrigerant_param.heat_cap_r,
                        refrigerant_param.lambda_r);
 
-    calcNusseltNum(Pr, Re);
+    double const Nu_out = nusseltNumber(Re.first, Pr, 2 * pipe_param.r_inner,
+                                        borehole_geometry.length);
+    _Nu(1) = Nu_out;
+    double const diameter_ratio =
+        pipe_param.r_outer / (pipe_param.r_inner + pipe_param.b_in);
+    double const pipe_aspect_ratio =
+        2.0 * (pipe_param.r_outer - (pipe_param.r_inner + pipe_param.b_in)) /
+        borehole_geometry.length;
+    double const Nu_in =
+        nusseltNumberAnnulus(Re.second, Pr, diameter_ratio, pipe_aspect_ratio);
+    _Nu(0) = Nu_in;
+
     calcThermalResistances();
     calcHeatTransferCoefficients();
 }
@@ -138,34 +149,6 @@ void BHE_CXA::calcThermalResistances()
             "Error!!! Grout Thermal Resistance is an infinite number! The "
             "simulation will be stopped! \n");
     }
-}
-
-/**
- * Nusselt number calculation
- */
-void BHE_CXA::calcNusseltNum(double const Pr,
-                             std::pair<double, double> const Re)
-{
-    // see Eq. 32 in Diersch_2011_CG
-    double const& L = borehole_geometry.length;
-    double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-    double const& b_in = pipe_param.b_in;
-
-    // first calculating Nu_out
-    double const& Re_o1 = Re.first;
-    double const Nu_out = nusseltNumber(Re_o1, Pr, 2 * r_inner, L);
-
-    // then calculating Nu_in
-    double const diameter_ratio = r_outer / (r_inner + b_in);
-    double const pipe_aspect_ratio = 2.0 * (r_outer - (r_inner + b_in)) / L;
-    double const& Re_i1 = Re.second;
-    double const Nu_in =
-        nusseltNumberAnnulus(Re_i1, Pr, diameter_ratio, pipe_aspect_ratio);
-
-    // _Nu(0) is Nu_in, and _Nu(1) is Nu_out
-    _Nu(0) = Nu_in;
-    _Nu(1) = Nu_out;
 }
 
 /**

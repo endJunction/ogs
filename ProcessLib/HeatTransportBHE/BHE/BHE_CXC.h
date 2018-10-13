@@ -175,11 +175,6 @@ public:
     void calcThermalResistances();
 
     /**
-     * Nusselt number calculation
-     */
-    void calcNusseltNum(double Pr, std::pair<double, double> Re);
-
-    /**
      * calculate heat transfer coefficient
      */
     void calcHeatTransferCoefficients();
