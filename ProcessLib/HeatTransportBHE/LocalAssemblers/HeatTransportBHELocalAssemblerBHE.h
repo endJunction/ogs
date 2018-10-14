@@ -91,4 +91,4 @@ private:
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
 
-#include "HeatTransportBHELocalAssemblerBHE_impl.h"
+#include "HeatTransportBHELocalAssemblerBHE-impl.h"

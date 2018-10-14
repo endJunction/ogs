@@ -83,4 +83,4 @@ private:
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
 
-#include "HeatTransportBHELocalAssemblerSoil_impl.h"
+#include "HeatTransportBHELocalAssemblerSoil-impl.h"
