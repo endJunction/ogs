@@ -82,9 +82,6 @@ public:
                   extern_def_thermal_resistances, std::move(bhe_curves),
                   bound_type, if_flowrate_curve)
     {
-        _u = Eigen::Vector2d::Zero();
-        _Nu = Eigen::Vector2d::Zero();
-
         Q_r = my_Qr;
 
         power_in_watt_val = my_power_in_watt;
@@ -230,12 +227,12 @@ public:
         return _inflow_outflow_bc_component_ids;
     }
 
-    /**
-     * required by eigen library,
-     * to make sure the dynamically allocated class has
-     * aligned "operator new"
-     */
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+public:
+    struct ThermoMechanicalFlowProperties
+    {
+        double velocity;
+        double nusselt_number;
+    };
 
 private:
     std::vector<std::pair<int, int>> const _inflow_outflow_bc_component_ids = {
@@ -278,14 +275,10 @@ private:
      * cross section area
      */
     double CSA_i, CSA_o, CSA_g;
-    /**
-     * Nusselt number
-     */
-    Eigen::Vector2d _Nu;
-    /**
-     * flow velocity inside the pipeline
-     */
-    Eigen::Vector2d _u;
+
+    ThermoMechanicalFlowProperties flow_properties_in{
+        0, 0};  // TODO (haibing) is this inlet/outlet or inner/outer?
+    ThermoMechanicalFlowProperties flow_properties_out{0, 0};
 };
 }  // namespace BHE
 }  // namespace HeatTransportBHE
