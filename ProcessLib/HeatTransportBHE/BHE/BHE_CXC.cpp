@@ -12,26 +12,6 @@
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
-namespace {
-std::pair<double, double> calcReynoldsNumber(
-    double const u_out, double const u_in, PipeParameters const& pipe_param,
-    RefrigerantParameters const& refrigerant_param)
-{
-    double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-    double const& b_in = pipe_param.b_in;
-    double const& mu_r = refrigerant_param.mu_r;
-    double const& rho_r = refrigerant_param.rho_r;
-
-    double const d_i = 2.0 * r_inner;
-    double const d_o = 2.0 * (r_outer - (r_inner + b_in));
-
-    double const Re_o1 = reynoldsNumber(u_out, d_o, mu_r, rho_r);
-    double const Re_i1 = reynoldsNumber(u_in, d_i, mu_r, rho_r);
-    return {Re_o1, Re_i1};
-}
-}  // namespace
-
 /**
  * calculate thermal resistance
  */
@@ -43,13 +23,20 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
     _u(0) = u_in;
     _u(1) = u_out;
 
-    auto const Re =
-        calcReynoldsNumber(u_out, u_in, pipe_param, refrigerant_param);
+    double const Re_out = reynoldsNumber(
+        u_out,
+        2.0 * (pipe_param.r_outer - (pipe_param.r_inner + pipe_param.b_in)),
+        refrigerant_param.mu_r, refrigerant_param.rho_r);
+
+    double const Re_in =
+        reynoldsNumber(u_in, 2.0 * pipe_param.r_inner, refrigerant_param.mu_r,
+                       refrigerant_param.rho_r);
+
     double const Pr = prandtlNumber(refrigerant_param.mu_r,
                        refrigerant_param.heat_cap_r,
                        refrigerant_param.lambda_r);
 
-    double const Nu_in = nusseltNumber(Re.second, Pr, 2 * pipe_param.r_inner,
+    double const Nu_in = nusseltNumber(Re_in, Pr, 2 * pipe_param.r_inner,
                                        borehole_geometry.length);
     _Nu(0) = Nu_in;
     double const diameter_ratio =
@@ -58,7 +45,7 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
         (2 * pipe_param.r_outer - 2 * (pipe_param.r_inner + pipe_param.b_in)) /
         borehole_geometry.length;
     double const Nu_out =
-        nusseltNumberAnnulus(Re.first, Pr, diameter_ratio, pipe_aspect_ratio);
+        nusseltNumberAnnulus(Re_out, Pr, diameter_ratio, pipe_aspect_ratio);
     // _Nu(0) is Nu_in, and _Nu(1) is Nu_out
     _Nu(1) = Nu_out;
 
