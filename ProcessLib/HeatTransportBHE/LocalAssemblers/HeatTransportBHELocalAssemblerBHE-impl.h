@@ -21,8 +21,8 @@ namespace HeatTransportBHE
 {
 using namespace BHE;
 
-template <typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
-HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
+template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
+HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, GlobalDim>::
     HeatTransportBHELocalAssemblerBHE(MeshLib::Element const& e,
                                       bool const is_axially_symmetric,
                                       unsigned const integration_order,
@@ -42,7 +42,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
 
     auto const shape_matrices =
         initShapeMatrices<ShapeFunction, ShapeMatricesType, IntegrationMethod,
-                          BHE_Dim>(e, is_axially_symmetric,
+                          GlobalDim>(e, is_axially_symmetric,
                                    _integration_method);
 
     auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
@@ -115,9 +115,9 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHE_Dim>::
     // std::cout << _R_pi_s_matrix.format(CleanFmt) << sep;
 }
 
-template <typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
+template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
 void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
-                                       BHE_Dim>::
+                                       GlobalDim>::
     assemble(
         double const /*t*/, std::vector<double> const& local_x,
         std::vector<double>& local_M_data, std::vector<double>& local_K_data,
@@ -208,10 +208,10 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     // std::cout << local_M.format(CleanFmt) << sep;
 }
 
-template <typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
+template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
 void HeatTransportBHELocalAssemblerBHE<
     ShapeFunction, IntegrationMethod,
-    BHE_Dim>::postTimestepConcrete(std::vector<double> const& /*local_x*/)
+    GlobalDim>::postTimestepConcrete(std::vector<double> const& /*local_x*/)
 {
 }
 }  // namespace HeatTransportBHE

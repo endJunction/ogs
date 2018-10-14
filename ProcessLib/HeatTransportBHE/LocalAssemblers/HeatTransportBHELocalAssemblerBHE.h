@@ -23,12 +23,12 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-template <typename ShapeFunction, typename IntegrationMethod, int BHE_Dim>
+template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
 class HeatTransportBHELocalAssemblerBHE
     : public HeatTransportBHELocalAssemblerInterface
 {
 public:
-    using ShapeMatricesType = ShapeMatrixPolicyType<ShapeFunction, BHE_Dim>;
+    using ShapeMatricesType = ShapeMatrixPolicyType<ShapeFunction, GlobalDim>;
     using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
     // Using dynamic size, because the number of unknowns in the BHE is runtime
     // value.
