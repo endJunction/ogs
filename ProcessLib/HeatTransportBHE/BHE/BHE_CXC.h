@@ -10,6 +10,8 @@
 #pragma once
 
 #include "BHEAbstract.h"
+#include "ThermoMechanicalFlowProperties.h"
+
 namespace ProcessLib
 {
 namespace HeatTransportBHE
@@ -227,13 +229,6 @@ public:
         return _inflow_outflow_bc_component_ids;
     }
 
-public:
-    struct ThermoMechanicalFlowProperties
-    {
-        double velocity;
-        double nusselt_number;
-    };
-
 private:
     std::vector<std::pair<int, int>> const _inflow_outflow_bc_component_ids = {
         {1, 0}};
@@ -276,9 +271,9 @@ private:
      */
     double CSA_i, CSA_o, CSA_g;
 
-    ThermoMechanicalFlowProperties flow_properties_in{
-        0, 0};  // TODO (haibing) is this inlet/outlet or inner/outer?
-    ThermoMechanicalFlowProperties flow_properties_out{0, 0};
+    // TODO (haibing) is this inlet/outlet or inner/outer?
+    ThermoMechanicalFlowProperties flow_properties_in;
+    ThermoMechanicalFlowProperties flow_properties_out;
 };
 }  // namespace BHE
 }  // namespace HeatTransportBHE

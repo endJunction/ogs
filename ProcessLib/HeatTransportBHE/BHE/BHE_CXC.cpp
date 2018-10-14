@@ -8,7 +8,6 @@
  */
 
 #include "BHE_CXC.h"
-#include "Physics.h"
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
@@ -17,37 +16,11 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
  */
 void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 {
-    double const u_in = pipeFlowVelocity(Q_r, pipe_param.r_inner);
-    double const u_out = annulusFlowVelocity(
-        Q_r, pipe_param.r_outer, pipe_param.r_inner + pipe_param.b_in);
-    _u(0) = u_in;
-    _u(1) = u_out;
+    flow_properties_in = calculateThermoMechanicalFlowPropertiesPipe(
+        pipe_param, borehole_geometry.length, refrigerant_param, Q_r);
 
-    double const Re_out = reynoldsNumber(
-        u_out,
-        2.0 * (pipe_param.r_outer - (pipe_param.r_inner + pipe_param.b_in)),
-        refrigerant_param.mu_r, refrigerant_param.rho_r);
-
-    double const Re_in =
-        reynoldsNumber(u_in, 2.0 * pipe_param.r_inner, refrigerant_param.mu_r,
-                       refrigerant_param.rho_r);
-
-    double const Pr = prandtlNumber(refrigerant_param.mu_r,
-                       refrigerant_param.heat_cap_r,
-                       refrigerant_param.lambda_r);
-
-    double const Nu_in = nusseltNumber(Re_in, Pr, 2 * pipe_param.r_inner,
-                                       borehole_geometry.length);
-    _Nu(0) = Nu_in;
-    double const diameter_ratio =
-        (pipe_param.r_inner + pipe_param.b_in) / pipe_param.r_outer;
-    double const pipe_aspect_ratio =
-        (2 * pipe_param.r_outer - 2 * (pipe_param.r_inner + pipe_param.b_in)) /
-        borehole_geometry.length;
-    double const Nu_out =
-        nusseltNumberAnnulus(Re_out, Pr, diameter_ratio, pipe_aspect_ratio);
-    // _Nu(0) is Nu_in, and _Nu(1) is Nu_out
-    _Nu(1) = Nu_out;
+    flow_properties_out = calculateThermoMechanicalFlowPropertiesAnnulus(
+        pipe_param, borehole_geometry.length, refrigerant_param, Q_r);
 
     calcThermalResistances();
     calcHeatTransferCoefficients();
@@ -69,8 +42,8 @@ void BHE_CXC::calcThermalResistances()
     double const& lambda_p_i = pipe_param.lambda_p_i;
     double const& lambda_p_o = pipe_param.lambda_p_o;
 
-    Nu_in = _Nu(0);
-    Nu_out = _Nu(1);
+    Nu_in = flow_properties_in.nusselt_number;
+    Nu_out = flow_properties_out.nusselt_number;
     d_o1 = 2.0 * r_outer;
     d_i1 = 2.0 * (r_inner + b_in);
     d_h = d_o1 - d_i1;
@@ -187,6 +160,9 @@ void BHE_CXC::getLaplaceMatrix(std::size_t idx_unknown,
     double const& porosity_g = grout_param.porosity_g;
     double const& lambda_g = grout_param.lambda_g;
 
+    double const velocity_norm =
+        std::sqrt(flow_properties_in.velocity * flow_properties_in.velocity +
+                  flow_properties_out.velocity * flow_properties_out.velocity);
     // Here we calculates the laplace coefficients in the governing
     // equations of BHE. These governing equations can be found in
     // 1) Diersch (2013) FEFLOW book on page 952, M.120-122, or
@@ -199,12 +175,14 @@ void BHE_CXC::getLaplaceMatrix(std::size_t idx_unknown,
         case 0:
             // pipe i1, Eq. 26
             laplace_coeff =
-                (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
+                (lambda_r + rho_r * heat_cap_r * alpha_L * velocity_norm) *
+                CSA_i;
             break;
         case 1:
             // pipe o1, Eq. 27
             laplace_coeff =
-                (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
+                (lambda_r + rho_r * heat_cap_r * alpha_L * velocity_norm) *
+                CSA_o;
             break;
         case 2:
             // pipe g1, Eq. 28
@@ -234,13 +212,13 @@ void BHE_CXC::getAdvectionVector(std::size_t idx_unknown,
     {
         case 0:
             // pipe i1, Eq. 26
-            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
+            advection_coeff = rho_r * heat_cap_r * flow_properties_in.velocity * CSA_i;
             // z direction
             vec_advection(2) = -1.0 * advection_coeff;
             break;
         case 1:
             // pipe o1, Eq. 27
-            advection_coeff = rho_r * heat_cap_r * _u(1) * CSA_o;
+            advection_coeff = rho_r * heat_cap_r * flow_properties_out.velocity * CSA_o;
             // z direction
             vec_advection(2) = advection_coeff;
             break;
