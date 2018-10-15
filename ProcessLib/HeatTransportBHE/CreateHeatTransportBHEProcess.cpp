@@ -219,7 +219,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         if (bhe_type_str == "BHE_TYPE_1U")
         {
             bhes.emplace_back(
-                BHE::CreateBHE1U(bhe_conf,
+                BHE::createBHE1U(bhe_conf,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
@@ -230,7 +230,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         if (bhe_type_str == "BHE_TYPE_2U")
         {
             bhes.emplace_back(
-                BHE::CreateBHE2U(bhe_conf,
+                BHE::createBHE2U(bhe_conf,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
@@ -241,7 +241,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         if (bhe_type_str == "BHE_TYPE_CXC")
         {
             bhes.emplace_back(
-                BHE::CreateBHECXC(bhe_conf,
+                BHE::createBHECXC(bhe_conf,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,
@@ -252,7 +252,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         if (bhe_type_str == "BHE_TYPE_CXA")
         {
             bhes.emplace_back(
-                BHE::CreateBHECXA(bhe_conf,
+                BHE::createBHECXA(bhe_conf,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,

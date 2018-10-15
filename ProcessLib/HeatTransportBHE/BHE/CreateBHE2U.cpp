@@ -20,7 +20,7 @@ namespace HeatTransportBHE
 {
 namespace BHE
 {
-BHE::BHE_2U* CreateBHE2U(
+BHE::BHE_2U* createBHE2U(
     BaseLib::ConfigTree const& bhe_conf,
     std::map<std::string,
              std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
