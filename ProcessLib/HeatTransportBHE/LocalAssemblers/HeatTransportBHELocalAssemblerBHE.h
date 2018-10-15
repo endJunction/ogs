@@ -27,6 +27,16 @@ template <typename ShapeFunction, typename IntegrationMethod, typename BHEType>
 class HeatTransportBHELocalAssemblerBHE
     : public HeatTransportBHELocalAssemblerInterface
 {
+    static constexpr int bhe_unknowns = BHEType::number_of_unknowns;
+    static constexpr int single_bhe_unknowns_size = ShapeFunction::NPOINTS;
+    static constexpr int temperature_size = ShapeFunction::NPOINTS;
+    static constexpr int temperature_index = 0;
+    static constexpr int bhe_unknowns_size =
+        single_bhe_unknowns_size * bhe_unknowns;
+    static constexpr int bhe_unknowns_index = ShapeFunction::NPOINTS;
+    static constexpr int local_matrix_size =
+        temperature_size + bhe_unknowns_size;
+
 public:
     using ShapeMatricesType =
         ShapeMatrixPolicyType<ShapeFunction, 3 /* GlobalDim */>;
@@ -34,8 +44,8 @@ public:
     // Using dynamic size, because the number of unknowns in the BHE is runtime
     // value.
     using BheLocalMatrixType =
-        typename ShapeMatricesType::template MatrixType<Eigen::Dynamic,
-                                                        Eigen::Dynamic>;
+        typename ShapeMatricesType::template MatrixType<local_matrix_size,
+                                                        local_matrix_size>;
     HeatTransportBHELocalAssemblerBHE(
         HeatTransportBHELocalAssemblerBHE const&) = delete;
     HeatTransportBHELocalAssemblerBHE(HeatTransportBHELocalAssemblerBHE&&) =
@@ -76,15 +86,20 @@ private:
 
     std::size_t const element_id;
 
-    static constexpr int bhe_unknowns = BHEType::number_of_unknowns;
 
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 
-    BheLocalMatrixType _R_matrix;
+    typename ShapeMatricesType::template MatrixType<bhe_unknowns_size,
+                                                    bhe_unknowns_size>
+        _R_matrix;
 
-    BheLocalMatrixType _R_s_matrix;
+    typename ShapeMatricesType::template MatrixType<temperature_size,
+                                                    temperature_size>
+        _R_s_matrix;
 
-    BheLocalMatrixType _R_pi_s_matrix;
+    typename ShapeMatricesType::template MatrixType<bhe_unknowns_size,
+                                                    temperature_size>
+        _R_pi_s_matrix;
 };
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

@@ -199,18 +199,54 @@ public:
     void getAdvectionVector(std::size_t idx_unknown,
                             Eigen::VectorXd& vec_advection) const;
 
-    /**
-     * return the _R_matrix, _R_pi_s_matrix, _R_s_matrix
-     */
-    void setRMatrices(
-        const int idx_bhe_unknowns, const int NumNodes,
-        Eigen::MatrixXd& matBHE_loc_R,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_matrix,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_pi_s_matrix,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_s_matrix) const;
+    template <int NPoints, typename SingleUnknownMatrixType,
+              typename RMatrixType, typename RPiSMatrixType,
+              typename RSMatrixType>
+    void assembleRMatrices(
+        int const idx_bhe_unknowns,
+        Eigen::MatrixBase<SingleUnknownMatrixType> const& matBHE_loc_R,
+        Eigen::MatrixBase<RMatrixType>& R_matrix,
+        Eigen::MatrixBase<RPiSMatrixType>& R_pi_s_matrix,
+        Eigen::MatrixBase<RSMatrixType>& R_s_matrix) const
+    {
+        switch (idx_bhe_unknowns)
+        {
+            case 0:  // R i1
+                R_matrix.block(0, 2 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(2 * NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+
+                R_matrix.block(0, 0, NPoints, NPoints) +=
+                    1.0 * matBHE_loc_R;  // K_i1
+                R_matrix.block(2 * NPoints,
+                               2 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_ig
+                break;
+            case 1:  // R io
+                R_matrix.block(0, NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+
+                R_matrix.block(0, 0, NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_i1
+                R_matrix.block(NPoints, NPoints, NPoints, NPoints) +=
+                    1.0 * matBHE_loc_R;  // K_o1
+                break;
+            case 2:  // R s
+                R_s_matrix += matBHE_loc_R;
+
+                R_pi_s_matrix.block(2 * NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+
+                R_matrix.block(2 * NPoints, 2 * NPoints, NPoints,
+                               NPoints) += matBHE_loc_R;  // K_gs
+                break;
+        }
+    }
+
     /**
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.

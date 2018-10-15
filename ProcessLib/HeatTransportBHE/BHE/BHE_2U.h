@@ -211,19 +211,149 @@ public:
     void getAdvectionVector(std::size_t idx_unknown,
                             Eigen::VectorXd& vec_advection) const;
 
-    /**
-     * return the _R_matrix, _R_pi_s_matrix, _R_s_matrix
-     */
-    void setRMatrices(
-        const int idx_bhe_unknowns, const int NumNodes,
-        Eigen::MatrixXd& matBHE_loc_R,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_matrix,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_pi_s_matrix,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_s_matrix) const;
+    template <int NPoints, typename SingleUnknownMatrixType,
+              typename RMatrixType, typename RPiSMatrixType,
+              typename RSMatrixType>
+    void assembleRMatrices(
+        int const idx_bhe_unknowns,
+        Eigen::MatrixBase<SingleUnknownMatrixType> const& matBHE_loc_R,
+        Eigen::MatrixBase<RMatrixType>& R_matrix,
+        Eigen::MatrixBase<RPiSMatrixType>& R_pi_s_matrix,
+        Eigen::MatrixBase<RSMatrixType>& R_s_matrix) const
+    {
+        switch (idx_bhe_unknowns)
+        {
+            case 0:  // R i1 i2
+                R_matrix.block(0, 4 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(4 * NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(NPoints, 5 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(5 * NPoints, NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
 
+                R_matrix.block(0, 0, NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_i1
+                R_matrix.block(NPoints, NPoints, NPoints, NPoints) +=
+                    1.0 * matBHE_loc_R;  // K_i2
+                R_matrix.block(4 * NPoints,
+                               4 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_ig
+                R_matrix.block(5 * NPoints,
+                               5 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_ig
+                break;
+            case 1:  // R o1 o2
+                R_matrix.block(2 * NPoints, 6 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(6 * NPoints, 2 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(3 * NPoints, 7 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * NPoints, 3 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+
+                R_matrix.block(2 * NPoints,
+                               2 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_o1
+                R_matrix.block(3 * NPoints,
+                               3 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_o2
+                R_matrix.block(6 * NPoints,
+                               6 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_og
+                R_matrix.block(7 * NPoints,
+                               7 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_og
+                break;
+            case 2:  // R g1
+                R_matrix.block(4 * NPoints, 6 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(6 * NPoints, 4 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(4 * NPoints, 7 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * NPoints, 4 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(5 * NPoints, 6 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(6 * NPoints, 5 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(5 * NPoints, 7 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * NPoints, 5 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+
+                R_matrix.block(4 * NPoints,
+                               4 * NPoints,
+                               NPoints,
+                               NPoints) += 2.0 * matBHE_loc_R;  // K_ig
+                R_matrix.block(5 * NPoints,
+                               5 * NPoints,
+                               NPoints,
+                               NPoints) += 2.0 * matBHE_loc_R;  // K_ig
+                R_matrix.block(6 * NPoints,
+                               6 * NPoints,
+                               NPoints,
+                               NPoints) += 2.0 * matBHE_loc_R;  // K_og
+                R_matrix.block(7 * NPoints,
+                               7 * NPoints,
+                               NPoints,
+                               NPoints) += 2.0 * matBHE_loc_R;  // K_og
+                break;
+            case 3:  // R g2
+                R_matrix.block(6 * NPoints, 7 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * NPoints, 6 * NPoints, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+
+                R_matrix.block(4 * NPoints,
+                               4 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_ig
+                R_matrix.block(5 * NPoints,
+                               5 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_ig
+                R_matrix.block(6 * NPoints,
+                               6 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_og
+                R_matrix.block(7 * NPoints,
+                               7 * NPoints,
+                               NPoints,
+                               NPoints) += 1.0 * matBHE_loc_R;  // K_og
+                break;
+            case 4:  // R s
+                R_s_matrix += 1.0 * matBHE_loc_R;
+
+                R_pi_s_matrix.block(4 * NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_pi_s_matrix.block(5 * NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_pi_s_matrix.block(6 * NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+                R_pi_s_matrix.block(7 * NPoints, 0, NPoints, NPoints) +=
+                    -1.0 * matBHE_loc_R;
+
+                R_matrix.block(4 * NPoints, 4 * NPoints, NPoints,
+                               NPoints) += matBHE_loc_R;  // K_gs
+                R_matrix.block(5 * NPoints, 5 * NPoints, NPoints,
+                               NPoints) += matBHE_loc_R;  // K_gs
+                R_matrix.block(6 * NPoints, 6 * NPoints, NPoints,
+                               NPoints) += matBHE_loc_R;  // K_gs
+                R_matrix.block(7 * NPoints, 7 * NPoints, NPoints,
+                               NPoints) += matBHE_loc_R;  // K_gs
+                break;
+        }
+    }
     /**
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.

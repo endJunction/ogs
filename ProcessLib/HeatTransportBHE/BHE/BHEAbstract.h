@@ -242,19 +242,6 @@ public:
      */
     virtual double getTinByTout(double T_in, double current_time) = 0;
 
-    /**
-     * return the _R_matrix, _R_pi_s_matrix, _R_s_matrix
-     */
-    virtual void setRMatrices(
-        const int idx_bhe_unknowns, const int NumNodes,
-        Eigen::MatrixXd& matBHE_loc_R,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_matrix,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_pi_s_matrix,
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>&
-            R_s_matrix) const = 0;
-
     virtual std::vector<std::pair<int, int>> const&
     inflowOutflowBcComponentIds() const = 0;
 

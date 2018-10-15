@@ -46,9 +46,6 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
                           3 /* GlobalDim */>(e, is_axially_symmetric,
                                              _integration_method);
 
-    auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
-    auto BHE_id = _process_data._map_materialID_to_BHE_ID[mat_id];
-
     SpatialPosition x_position;
     x_position.setElementID(element_id);
 
@@ -70,17 +67,19 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
         _secondary_data.N[ip] = sm.N;
     }
 
-    constexpr int NumRMatrixRows = ShapeFunction::NPOINTS * bhe_unknowns;
-    _R_matrix.setZero(NumRMatrixRows, NumRMatrixRows);
-    _R_pi_s_matrix.setZero(NumRMatrixRows, ShapeFunction::NPOINTS);
-    _R_s_matrix.setZero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
+    _R_matrix.setZero(bhe_unknowns_size, bhe_unknowns_size);
+    _R_pi_s_matrix.setZero(bhe_unknowns_size, temperature_size);
+    _R_s_matrix.setZero(temperature_size, temperature_size);
     // formulate the local BHE R matrix
-    Eigen::MatrixXd matBHE_loc_R =
-        Eigen::MatrixXd::Zero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
     for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < bhe_unknowns;
          idx_bhe_unknowns++)
     {
-        matBHE_loc_R.setZero();
+        typename ShapeMatricesType::template MatrixType<
+            single_bhe_unknowns_size, single_bhe_unknowns_size>
+            matBHE_loc_R = ShapeMatricesType::template MatrixType<
+                single_bhe_unknowns_size,
+                single_bhe_unknowns_size>::Zero(single_bhe_unknowns_size,
+                                                single_bhe_unknowns_size);
         // Loop over Gauss points
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
@@ -98,8 +97,9 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
 
         // The following assembly action is according to Diersch (2013) FEFLOW
         // book please refer to M.127 and M.128 on page 955 and 956
-        _bhe.setRMatrices(idx_bhe_unknowns, ShapeFunction::NPOINTS,
-                          matBHE_loc_R, _R_matrix, _R_pi_s_matrix, _R_s_matrix);
+        _bhe.template assembleRMatrices<ShapeFunction::NPOINTS>(
+            idx_bhe_unknowns, matBHE_loc_R, _R_matrix, _R_pi_s_matrix,
+            _R_s_matrix);
     }  // end of loop over BHE unknowns
 
     // debugging
@@ -117,14 +117,10 @@ template <typename ShapeFunction, typename IntegrationMethod, typename BHEType>
 void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
                                        BHEType>::
     assemble(
-        double const /*t*/, std::vector<double> const& local_x,
+        double const /*t*/, std::vector<double> const& /*local_x*/,
         std::vector<double>& local_M_data, std::vector<double>& local_K_data,
         std::vector<double>& /*local_b_data*/)  // local b vector is not touched
 {
-    auto const local_matrix_size = local_x.size();
-    // plus one because the soil temperature is included in local_x
-    assert(local_matrix_size == ShapeFunction::NPOINTS * (bhe_unknowns + 1));
-
     auto local_M = MathLib::createZeroedMatrix<BheLocalMatrixType>(
         local_M_data, local_matrix_size, local_matrix_size);
     auto local_K = MathLib::createZeroedMatrix<BheLocalMatrixType>(
@@ -135,10 +131,6 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
 
     SpatialPosition x_position;
     x_position.setElementID(element_id);
-
-    int shift = 0;
-    constexpr int local_BHE_matrix_size = ShapeFunction::NPOINTS * bhe_unknowns;
-    constexpr int shift_start = ShapeFunction::NPOINTS;
 
     // the mass and conductance matrix terms
     for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -160,41 +152,52 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
             auto& advection_vec =
                 ip_data._vec_Advection_vectors[idx_bhe_unknowns];
 
-            // calculate shift.
-            shift = shift_start + ShapeFunction::NPOINTS * idx_bhe_unknowns;
+            int const single_bhe_unknowns_index =
+                bhe_unknowns_index +
+                single_bhe_unknowns_size * idx_bhe_unknowns;
             // local M
             local_M
-                .template block<ShapeFunction::NPOINTS, ShapeFunction::NPOINTS>(
-                    shift, shift)
+                .template block<single_bhe_unknowns_size,
+                                single_bhe_unknowns_size>(
+                    single_bhe_unknowns_index, single_bhe_unknowns_index)
                 .noalias() += N.transpose() * mass_coeff * N * w;
 
             // local K
             // laplace part
             local_K
-                .block(shift, shift, ShapeFunction::NPOINTS,
-                       ShapeFunction::NPOINTS)
+                .template block<single_bhe_unknowns_size,
+                                single_bhe_unknowns_size>(
+                    single_bhe_unknowns_index, single_bhe_unknowns_index)
                 .noalias() += dNdx.transpose() * laplace_mat * dNdx * w;
             // advection part
             local_K
-                .block(shift, shift, ShapeFunction::NPOINTS,
-                       ShapeFunction::NPOINTS)
+                .template block<single_bhe_unknowns_size,
+                                single_bhe_unknowns_size>(
+                    single_bhe_unknowns_index, single_bhe_unknowns_index)
                 .noalias() +=
                 N.transpose() * advection_vec.transpose() * dNdx * w;
         }
     }
 
     // add the R matrix to local_K
-    local_K.block(shift_start, shift_start, local_BHE_matrix_size,
-                  local_BHE_matrix_size) += _R_matrix;
+    local_K.template block<bhe_unknowns_size, bhe_unknowns_size>(
+        bhe_unknowns_index, bhe_unknowns_index) += _R_matrix;
 
     // add the R_pi_s matrix to local_K
-    local_K.block(shift_start, 0, local_BHE_matrix_size, shift_start) +=
-        _R_pi_s_matrix;
-    local_K.block(0, shift_start, shift_start, local_BHE_matrix_size) +=
-        _R_pi_s_matrix.transpose();
+    local_K
+        .template block<bhe_unknowns_size, temperature_size>(bhe_unknowns_index,
+                                                             temperature_index)
+        .noalias() += _R_pi_s_matrix;
+    local_K
+        .template block<temperature_size, bhe_unknowns_size>(temperature_index,
+                                                             bhe_unknowns_index)
+        .noalias() += _R_pi_s_matrix.transpose();
 
     // add the R_s matrix to local_K
-    local_K.block(0, 0, shift_start, shift_start) += 2.0 * _R_s_matrix;
+    local_K
+        .template block<temperature_size, temperature_size>(temperature_index,
+                                                            temperature_index)
+        .noalias() += 2.0 * _R_s_matrix;
 
     // debugging
     // std::string sep =
