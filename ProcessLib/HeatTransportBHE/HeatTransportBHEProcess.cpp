@@ -132,10 +132,23 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     MeshLib::Mesh const& mesh,
     unsigned const integration_order)
 {
+    // Quick access map to BHE's through element ids.
+    std::unordered_map<std::size_t, BHE::BHEAbstract*> element_to_bhe_map;
+    int const n_BHEs = _process_data._vec_BHE_property.size();
+    for (int i = 0; i < n_BHEs; i++)
+    {
+        auto const& bhe_elements = _bheMeshData.BHE_elements[i];
+        for (auto const& e : bhe_elements)
+        {
+            element_to_bhe_map[e->getID()] =
+                _process_data._vec_BHE_property[i].get();
+        }
+    }
+
     assert(mesh.getDimension() == 3);
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
         HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(
-        mesh.getElements(), dof_table, _local_assemblers,
+        mesh.getElements(), dof_table, _local_assemblers, element_to_bhe_map,
         mesh.isAxiallySymmetric(), integration_order, _process_data);
 
     // Create BHE boundary conditions for each of the BHEs

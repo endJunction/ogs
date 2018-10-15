@@ -20,6 +20,10 @@
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/Fem/Integration/GaussLegendreIntegrationPolicy.h"
 #include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHE_1U.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHE_2U.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHE_CXA.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHE_CXC.h"
 
 #ifndef OGS_MAX_ELEMENT_DIM
 static_assert(false, "The macro OGS_MAX_ELEMENT_DIM is undefined.");
@@ -120,7 +124,7 @@ namespace HeatTransportBHE
 template <typename LocalAssemblerInterface,
           template <typename, typename>
           class LocalAssemblerDataSoil,
-          template <typename, typename>
+          template <typename, typename, typename>
           class LocalAssemblerDataBHE,
           typename... ConstructorArgs>
 class LocalDataInitializer final
@@ -235,6 +239,8 @@ public:
     void operator()(std::size_t const /*id*/,
                     MeshLib::Element const& mesh_item,
                     LADataIntfPtr& data_ptr,
+                    std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
+                        element_to_bhe_map,
                     ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
@@ -250,13 +256,17 @@ public:
                 type_idx.name());
         }
 
-        data_ptr =
-            it->second(mesh_item, std::forward<ConstructorArgs>(args)...);
+        data_ptr = it->second(mesh_item,
+                              element_to_bhe_map,
+                              std::forward<ConstructorArgs>(args)...);
     }
 
 private:
-    using LADataBuilder = std::function<LADataIntfPtr(MeshLib::Element const& e,
-                                                      ConstructorArgs&&...)>;
+    using LADataBuilder = std::function<LADataIntfPtr(
+        MeshLib::Element const& e,
+        std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
+            element_to_bhe_map,
+        ConstructorArgs&&...)>;
 
     template <typename ShapeFunction>
     using IntegrationMethod = typename NumLib::GaussLegendreIntegrationPolicy<
@@ -267,14 +277,17 @@ private:
     using LADataSoil =
         LocalAssemblerDataSoil<ShapeFunction, IntegrationMethod<ShapeFunction>>;
 
-    template <typename ShapeFunction>
-    using LADataBHE =
-        LocalAssemblerDataBHE<ShapeFunction, IntegrationMethod<ShapeFunction>>;
+    template <typename ShapeFunction, typename BHE>
+    using LADataBHE = LocalAssemblerDataBHE<ShapeFunction,
+                                            IntegrationMethod<ShapeFunction>,
+                                            BHE>;
 
     template <typename ShapeFunction>
     static LADataBuilder makeLocalAssemblerBuilder()
     {
         return [](MeshLib::Element const& e,
+                  std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
+                  /* unused */,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             if (e.getDimension() == 3)  // soil elements
             {
@@ -291,9 +304,35 @@ private:
     static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine2>()
     {
         return [](MeshLib::Element const& e,
+                  std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
+                      element_to_bhe_map,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
-            return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine2>{
-                e, std::forward<ConstructorArgs>(args)...}};
+            auto* bhe = element_to_bhe_map.at(e.getID());
+            if (dynamic_cast<BHE::BHE_1U const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine2, BHE::BHE_1U>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            if (dynamic_cast<BHE::BHE_2U const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine2, BHE::BHE_2U>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            if (dynamic_cast<BHE::BHE_CXA const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine2, BHE::BHE_CXA>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            if (dynamic_cast<BHE::BHE_CXC const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine2, BHE::BHE_CXC>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            return nullptr;
         };
     }
 
@@ -302,9 +341,35 @@ private:
     static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine3>()
     {
         return [](MeshLib::Element const& e,
+                  std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
+                      element_to_bhe_map,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
-            return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine3>{
-                e, std::forward<ConstructorArgs>(args)...}};
+            auto* bhe = element_to_bhe_map.at(e.getID());
+            if (dynamic_cast<BHE::BHE_1U const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine3, BHE::BHE_1U>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            if (dynamic_cast<BHE::BHE_2U const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine3, BHE::BHE_2U>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            if (dynamic_cast<BHE::BHE_CXA const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine3, BHE::BHE_CXA>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            if (dynamic_cast<BHE::BHE_CXC const*>(bhe) != nullptr)
+            {
+                return LADataIntfPtr{
+                    new LADataBHE<NumLib::ShapeLine3, BHE::BHE_CXC>{
+                        e, *bhe, std::forward<ConstructorArgs>(args)...}};
+            }
+            return nullptr;
         };
     }
 

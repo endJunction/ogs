@@ -21,14 +21,16 @@ namespace HeatTransportBHE
 {
 using namespace BHE;
 
-template <typename ShapeFunction, typename IntegrationMethod>
-HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod>::
+template <typename ShapeFunction, typename IntegrationMethod, typename BHEType>
+HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
     HeatTransportBHELocalAssemblerBHE(MeshLib::Element const& e,
+                                      BHE::BHEAbstract const& bhe,
                                       bool const is_axially_symmetric,
                                       unsigned const integration_order,
                                       HeatTransportBHEProcessData& process_data)
     : _process_data(process_data),
       _integration_method(integration_order),
+      _bhe(static_cast<BHEType const&>(bhe)),
       element_id(e.getID())
 {
     // need to make sure that the BHE elements are one-dimensional
@@ -115,8 +117,9 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod>::
     // std::cout << _R_pi_s_matrix.format(CleanFmt) << sep;
 }
 
-template <typename ShapeFunction, typename IntegrationMethod>
-void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod>::
+template <typename ShapeFunction, typename IntegrationMethod, typename BHEType>
+void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
+                                       BHEType>::
     assemble(
         double const /*t*/, std::vector<double> const& local_x,
         std::vector<double>& local_M_data, std::vector<double>& local_K_data,

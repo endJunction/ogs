@@ -23,7 +23,7 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-template <typename ShapeFunction, typename IntegrationMethod>
+template <typename ShapeFunction, typename IntegrationMethod, typename BHEType>
 class HeatTransportBHELocalAssemblerBHE
     : public HeatTransportBHELocalAssemblerInterface
 {
@@ -43,6 +43,7 @@ public:
 
     HeatTransportBHELocalAssemblerBHE(
         MeshLib::Element const& e,
+        BHE::BHEAbstract const& bhe,
         bool const is_axially_symmetric,
         unsigned const integration_order,
         HeatTransportBHEProcessData& process_data);
@@ -70,6 +71,8 @@ private:
         _ip_data;
 
     IntegrationMethod _integration_method;
+
+    BHEType const& _bhe;
 
     std::size_t const element_id;
 

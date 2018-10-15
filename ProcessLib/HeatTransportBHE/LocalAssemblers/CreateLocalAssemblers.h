@@ -23,12 +23,15 @@ namespace HeatTransportBHE
 namespace detail
 {
 template <template <typename, typename> class LocalAssemblerSoilImplementation,
-          template <typename, typename> class LocalAssemblerBHEImplementation,
+          template <typename, typename, typename>
+          class LocalAssemblerBHEImplementation,
           typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
     NumLib::LocalToGlobalIndexMap const& dof_table,
     std::vector<MeshLib::Element*> const& mesh_elements,
     std::vector<std::unique_ptr<LocalAssemblerInterface>>& local_assemblers,
+    std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
+        element_to_bhe_map,
     ExtraCtorArgs&&... extra_ctor_args)
 {
     // Shape matrices initializer
@@ -45,7 +48,7 @@ void createLocalAssemblers(
 
     DBUG("Calling local assembler builder for all mesh elements.");
     GlobalExecutor::transformDereferenced(
-        initializer, mesh_elements, local_assemblers,
+        initializer, mesh_elements, local_assemblers, element_to_bhe_map,
         std::forward<ExtraCtorArgs>(extra_ctor_args)...);
 }
 }  // namespace detail
@@ -62,7 +65,8 @@ void createLocalAssemblers(
  * Therefore they always have to be provided manually.
  */
 template <template <typename, typename> class LocalAssemblerSoilImplementation,
-          template <typename, typename> class LocalAssemblerBHEImplementation,
+          template <typename, typename, typename>
+          class LocalAssemblerBHEImplementation,
           typename LocalAssemblerInterface, typename... ExtraCtorArgs>
 void createLocalAssemblers(
     std::vector<MeshLib::Element*> const& mesh_elements,
