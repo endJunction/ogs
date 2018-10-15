@@ -76,6 +76,8 @@ private:
 
     std::size_t const element_id;
 
+    static constexpr int bhe_unknowns = BHEType::number_of_unknowns;
+
     SecondaryData<typename ShapeMatrices::ShapeType> _secondary_data;
 
     BheLocalMatrixType _R_matrix;

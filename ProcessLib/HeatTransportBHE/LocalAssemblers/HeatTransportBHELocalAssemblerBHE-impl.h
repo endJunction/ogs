@@ -70,15 +70,14 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
         _secondary_data.N[ip] = sm.N;
     }
 
-    const int BHE_n_unknowns = _bhe.getNumUnknowns();
-    const int NumRMatrixRows = ShapeFunction::NPOINTS * BHE_n_unknowns;
+    constexpr int NumRMatrixRows = ShapeFunction::NPOINTS * bhe_unknowns;
     _R_matrix.setZero(NumRMatrixRows, NumRMatrixRows);
     _R_pi_s_matrix.setZero(NumRMatrixRows, ShapeFunction::NPOINTS);
     _R_s_matrix.setZero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
     // formulate the local BHE R matrix
     Eigen::MatrixXd matBHE_loc_R =
         Eigen::MatrixXd::Zero(ShapeFunction::NPOINTS, ShapeFunction::NPOINTS);
-    for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < BHE_n_unknowns;
+    for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < bhe_unknowns;
          idx_bhe_unknowns++)
     {
         matBHE_loc_R.setZero();
@@ -123,9 +122,8 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
         std::vector<double>& /*local_b_data*/)  // local b vector is not touched
 {
     auto const local_matrix_size = local_x.size();
-    const int BHE_n_unknowns = _bhe.getNumUnknowns();
     // plus one because the soil temperature is included in local_x
-    assert(local_matrix_size == ShapeFunction::NPOINTS * (BHE_n_unknowns + 1));
+    assert(local_matrix_size == ShapeFunction::NPOINTS * (bhe_unknowns + 1));
 
     auto local_M = MathLib::createZeroedMatrix<BheLocalMatrixType>(
         local_M_data, local_matrix_size, local_matrix_size);
@@ -139,9 +137,8 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     x_position.setElementID(element_id);
 
     int shift = 0;
-    static const int local_BHE_matrix_size =
-        ShapeFunction::NPOINTS * BHE_n_unknowns;
-    static const int shift_start = ShapeFunction::NPOINTS;
+    constexpr int local_BHE_matrix_size = ShapeFunction::NPOINTS * bhe_unknowns;
+    constexpr int shift_start = ShapeFunction::NPOINTS;
 
     // the mass and conductance matrix terms
     for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -154,7 +151,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
         auto const& dNdx = ip_data.dNdx;
 
         // looping over all unknowns.
-        for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < BHE_n_unknowns;
+        for (int idx_bhe_unknowns = 0; idx_bhe_unknowns < bhe_unknowns;
              idx_bhe_unknowns++)
         {
             // get coefficient of mass from corresponding BHE.
