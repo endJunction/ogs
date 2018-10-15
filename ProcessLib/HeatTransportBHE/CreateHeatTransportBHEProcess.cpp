@@ -200,83 +200,70 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
     auto bhe_regrigerant_heat_conductivity =
         MaterialLib::Fluid::createFluidThermalConductivityModel(lambda_conf);
 
-    // reading BHE
-    // parameters--------------------------------------------------------------
-    std::vector<std::unique_ptr<BHE::BHEAbstract>> vec_BHEs;
-    // BHE::BHE_Net BHE_network;
-
-    // now read the BHE configurations
+    // reading BHE parameters --------------------------------------------------
+    std::vector<std::unique_ptr<BHE::BHEAbstract>> bhes;
     auto const& bhe_configs =
         //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__borehole_heat_exchangers}
         config.getConfigSubtree("borehole_heat_exchangers");
 
     for (
         auto const& bhe_conf :
-        //! \ogs_file_param
-        //! prj__processes__process___HEAT_TRANSPORT_BHE__borehole_heat_exchangers__borehole_heat_exchanger}
+        //! \ogs_file_param{prj__processes__process___HEAT_TRANSPORT_BHE__borehole_heat_exchangers__borehole_heat_exchanger}
         bhe_configs.getConfigSubtreeList("borehole_heat_exchanger"))
     {
         // read in the parameters
-        using namespace BHE;
         const std::string bhe_type_str =
+            //! \ogs_file_param{prj__processes__process___HEAT_TRANSPORT_BHE__borehole_heat_exchangers__borehole_heat_exchanger__bhe_type}
             bhe_conf.getConfigParameter<std::string>("bhe_type");
 
-        // convert BHE type
         if (bhe_type_str == "BHE_TYPE_1U")
         {
-            // initialize the 1U type BHE
-            BHE::BHE_1U* m_bhe_1u =
+            bhes.emplace_back(
                 BHE::CreateBHE1U(bhe_conf,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
                                  bhe_refrigerant_heat_capacity,
-                                 bhe_regrigerant_heat_conductivity);
-
-            vec_BHEs.emplace_back(std::make_unique<BHE_1U>(*m_bhe_1u));
+                                 bhe_regrigerant_heat_conductivity));
+            continue;
         }
-        else if (bhe_type_str == "BHE_TYPE_2U")
+        if (bhe_type_str == "BHE_TYPE_2U")
         {
-            // initialize the 2U type BHE
-            BHE::BHE_2U* m_bhe_2u =
+            bhes.emplace_back(
                 BHE::CreateBHE2U(bhe_conf,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
                                  bhe_refrigerant_heat_capacity,
-                                 bhe_regrigerant_heat_conductivity);
-
-            vec_BHEs.emplace_back(std::make_unique<BHE_2U>(*m_bhe_2u));
+                                 bhe_regrigerant_heat_conductivity));
+            continue;
         }
-        else if (bhe_type_str == "BHE_TYPE_CXC")
+        if (bhe_type_str == "BHE_TYPE_CXC")
         {
-            // initialize the CXC type BHE
-            BHE::BHE_CXC* m_bhe_CXC =
+            bhes.emplace_back(
                 BHE::CreateBHECXC(bhe_conf,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,
                                   bhe_refrigerant_heat_capacity,
-                                  bhe_regrigerant_heat_conductivity);
-
-            vec_BHEs.emplace_back(std::make_unique<BHE_CXC>(*m_bhe_CXC));
+                                  bhe_regrigerant_heat_conductivity));
+            continue;
         }
-        else if (bhe_type_str == "BHE_TYPE_CXA")
+        if (bhe_type_str == "BHE_TYPE_CXA")
         {
-            // initialize the CXA type BHE
-            BHE::BHE_CXA* m_bhe_CXA =
+            bhes.emplace_back(
                 BHE::CreateBHECXA(bhe_conf,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,
                                   bhe_refrigerant_heat_capacity,
-                                  bhe_regrigerant_heat_conductivity);
-
-            vec_BHEs.emplace_back(std::make_unique<BHE_CXA>(*m_bhe_CXA));
+                                  bhe_regrigerant_heat_conductivity));
+            continue;
         }
+
+        OGS_FATAL("Unknown BHE type '%s'.", bhe_type_str.c_str());
     }
-    // end of reading BHE
-    // parameters-------------------------------------------------------
+    // end of reading BHE parameters -------------------------------------------
 
     HeatTransportBHEProcessData process_data{thermal_conductivity_solid,
                                              thermal_conductivity_fluid,
@@ -287,7 +274,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
                                              density_solid,
                                              density_fluid,
                                              density_gas,
-                                             std::move(vec_BHEs)};
+                                             std::move(bhes)};
 
     SecondaryVariableCollection secondary_variables;
 
