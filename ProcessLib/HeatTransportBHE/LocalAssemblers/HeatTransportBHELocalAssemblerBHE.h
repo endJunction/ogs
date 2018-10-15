@@ -65,9 +65,9 @@ public:
 private:
     HeatTransportBHEProcessData& _process_data;
 
-    std::vector<
-        IntegrationPointDataBHE<ShapeMatricesType>,
-        Eigen::aligned_allocator<IntegrationPointDataBHE<ShapeMatricesType>>>
+    std::vector<IntegrationPointDataBHE<ShapeMatricesType, BHEType>,
+                Eigen::aligned_allocator<
+                    IntegrationPointDataBHE<ShapeMatricesType, BHEType>>>
         _ip_data;
 
     IntegrationMethod _integration_method;

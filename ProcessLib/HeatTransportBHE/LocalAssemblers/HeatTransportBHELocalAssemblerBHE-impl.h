@@ -59,7 +59,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
         x_position.setIntegrationPoint(ip);
 
         // create the class IntegrationPointDataBHE in place
-        _ip_data.emplace_back(*(_process_data._vec_BHE_property[BHE_id]));
+        _ip_data.emplace_back(_bhe);
         auto const& sm = shape_matrices[ip];
         auto& ip_data = _ip_data[ip];
         ip_data.integration_weight =
@@ -71,7 +71,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
         _secondary_data.N[ip] = sm.N;
     }
 
-    const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
+    const int BHE_n_unknowns = _bhe.getNumUnknowns();
     const int NumRMatrixRows = ShapeFunction::NPOINTS * BHE_n_unknowns;
     _R_matrix.setZero(NumRMatrixRows, NumRMatrixRows);
     _R_pi_s_matrix.setZero(NumRMatrixRows, ShapeFunction::NPOINTS);
@@ -126,7 +126,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
         std::vector<double>& /*local_b_data*/)  // local b vector is not touched
 {
     auto const local_matrix_size = local_x.size();
-    const int BHE_n_unknowns = _ip_data[0]._bhe_instance.getNumUnknowns();
+    const int BHE_n_unknowns = _bhe.getNumUnknowns();
     // plus one because the soil temperature is included in local_x
     assert(local_matrix_size == ShapeFunction::NPOINTS * (BHE_n_unknowns + 1));
 

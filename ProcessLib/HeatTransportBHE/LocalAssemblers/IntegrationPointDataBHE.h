@@ -19,14 +19,13 @@ namespace HeatTransportBHE
 {
 using namespace BHE;
 
-template <typename ShapeMatrixType>
+template <typename ShapeMatrixType, typename BHEType>
 struct IntegrationPointDataBHE final
 {
-    explicit IntegrationPointDataBHE(BHEAbstract& bhe_instance)
-        : _bhe_instance(bhe_instance)
+    explicit IntegrationPointDataBHE(BHEType const& bhe) : _bhe(bhe)
     {
         // depending on the type of BHE
-        const int unknown_size = _bhe_instance.getNumUnknowns();
+        const int unknown_size = _bhe.getNumUnknowns();
         // initialization
         _vec_mass_coefficients.resize(unknown_size);
         for (int i = 0; i < unknown_size; i++)
@@ -43,15 +42,15 @@ struct IntegrationPointDataBHE final
         for (int j = 0; j < unknown_size; j++)
         {
             // mass matrix coefficients
-            _vec_mass_coefficients[j] = _bhe_instance.getMassCoeff(j);
+            _vec_mass_coefficients[j] = _bhe.getMassCoeff(j);
             // laplace matrix
-            _bhe_instance.getLaplaceMatrix(j, _vec_mat_Laplace[j]);
+            _bhe.getLaplaceMatrix(j, _vec_mat_Laplace[j]);
             // advection vector
-            _bhe_instance.getAdvectionVector(j, _vec_Advection_vectors[j]);
+            _bhe.getAdvectionVector(j, _vec_Advection_vectors[j]);
         }
     }
 
-    BHEAbstract& _bhe_instance;
+    BHEAbstract const& _bhe;
 
     typename ShapeMatrixType::NodalRowVectorType N;
     typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
@@ -65,8 +64,6 @@ struct IntegrationPointDataBHE final
 
     // Advection vectors
     std::vector<Eigen::VectorXd> _vec_Advection_vectors;
-
-    void pushBackState() {}
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
