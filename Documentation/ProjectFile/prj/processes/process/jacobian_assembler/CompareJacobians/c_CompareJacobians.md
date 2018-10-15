@@ -16,7 +16,9 @@ Code snippet:
             <jacobian_assembler>
                 <type>CompareJacobians</type>
                 <jacobian_assembler>
-                    <type>Analytical</type>
+                    <type>CentralDifferences</type>
+                    <component_magnitudes>1 1</component_magnitudes>
+                    <relative_epsilons>1e-8 1e-8</relative_epsilons>
                 </jacobian_assembler>
                 <reference_jacobian_assembler>
                     <type>CentralDifferences</type>
