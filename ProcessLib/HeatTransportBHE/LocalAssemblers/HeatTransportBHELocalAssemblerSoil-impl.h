@@ -31,10 +31,8 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
-HeatTransportBHELocalAssemblerSoil<ShapeFunction,
-                                   IntegrationMethod,
-                                   GlobalDim>::
+template <typename ShapeFunction, typename IntegrationMethod>
+HeatTransportBHELocalAssemblerSoil<ShapeFunction, IntegrationMethod>::
     HeatTransportBHELocalAssemblerSoil(
         MeshLib::Element const& e,
         bool const is_axially_symmetric,
@@ -54,7 +52,7 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
     _shape_matrices = initShapeMatrices<ShapeFunction,
                                         ShapeMatricesType,
                                         IntegrationMethod,
-                                        GlobalDim>(
+                                        3 /* GlobalDim */>(
         e, is_axially_symmetric, _integration_method);
 
     SpatialPosition x_position;
@@ -78,15 +76,13 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction,
     }
 }
 
-template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
-void HeatTransportBHELocalAssemblerSoil<
-    ShapeFunction,
-    IntegrationMethod,
-    GlobalDim>::assemble(double const t,
-                         std::vector<double> const& local_x,
-                         std::vector<double>& local_M_data,
-                         std::vector<double>& local_K_data,
-                         std::vector<double>& /*local_b_data*/)
+template <typename ShapeFunction, typename IntegrationMethod>
+void HeatTransportBHELocalAssemblerSoil<ShapeFunction, IntegrationMethod>::
+    assemble(double const t,
+             std::vector<double> const& local_x,
+             std::vector<double>& local_M_data,
+             std::vector<double>& local_K_data,
+             std::vector<double>& /*local_b_data*/)
 {
     assert(local_x.size() == ShapeFunction::NPOINTS);
     (void)local_x;  // Avoid unused arg warning.

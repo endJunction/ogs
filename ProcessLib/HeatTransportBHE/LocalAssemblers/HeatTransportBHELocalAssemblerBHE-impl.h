@@ -21,8 +21,8 @@ namespace HeatTransportBHE
 {
 using namespace BHE;
 
-template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
-HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, GlobalDim>::
+template <typename ShapeFunction, typename IntegrationMethod>
+HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod>::
     HeatTransportBHELocalAssemblerBHE(MeshLib::Element const& e,
                                       bool const is_axially_symmetric,
                                       unsigned const integration_order,
@@ -42,8 +42,8 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, GlobalDim>::
 
     auto const shape_matrices =
         initShapeMatrices<ShapeFunction, ShapeMatricesType, IntegrationMethod,
-                          GlobalDim>(e, is_axially_symmetric,
-                                   _integration_method);
+                          3 /* GlobalDim */>(e, is_axially_symmetric,
+                                             _integration_method);
 
     auto mat_id = (*_process_data._mesh_prop_materialIDs)[e.getID()];
     auto BHE_id = _process_data._map_materialID_to_BHE_ID[mat_id];
@@ -115,9 +115,8 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, GlobalDim>::
     // std::cout << _R_pi_s_matrix.format(CleanFmt) << sep;
 }
 
-template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
-void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
-                                       GlobalDim>::
+template <typename ShapeFunction, typename IntegrationMethod>
+void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod>::
     assemble(
         double const /*t*/, std::vector<double> const& local_x,
         std::vector<double>& local_M_data, std::vector<double>& local_K_data,

@@ -26,12 +26,13 @@ namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-template <typename ShapeFunction, typename IntegrationMethod, int GlobalDim>
+template <typename ShapeFunction, typename IntegrationMethod>
 class HeatTransportBHELocalAssemblerSoil
     : public HeatTransportBHELocalAssemblerInterface
 {
 public:
-    using ShapeMatricesType = ShapeMatrixPolicyType<ShapeFunction, GlobalDim>;
+    using ShapeMatricesType =
+        ShapeMatrixPolicyType<ShapeFunction, 3 /* GlobalDim */>;
     using NodalMatrixType = typename ShapeMatricesType::NodalMatrixType;
     using NodalVectorType = typename ShapeMatricesType::NodalVectorType;
     using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;

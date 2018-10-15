@@ -134,8 +134,7 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
 {
     assert(mesh.getDimension() == 3);
     ProcessLib::HeatTransportBHE::createLocalAssemblers<
-        3 /* mesh dimension */, HeatTransportBHELocalAssemblerSoil,
-        HeatTransportBHELocalAssemblerBHE>(
+        HeatTransportBHELocalAssemblerSoil, HeatTransportBHELocalAssemblerBHE>(
         mesh.getElements(), dof_table, _local_assemblers,
         mesh.isAxiallySymmetric(), integration_order, _process_data);
 

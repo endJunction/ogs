@@ -118,9 +118,10 @@ namespace HeatTransportBHE
 /// For example for MeshLib::Quad a local assembler data with template argument
 /// NumLib::ShapeQuad4 is created.
 template <typename LocalAssemblerInterface,
-          template <typename, typename, int> class LocalAssemblerDataSoil,
-          template <typename, typename, int> class LocalAssemblerDataBHE,
-          int GlobalDim,
+          template <typename, typename>
+          class LocalAssemblerDataSoil,
+          template <typename, typename>
+          class LocalAssemblerDataBHE,
           typename... ConstructorArgs>
 class LocalDataInitializer final
 {
@@ -263,45 +264,19 @@ private:
 
     // local assembler builder implementations.
     template <typename ShapeFunction>
-    using LADataSoil = LocalAssemblerDataSoil<ShapeFunction,
-                                              IntegrationMethod<ShapeFunction>,
-                                              GlobalDim>;
+    using LADataSoil =
+        LocalAssemblerDataSoil<ShapeFunction, IntegrationMethod<ShapeFunction>>;
 
     template <typename ShapeFunction>
-    using LADataBHE = LocalAssemblerDataBHE<ShapeFunction,
-                                            IntegrationMethod<ShapeFunction>,
-                                            GlobalDim>;
-    /// A helper forwarding to the correct version of makeLocalAssemblerBuilder
-    /// depending whether the global dimension is less than the shape function's
-    /// dimension or not.
+    using LADataBHE =
+        LocalAssemblerDataBHE<ShapeFunction, IntegrationMethod<ShapeFunction>>;
+
     template <typename ShapeFunction>
     static LADataBuilder makeLocalAssemblerBuilder()
     {
-        return makeLocalAssemblerBuilder<ShapeFunction>(
-            static_cast<
-                std::integral_constant<bool,
-                                       (GlobalDim >= ShapeFunction::DIM)>*>(
-                nullptr));
-    }
-
-    /// Mapping of element types to local assembler constructors.
-    std::unordered_map<std::type_index, LADataBuilder> _builder;
-
-    NumLib::LocalToGlobalIndexMap const& _dof_table;
-
-private:
-    /// Generates a function that creates a new LocalAssembler of type
-    /// LAData<ShapeFunction>. Only functions with shape function's dimension
-    /// less equal to the global dimension or with shape function of a line
-    /// elements are instantiated, e.g.  following
-    /// combinations of shape functions and global dimensions: (Line2, 1),
-    /// (Line3, 1), (Hex20, 3) but not (Hex20, 2) or (Hex20, 1) or (Line2, 2).
-    template <typename ShapeFunction>
-    static LADataBuilder makeLocalAssemblerBuilder(std::true_type*)
-    {
         return [](MeshLib::Element const& e,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
-            if (e.getDimension() == GlobalDim)  // soil elements
+            if (e.getDimension() == 3)  // soil elements
             {
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
                     e, std::forward<ConstructorArgs>(args)...}};
@@ -313,8 +288,7 @@ private:
 
     /// Specialization for BHE elements.
     template <>
-    static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine2>(
-        std::true_type*)
+    static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine2>()
     {
         return [](MeshLib::Element const& e,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
@@ -325,8 +299,7 @@ private:
 
     /// Specialization for BHE elements.
     template <>
-    static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine3>(
-        std::true_type*)
+    static LADataBuilder makeLocalAssemblerBuilder<NumLib::ShapeLine3>()
     {
         return [](MeshLib::Element const& e,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
@@ -335,13 +308,10 @@ private:
         };
     }
 
-    /// Returns nullptr for shape functions whose dimensions are less than the
-    /// global dimension.
-    template <typename ShapeFunction>
-    static LADataBuilder makeLocalAssemblerBuilder(std::false_type*)
-    {
-        return nullptr;
-    }
+    /// Mapping of element types to local assembler constructors.
+    std::unordered_map<std::type_index, LADataBuilder> _builder;
+
+    NumLib::LocalToGlobalIndexMap const& _dof_table;
 };  // namespace HeatTransportBHE
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
