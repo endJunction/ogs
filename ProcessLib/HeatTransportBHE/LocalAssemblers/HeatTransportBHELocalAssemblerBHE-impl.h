@@ -9,10 +9,9 @@
 
 #pragma once
 
-#include <Eigen/Eigen>
 #include "HeatTransportBHELocalAssemblerBHE.h"
+
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
-#include "ProcessLib/HeatTransportBHE/LocalAssemblers/IntegrationPointDataBHE.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
 
 namespace ProcessLib
