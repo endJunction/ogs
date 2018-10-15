@@ -43,7 +43,6 @@ public:
 
     HeatTransportBHELocalAssemblerSoil(
         MeshLib::Element const& e,
-        std::vector<unsigned> const& dofIndex_to_localIndex,
         bool is_axially_symmetric,
         unsigned const integration_order,
         HeatTransportBHEProcessData& process_data);

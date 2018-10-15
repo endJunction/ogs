@@ -231,13 +231,11 @@ public:
     /// The index \c id is not necessarily the mesh item's id. Especially when
     /// having multiple meshes it will differ from the latter.
     void operator()(
-        std::size_t const id,
+        std::size_t const /*id*/,
         MeshLib::Element const& mesh_item,
         LADataIntfPtr& data_ptr,
-        const std::vector<
-            std::vector<std::size_t>>& /*vec_ele_connected_BHE_IDs*/,
-        const std::vector<
-            std::unique_ptr<BHE::BHEAbstract>>& /*vec_BHE_property*/,
+        const std::vector<std::vector<std::size_t>>& /*vec_ele_connected_BHE_IDs*/,
+        const std::vector<std::unique_ptr<BHE::BHEAbstract>>& /*vec_BHE_property*/,
         ConstructorArgs&&... args) const
     {
         auto const type_idx = std::type_index(typeid(mesh_item));
@@ -253,50 +251,13 @@ public:
                 type_idx.name());
         }
 
-        std::vector<unsigned> dofIndex_to_localIndex;
-
-        // Create customed dof table when it is a BHE element.
-        if (mesh_item.getDimension() == 1)
-        {
-            // this is a BHE element
-            auto const n_local_dof = _dof_table.getNumberOfElementDOF(id);
-            dofIndex_to_localIndex.resize(n_local_dof);
-            unsigned dof_id = 0;
-            unsigned local_id = 0;
-            for (auto const i : _dof_table.getElementVariableIDs(id))
-            {
-                auto const n_global_components =
-                    _dof_table.getNumberOfElementComponents(i);
-                for (unsigned j = 0; j < n_global_components; j++)
-                {
-                    auto const& ms = _dof_table.getMeshSubset(i, j);
-                    auto const mesh_id = ms.getMeshID();
-                    for (unsigned k = 0; k < mesh_item.getNumberOfNodes(); k++)
-                    {
-                        MeshLib::Location l(mesh_id,
-                                            MeshLib::MeshItemType::Node,
-                                            mesh_item.getNodeIndex(k));
-                        auto const global_index =
-                            _dof_table.getGlobalIndex(l, i, j);
-                        if (global_index != NumLib::MeshComponentMap::nop)
-                        {
-                            dofIndex_to_localIndex[dof_id++] = local_id;
-                        }
-                        local_id++;
-                    }
-                }
-            }
-        }
-
-        data_ptr = it->second(mesh_item, dofIndex_to_localIndex,
-                              std::forward<ConstructorArgs>(args)...);
+        data_ptr =
+            it->second(mesh_item, std::forward<ConstructorArgs>(args)...);
     }
 
 private:
-    using LADataBuilder = std::function<LADataIntfPtr(
-        MeshLib::Element const& e,
-        std::vector<unsigned> const& dofIndex_to_localIndex,
-        ConstructorArgs&&...)>;
+    using LADataBuilder = std::function<LADataIntfPtr(MeshLib::Element const& e,
+                                                      ConstructorArgs&&...)>;
 
     template <typename ShapeFunction>
     using IntegrationMethod = typename NumLib::GaussLegendreIntegrationPolicy<
@@ -338,13 +299,11 @@ private:
     static LADataBuilder makeLocalAssemblerBuilder(std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             if (e.getDimension() == GlobalDim)  // soil elements
             {
                 return LADataIntfPtr{new LADataSoil<ShapeFunction>{
-                    e, dofIndex_to_localIndex,
-                    std::forward<ConstructorArgs>(args)...}};
+                    e, std::forward<ConstructorArgs>(args)...}};
             }
 
             return nullptr;
@@ -356,12 +315,10 @@ private:
         std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine2>{
                 // BHE elements
-                e, dofIndex_to_localIndex,
-                std::forward<ConstructorArgs>(args)...}};
+                e, std::forward<ConstructorArgs>(args)...}};
         };
     }
 
@@ -370,12 +327,10 @@ private:
         std::true_type*)
     {
         return [](MeshLib::Element const& e,
-                  std::vector<unsigned> const& dofIndex_to_localIndex,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
             return LADataIntfPtr{new LADataBHE<NumLib::ShapeLine3>{
                 // BHE elements
-                e, dofIndex_to_localIndex,
-                std::forward<ConstructorArgs>(args)...}};
+                e, std::forward<ConstructorArgs>(args)...}};
         };
     }
 

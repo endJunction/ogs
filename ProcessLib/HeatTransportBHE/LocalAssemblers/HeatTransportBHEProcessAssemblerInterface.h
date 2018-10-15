@@ -29,18 +29,7 @@ public:
     // The following function is necessary, because the BHE or Soil assemblers
     // create their local_x memory based on the passed on dofIndex_to_localIndex
     // Please keep it unchanged.
-    HeatTransportBHELocalAssemblerInterface(std::size_t /*n_local_size*/,
-                                            std::vector<unsigned>
-                                                dofIndex_to_localIndex)
-        : _dofIndex_to_localIndex(std::move(dofIndex_to_localIndex))
-    {
-    }
-
-private:
-    // this dofTalbe must be kept here.
-    // When initializing the assembler, this will be needed to
-    // initialize the memory for local assemblers.
-    std::vector<unsigned> const _dofIndex_to_localIndex;
+    HeatTransportBHELocalAssemblerInterface(std::size_t n_local_size) {}
 };
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib
