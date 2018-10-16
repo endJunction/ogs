@@ -9,19 +9,22 @@
 
 #include "CreateHeatTransportBHEProcess.h"
 
-#include "BHE/BHEAbstract.h"
-#include "BHE/CreateBHE1U.h"
-#include "BHE/CreateBHE2U.h"
-#include "BHE/CreateBHECXA.h"
-#include "BHE/CreateBHECXC.h"
-#include "HeatTransportBHEProcess.h"
-#include "HeatTransportBHEProcessData.h"
+#include <vector>
+
 #include "MaterialLib/Fluid/Density/CreateFluidDensityModel.h"
 #include "MaterialLib/Fluid/SpecificHeatCapacity/CreateSpecificFluidHeatCapacityModel.h"
 #include "MaterialLib/Fluid/ThermalConductivity/CreateFluidThermalConductivityModel.h"
 #include "MaterialLib/Fluid/Viscosity/CreateViscosityModel.h"
 #include "ProcessLib/Output/CreateSecondaryVariables.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
+
+#include "BHE/BHETypes.h"
+#include "BHE/CreateBHE1U.h"
+#include "BHE/CreateBHE2U.h"
+#include "BHE/CreateBHECXA.h"
+#include "BHE/CreateBHECXC.h"
+#include "HeatTransportBHEProcess.h"
+#include "HeatTransportBHEProcessData.h"
 
 namespace ProcessLib
 {
@@ -195,7 +198,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         MaterialLib::Fluid::createFluidThermalConductivityModel(lambda_conf);
 
     // reading BHE parameters --------------------------------------------------
-    std::vector<std::unique_ptr<BHE::BHEAbstract>> bhes;
+    std::vector<BHETypes> bhes;
     auto const& bhe_configs =
         //! \ogs_file_param{prj__processes__process__HEAT_TRANSPORT_BHE__borehole_heat_exchangers}
         config.getConfigSubtree("borehole_heat_exchangers");

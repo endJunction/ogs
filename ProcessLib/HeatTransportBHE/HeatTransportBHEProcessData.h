@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #include "MeshLib/PropertyVector.h"
-#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHETypes.h"
 
 namespace MeshLib
 {
@@ -40,7 +40,7 @@ struct HeatTransportBHEProcessData
         Parameter<double> const& density_solid_,
         Parameter<double> const& density_fluid_,
         Parameter<double> const& density_gas_,
-        std::vector<std::unique_ptr<BHE::BHEAbstract>>&& vec_BHEs_)
+        std::vector<BHETypes>&& vec_BHEs_)
         : thermal_conductivity_solid(thermal_conductivity_solid_),
           thermal_conductivity_fluid(thermal_conductivity_fluid_),
           thermal_conductivity_gas(thermal_conductivity_gas_),
@@ -83,7 +83,7 @@ struct HeatTransportBHEProcessData
     MeshLib::PropertyVector<int> const* _mesh_prop_materialIDs = nullptr;
     std::unordered_map<int, int> _map_materialID_to_BHE_ID;
 
-    std::vector<std::unique_ptr<BHE::BHEAbstract>> _vec_BHE_property;
+    std::vector<BHETypes> _vec_BHE_property;
 };
 }  // namespace HeatTransportBHE
 }  // namespace ProcessLib

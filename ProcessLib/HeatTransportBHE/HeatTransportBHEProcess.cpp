@@ -96,7 +96,8 @@ void HeatTransportBHEProcess::constructDofTable()
     for (int i = 0; i < n_BHEs; i++)
     {
         auto const number_of_unknowns =
-            _process_data._vec_BHE_property[i]->getNumUnknowns();
+            apply_visitor([](auto const& bhe) { return bhe.getNumUnknowns(); },
+                          _process_data._vec_BHE_property[i]);
         auto const& bhe_nodes = _bheMeshData.BHE_nodes[i];
         auto const& bhe_elements = _bheMeshData.BHE_elements[i];
 
@@ -139,8 +140,9 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
         auto const& bhe_elements = _bheMeshData.BHE_elements[i];
         for (auto const& e : bhe_elements)
         {
-            element_to_bhe_map[e->getID()] =
-                _process_data._vec_BHE_property[i].get();
+            element_to_bhe_map[e->getID()] = apply_visitor(
+                [](auto& bhe) { return static_cast<BHE::BHEAbstract*>(&bhe); },
+                _process_data._vec_BHE_property[i]);
         }
     }
 
@@ -227,18 +229,22 @@ void HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom(
                         variable_id, in_out_component_id.second));
             };
 
-        for (auto const& in_out_component_id :
-             _process_data._vec_BHE_property[bhe_i]
-                 ->inflowOutflowBcComponentIds())
+        for (auto const& in_out_component_id : apply_visitor(
+                 [](auto const& bhe) {
+                     return bhe.inflowOutflowBcComponentIds();
+                 },
+                 _process_data._vec_BHE_property[bhe_i]))
         {
             // Top, inflow.
+            auto* bhe = apply_visitor(
+                [](auto& bhe) { return static_cast<BHE::BHEAbstract*>(&bhe); },
+                _process_data._vec_BHE_property[bhe_i]);
             bcs.addBoundaryCondition(
                 ProcessLib::createBHEInflowDirichletBoundaryCondition(
                     get_global_bhe_bc_indices(bc_top_node->getID(),
                                               in_out_component_id),
                     _mesh, {bc_top_node}, variable_id,
-                    in_out_component_id.first,
-                    _process_data._vec_BHE_property[bhe_i]));
+                    in_out_component_id.first, bhe));
 
             // Bottom, outflow.
             bcs.addBoundaryCondition(
