@@ -206,11 +206,11 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         bhe_configs.getConfigSubtreeList("borehole_heat_exchanger"))
     {
         // read in the parameters
-        const std::string bhe_type_str =
+        const std::string bhe_type =
             //! \ogs_file_param{prj__processes__process___HEAT_TRANSPORT_BHE__borehole_heat_exchangers__borehole_heat_exchanger__bhe_type}
             bhe_config.getConfigParameter<std::string>("bhe_type");
 
-        if (bhe_type_str == "BHE_TYPE_1U")
+        if (bhe_type == "BHE_TYPE_1U")
         {
             bhes.emplace_back(
                 BHE::createBHE1U(bhe_config,
@@ -221,7 +221,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
                                  bhe_regrigerant_heat_conductivity));
             continue;
         }
-        if (bhe_type_str == "BHE_TYPE_2U")
+        if (bhe_type == "BHE_TYPE_2U")
         {
             bhes.emplace_back(
                 BHE::createBHE2U(bhe_config,
@@ -232,7 +232,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
                                  bhe_regrigerant_heat_conductivity));
             continue;
         }
-        if (bhe_type_str == "BHE_TYPE_CXC")
+        if (bhe_type == "BHE_TYPE_CXC")
         {
             bhes.emplace_back(
                 BHE::createBHECXC(bhe_config,
@@ -243,7 +243,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
                                   bhe_regrigerant_heat_conductivity));
             continue;
         }
-        if (bhe_type_str == "BHE_TYPE_CXA")
+        if (bhe_type == "BHE_TYPE_CXA")
         {
             bhes.emplace_back(
                 BHE::createBHECXA(bhe_config,
@@ -255,7 +255,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
             continue;
         }
 
-        OGS_FATAL("Unknown BHE type '%s'.", bhe_type_str.c_str());
+        OGS_FATAL("Unknown BHE type '%s'.", bhe_type.c_str());
     }
     // end of reading BHE parameters -------------------------------------------
 
