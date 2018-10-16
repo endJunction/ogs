@@ -53,7 +53,7 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXA::initialize()
                                         borehole_geometry.length);
     _Nu(1) = Nu_out;
     double const diameter_ratio =
-        pipe_param.r_outer / (pipe_param.r_inner + pipe_param.b_in);
+        (pipe_param.r_inner + pipe_param.b_in) / pipe_param.r_outer;
     double const pipe_aspect_ratio =
         2.0 * (pipe_param.r_outer - (pipe_param.r_inner + pipe_param.b_in)) /
         borehole_geometry.length;
@@ -96,8 +96,8 @@ void BHE_CXA::calcThermalResistances()
 
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 66 in Diersch_2011_CG
-    _R_con_i1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_i);
-    _R_con_o1 = std::log((r_inner + b_out) / r_inner) / (2.0 * PI * lambda_p_o);
+    _R_con_i1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_o);
+    _R_con_o1 = std::log((r_inner + b_out) / r_inner) / (2.0 * PI * lambda_p_i);
 
     // thermal resistance due to the grout transition
     d_i1 = 2.0 * (r_outer + b_out);
