@@ -122,56 +122,6 @@ void BHE_CXC::calcHeatTransferCoefficients()
     _PHI_gs = 1.0 / _R_gs;
 }
 
-void BHE_CXC::getLaplaceMatrix(std::size_t idx_unknown,
-                               Eigen::MatrixXd& mat_laplace) const
-{
-    double const& lambda_r = refrigerant_param.lambda_r;
-    double const& rho_r = refrigerant_param.rho_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    double const& alpha_L = refrigerant_param.alpha_L;
-    double const& porosity_g = grout_param.porosity_g;
-    double const& lambda_g = grout_param.lambda_g;
-
-    double const velocity_norm =
-        std::sqrt(flow_properties_in.velocity * flow_properties_in.velocity +
-                  flow_properties_out.velocity * flow_properties_out.velocity);
-    // Here we calculates the laplace coefficients in the governing
-    // equations of BHE. These governing equations can be found in
-    // 1) Diersch (2013) FEFLOW book on page 952, M.120-122, or
-    // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 26-28.
-    double laplace_coeff(0.0);
-    mat_laplace.setZero();
-
-    switch (idx_unknown)
-    {
-        case 0:
-            // pipe i1, Eq. 26
-            laplace_coeff =
-                (lambda_r + rho_r * heat_cap_r * alpha_L * velocity_norm) *
-                CSA_i;
-            break;
-        case 1:
-            // pipe o1, Eq. 27
-            laplace_coeff =
-                (lambda_r + rho_r * heat_cap_r * alpha_L * velocity_norm) *
-                CSA_o;
-            break;
-        case 2:
-            // pipe g1, Eq. 28
-            laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g;
-            break;
-        default:
-            OGS_FATAL(
-                "Error !!! The index passed to get_laplace_coeff for BHE is "
-                "not correct. ");
-            break;
-    }
-
-    mat_laplace(0, 0) = laplace_coeff;
-    mat_laplace(1, 1) = laplace_coeff;
-    mat_laplace(2, 2) = laplace_coeff;
-}
-
 void BHE_CXC::getAdvectionVector(std::size_t idx_unknown,
                                  Eigen::VectorXd& vec_advection) const
 {

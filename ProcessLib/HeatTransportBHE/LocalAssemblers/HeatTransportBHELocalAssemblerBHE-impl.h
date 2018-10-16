@@ -133,6 +133,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     x_position.setElementID(element_id);
 
     auto const& pipe_heat_capacities = _bhe.pipeHeatCapacities();
+    auto const& pipe_heat_conductions = _bhe.pipeHeatConductions();
 
     // the mass and conductance matrix terms
     for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -150,7 +151,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
         {
             // get coefficient of mass from corresponding BHE.
             auto const& mass_coeff = pipe_heat_capacities[idx_bhe_unknowns];
-            auto& laplace_mat = ip_data._vec_mat_Laplace[idx_bhe_unknowns];
+            auto const& lambda = pipe_heat_conductions[idx_bhe_unknowns];
             auto& advection_vec =
                 ip_data._vec_Advection_vectors[idx_bhe_unknowns];
 
@@ -170,7 +171,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
                 .template block<single_bhe_unknowns_size,
                                 single_bhe_unknowns_size>(
                     single_bhe_unknowns_index, single_bhe_unknowns_index)
-                .noalias() += dNdx.transpose() * laplace_mat * dNdx * w;
+                .noalias() += dNdx.transpose() * dNdx * lambda * w;
             // advection part
             local_K
                 .template block<single_bhe_unknowns_size,

@@ -210,13 +210,6 @@ public:
     virtual void calcHeatTransferCoefficients() = 0;
 
     /**
-     * return the coeff of laplace matrix,
-     * depending on the index of unknown.
-     */
-    virtual void getLaplaceMatrix(std::size_t idx_unknown,
-                                  Eigen::MatrixXd& mat_laplace) const = 0;
-
-    /**
      * return the coeff of advection matrix,
      * depending on the index of unknown.
      */

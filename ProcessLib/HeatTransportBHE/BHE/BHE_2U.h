@@ -209,12 +209,36 @@ public:
                  /*g4*/ (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g2}};
     }
 
-    /**
-     * return the coeff of laplace matrix,
-     * depending on the index of unknown.
-     */
-    void getLaplaceMatrix(std::size_t idx_unknown,
-                          Eigen::MatrixXd& mat_laplace) const;
+    std::array<double, number_of_unknowns> pipeHeatConductions() const
+    {
+        double const& lambda_r = refrigerant_param.lambda_r;
+        double const& rho_r = refrigerant_param.rho_r;
+        double const& heat_cap_r = refrigerant_param.heat_cap_r;
+        double const& alpha_L = refrigerant_param.alpha_L;
+        double const& porosity_g = grout_param.porosity_g;
+        double const& lambda_g = grout_param.lambda_g;
+
+        // Here we calculates the laplace coefficients in the governing
+        // equations of BHE. These governing equations can be found in
+        // 1) Diersch (2013) FEFLOW book on page 952, M.120-122, or
+        // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 10-18.
+        return {{// pipe i1, Eq. 18
+                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i,
+                 // pipe i2, Eq. 18
+                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i,
+                 // pipe o1,  Eq. 18
+                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o,
+                 // pipe o2,  Eq. 18
+                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o,
+                 // pipe g1, Eq. 14
+                 (1.0 - porosity_g) * lambda_g * CSA_g1,
+                 // pipe g2, Eq. 15
+                 (1.0 - porosity_g) * lambda_g * CSA_g1,
+                 // pipe g3, Eq. 16
+                 (1.0 - porosity_g) * lambda_g * CSA_g2,
+                 // pipe g4, Eq. 17
+                 (1.0 - porosity_g) * lambda_g * CSA_g2}};
+    }
 
     /**
      * return the coeff of advection matrix,

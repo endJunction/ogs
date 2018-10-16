@@ -29,9 +29,6 @@ struct IntegrationPointDataBHE final
         // initialization
         for (int i = 0; i < unknown_size; i++)
         {
-            Eigen::MatrixXd mat_laplace(3, 3);
-            mat_laplace.setZero();
-            _vec_mat_Laplace.push_back(mat_laplace);
             Eigen::VectorXd vec_advection(3);
             vec_advection.setZero();
             _vec_Advection_vectors.push_back(vec_advection);
@@ -40,8 +37,6 @@ struct IntegrationPointDataBHE final
         // set parameter values
         for (int j = 0; j < unknown_size; j++)
         {
-            // laplace matrix
-            _bhe.getLaplaceMatrix(j, _vec_mat_Laplace[j]);
             // advection vector
             _bhe.getAdvectionVector(j, _vec_Advection_vectors[j]);
         }
@@ -52,9 +47,6 @@ struct IntegrationPointDataBHE final
     typename ShapeMatrixType::NodalRowVectorType N;
     typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
     double integration_weight;
-
-    // Laplace matrices
-    std::vector<Eigen::MatrixXd> _vec_mat_Laplace;
 
     // Advection vectors
     std::vector<Eigen::VectorXd> _vec_Advection_vectors;
