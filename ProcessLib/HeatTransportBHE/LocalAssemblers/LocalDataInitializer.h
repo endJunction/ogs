@@ -61,15 +61,6 @@ static_assert(false, "The macro OGS_MAX_ELEMENT_ORDER is undefined.");
 #endif
 
 // Dependent element types.
-// Faces of tets, pyramids and prisms are triangles
-#define ENABLED_ELEMENT_TYPE_TRI                                       \
-    ((ENABLED_ELEMENT_TYPE_SIMPLEX) | (ENABLED_ELEMENT_TYPE_PYRAMID) | \
-     (ENABLED_ELEMENT_TYPE_PRISM))
-// Faces of hexes, pyramids and prisms are quads
-#define ENABLED_ELEMENT_TYPE_QUAD                                     \
-    ((ENABLED_ELEMENT_TYPE_CUBOID) | (ENABLED_ELEMENT_TYPE_PYRAMID) | \
-     (ENABLED_ELEMENT_TYPE_PRISM))
-
 // All enabled element types
 #define OGS_ENABLED_ELEMENTS                                          \
     ((ENABLED_ELEMENT_TYPE_SIMPLEX) | (ENABLED_ELEMENT_TYPE_CUBOID) | \
@@ -86,20 +77,9 @@ static_assert(false, "The macro OGS_MAX_ELEMENT_ORDER is undefined.");
 #include "NumLib/Fem/ShapeFunction/ShapeTet4.h"
 #endif
 
-#if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_TRI) != 0
-#include "NumLib/Fem/ShapeFunction/ShapeTri3.h"
-#include "NumLib/Fem/ShapeFunction/ShapeTri6.h"
-#endif
-
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_CUBOID) != 0
 #include "NumLib/Fem/ShapeFunction/ShapeHex20.h"
 #include "NumLib/Fem/ShapeFunction/ShapeHex8.h"
-#endif
-
-#if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_QUAD) != 0
-#include "NumLib/Fem/ShapeFunction/ShapeQuad4.h"
-#include "NumLib/Fem/ShapeFunction/ShapeQuad8.h"
-#include "NumLib/Fem/ShapeFunction/ShapeQuad9.h"
 #endif
 
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_PRISM) != 0
@@ -138,25 +118,10 @@ public:
     {
         // REMARKS: At the moment, only a 3D mesh (soil) with 1D elements (BHE)
         // are supported.
-
-#if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_QUAD) != 0 && \
-    OGS_MAX_ELEMENT_DIM >= 2 && OGS_MAX_ELEMENT_ORDER >= 1
-        _builder[std::type_index(typeid(MeshLib::Quad))] =
-            makeLocalAssemblerBuilder<NumLib::ShapeQuad4>();
-#endif
-
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_CUBOID) != 0 && \
     OGS_MAX_ELEMENT_DIM >= 3 && OGS_MAX_ELEMENT_ORDER >= 1
         _builder[std::type_index(typeid(MeshLib::Hex))] =
             makeLocalAssemblerBuilder<NumLib::ShapeHex8>();
-#endif
-
-#if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_QUAD) != 0 && \
-    OGS_MAX_ELEMENT_DIM >= 2 && OGS_MAX_ELEMENT_ORDER >= 2
-        _builder[std::type_index(typeid(MeshLib::Quad8))] =
-            makeLocalAssemblerBuilder<NumLib::ShapeQuad8>();
-        _builder[std::type_index(typeid(MeshLib::Quad9))] =
-            makeLocalAssemblerBuilder<NumLib::ShapeQuad9>();
 #endif
 
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_CUBOID) != 0 && \
@@ -166,23 +131,10 @@ public:
 #endif
 
         // /// Simplices ////////////////////////////////////////////////
-
-#if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_TRI) != 0 && \
-    OGS_MAX_ELEMENT_DIM >= 2 && OGS_MAX_ELEMENT_ORDER >= 1
-        _builder[std::type_index(typeid(MeshLib::Tri))] =
-            makeLocalAssemblerBuilder<NumLib::ShapeTri3>();
-#endif
-
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_SIMPLEX) != 0 && \
     OGS_MAX_ELEMENT_DIM >= 3 && OGS_MAX_ELEMENT_ORDER >= 1
         _builder[std::type_index(typeid(MeshLib::Tet))] =
             makeLocalAssemblerBuilder<NumLib::ShapeTet4>();
-#endif
-
-#if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_TRI) != 0 && \
-    OGS_MAX_ELEMENT_DIM >= 2 && OGS_MAX_ELEMENT_ORDER >= 2
-        _builder[std::type_index(typeid(MeshLib::Tri6))] =
-            makeLocalAssemblerBuilder<NumLib::ShapeTri6>();
 #endif
 
 #if (OGS_ENABLED_ELEMENTS & ENABLED_ELEMENT_TYPE_SIMPLEX) != 0 && \
@@ -387,6 +339,4 @@ private:
 #undef ENABLED_ELEMENT_TYPE_CUBOID
 #undef ENABLED_ELEMENT_TYPE_PYRAMID
 #undef ENABLED_ELEMENT_TYPE_PRISM
-#undef ENABLED_ELEMENT_TYPE_TRI
-#undef ENABLED_ELEMENT_TYPE_QUAD
 #undef OGS_ENABLED_ELEMENTS
