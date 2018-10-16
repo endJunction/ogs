@@ -22,8 +22,7 @@ BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id,
     int const component_id,
-    std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
-        pt_bhe)
+    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe)
     : _bc_mesh(bc_mesh), _pt_bhe(pt_bhe)
 {
     DBUG(
@@ -101,8 +100,7 @@ createBHEInflowDirichletBoundaryCondition(
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id, int const component_id,
-    std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
-        pt_bhe)
+    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe)
 {
     DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
 

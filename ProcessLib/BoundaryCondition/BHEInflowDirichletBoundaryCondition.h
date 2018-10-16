@@ -26,8 +26,7 @@ public:
         std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
         int const variable_id,
         int const component_id,
-        std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
-            pt_bhe);
+        ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe);
 
     void getEssentialBCValues(
         const double t, GlobalVector const& x,
@@ -45,8 +44,7 @@ private:
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 
-    std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
-        _pt_bhe;
+    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* _pt_bhe;
 };
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
@@ -55,6 +53,5 @@ createBHEInflowDirichletBoundaryCondition(
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, int const component_id,
-    std::unique_ptr<ProcessLib::HeatTransportBHE::BHE::BHEAbstract> const&
-        pt_bhe);
+    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe);
 }  // namespace ProcessLib
