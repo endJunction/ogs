@@ -133,16 +133,15 @@ void HeatTransportBHEProcess::initializeConcreteProcess(
     unsigned const integration_order)
 {
     // Quick access map to BHE's through element ids.
-    std::unordered_map<std::size_t, BHE::BHEAbstract*> element_to_bhe_map;
+    std::unordered_map<std::size_t, BHETypes*> element_to_bhe_map;
     int const n_BHEs = _process_data._vec_BHE_property.size();
     for (int i = 0; i < n_BHEs; i++)
     {
         auto const& bhe_elements = _bheMeshData.BHE_elements[i];
         for (auto const& e : bhe_elements)
         {
-            element_to_bhe_map[e->getID()] = apply_visitor(
-                [](auto& bhe) { return static_cast<BHE::BHEAbstract*>(&bhe); },
-                _process_data._vec_BHE_property[i]);
+            element_to_bhe_map[e->getID()] =
+                &_process_data._vec_BHE_property[i];
         }
     }
 
