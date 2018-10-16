@@ -179,11 +179,18 @@ public:
      */
     void calcHeatTransferCoefficients();
 
-    /**
-     * return the coeff of mass matrix,
-     * depending on the index of unknown.
-     */
-    double getMassCoeff(std::size_t idx_unknown) const;
+    std::array<double, number_of_unknowns> pipeHeatCapacities() const
+    {
+        double const& rho_r = refrigerant_param.rho_r;
+        double const& heat_cap_r = refrigerant_param.heat_cap_r;
+        double const& porosity_g = grout_param.porosity_g;
+        double const& rho_g = grout_param.rho_g;
+        double const& heat_cap_g = grout_param.heat_cap_g;
+
+        return {{/*i1*/ rho_r * heat_cap_r * CSA_i,
+                 /*o1*/ rho_r * heat_cap_r * CSA_o,
+                 /*grout*/ (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g}};
+    }
 
     /**
      * return the coeff of laplace matrix,

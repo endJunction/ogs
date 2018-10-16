@@ -210,12 +210,6 @@ public:
     virtual void calcHeatTransferCoefficients() = 0;
 
     /**
-     * return the coeff of mass matrix,
-     * depending on the index of unknown.
-     */
-    virtual double getMassCoeff(std::size_t idx_unknown) const = 0;
-
-    /**
      * return the coeff of laplace matrix,
      * depending on the index of unknown.
      */

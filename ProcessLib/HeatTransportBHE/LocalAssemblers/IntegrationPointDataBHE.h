@@ -27,7 +27,6 @@ struct IntegrationPointDataBHE final
         // depending on the type of BHE
         const int unknown_size = _bhe.getNumUnknowns();
         // initialization
-        _vec_mass_coefficients.resize(unknown_size);
         for (int i = 0; i < unknown_size; i++)
         {
             Eigen::MatrixXd mat_laplace(3, 3);
@@ -41,8 +40,6 @@ struct IntegrationPointDataBHE final
         // set parameter values
         for (int j = 0; j < unknown_size; j++)
         {
-            // mass matrix coefficients
-            _vec_mass_coefficients[j] = _bhe.getMassCoeff(j);
             // laplace matrix
             _bhe.getLaplaceMatrix(j, _vec_mat_Laplace[j]);
             // advection vector
@@ -55,9 +52,6 @@ struct IntegrationPointDataBHE final
     typename ShapeMatrixType::NodalRowVectorType N;
     typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
     double integration_weight;
-
-    // mass coefficients, length depending on the type of BHE
-    std::vector<double> _vec_mass_coefficients;
 
     // Laplace matrices
     std::vector<Eigen::MatrixXd> _vec_mat_Laplace;

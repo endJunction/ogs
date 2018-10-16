@@ -122,34 +122,6 @@ void BHE_CXC::calcHeatTransferCoefficients()
     _PHI_gs = 1.0 / _R_gs;
 }
 
-double BHE_CXC::getMassCoeff(std::size_t idx_unknown) const
-{
-    double const& rho_r = refrigerant_param.rho_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    double const& porosity_g = grout_param.porosity_g;
-    double const& rho_g = grout_param.rho_g;
-    double const& heat_cap_g = grout_param.heat_cap_g;
-
-    double mass_coeff = 0.0;
-
-    switch (idx_unknown)
-    {
-        case 0:  // i1
-            mass_coeff = rho_r * heat_cap_r * CSA_i;
-            break;
-        case 1:  // o1
-            mass_coeff = rho_r * heat_cap_r * CSA_o;
-            break;
-        case 2:  // grout
-            mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g;
-            break;
-        default:
-            break;
-    }
-
-    return mass_coeff;
-}
-
 void BHE_CXC::getLaplaceMatrix(std::size_t idx_unknown,
                                Eigen::MatrixXd& mat_laplace) const
 {

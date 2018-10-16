@@ -220,48 +220,6 @@ void BHE_2U::calcHeatTransferCoefficients()
     _PHI_gs = 1.0 / _R_gs;
 }
 
-double BHE_2U::getMassCoeff(std::size_t idx_unknown) const
-{
-    double const& rho_r = refrigerant_param.rho_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    double const& porosity_g = grout_param.porosity_g;
-    double const& rho_g = grout_param.rho_g;
-    double const& heat_cap_g = grout_param.heat_cap_g;
-    double mass_coeff = 0.0;
-
-    switch (idx_unknown)
-    {
-        case 0:  // i1
-            mass_coeff = rho_r * heat_cap_r * CSA_i;
-            break;
-        case 1:  // i2
-            mass_coeff = rho_r * heat_cap_r * CSA_i;
-            break;
-        case 2:  // o1
-            mass_coeff = rho_r * heat_cap_r * CSA_o;
-            break;
-        case 3:  // o2
-            mass_coeff = rho_r * heat_cap_r * CSA_o;
-            break;
-        case 4:  // g1
-            mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g1;
-            break;
-        case 5:  // g2
-            mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g1;
-            break;
-        case 6:  // g3
-            mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g2;
-            break;
-        case 7:  // g4
-            mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g2;
-            break;
-        default:
-            break;
-    }
-
-    return mass_coeff;
-}
-
 void BHE_2U::getLaplaceMatrix(std::size_t idx_unknown,
                               Eigen::MatrixXd& mat_laplace) const
 {
