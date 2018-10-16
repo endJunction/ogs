@@ -54,15 +54,12 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
     {
         x_position.setIntegrationPoint(ip);
 
-        // create the class IntegrationPointDataBHE in place
-        _ip_data.emplace_back(_bhe);
         auto const& sm = shape_matrices[ip];
-        auto& ip_data = _ip_data[ip];
-        ip_data.integration_weight =
-            _integration_method.getWeightedPoint(ip).getWeight() *
-            sm.integralMeasure * sm.detJ;
-        ip_data.N = sm.N;
-        ip_data.dNdx = sm.dNdx;
+        // create the class IntegrationPointDataBHE in place
+        _ip_data.push_back(
+            {sm.N, sm.dNdx,
+             _integration_method.getWeightedPoint(ip).getWeight() *
+                 sm.integralMeasure * sm.detJ});
 
         _secondary_data.N[ip] = sm.N;
     }

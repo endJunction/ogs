@@ -9,26 +9,16 @@
 
 #pragma once
 
-#include <Eigen/Eigen>
-
-#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
-
 namespace ProcessLib
 {
 namespace HeatTransportBHE
 {
-using namespace BHE;
-
-template <typename ShapeMatrixType, typename BHEType>
+template <typename ShapeMatrixType>
 struct IntegrationPointDataBHE final
 {
-    explicit IntegrationPointDataBHE(BHEType const& bhe) : _bhe(bhe) {}
-
-    BHEAbstract const& _bhe;
-
-    typename ShapeMatrixType::NodalRowVectorType N;
-    typename ShapeMatrixType::GlobalDimNodalMatrixType dNdx;
-    double integration_weight;
+    typename ShapeMatrixType::NodalRowVectorType const N;
+    typename ShapeMatrixType::GlobalDimNodalMatrixType const dNdx;
+    double const integration_weight;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
