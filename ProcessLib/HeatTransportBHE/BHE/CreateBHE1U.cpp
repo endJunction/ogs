@@ -19,7 +19,7 @@ namespace HeatTransportBHE
 {
 namespace BHE
 {
-BHE::BHE_1U* createBHE1U(
+BHE::BHE_1U createBHE1U(
     BaseLib::ConfigTree const& bhe_conf,
     std::map<std::string,
              std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
@@ -211,7 +211,7 @@ BHE::BHE_1U* createBHE1U(
     vars[static_cast<int>(MaterialLib::Fluid::PropertyVariableType::p)] =
         101325.0;
 
-    BHE::BHE_1U* m_bhe_1u = new BHE::BHE_1U(
+    return {
         bhe_ply_name,
         bhe_bound_type,
         curves,
@@ -240,9 +240,7 @@ BHE::BHE_1U* createBHE1U(
         bhe_power_in_watt_val,
         bhe_delta_T_val,
         bhe_if_use_flow_rate_curve,
-        bhe_switch_off_threshold);
-
-    return m_bhe_1u;
+        bhe_switch_off_threshold};
 }
 }  // namespace BHE
 }  // namespace HeatTransportBHE
