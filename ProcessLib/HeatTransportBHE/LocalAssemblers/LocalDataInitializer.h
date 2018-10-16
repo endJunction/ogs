@@ -277,10 +277,10 @@ private:
     using LADataSoil =
         LocalAssemblerDataSoil<ShapeFunction, IntegrationMethod<ShapeFunction>>;
 
-    template <typename ShapeFunction, typename BHE>
+    template <typename ShapeFunction, typename BHEType>
     using LADataBHE = LocalAssemblerDataBHE<ShapeFunction,
                                             IntegrationMethod<ShapeFunction>,
-                                            BHE>;
+                                            BHEType>;
 
     template <typename ShapeFunction>
     static LADataBuilder makeLocalAssemblerBuilder()
@@ -307,32 +307,33 @@ private:
                   std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
                       element_to_bhe_map,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
-            auto* bhe = element_to_bhe_map.at(e.getID());
-            if (dynamic_cast<BHE::BHE_1U const*>(bhe) != nullptr)
+            auto* abstract_bhe = element_to_bhe_map.at(e.getID());
+            if (auto bhe = dynamic_cast<BHE::BHE_1U const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine2, BHE::BHE_1U>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            if (dynamic_cast<BHE::BHE_2U const*>(bhe) != nullptr)
+            if (auto bhe = dynamic_cast<BHE::BHE_2U const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine2, BHE::BHE_2U>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            if (dynamic_cast<BHE::BHE_CXA const*>(bhe) != nullptr)
+            if (auto bhe = dynamic_cast<BHE::BHE_CXA const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine2, BHE::BHE_CXA>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            if (dynamic_cast<BHE::BHE_CXC const*>(bhe) != nullptr)
+            if (auto bhe = dynamic_cast<BHE::BHE_CXC const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine2, BHE::BHE_CXC>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            return nullptr;
+            OGS_FATAL(
+                "Trying to create local assembler for an unknown BHE type.");
         };
     }
 
@@ -344,32 +345,33 @@ private:
                   std::unordered_map<std::size_t, BHE::BHEAbstract*> const&
                       element_to_bhe_map,
                   ConstructorArgs&&... args) -> LADataIntfPtr {
-            auto* bhe = element_to_bhe_map.at(e.getID());
-            if (dynamic_cast<BHE::BHE_1U const*>(bhe) != nullptr)
+            auto* abstract_bhe = element_to_bhe_map.at(e.getID());
+            if (auto bhe = dynamic_cast<BHE::BHE_1U const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine3, BHE::BHE_1U>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            if (dynamic_cast<BHE::BHE_2U const*>(bhe) != nullptr)
+            if (auto bhe = dynamic_cast<BHE::BHE_2U const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine3, BHE::BHE_2U>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            if (dynamic_cast<BHE::BHE_CXA const*>(bhe) != nullptr)
+            if (auto bhe = dynamic_cast<BHE::BHE_CXA const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine3, BHE::BHE_CXA>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            if (dynamic_cast<BHE::BHE_CXC const*>(bhe) != nullptr)
+            if (auto bhe = dynamic_cast<BHE::BHE_CXC const*>(abstract_bhe))
             {
                 return LADataIntfPtr{
                     new LADataBHE<NumLib::ShapeLine3, BHE::BHE_CXC>{
                         e, *bhe, std::forward<ConstructorArgs>(args)...}};
             }
-            return nullptr;
+            OGS_FATAL(
+                "Trying to create local assembler for an unknown BHE type.");
         };
     }
 

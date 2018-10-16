@@ -53,7 +53,7 @@ public:
 
     HeatTransportBHELocalAssemblerBHE(
         MeshLib::Element const& e,
-        BHE::BHEAbstract const& bhe,
+        BHEType const& bhe,
         bool const is_axially_symmetric,
         unsigned const integration_order,
         HeatTransportBHEProcessData& process_data);

@@ -23,13 +23,13 @@ using namespace BHE;
 template <typename ShapeFunction, typename IntegrationMethod, typename BHEType>
 HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
     HeatTransportBHELocalAssemblerBHE(MeshLib::Element const& e,
-                                      BHE::BHEAbstract const& bhe,
+                                      BHEType const& bhe,
                                       bool const is_axially_symmetric,
                                       unsigned const integration_order,
                                       HeatTransportBHEProcessData& process_data)
     : _process_data(process_data),
       _integration_method(integration_order),
-      _bhe(static_cast<BHEType const&>(bhe)),
+      _bhe(bhe),
       element_id(e.getID())
 {
     // need to make sure that the BHE elements are one-dimensional
