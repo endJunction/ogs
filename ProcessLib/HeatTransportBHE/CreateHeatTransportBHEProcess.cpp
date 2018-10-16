@@ -201,19 +201,19 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         config.getConfigSubtree("borehole_heat_exchangers");
 
     for (
-        auto const& bhe_conf :
+        auto const& bhe_config :
         //! \ogs_file_param{prj__processes__process___HEAT_TRANSPORT_BHE__borehole_heat_exchangers__borehole_heat_exchanger}
         bhe_configs.getConfigSubtreeList("borehole_heat_exchanger"))
     {
         // read in the parameters
         const std::string bhe_type_str =
             //! \ogs_file_param{prj__processes__process___HEAT_TRANSPORT_BHE__borehole_heat_exchangers__borehole_heat_exchanger__bhe_type}
-            bhe_conf.getConfigParameter<std::string>("bhe_type");
+            bhe_config.getConfigParameter<std::string>("bhe_type");
 
         if (bhe_type_str == "BHE_TYPE_1U")
         {
             bhes.emplace_back(
-                BHE::createBHE1U(bhe_conf,
+                BHE::createBHE1U(bhe_config,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
@@ -224,7 +224,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         if (bhe_type_str == "BHE_TYPE_2U")
         {
             bhes.emplace_back(
-                BHE::createBHE2U(bhe_conf,
+                BHE::createBHE2U(bhe_config,
                                  curves,
                                  bhe_refrigerant_density,
                                  bhe_refrigerant_viscosity,
@@ -235,7 +235,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         if (bhe_type_str == "BHE_TYPE_CXC")
         {
             bhes.emplace_back(
-                BHE::createBHECXC(bhe_conf,
+                BHE::createBHECXC(bhe_config,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,
@@ -246,7 +246,7 @@ std::unique_ptr<Process> createHeatTransportBHEProcess(
         if (bhe_type_str == "BHE_TYPE_CXA")
         {
             bhes.emplace_back(
-                BHE::createBHECXA(bhe_conf,
+                BHE::createBHECXA(bhe_config,
                                   curves,
                                   bhe_refrigerant_density,
                                   bhe_refrigerant_viscosity,
