@@ -210,13 +210,6 @@ public:
     virtual void calcHeatTransferCoefficients() = 0;
 
     /**
-     * return the coeff of advection matrix,
-     * depending on the index of unknown.
-     */
-    virtual void getAdvectionVector(std::size_t idx_unknown,
-                                    Eigen::VectorXd& vec_advection) const = 0;
-
-    /**
      * return the coeff of boundary heat exchange matrix,
      * depending on the index of unknown.
      */

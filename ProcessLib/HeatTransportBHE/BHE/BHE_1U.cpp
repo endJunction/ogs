@@ -191,44 +191,6 @@ void BHE_1U::calcHeatTransferCoefficients()
     _PHI_gs = 1.0 / _R_gs;
 }
 
-void BHE_1U::getAdvectionVector(std::size_t idx_unknown,
-                                Eigen::VectorXd& vec_advection) const
-{
-    double const& rho_r = refrigerant_param.rho_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    double advection_coeff(0);
-    vec_advection.setZero();
-
-    switch (idx_unknown)
-    {
-        case 0:
-            // pipe i1, Eq. 19
-            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
-            // z direction
-            vec_advection(2) = -1.0 * advection_coeff;
-            break;
-        case 1:
-            // pipe o1, Eq. 20
-            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
-            // z direction
-            vec_advection(2) = 1.0 * advection_coeff;
-            break;
-        case 2:
-            // grout g1, Eq. 21
-            advection_coeff = 0.0;
-            break;
-        case 3:
-            // grout g2, Eq. 22
-            advection_coeff = 0.0;
-            break;
-        default:
-            OGS_FATAL(
-                "Error !!! The index passed to get_advection_coeff for BHE is "
-                "not correct. ");
-            break;
-    }
-}
-
 double BHE_1U::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const
 {
     // Here we calculates the boundary heat exchange coefficients

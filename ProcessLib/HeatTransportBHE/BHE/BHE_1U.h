@@ -225,12 +225,20 @@ public:
                  (1.0 - porosity_g) * lambda_g * CSA_g2}};
     }
 
-    /**
-     * return the coeff of advection matrix,
-     * depending on the index of unknown.
-     */
-    void getAdvectionVector(std::size_t idx_unknown,
-                            Eigen::VectorXd& vec_advection) const;
+    std::array<Eigen::Vector3d, number_of_unknowns> pipeAdvectionVectors() const
+    {
+        double const& rho_r = refrigerant_param.rho_r;
+        double const& heat_cap_r = refrigerant_param.heat_cap_r;
+
+        return {{// pipe i1, Eq. 19
+                 {0, 0, -rho_r * heat_cap_r * _u(0) * CSA_i},
+                 // pipe o1, Eq. 20
+                 {0, 0, rho_r * heat_cap_r * _u(0) * CSA_o},
+                 // grout g1, Eq. 21
+                 {0, 0, 0},
+                 // grout g2, Eq. 22
+                 {0, 0, 0}}};
+    }
 
     template <int NPoints, typename SingleUnknownMatrixType,
               typename RMatrixType, typename RPiSMatrixType,

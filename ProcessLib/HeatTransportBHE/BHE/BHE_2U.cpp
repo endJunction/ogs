@@ -220,64 +220,6 @@ void BHE_2U::calcHeatTransferCoefficients()
     _PHI_gs = 1.0 / _R_gs;
 }
 
-void BHE_2U::getAdvectionVector(std::size_t idx_unknown,
-                                Eigen::VectorXd& vec_advection) const
-{
-    double const& rho_r = refrigerant_param.rho_r;
-    double const& heat_cap_r = refrigerant_param.heat_cap_r;
-    vec_advection.setZero();
-
-    double advection_coeff(0);
-    switch (idx_unknown)
-    {
-        case 0:
-            // pipe i1, Eq. 10
-            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
-            // z direction
-            vec_advection(2) = -1.0 * advection_coeff;
-            break;
-        case 1:
-            // pipe i2, Eq. 11
-            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
-            // z direction
-            vec_advection(2) = -1.0 * advection_coeff;
-            break;
-        case 2:
-            // pipe o1, Eq. 12
-            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
-            // z direction
-            vec_advection(2) = advection_coeff;
-            break;
-        case 3:
-            // pipe o2, Eq. 13
-            advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
-            // z direction
-            vec_advection(2) = advection_coeff;
-            break;
-        case 4:
-            // pipe g1, Eq. 14
-            advection_coeff = 0.0;
-            break;
-        case 5:
-            // pipe g2, Eq. 15
-            advection_coeff = 0.0;
-            break;
-        case 6:
-            // pipe g3, Eq. 16
-            advection_coeff = 0.0;
-            break;
-        case 7:
-            // pipe g4, Eq. 17
-            advection_coeff = 0.0;
-            break;
-        default:
-            OGS_FATAL(
-                "Error !!! The index passed to get_advection_coeff for BHE is "
-                "not correct. \n");
-            break;
-    }
-}
-
 double BHE_2U::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const
 {
     // Here we calculates the boundary heat exchange coefficients
