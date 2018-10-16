@@ -9,21 +9,14 @@
 
 #pragma once
 
-#include "HeatTransportBHELocalAssemblerSoil.h"
-
 #include <valarray>
 #include <vector>
 
-#include <Eigen/Eigen>
-
 #include "MathLib/LinAlg/Eigen/EigenMapTools.h"
-
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
+#include "ProcessLib/HeatTransportBHE/HeatTransportBHEProcessData.h"
 #include "ProcessLib/Utils/InitShapeMatrices.h"
 
-#include "ProcessLib/HeatTransportBHE/HeatTransportBHEProcessData.h"
-
-// #include "IntegrationPointDataMatrix.h"
 #include "HeatTransportBHEProcessAssemblerInterface.h"
 #include "SecondaryData.h"
 
@@ -64,13 +57,11 @@ HeatTransportBHELocalAssemblerSoil<ShapeFunction, IntegrationMethod>::
         x_position.setIntegrationPoint(ip);
 
         // create the class IntegrationPointDataBHE in place
-        _ip_data.emplace_back();
         auto const& sm = _shape_matrices[ip];
-        auto& ip_data = _ip_data[ip];
         double const w = _integration_method.getWeightedPoint(ip).getWeight() *
                          sm.integralMeasure * sm.detJ;
-        ip_data.NTN_product_times_w = sm.N.transpose() * sm.N * w;
-        ip_data.dNdxTdNdx_product_times_w = sm.dNdx.transpose() * sm.dNdx * w;
+        _ip_data.push_back(
+            {sm.N.transpose() * sm.N * w, sm.dNdx.transpose() * sm.dNdx * w});
 
         _secondary_data.N[ip] = sm.N;
     }

@@ -46,14 +46,9 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
                           3 /* GlobalDim */>(e, is_axially_symmetric,
                                              _integration_method);
 
-    SpatialPosition x_position;
-    x_position.setElementID(element_id);
-
     // ip data initialization
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
-        x_position.setIntegrationPoint(ip);
-
         auto const& sm = shape_matrices[ip];
         // create the class IntegrationPointDataBHE in place
         _ip_data.push_back(
@@ -80,8 +75,6 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
         // Loop over Gauss points
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
-            x_position.setIntegrationPoint(ip);
-
             auto const& N = _ip_data[ip].N;
             auto const& w = _ip_data[ip].integration_weight;
 
@@ -126,9 +119,6 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
-    SpatialPosition x_position;
-    x_position.setElementID(element_id);
-
     auto const& pipe_heat_capacities = _bhe.pipeHeatCapacities();
     auto const& pipe_heat_conductions = _bhe.pipeHeatConductions();
     auto const& pipe_advection_vectors = _bhe.pipeAdvectionVectors();
@@ -136,7 +126,6 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     // the mass and conductance matrix terms
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
-        x_position.setIntegrationPoint(ip);
         auto& ip_data = _ip_data[ip];
 
         auto const& w = ip_data.integration_weight;
