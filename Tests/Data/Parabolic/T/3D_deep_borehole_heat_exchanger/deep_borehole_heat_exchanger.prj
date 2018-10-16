@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <OpenGeoSysProject>
-    <mesh>beier_sandbox.vtu</mesh>
-    <geometry>beier_sandbox.gml</geometry>
+    <mesh>deep_borehole_heat_exchanger.vtu</mesh>
+    <geometry>deep_borehole_heat_exchanger.gml</geometry>
 
     <processes>
         <process>
-            <type>HEAT_TRANSPORT_BHE</type>
             <name>HeatTransportBHE</name>
+            <type>HEAT_TRANSPORT_BHE</type>
             <integration_order>2</integration_order>
             <process_variables>
                 <process_variable>temperature_soil</process_variable>
@@ -26,55 +26,54 @@
             <density_gas>rho_g</density_gas>
 
             <borehole_heat_exchangers>
-                <borehole_heat_exchanger id="0">
+                <borehole_heat_exchanger>
                     <bhe_polyline>BHE_1</bhe_polyline>
                     <bhe_type>BHE_TYPE_CXA</bhe_type>
-                    <bhe_bound_type>POWER_IN_WATT_CURVE_FIXED_DT</bhe_bound_type>
+                    <bhe_bound_type>POWER_IN_WATT</bhe_bound_type>
+		    <bhe_power_in_watt_value>-3000.0</bhe_power_in_watt_value>
                     <bhe_use_external_therm_resis>false</bhe_use_external_therm_resis>
-                    <bhe_length>18.3</bhe_length>
-                    <bhe_diameter>0.126</bhe_diameter>
-                    <bhe_refrigerant_flow_rate>1.97e-4</bhe_refrigerant_flow_rate>
-                    <bhe_pipe_inner_radius>0.013665</bhe_pipe_inner_radius>
-                    <bhe_pipe_outer_radius>0.0167</bhe_pipe_outer_radius>
-                    <bhe_pipe_in_wall_thickness>0.00305</bhe_pipe_in_wall_thickness>
-                    <bhe_pipe_out_wall_thickness>0.00305</bhe_pipe_out_wall_thickness>
-                    <bhe_fluid_idx>0</bhe_fluid_idx>
-                    <bhe_fluid_longitudinal_dispsion_length>1.0e-4</bhe_fluid_longitudinal_dispsion_length>
+                    <bhe_length>18.0</bhe_length>
+                    <bhe_diameter>0.216</bhe_diameter>
+                    <bhe_refrigerant_flow_rate>0.00833</bhe_refrigerant_flow_rate>
+                    <bhe_pipe_inner_radius>0.0477</bhe_pipe_inner_radius>
+                    <bhe_pipe_outer_radius>0.0831</bhe_pipe_outer_radius>
+                    <bhe_pipe_in_wall_thickness>0.00587</bhe_pipe_in_wall_thickness>
+                    <bhe_pipe_out_wall_thickness>0.00734</bhe_pipe_out_wall_thickness>
+                    <bhe_fluid_longitudinal_dispsion_length>0.001</bhe_fluid_longitudinal_dispsion_length>
                     <bhe_grout_density>2190.0</bhe_grout_density>
                     <bhe_grout_porosity>0.2</bhe_grout_porosity>
-                    <bhe_grout_heat_capacity>1000.0</bhe_grout_heat_capacity>
-                    <bhe_inner_pipe_wall_thermal_conductivity>0.39</bhe_inner_pipe_wall_thermal_conductivity>
-                    <bhe_outer_pipe_wall_thermal_conductivity>0.39</bhe_outer_pipe_wall_thermal_conductivity>
-                    <bhe_grout_thermal_conductivity>0.73</bhe_grout_thermal_conductivity>
-                    <bhe_switch_off_threshold>0.001</bhe_switch_off_threshold>
+                    <bhe_grout_heat_capacity>1735.16</bhe_grout_heat_capacity>
+                    <bhe_inner_pipe_wall_thermal_conductivity>0.21</bhe_inner_pipe_wall_thermal_conductivity>
+                    <bhe_outer_pipe_wall_thermal_conductivity>1.3</bhe_outer_pipe_wall_thermal_conductivity>
+                    <bhe_grout_thermal_conductivity>1.3</bhe_grout_thermal_conductivity>
+		    <bhe_switch_off_threshold>0.001</bhe_switch_off_threshold>
                 </borehole_heat_exchanger>
             </borehole_heat_exchangers>
 
             <secondary_variables>
-               <secondary_variable type="static" internal_name="heat_flux_x" output_name="heat_flux_x" />
-               <secondary_variable type="static" internal_name="heat_flux_y" output_name="heat_flux_y" />
-               <secondary_variable type="static" internal_name="heat_flux_z" output_name="heat_flux_z" />
+                <secondary_variable type="static" internal_name="heat_flux_x" output_name="heat_flux_x" />
+                <secondary_variable type="static" internal_name="heat_flux_y" output_name="heat_flux_y" />
+                <secondary_variable type="static" internal_name="heat_flux_z" output_name="heat_flux_z" />
             </secondary_variables>
 
             <fluid>
                 <refrigerant_density>
                     <type>Constant</type>
-                    <value> 1.e3 </value>
+                    <value> 1000.0 </value>
                 </refrigerant_density>
                 <refrigerant_viscosity>
                     <type>Constant</type>
-                    <value> 1.e-3 </value>
+                    <value> 0.00114 </value>
                 </refrigerant_viscosity>
                 <refrigerant_specific_heat_capacity>
                     <type>Constant</type>
-                    <value> 4200 </value>
+                    <value> 4190.0 </value>
                 </refrigerant_specific_heat_capacity>
                 <refrigerant_thermal_conductivity>
                     <type>Constant</type>
-                    <value> 2.5 </value>
+                    <value> 0.59 </value>
                 </refrigerant_thermal_conductivity>
             </fluid>
-
         </process>
     </processes>
 
@@ -85,34 +84,62 @@
                 <convergence_criterion>
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <abstol>1.e-6</abstol>
+                    <reltol>1.e-6</reltol>
                 </convergence_criterion>
-                <time_discretization><type>BackwardEuler</type></time_discretization>
+                <time_discretization>
+                    <type>BackwardEuler</type>
+                </time_discretization>
                 <output>
                     <variables>
-                        <variable> temperature_soil </variable>
-                        <variable> heat_flux_x </variable>
-                        <variable> heat_flux_y </variable>
-                        <variable> heat_flux_z </variable>
+                        <variable>temperature_soil</variable>
+                        <variable>temperature_BHE1</variable>
                     </variables>
                 </output>
                 <time_stepping>
                     <type>FixedTimeStepping</type>
                     <t_initial> 0.0 </t_initial>
-                    <t_end> 186420 </t_end>
+                    <t_end> 10368000 </t_end>
                     <timesteps>
-                        <pair><repeat>3107</repeat><delta_t>60</delta_t></pair>
+                        <pair>
+                            <repeat>60</repeat>
+                            <delta_t>60</delta_t>
+                        </pair>
+			<pair>
+                            <repeat>167</repeat>
+                            <delta_t>3600</delta_t>
+                        </pair>
+			<pair>
+                            <repeat>64</repeat>
+                            <delta_t>21600</delta_t>
+                        </pair>
+			<pair>
+                            <repeat>10</repeat>
+                            <delta_t>43200</delta_t>
+                        </pair>
+			<pair>
+                            <repeat>92</repeat>
+                            <delta_t>86400</delta_t>
+                        </pair>
                     </timesteps>
                 </time_stepping>
             </process>
         </processes>
-       <output>
+        <output>
             <type>VTK</type>
             <prefix>beier_sandbox</prefix>
             <timesteps>
-                <pair><repeat> 10</repeat><each_steps> 1 </each_steps></pair>
-                <pair><repeat> 1 </repeat><each_steps> 50 </each_steps></pair>
-                <pair><repeat> 1 </repeat><each_steps> 3107 </each_steps></pair>
+                <pair>
+                    <repeat> 10</repeat>
+                    <each_steps> 1 </each_steps>
+                </pair>
+                <pair>
+                    <repeat> 10 </repeat>
+                    <each_steps> 20 </each_steps>
+                </pair>
+                <pair>
+                    <repeat> 1 </repeat>
+                    <each_steps> 393 </each_steps>
+                </pair>
             </timesteps>
         </output>
     </time_loop>
@@ -121,34 +148,34 @@
         <parameter>
             <name>K_s</name>
             <type>Constant</type>
-            <value>3.2</value>
+            <value>2.5</value>
         </parameter>
         <parameter>
             <name>Cp_s</name>
             <type>Constant</type>
-            <value>1000</value>
+            <value>2000.0</value>
         </parameter>
         <parameter>
             <name>rho_s</name>
             <type>Constant</type>
-            <value>2500</value>
+            <value>1120.0</value>
         </parameter>
-                <parameter>
+        <parameter>
             <name>K_f</name>
             <type>Constant</type>
-            <value>3.2</value>
+            <value>0.59</value>
         </parameter>
         <parameter>
             <name>Cp_f</name>
             <type>Constant</type>
-            <value>1000</value>
+            <value>4190.0</value>
         </parameter>
         <parameter>
             <name>rho_f</name>
             <type>Constant</type>
-            <value>2500</value>
+            <value>1000.0</value>
         </parameter>
-                <parameter>
+        <parameter>
             <name>K_g</name>
             <type>Constant</type>
             <value>3.2</value>
@@ -166,19 +193,13 @@
         <parameter>
             <name>T0</name>
             <type>Constant</type>
-            <value>295.25</value>
+            <value>294.15</value>
         </parameter>
         <parameter>
             <name>T0_BHE1</name>
             <type>Constant</type>
-            <values>295.25 295.25 295.25</values>
+            <values>294.15 294.15 294.15</values>
         </parameter>
-        <parameter>
-            <name>T_bound</name>
-            <type>Constant</type>
-            <value>300.0</value>
-        </parameter>
-
     </parameters>
 
     <process_variables>
@@ -188,21 +209,13 @@
             <order>1</order>
             <initial_condition>T0</initial_condition>
             <boundary_conditions>
-                <boundary_condition>
-                    <geometrical_set>beier_sandbox</geometrical_set>
-                    <geometry>BHE_1</geometry>
-                    <type>Dirichlet</type>
-                    <parameter>T_bound</parameter>
-                </boundary_condition>
-           </boundary_conditions>
+            </boundary_conditions>
         </process_variable>
-                <process_variable>
+        <process_variable>
             <name>temperature_BHE1</name>
             <components>3</components>
             <order>1</order>
             <initial_condition>T0_BHE1</initial_condition>
-            <boundary_conditions>
-            </boundary_conditions>
         </process_variable>
     </process_variables>
 
@@ -210,7 +223,7 @@
         <nonlinear_solver>
             <name>basic_picard</name>
             <type>Picard</type>
-            <max_iter>10</max_iter>
+            <max_iter>20</max_iter>
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
@@ -220,9 +233,9 @@
             <name>general_linear_solver</name>
             <lis>-i cg -p jacobi -tol 1e-16 -maxiter 10000</lis>
             <eigen>
-                <solver_type>CG</solver_type>
-                <precon_type>DIAGONAL</precon_type>
-                <max_iteration_step>10000</max_iteration_step>
+                <solver_type>BiCGSTAB</solver_type>
+                <precon_type>ILUT</precon_type>
+                <max_iteration_step>1000</max_iteration_step>
                 <error_tolerance>1e-16</error_tolerance>
             </eigen>
             <petsc>
@@ -231,13 +244,4 @@
             </petsc>
         </linear_solver>
     </linear_solvers>
-    <curves>
-        <curve>
-            <name>power_in_watt_curve</name>
-            <coords>9938.064    9516.018    9065.393    8589.271    8052.432    7469.886    6813.948    6052.562    5121.663    4847.584    4549.372    4220.252    3849.668    3419.508    2893.579    2174.942    1000    0
-            </coords>
-            <values>0.900000007    0.910000009    0.920000003    0.929821599    0.939999996    0.950000006    0.960000005    0.97    0.980000004    0.982500005    0.984999999    0.9875    0.989999997    0.9925    0.995000002    0.997499999    0.99962099    1
-            </values>
-        </curve>
-    </curves>
 </OpenGeoSysProject>
