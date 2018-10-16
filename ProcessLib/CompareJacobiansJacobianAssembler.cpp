@@ -238,9 +238,9 @@ void CompareJacobiansJacobianAssembler::assembleWithJacobian(
         }
     };
 
-    check_equality(local_M1, local_M2);
-    check_equality(local_K1, local_K2);
-    check_equality(local_b1, local_b2);
+ //   if (!local_M_data.empty()) {check_equality(local_M1, local_M2);}
+ //   if (!local_K_data.empty()) {check_equality(local_K1, local_K2);}
+ //   if (!local_b_data.empty()) {check_equality(local_b1, local_b2);}
 
     Eigen::VectorXd res1 = Eigen::VectorXd::Zero(num_dof);
     if (local_M1.size() != 0)
@@ -342,6 +342,7 @@ void CompareJacobiansJacobianAssembler::assembleWithJacobian(
 
         _log_file << '\n';
 
+        if (!local_M_data.empty()) {
         dump_py(_log_file, "M_1", local_M1);
         dump_py(_log_file, "M_2", local_M2);
         if (fatal_error && local_M1.size() == local_M2.size())
@@ -349,13 +350,15 @@ void CompareJacobiansJacobianAssembler::assembleWithJacobian(
             dump_py(_log_file, "delta_M", local_M2 - local_M1);
             _log_file << '\n';
         }
-
+        }
+        if (!local_K_data.empty()) {
         dump_py(_log_file, "K_1", local_K1);
         dump_py(_log_file, "K_2", local_K2);
         if (fatal_error && local_K1.size() == local_K2.size())
         {
             dump_py(_log_file, "delta_K", local_K2 - local_K1);
             _log_file << '\n';
+        }
         }
 
         dump_py(_log_file, "b_1", local_b_data);
