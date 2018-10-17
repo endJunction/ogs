@@ -186,7 +186,7 @@ public:
         double const velocity_norm = std::sqrt(
             flow_properties_in.velocity * flow_properties_in.velocity +
             flow_properties_out.velocity * flow_properties_out.velocity);
-        // Here we calculates the laplace coefficients in the governing
+        // Here we calculate the laplace coefficients in the governing
         // equations of BHE. These governing equations can be found in
         // 1) Diersch (2013) FEFLOW book on page 952, M.120-122, or
         // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 26-28.
