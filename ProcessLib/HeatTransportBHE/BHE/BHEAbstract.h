@@ -172,8 +172,6 @@ public:
         initialize();
     };
 
-    inflowOutflowBcComponentIds() const = 0;
-
 public:
     /**
      * the type of the boundary condition on this BHE

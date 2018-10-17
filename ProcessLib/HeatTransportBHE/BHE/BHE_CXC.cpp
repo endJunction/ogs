@@ -11,6 +11,8 @@
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
+constexpr std::pair<int, int> BHE_CXC::inflow_outflow_bc_component_ids[];
+
 /**
  * calculate thermal resistance
  */

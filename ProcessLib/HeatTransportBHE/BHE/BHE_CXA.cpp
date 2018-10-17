@@ -12,6 +12,8 @@
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
+constexpr std::pair<int, int> BHE_CXA::inflow_outflow_bc_component_ids[];
+
 namespace {
 std::pair<double, double> calcReynoldsNumber(
     double const u_out, double const u_in, PipeParameters const& pipe_param,

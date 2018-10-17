@@ -12,6 +12,8 @@
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
+constexpr std::pair<int, int> BHE_1U::inflow_outflow_bc_component_ids[];
+
 void BHE_1U::initialize()
 
 {

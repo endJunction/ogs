@@ -12,6 +12,8 @@
 
 using namespace ProcessLib::HeatTransportBHE::BHE;
 
+constexpr std::pair<int, int> BHE_2U::inflow_outflow_bc_component_ids[];
+
 void ProcessLib::HeatTransportBHE::BHE::BHE_2U::initialize()
 {
     double tmp_u = pipeFlowVelocity(Q_r, pipe_param.r_inner);

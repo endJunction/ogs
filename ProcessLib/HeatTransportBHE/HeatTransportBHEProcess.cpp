@@ -228,27 +228,27 @@ void HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom(
                         variable_id, in_out_component_id.second));
             };
 
-        for (auto const& in_out_component_id : apply_visitor(
-                 [](auto const& bhe) {
-                     return bhe.inflowOutflowBcComponentIds();
-                 },
-                 _process_data._vec_BHE_property[bhe_i]))
-        {
-            // Top, inflow.
-            bcs.addBoundaryCondition(
-                ProcessLib::createBHEInflowDirichletBoundaryCondition(
-                    get_global_bhe_bc_indices(bc_top_node->getID(),
-                                              in_out_component_id),
-                    _mesh, {bc_top_node}, variable_id,
-                    in_out_component_id.first,
-                    _process_data._vec_BHE_property[bhe_i]));
+        auto createBCs =
+            [&](auto& bhe) {
+                for (auto const& in_out_component_id :
+                     bhe.inflow_outflow_bc_component_ids)
+                {
+                    // Top, inflow.
+                    bcs.addBoundaryCondition(
+                        ProcessLib::createBHEInflowDirichletBoundaryCondition(
+                            get_global_bhe_bc_indices(bc_top_node->getID(),
+                                                      in_out_component_id),
+                            _mesh, {bc_top_node}, variable_id,
+                            in_out_component_id.first, bhe));
 
-            // Bottom, outflow.
-            bcs.addBoundaryCondition(
-                ProcessLib::createBHEBottomDirichletBoundaryCondition(
-                    get_global_bhe_bc_indices(bc_bottom_node_id,
-                                              in_out_component_id)));
-        }
+                    // Bottom, outflow.
+                    bcs.addBoundaryCondition(
+                        ProcessLib::createBHEBottomDirichletBoundaryCondition(
+                            get_global_bhe_bc_indices(bc_bottom_node_id,
+                                                      in_out_component_id)));
+                }
+            };
+        apply_visitor(createBCs, _process_data._vec_BHE_property[bhe_i]);
     }
 }
 }  // namespace HeatTransportBHE
