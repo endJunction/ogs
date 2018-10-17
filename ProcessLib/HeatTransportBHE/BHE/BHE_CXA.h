@@ -24,12 +24,12 @@ public:
      * constructor
      */
     BHE_CXA(
-        BHE::BHE_BOUNDARY_TYPE bound_type /* type of BHE boundary */,
+        BHE::BHE_BOUNDARY_TYPE const bound_type /* type of BHE boundary */,
         std::map<std::string,
                  std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
             bhe_curves /* bhe related curves */,
-        BoreholeGeometry borehole_geometry = {100, 0.013},
-        PipeParameters pipe_geometry =
+        BoreholeGeometry const borehole_geometry = {100, 0.013},
+        PipeParameters const pipe_geometry =
             {0.024 /* inner radius of the pipline */,
              0.05 /* outer radius of the pipline */,
              0.004 /* pipe-in wall thickness*/,
@@ -37,31 +37,32 @@ public:
              0.38 /* thermal conductivity of the pipe wall */,
              0.38 /* thermal conductivity of the inner pipe wall */,
              0.38 /* thermal conductivity of the outer pipe wall */},
-        RefrigerantParameters refrigerant_param =
+        RefrigerantParameters const refrigerant_param =
             {
                 0.00054741 /* dynamic viscosity of the refrigerant */,
                 988.1 /* density of the refrigerant */,
                 0.6405 /* thermal conductivity of the refrigerant */,
                 4180 /* specific heat capacity of the refrigerant */, 1.0e-4 /* longitudinal dispersivity of the refrigerant in the pipeline */},
-        GroutParameters grout_param =
+        GroutParameters const grout_param =
             {2190 /* density of the grout */, 0.5 /* porosity of the grout */,
              1000 /* specific heat capacity of the grout */,
              2.3 /* thermal conductivity of the grout */},
-        ExternallyDefinedRaRb extern_Ra_Rb =
+        ExternallyDefinedRaRb const extern_Ra_Rb =
             {false /* whether Ra and Rb values are used */,
              0.0 /* external defined borehole internal thermal resistance */,
              0.0 /* external defined borehole thermal resistance */},
-        ExternallyDefinedThermalResistances extern_def_thermal_resistances =
-            {false /* whether user defined R values are used */,
-             0.0 /* external defined borehole thermal resistance */,
-             0.0 /* external defined borehole thermal resistance */,
-             0.0 /* external defined borehole thermal resistance */,
-             0.0 /* external defined borehole thermal resistance */,
-             0.0 /* external defined borehole thermal resistance */},
-        double my_Qr = 21.86 /
-                       86400 /* total refrigerant flow discharge of BHE */,
-        double my_power_in_watt = 0.0 /* injected or extracted power */,
-        double my_delta_T_val =
+        ExternallyDefinedThermalResistances const
+            extern_def_thermal_resistances =
+                {false /* whether user defined R values are used */,
+                 0.0 /* external defined borehole thermal resistance */,
+                 0.0 /* external defined borehole thermal resistance */,
+                 0.0 /* external defined borehole thermal resistance */,
+                 0.0 /* external defined borehole thermal resistance */,
+                 0.0 /* external defined borehole thermal resistance */},
+        double const Q_r = 21.86 /
+                           86400 /* total refrigerant flow discharge of BHE */,
+        double const power_in_watt = 0.0 /* injected or extracted power */,
+        double const delta_T_val =
             0.0 /* Temperature difference btw inflow and outflow temperature */,
         // double my_ext_Ra = 0.0             /* external defined borehole
         // internal thermal resistance */, double my_ext_Rb = 0.0             /*
@@ -72,22 +73,18 @@ public:
         // defined borehole thermal resistance */, double my_ext_Rgg2 = 0.0 /*
         // external defined borehole thermal resistance */, double my_ext_Rgs =
         // 0.0           /* external defined borehole thermal resistance */,
-        bool if_flowrate_curve = false /* whether flowrate curve is used*/,
-        double my_threshold = 0.0) /* Threshold Q value for switching off the
-                                      BHE when using Q_Curve_fixed_dT B.C.*/
+        bool const if_flowrate_curve =
+            false /* whether flowrate curve is used*/,
+        double const threshold = 0.0) /* Threshold Q value for switching off the
+                                     BHE when using Q_Curve_fixed_dT B.C.*/
     : BHEAbstract(borehole_geometry, pipe_geometry, refrigerant_param,
                   grout_param, extern_Ra_Rb, extern_def_thermal_resistances,
                   std::move(bhe_curves), bound_type, false /*if_use_ext_Ra_Rb*/,
-                  false /*user_defined_R_vals*/, if_flowrate_curve)
+                  false /*user_defined_R_vals*/, if_flowrate_curve, Q_r,
+                  power_in_watt, delta_T_val, threshold)
     {
         _u = Eigen::Vector2d::Zero();
         _Nu = Eigen::Vector2d::Zero();
-
-        Q_r = my_Qr;
-
-        power_in_watt_val = my_power_in_watt;
-        delta_T_val = my_delta_T_val;
-        threshold = my_threshold;
 
         // get the corresponding curve
         std::map<std::string,

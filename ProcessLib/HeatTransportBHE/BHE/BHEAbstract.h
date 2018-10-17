@@ -127,21 +127,29 @@ public:
         std::map<std::string,
                  std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
             bhe_curves_,
-        BHE_BOUNDARY_TYPE my_bound_type,
+        BHE_BOUNDARY_TYPE boundary_type_,
         bool if_use_ext_Ra_Rb,
         bool user_defined_R_vals,
-        bool if_flowrate_curve)
-        : boundary_type(my_bound_type),
+        bool if_flowrate_curve,
+        double const Q_r_,
+        double const power_in_watt_,
+        double const delta_T_val_,
+        double const threshold_)
+        : boundary_type(boundary_type_),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
           refrigerant_param(refrigerant_param_),
           grout_param(grout_param_),
           extern_Ra_Rb(extern_Ra_Rb_),
           extern_def_thermal_resistances(extern_def_thermal_resistances_),
+          power_in_watt_val(power_in_watt_),
+          delta_T_val(delta_T_val_),
+          threshold(threshold_),
           bhe_curves(bhe_curves_),
           use_flowrate_curve(if_flowrate_curve),
           if_use_ext_Ra_Rb(if_use_ext_Ra_Rb),
-          user_defined_R_vals(user_defined_R_vals){};
+          user_defined_R_vals(user_defined_R_vals),
+          Q_r(Q_r_){};
 
     /**
      * destructor
@@ -299,11 +307,6 @@ protected:
      * unit is m^3/sec
      */
     double Q_r;
-
-    /**
-     * pipe distance
-     */
-    double omega;
 };
 }  // end of namespace BHE
 }  // end of namespace HeatTransportBHE

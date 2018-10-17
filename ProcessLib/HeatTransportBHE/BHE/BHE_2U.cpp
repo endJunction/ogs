@@ -79,7 +79,7 @@ void BHE_2U::calcThermalResistances()
     // _R_con_a = std::log(r_outer / r_inner) / ( 2.0 * PI * lambda_p );
 
     d0 = 2.0 * r_inner;
-    s = omega * std::sqrt(2);
+    s = _omega * std::sqrt(2);
     chi = std::log(std::sqrt(D * D + 4 * d0 * d0) / 2 / std::sqrt(2) / d0) /
           std::log(D / 2 / d0);
     // Eq. 36

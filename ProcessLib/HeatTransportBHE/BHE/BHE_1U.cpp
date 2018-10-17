@@ -60,7 +60,7 @@ void BHE_1U::calcThermalResistances()
     _R_adv_o1 = 1.0 / (_Nu(1) * lambda_r * PI);
 
     d0 = 2.0 * pipe_param.r_outer;
-    // s = omega * std::sqrt(2);
+    // s = _omega * std::sqrt(2);
     // Eq. 49
     _R_con_a_i1 = _R_con_a_o1 =
         std::log(pipe_param.r_outer / pipe_param.r_inner) /
@@ -77,8 +77,8 @@ void BHE_1U::calcThermalResistances()
     else
     {
         // Eq. 52
-        _R_g = acosh((D * D + d0 * d0 - omega * omega) / (2 * D * d0)) /
-               (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
+        _R_g = acosh((D * D + d0 * d0 - _omega * _omega) / (2 * D * d0)) /
+               (2 * PI * lambda_g) * (1.601 - 0.888 * _omega / D);
     }
     _R_con_b = chi * _R_g;
     // Eq. 29 and 30
@@ -107,7 +107,7 @@ void BHE_1U::calcThermalResistances()
     }
     else
     {
-        R_ar = acosh((2.0 * omega * omega - d0 * d0) / d0 / d0) /
+        R_ar = acosh((2.0 * _omega * _omega - d0 * d0) / d0 / d0) /
                (2.0 * PI * lambda_g);
     }
 
