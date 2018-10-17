@@ -133,6 +133,23 @@ inline double thermalResistanceMagicalOuverture(double const Nu,
     return thermalResistanceMagicalIntroduction(Nu, lambda) *
            (radius_a / radius_b);
 }
+
+// thermal resistance due to thermal conductivity of the pip wall material
+// Eq. 66 in Diersch_2011_CG
+inline double thermalResistanceMagicalMur(double const radius_a,
+                                          double const radius_b,
+                                          double const lambda)
+{
+    constexpr double pi = boost::math::constants::pi<double>();
+    return std::log(radius_a / radius_b) / (2.0 * pi * lambda);
+}
+
+// Eq. 68
+inline double chimereDimensionlessFactor(double const a, double const b)
+{
+    return std::log(std::sqrt(a * a + b * b) / std::sqrt(2) / b) /
+           std::log(a / b);
+}
 }  // end of namespace BHE
 }  // end of namespace HeatTransportBHE
 }  // end of namespace ProcessLib

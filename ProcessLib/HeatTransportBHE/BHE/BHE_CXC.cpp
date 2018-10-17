@@ -48,23 +48,18 @@ void BHE_CXC::calcThermalResistances()
     double const _R_adv_b_o1 = thermalResistanceMagicalOuverture(
         Nu_out, lambda_r, r_outer - (r_inner + b_in), r_outer);
 
-    constexpr double PI = boost::math::constants::pi<double>();
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 66 in Diersch_2011_CG
-    double const& lambda_p_i = pipe_param.lambda_p_i;
-    double const _R_con_i1 =
-        std::log((r_inner + b_in) / r_inner) / (2.0 * PI * lambda_p_i);
-    double const& lambda_p_o = pipe_param.lambda_p_o;
-    double const _R_con_o1 =
-        std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_o);
+    double const _R_con_i1 = thermalResistanceMagicalMur(
+        r_inner + b_in, r_inner, pipe_param.lambda_p_i);
+    double const _R_con_o1 = thermalResistanceMagicalMur(
+        r_outer + b_out, r_outer, pipe_param.lambda_p_o);
 
     // thermal resistance due to the grout transition
-    double const d_o1 = 2.0 * (r_outer + b_out);
-    double const& D = borehole_geometry.diameter;
     // Eq. 68
-    double const chi =
-        std::log(std::sqrt(D * D + d_o1 * d_o1) / std::sqrt(2) / d_o1) /
-        std::log(D / d_o1);
+    double const chi = chimereDimensionlessFactor(borehole_geometry.diameter,
+                                                  2.0 * (r_outer + b_out));
+
     if (extern_Ra_Rb.use_extern_Ra_Rb)
     {
         _R_g = extern_Ra_Rb.ext_Rb - _R_adv_b_o1 - _R_con_o1;
@@ -72,8 +67,9 @@ void BHE_CXC::calcThermalResistances()
     else
     {
         // Eq. 69
-        double const& lambda_g = grout_param.lambda_g;
-        _R_g = std::log(D / d_o1) / (2.0 * PI * lambda_g);
+        _R_g =
+            thermalResistanceMagicalMur(borehole_geometry.diameter / 2,
+                                        r_outer + b_out, grout_param.lambda_g);
     }
     _R_con_b = chi * _R_g;
 
