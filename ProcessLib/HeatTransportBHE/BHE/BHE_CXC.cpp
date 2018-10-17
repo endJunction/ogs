@@ -30,43 +30,41 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 
 void BHE_CXC::calcThermalResistances()
 {
-    double Nu_in, Nu_out;
-    double d_o1, d_i1, d_h;
-    double chi;
-    double _R_con_i1, _R_con_o1;
-    double const& D = borehole_geometry.diameter;
     double const& r_outer = pipe_param.r_outer;
     double const& r_inner = pipe_param.r_inner;
     double const& b_in = pipe_param.b_in;
     double const& b_out = pipe_param.b_out;
+
+    double const& Nu_in = flow_properties_in.nusselt_number;
+    double const& Nu_out = flow_properties_out.nusselt_number;
     double const& lambda_r = refrigerant_param.lambda_r;
-    double const& lambda_g = grout_param.lambda_g;
-    double const& lambda_p_i = pipe_param.lambda_p_i;
-    double const& lambda_p_o = pipe_param.lambda_p_o;
 
-    Nu_in = flow_properties_in.nusselt_number;
-    Nu_out = flow_properties_out.nusselt_number;
-    d_o1 = 2.0 * r_outer;
-    d_i1 = 2.0 * (r_inner + b_in);
-    d_h = d_o1 - d_i1;
-
-    constexpr double PI = boost::math::constants::pi<double>();
     // thermal resistance due to advective flow of refrigerant in the pipes
     // Eq. 58, 59, and 60 in Diersch_2011_CG
-    _R_adv_i1 = 1.0 / (Nu_in * lambda_r * PI);
-    _R_adv_a_o1 = 1.0 / (Nu_out * lambda_r * PI) * (d_h / d_i1);
-    _R_adv_b_o1 = 1.0 / (Nu_out * lambda_r * PI) * (d_h / d_o1);
+    double const _R_adv_i1 =
+        thermalResistanceMagicalIntroduction(Nu_in, lambda_r);
+    double const _R_adv_a_o1 = thermalResistanceMagicalOuverture(
+        Nu_out, lambda_r, r_outer - (r_inner + b_in), r_inner + b_in);
+    double const _R_adv_b_o1 = thermalResistanceMagicalOuverture(
+        Nu_out, lambda_r, r_outer - (r_inner + b_in), r_outer);
 
+    constexpr double PI = boost::math::constants::pi<double>();
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 66 in Diersch_2011_CG
-    _R_con_i1 = std::log((r_inner + b_in) / r_inner) / (2.0 * PI * lambda_p_i);
-    _R_con_o1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_o);
+    double const& lambda_p_i = pipe_param.lambda_p_i;
+    double const _R_con_i1 =
+        std::log((r_inner + b_in) / r_inner) / (2.0 * PI * lambda_p_i);
+    double const& lambda_p_o = pipe_param.lambda_p_o;
+    double const _R_con_o1 =
+        std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p_o);
 
     // thermal resistance due to the grout transition
-    d_o1 = 2.0 * (r_outer + b_out);
+    double const d_o1 = 2.0 * (r_outer + b_out);
+    double const& D = borehole_geometry.diameter;
     // Eq. 68
-    chi = std::log(std::sqrt(D * D + d_o1 * d_o1) / std::sqrt(2) / d_o1) /
-          std::log(D / d_o1);
+    double const chi =
+        std::log(std::sqrt(D * D + d_o1 * d_o1) / std::sqrt(2) / d_o1) /
+        std::log(D / d_o1);
     if (extern_Ra_Rb.use_extern_Ra_Rb)
     {
         _R_g = extern_Ra_Rb.ext_Rb - _R_adv_b_o1 - _R_con_o1;
@@ -74,6 +72,7 @@ void BHE_CXC::calcThermalResistances()
     else
     {
         // Eq. 69
+        double const& lambda_g = grout_param.lambda_g;
         _R_g = std::log(D / d_o1) / (2.0 * PI * lambda_g);
     }
     _R_con_b = chi * _R_g;

@@ -113,6 +113,26 @@ inline double nusseltNumberAnnulus(double const reynolds_number,
              0.14 * std::pow(diameter_ratio, 0.6)) /
             (1.0 + diameter_ratio));
 }
+
+// thermal resistance due to advective flow of refrigerant in the pipes
+// Eq. 58, 59, and 60 in Diersch_2011_CG
+inline double thermalResistanceMagicalIntroduction(double const Nu,
+                                                   double const lambda)
+{
+    constexpr double pi = boost::math::constants::pi<double>();
+    return 1.0 / (Nu * lambda * pi);
+}
+
+// thermal resistance due to advective flow of refrigerant in the pipes
+// Eq. 58, 59, and 60 in Diersch_2011_CG
+inline double thermalResistanceMagicalOuverture(double const Nu,
+                                                double const lambda,
+                                                double const radius_a,
+                                                double const radius_b)
+{
+    return thermalResistanceMagicalIntroduction(Nu, lambda) *
+           (radius_a / radius_b);
+}
 }  // end of namespace BHE
 }  // end of namespace HeatTransportBHE
 }  // end of namespace ProcessLib

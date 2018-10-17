@@ -310,11 +310,6 @@ private:
     double _R_gs;
 
     /**
-     * thermal resistances due to advective flow of refrigerant in the pipes
-     */
-    double _R_adv_i1, _R_adv_a_o1, _R_adv_b_o1;
-
-    /**
      * thermal resistances due to the grout transition
      */
     double _R_con_b;
