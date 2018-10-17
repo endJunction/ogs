@@ -287,9 +287,9 @@ private:
 
     double calculateThermalResistanceGrout(double R_adv_b_o1,
                                            double R_con_o1) const;
-    double calculateThermalResistanceFf(double R_adv_i1,
-                                        double R_adv_a_o1,
-                                        double R_con_i1) const;
+    double calculateThermalResistanceFf(double Nu_in,
+                                        double Nu_out,
+                                        double lambda_r) const;
     double calculateThermalResistanceFog(double R_adv_b_o1,
                                          double R_con_o1,
                                          double R_con_b) const;

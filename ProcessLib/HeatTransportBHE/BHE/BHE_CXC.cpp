@@ -40,17 +40,11 @@ void BHE_CXC::calcThermalResistances()
 
     // thermal resistance due to advective flow of refrigerant in the pipes
     // Eq. 58, 59, and 60 in Diersch_2011_CG
-    double const _R_adv_i1 =
-        thermalResistanceMagicalIntroduction(Nu_in, lambda_r);
-    double const _R_adv_a_o1 = thermalResistanceMagicalOuverture(
-        Nu_out, lambda_r, r_outer - (r_inner + b_in), r_inner + b_in);
     double const _R_adv_b_o1 = thermalResistanceMagicalOuverture(
         Nu_out, lambda_r, r_outer - (r_inner + b_in), r_outer);
 
     // thermal resistance due to thermal conductivity of the pip wall material
     // Eq. 66 in Diersch_2011_CG
-    double const _R_con_i1 = thermalResistanceMagicalMur(
-        r_inner + b_in, r_inner, pipe_param.lambda_p_i);
     double const _R_con_o1 = thermalResistanceMagicalMur(
         r_outer + b_out, r_outer, pipe_param.lambda_p_o);
 
@@ -65,9 +59,10 @@ void BHE_CXC::calcThermalResistances()
     // thermal resistances due to the grout transition
     double const _R_con_b = chi * _R_g;
 
-    _R_ff = calculateThermalResistanceFf(_R_adv_i1, _R_adv_a_o1, _R_con_i1);
-    _R_fog = calculateThermalResistanceFog(_R_adv_b_o1, _R_con_o1, _R_con_b);
-    _R_gs = calculateThermalResistanceGroutSoil(chi, _R_g);
+    double const _R_ff = calculateThermalResistanceFf(Nu_in, Nu_out, lambda_r);
+    double const _R_fog =
+        calculateThermalResistanceFog(_R_adv_b_o1, _R_con_o1, _R_con_b);
+    double const _R_gs = calculateThermalResistanceGroutSoil(chi, _R_g);
 
     calcHeatTransferCoefficients(_R_fog, _R_ff, _R_gs);
 }
@@ -86,9 +81,9 @@ double BHE_CXC::calculateThermalResistanceGrout(double const R_adv_b_o1,
 }
 
 // Eq. 67
-double BHE_CXC::calculateThermalResistanceFf(double const R_adv_i1,
-                                             double const R_adv_a_o1,
-                                             double const R_con_i1) const
+double BHE_CXC::calculateThermalResistanceFf(double const Nu_in,
+                                             double const Nu_out,
+                                             double const lambda_r) const
 {
     if (extern_Ra_Rb.use_extern_Ra_Rb)
     {
@@ -100,6 +95,19 @@ double BHE_CXC::calculateThermalResistanceFf(double const R_adv_i1,
             .ext_Rgg1;  // Attention! Here ext_Rgg1 is treated as Rff for
                         // coaxial type
     }
+    // thermal resistance due to advective flow of refrigerant in the pipes
+    // Eq. 58, 59, and 60 in Diersch_2011_CG
+    double const R_adv_i1 =
+        thermalResistanceMagicalIntroduction(Nu_in, lambda_r);
+    double const R_adv_a_o1 = thermalResistanceMagicalOuverture(
+        Nu_out, lambda_r,
+        pipe_param.r_outer - (pipe_param.r_inner + pipe_param.b_in),
+        pipe_param.r_inner + pipe_param.b_in);
+    // thermal resistance due to thermal conductivity of the pip wall material
+    // Eq. 66 in Diersch_2011_CG
+    double const R_con_i1 =
+        thermalResistanceMagicalMur(pipe_param.r_inner + pipe_param.b_in,
+                                    pipe_param.r_inner, pipe_param.lambda_p_i);
     // Eq. 56
     return R_adv_i1 + R_adv_a_o1 + R_con_i1;
 }
