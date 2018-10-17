@@ -127,7 +127,6 @@ public:
      * constructor
      */
     BHEAbstract(
-        const std::string name_,
         BoreholeGeometry borehole_geometry_,
         PipeParameters pipe_param_,
         RefrigerantParameters refrigerant_param_,
@@ -142,8 +141,7 @@ public:
         bool if_use_ext_Ra_Rb = false,
         bool user_defined_R_vals = false,
         bool if_flowrate_curve = false)
-        : name(name_),
-          boundary_type(my_bound_type),
+        : boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
           refrigerant_param(refrigerant_param_),
@@ -213,11 +211,6 @@ public:
     inflowOutflowBcComponentIds() const = 0;
 
 public:
-    /**
-     * name of the borehole heat exchanger
-     */
-    const std::string name;
-
     /**
      * the type of the boundary condition on this BHE
      */

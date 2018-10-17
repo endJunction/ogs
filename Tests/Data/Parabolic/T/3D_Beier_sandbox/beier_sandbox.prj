@@ -27,7 +27,6 @@
 
             <borehole_heat_exchangers>
                 <borehole_heat_exchanger>
-                    <bhe_polyline>BHE_1</bhe_polyline>
                     <bhe_type>BHE_TYPE_1U</bhe_type>
                     <bhe_bound_type>FIXED_INFLOW_TEMP_CURVE</bhe_bound_type>
                     <bhe_use_external_therm_resis>false</bhe_use_external_therm_resis>

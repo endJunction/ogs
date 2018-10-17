@@ -34,8 +34,6 @@ BHE::BHE_1U createBHE1U(
         bhe_regrigerant_heat_conductivity)
 {
     // read in the parameters
-    const std::string bhe_ply_name =
-        bhe_conf.getConfigParameter<std::string>("bhe_polyline");
     const std::string bhe_bound_type_str =
         bhe_conf.getConfigParameter<std::string>("bhe_bound_type");
     const bool bhe_if_use_flow_rate_curve = false;
@@ -212,7 +210,6 @@ BHE::BHE_1U createBHE1U(
         101325.0;
 
     return {
-        bhe_ply_name,
         bhe_bound_type,
         curves,
         {bhe_length, bhe_diameter} /* Borehole Geometry */,
