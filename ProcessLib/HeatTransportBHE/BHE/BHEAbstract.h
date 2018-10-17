@@ -269,16 +269,6 @@ public:
     MathLib::PiecewiseLinearInterpolation* power_in_watt_curve;
 
     /**
-     * heating COP curve
-     */
-    MathLib::PiecewiseLinearInterpolation* heating_cop_curve;
-
-    /**
-     * cooling COP curve
-     */
-    MathLib::PiecewiseLinearInterpolation* cooling_cop_curve;
-
-    /**
      * refrigerant flow rate curve
      */
     MathLib::PiecewiseLinearInterpolation* flowrate_curve;

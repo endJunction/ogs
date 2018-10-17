@@ -332,6 +332,16 @@ private:
         {0, 1}};
 
     /**
+     * heating COP curve
+     */
+    MathLib::PiecewiseLinearInterpolation* const heating_cop_curve = nullptr;
+
+    /**
+     * cooling COP curve
+     */
+    MathLib::PiecewiseLinearInterpolation* const cooling_cop_curve = nullptr;
+
+    /**
      * thermal resistances
      */
     double _R_fig, _R_fog;
