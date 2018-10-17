@@ -298,19 +298,10 @@ private:
     /**
      * calculate heat transfer coefficient
      */
-    void calcHeatTransferCoefficients();
+    void calcHeatTransferCoefficients(double const R_fog, double const R_ff,
+                                      double const R_gs);
 
 private:
-    /**
-     * thermal resistances
-     */
-    double _R_ff, _R_fog;
-
-    /**
-     * thermal resistances of the grout soil exchange
-     */
-    double _R_gs;
-
     /**
      * specific exchange surfaces S
      */

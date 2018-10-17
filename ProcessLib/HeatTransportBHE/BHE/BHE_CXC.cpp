@@ -25,7 +25,6 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
         pipe_param, borehole_geometry.length, refrigerant_param, Q_r);
 
     calcThermalResistances();
-    calcHeatTransferCoefficients();
 }
 
 void BHE_CXC::calcThermalResistances()
@@ -69,6 +68,8 @@ void BHE_CXC::calcThermalResistances()
     _R_ff = calculateThermalResistanceFf(_R_adv_i1, _R_adv_a_o1, _R_con_i1);
     _R_fog = calculateThermalResistanceFog(_R_adv_b_o1, _R_con_o1, _R_con_b);
     _R_gs = calculateThermalResistanceGroutSoil(chi, _R_g);
+
+    calcHeatTransferCoefficients(_R_fog, _R_ff, _R_gs);
 }
 
 double BHE_CXC::calculateThermalResistanceGrout(double const R_adv_b_o1,
@@ -128,18 +129,19 @@ double BHE_CXC::calculateThermalResistanceGroutSoil(double const chi,
 /**
  * calculate heat transfer coefficient
  */
-void BHE_CXC::calcHeatTransferCoefficients()
+void BHE_CXC::calcHeatTransferCoefficients(double const R_fog,
+                                           double const R_ff, double const R_gs)
 {
-    boundary_heat_exchange_coefficients[0] = 1.0 / _R_fog;
-    boundary_heat_exchange_coefficients[1] = 1.0 / _R_ff;
+    boundary_heat_exchange_coefficients[0] = 1.0 / R_fog;
+    boundary_heat_exchange_coefficients[1] = 1.0 / R_ff;
 
-    if (!std::isfinite(_R_gs))
+    if (!std::isfinite(R_gs))
     {
         OGS_FATAL(
             "Error!!! Grout Thermal Resistance is an infinite number! The "
             "simulation will be stopped! \n");
     }
-    boundary_heat_exchange_coefficients[2] = 1.0 / _R_gs;
+    boundary_heat_exchange_coefficients[2] = 1.0 / R_gs;
 }
 
 double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
