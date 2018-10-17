@@ -89,6 +89,8 @@ public:
         delta_T_val = my_delta_T_val;
         threshold = my_threshold;
 
+        // TODO (haibing) Move the curve search to createBHE* function, then use
+        // const ref to the curves.
         // get the corresponding curve
         std::map<std::string,
                  std::unique_ptr<MathLib::PiecewiseLinearInterpolation>>::
