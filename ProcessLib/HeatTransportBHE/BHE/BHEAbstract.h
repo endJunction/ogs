@@ -58,15 +58,6 @@ enum class BHE_BOUNDARY_TYPE
     INVALID_BHE_BOUNDARY_TYPE
 };
 
-/**
- * discharge type of the 2U BHE
- */
-enum class BHE_DISCHARGE_TYPE
-{
-    BHE_DISCHARGE_TYPE_PARALLEL,  // parallel discharge
-    BHE_DISCHARGE_TYPE_SERIAL     // serial discharge
-};
-
 class BHEAbstract
 {
 public:

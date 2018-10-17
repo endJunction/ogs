@@ -17,6 +17,15 @@ namespace HeatTransportBHE
 {
 namespace BHE  // namespace of borehole heat exchanger
 {
+/**
+ * discharge type of the 2U BHE
+ */
+enum class BHE_DISCHARGE_TYPE
+{
+    BHE_DISCHARGE_TYPE_PARALLEL,  // parallel discharge
+    BHE_DISCHARGE_TYPE_SERIAL     // serial discharge
+};
+
 class BHE_2U final : public BHEAbstract
 {
 public:
