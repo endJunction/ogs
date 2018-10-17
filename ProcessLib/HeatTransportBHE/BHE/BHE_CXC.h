@@ -285,6 +285,8 @@ private:
      */
     void calcThermalResistances();
 
+    double calculateThermalResistanceGrout(double R_adv_b_o1,
+                                           double R_con_o1) const;
     double calculateThermalResistanceFf(double R_adv_i1,
                                         double R_adv_a_o1,
                                         double R_con_i1) const;
@@ -308,16 +310,6 @@ private:
      * thermal resistances of the grout soil exchange
      */
     double _R_gs;
-
-    /**
-     * thermal resistances due to the grout transition
-     */
-    double _R_con_b;
-
-    /**
-     * thermal resistances of the grout
-     */
-    double _R_g;
 
     /**
      * specific exchange surfaces S

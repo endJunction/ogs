@@ -60,22 +60,28 @@ void BHE_CXC::calcThermalResistances()
     double const chi = chimereDimensionlessFactor(borehole_geometry.diameter,
                                                   2.0 * (r_outer + b_out));
 
-    if (extern_Ra_Rb.use_extern_Ra_Rb)
-    {
-        _R_g = extern_Ra_Rb.ext_Rb - _R_adv_b_o1 - _R_con_o1;
-    }
-    else
-    {
-        // Eq. 69
-        _R_g =
-            thermalResistanceMagicalMur(borehole_geometry.diameter / 2,
-                                        r_outer + b_out, grout_param.lambda_g);
-    }
-    _R_con_b = chi * _R_g;
+    // thermal resistances of the grout
+    double const _R_g = calculateThermalResistanceGrout(_R_adv_b_o1, _R_con_o1);
+
+    // thermal resistances due to the grout transition
+    double const _R_con_b = chi * _R_g;
 
     _R_ff = calculateThermalResistanceFf(_R_adv_i1, _R_adv_a_o1, _R_con_i1);
     _R_fog = calculateThermalResistanceFog(_R_adv_b_o1, _R_con_o1, _R_con_b);
     _R_gs = calculateThermalResistanceGroutSoil(chi, _R_g);
+}
+
+double BHE_CXC::calculateThermalResistanceGrout(double const R_adv_b_o1,
+                                                double const R_con_o1) const
+{
+    if (extern_Ra_Rb.use_extern_Ra_Rb)
+    {
+        return extern_Ra_Rb.ext_Rb - R_adv_b_o1 - R_con_o1;
+    }
+    // Eq. 69
+    return thermalResistanceMagicalMur(borehole_geometry.diameter / 2,
+                                       pipe_param.r_outer + pipe_param.b_out,
+                                       grout_param.lambda_g);
 }
 
 // Eq. 67
