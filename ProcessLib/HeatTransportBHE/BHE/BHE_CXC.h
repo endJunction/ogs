@@ -285,6 +285,14 @@ private:
      */
     void calcThermalResistances();
 
+    double calculateThermalResistanceFf(double R_adv_i1,
+                                        double R_adv_a_o1,
+                                        double R_con_i1) const;
+    double calculateThermalResistanceFog(double R_adv_b_o1,
+                                         double R_con_o1,
+                                         double R_con_b) const;
+    double calculateThermalResistanceGroutSoil(double chi, double R_g) const;
+
     /**
      * calculate heat transfer coefficient
      */
@@ -295,6 +303,11 @@ private:
      * thermal resistances
      */
     double _R_ff, _R_fog;
+
+    /**
+     * thermal resistances of the grout soil exchange
+     */
+    double _R_gs;
 
     /**
      * thermal resistances due to advective flow of refrigerant in the pipes
@@ -310,11 +323,6 @@ private:
      * thermal resistances of the grout
      */
     double _R_g;
-
-    /**
-     * thermal resistances of the grout soil exchange
-     */
-    double _R_gs;
 
     /**
      * specific exchange surfaces S

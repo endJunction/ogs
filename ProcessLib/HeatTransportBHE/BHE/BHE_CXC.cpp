@@ -76,42 +76,52 @@ void BHE_CXC::calcThermalResistances()
         // Eq. 69
         _R_g = std::log(D / d_o1) / (2.0 * PI * lambda_g);
     }
-    // Eq. 67
     _R_con_b = chi * _R_g;
+
+    _R_ff = calculateThermalResistanceFf(_R_adv_i1, _R_adv_a_o1, _R_con_i1);
+    _R_fog = calculateThermalResistanceFog(_R_adv_b_o1, _R_con_o1, _R_con_b);
+    _R_gs = calculateThermalResistanceGroutSoil(chi, _R_g);
+}
+
+// Eq. 67
+double BHE_CXC::calculateThermalResistanceFf(double const R_adv_i1,
+                                             double const R_adv_a_o1,
+                                             double const R_con_i1) const
+{
     if (extern_Ra_Rb.use_extern_Ra_Rb)
     {
-        _R_ff = extern_Ra_Rb.ext_Ra;
+        return extern_Ra_Rb.ext_Ra;
     }
-    else if (extern_def_thermal_resistances.if_use_defined_therm_resis)
-    {
-        _R_ff = extern_def_thermal_resistances
-                    .ext_Rgg1;  // Attention! Here ext_Rgg1 is treated as Rff
-                                // for coaxial type
-    }
-    else
-    {
-        // Eq. 56
-        _R_ff = _R_adv_i1 + _R_adv_a_o1 + _R_con_i1;
-    }
-
-    // Eq. 57
     if (extern_def_thermal_resistances.if_use_defined_therm_resis)
-        _R_fog = extern_def_thermal_resistances.ext_Rfog;
-    else
-        _R_fog = _R_adv_b_o1 + _R_con_o1 + _R_con_b;
-
-    // thermal resistance due to grout-soil exchange
-    if (extern_def_thermal_resistances.if_use_defined_therm_resis)
-        _R_gs = extern_def_thermal_resistances.ext_Rgs;
-    else
-        _R_gs = (1 - chi) * _R_g;
-
-    if (!std::isfinite(_R_gs))
     {
-        OGS_FATAL(
-            "Error!!! Grout Thermal Resistance is an infinite number! The "
-            "simulation will be stopped! \n");
+        return extern_def_thermal_resistances
+            .ext_Rgg1;  // Attention! Here ext_Rgg1 is treated as Rff for
+                        // coaxial type
     }
+    // Eq. 56
+    return R_adv_i1 + R_adv_a_o1 + R_con_i1;
+}
+
+// Eq. 57
+double BHE_CXC::calculateThermalResistanceFog(double const R_adv_b_o1,
+                                              double const R_con_o1,
+                                              double const R_con_b) const
+{
+    if (extern_def_thermal_resistances.if_use_defined_therm_resis)
+        return extern_def_thermal_resistances.ext_Rfog;
+
+    return R_adv_b_o1 + R_con_o1 + R_con_b;
+}
+
+// thermal resistance due to grout-soil exchange
+double BHE_CXC::calculateThermalResistanceGroutSoil(double const chi,
+                                                    double const R_g) const
+{
+    if (extern_def_thermal_resistances.if_use_defined_therm_resis)
+    {
+        return extern_def_thermal_resistances.ext_Rgs;
+    }
+    return (1 - chi) * R_g;
 }
 
 /**
@@ -121,6 +131,13 @@ void BHE_CXC::calcHeatTransferCoefficients()
 {
     boundary_heat_exchange_coefficients[0] = 1.0 / _R_fog;
     boundary_heat_exchange_coefficients[1] = 1.0 / _R_ff;
+
+    if (!std::isfinite(_R_gs))
+    {
+        OGS_FATAL(
+            "Error!!! Grout Thermal Resistance is an infinite number! The "
+            "simulation will be stopped! \n");
+    }
     boundary_heat_exchange_coefficients[2] = 1.0 / _R_gs;
 }
 
