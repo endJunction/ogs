@@ -80,10 +80,9 @@ public:
         ,
         BHE_DISCHARGE_TYPE type =
             BHE_DISCHARGE_TYPE::BHE_DISCHARGE_TYPE_PARALLEL)
-        : BHEAbstract(name, BHE_TYPE::TYPE_2U, borehole_geometry, pipe_geometry,
-                      refrigerant_param, grout_param, extern_Ra_Rb,
-                      extern_def_thermal_resistances, std::move(bhe_curves),
-                      bound_type, if_flowrate_curve),
+        : BHEAbstract(name, borehole_geometry, pipe_geometry, refrigerant_param,
+                      grout_param, extern_Ra_Rb, extern_def_thermal_resistances,
+                      std::move(bhe_curves), bound_type, if_flowrate_curve),
           _discharge_type(type)
     {
         _u = Eigen::Vector4d::Zero();

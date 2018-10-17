@@ -45,17 +45,6 @@ namespace HeatTransportBHE
 {
 namespace BHE  // namespace of borehole heat exchanger
 {
-/**
- * list the types of borehole heat exchanger
- */
-enum class BHE_TYPE
-{
-    TYPE_2U,   // two u-tube borehole heat exchanger
-    TYPE_1U,   // one u-tube borehole heat exchanger
-    TYPE_CXC,  // coaxial pipe with annualar inlet
-    TYPE_CXA   // coaxial pipe with centreed inlet
-};
-
 enum class BHE_BOUNDARY_TYPE
 {
     FIXED_INFLOW_TEMP_BOUNDARY,
@@ -139,7 +128,6 @@ public:
      */
     BHEAbstract(
         const std::string name_,
-        const BHE_TYPE bhe_type_,
         BoreholeGeometry borehole_geometry_,
         PipeParameters pipe_param_,
         RefrigerantParameters refrigerant_param_,
@@ -155,7 +143,6 @@ public:
         bool user_defined_R_vals = false,
         bool if_flowrate_curve = false)
         : name(name_),
-          bhe_type(bhe_type_),
           boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
@@ -230,11 +217,6 @@ public:
      * name of the borehole heat exchanger
      */
     const std::string name;
-
-    /**
-     * the type of this BHE
-     */
-    const BHE_TYPE bhe_type;
 
     /**
      * the type of the boundary condition on this BHE
