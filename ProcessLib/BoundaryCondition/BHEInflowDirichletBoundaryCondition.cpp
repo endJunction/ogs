@@ -22,8 +22,8 @@ BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id,
     int const component_id,
-    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe)
-    : _bc_mesh(bc_mesh), _pt_bhe(pt_bhe)
+    ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe)
+    : _bc_mesh(bc_mesh), _bhe(bhe)
 {
     DBUG(
         "Found %d nodes for BHE Inflow Dirichlet BCs for the variable %d and "
@@ -74,7 +74,8 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
         bc_values.ids[i] = _bc_values.ids[i];
         // here call the corresponding BHE functions
         auto const tmp_T_out = x[_T_out_indices[i]];
-        bc_values.values[i] = _pt_bhe->getTinByTout(tmp_T_out, t);
+        bc_values.values[i] = boost::apply_visitor(
+            [&](auto& bhe) { return bhe.getTinByTout(tmp_T_out, t); }, _bhe);
     }
 }
 
@@ -100,12 +101,12 @@ createBHEInflowDirichletBoundaryCondition(
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
     int const variable_id, int const component_id,
-    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe)
+    ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe)
 {
     DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
 
     return std::make_unique<BHEInflowDirichletBoundaryCondition>(
         std::move(in_out_global_indices), bc_mesh, vec_inflow_bc_nodes,
-        variable_id, component_id, pt_bhe);
+        variable_id, component_id, bhe);
 }
 }  // namespace ProcessLib

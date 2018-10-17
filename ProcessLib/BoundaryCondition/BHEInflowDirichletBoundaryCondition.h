@@ -12,7 +12,7 @@
 #include "BoundaryCondition.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
 #include "NumLib/IndexValueVector.h"
-#include "ProcessLib/HeatTransportBHE/BHE/BHEAbstract.h"
+#include "ProcessLib/HeatTransportBHE/BHE/BHETypes.h"
 #include "ProcessLib/Parameter/Parameter.h"
 
 namespace ProcessLib
@@ -26,7 +26,7 @@ public:
         std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
         int const variable_id,
         int const component_id,
-        ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe);
+        ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe);
 
     void getEssentialBCValues(
         const double t, GlobalVector const& x,
@@ -44,7 +44,7 @@ private:
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 
-    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* _pt_bhe;
+    ProcessLib::HeatTransportBHE::BHE::BHETypes& _bhe;
 };
 
 std::unique_ptr<BHEInflowDirichletBoundaryCondition>
@@ -53,5 +53,5 @@ createBHEInflowDirichletBoundaryCondition(
     MeshLib::Mesh const& bc_mesh,
     std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
     int const variable_id, int const component_id,
-    ProcessLib::HeatTransportBHE::BHE::BHEAbstract* pt_bhe);
+    ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe);
 }  // namespace ProcessLib

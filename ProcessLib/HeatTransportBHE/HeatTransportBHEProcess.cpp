@@ -235,15 +235,13 @@ void HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom(
                  _process_data._vec_BHE_property[bhe_i]))
         {
             // Top, inflow.
-            auto* bhe = apply_visitor(
-                [](auto& bhe) { return static_cast<BHE::BHEAbstract*>(&bhe); },
-                _process_data._vec_BHE_property[bhe_i]);
             bcs.addBoundaryCondition(
                 ProcessLib::createBHEInflowDirichletBoundaryCondition(
                     get_global_bhe_bc_indices(bc_top_node->getID(),
                                               in_out_component_id),
                     _mesh, {bc_top_node}, variable_id,
-                    in_out_component_id.first, bhe));
+                    in_out_component_id.first,
+                    _process_data._vec_BHE_property[bhe_i]));
 
             // Bottom, outflow.
             bcs.addBoundaryCondition(
