@@ -29,6 +29,9 @@ public:
         std::map<std::string,
                  std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
             bhe_curves /* bhe related curves */,
+        // TODO (haibing) default arguments of a ctor are bad places to set the
+        // constant values of the members. Move default values either to the
+        // caller or into the member definition.
         BoreholeGeometry const borehole_geometry = {100, 0.013},
         PipeParameters const pipe_geometry =
             {0.024 /* inner radius of the pipline */,
