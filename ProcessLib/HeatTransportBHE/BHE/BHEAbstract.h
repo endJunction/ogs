@@ -157,12 +157,6 @@ public:
     virtual ~BHEAbstract() = default;
 
     /**
-     * return the number of unknowns needed for this BHE
-     * abstract function, need to be realized.
-     */
-    virtual std::size_t getNumUnknowns() const = 0;
-
-    /**
      * initialization calcultion,
      * need to be overwritten.
      */
@@ -178,34 +172,6 @@ public:
         initialize();
     };
 
-    virtual void updateFlowRateFromCurve(double current_time) = 0;
-
-    /**
-     * thermal resistance calculation,
-     * need to be overwritten.
-     */
-    virtual void calcThermalResistances() = 0;
-
-    /**
-     * heat transfer coefficient,
-     * need to be overwritten.
-     */
-    virtual void calcHeatTransferCoefficients() = 0;
-
-    /**
-     * return the coeff of boundary heat exchange matrix,
-     * depending on the index of unknown.
-     */
-    virtual double getBoundaryHeatExchangeCoeff(
-        std::size_t idx_unknown) const = 0;
-
-    /**
-     * return the inflow temperature based on outflow temperature and fixed
-     * power.
-     */
-    virtual double getTinByTout(double T_in, double current_time) = 0;
-
-    virtual std::vector<std::pair<int, int>> const&
     inflowOutflowBcComponentIds() const = 0;
 
 public:
