@@ -261,12 +261,6 @@ public:
     }
 
     /**
-     * return the coeff of boundary heat exchange matrix,
-     * depending on the index of unknown.
-     */
-    double getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const;
-
-    /**
      * return the inflow temperature based on outflow temperature and fixed
      * power.
      */
@@ -274,6 +268,14 @@ public:
 
     static constexpr std::pair<int, int> inflow_outflow_bc_component_ids[] = {
         {1, 0}};
+
+    /// PHI_fog, PHI_ff, PHI_gs
+    /// Here we store the boundary heat exchange coefficients in the governing
+    /// equations of BHE.
+    /// These governing equations can be found in
+    /// 1) Diersch (2013) FEFLOW book on page 958, M.3, or
+    /// 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97.
+    std::array<double, number_of_unknowns> boundary_heat_exchange_coefficients;
 
 private:
     void initialize();
@@ -313,11 +315,6 @@ private:
      * thermal resistances of the grout soil exchange
      */
     double _R_gs;
-
-    /**
-     * heat transfer coefficients
-     */
-    double _PHI_fog, _PHI_ff, _PHI_gs;
 
     /**
      * specific exchange surfaces S

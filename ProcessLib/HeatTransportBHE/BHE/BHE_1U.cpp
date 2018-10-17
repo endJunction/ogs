@@ -187,47 +187,10 @@ void BHE_1U::calcThermalResistances()
  */
 void BHE_1U::calcHeatTransferCoefficients()
 {
-    _PHI_fig = 1.0 / _R_fig;
-    _PHI_fog = 1.0 / _R_fog;
-    _PHI_gg = 1.0 / _R_gg;
-    _PHI_gs = 1.0 / _R_gs;
-}
-
-double BHE_1U::getBoundaryHeatExchangeCoeff(std::size_t idx_unknown) const
-{
-    // Here we calculates the boundary heat exchange coefficients
-    // in the governing equations of BHE.
-    // These governing equations can be found in
-    // 1) Diersch (2013) FEFLOW book on page 958, M.3, or
-    // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97.
-
-    double exchange_coeff(0);
-
-    switch (idx_unknown)
-    {
-        case 0:
-            // PHI_fig
-            exchange_coeff = _PHI_fig;
-            break;
-        case 1:
-            // PHI_fog
-            exchange_coeff = _PHI_fog;
-            break;
-        case 2:
-            // PHI_gg
-            exchange_coeff = _PHI_gg;
-            break;
-        case 3:
-            // PHI_gs
-            exchange_coeff = _PHI_gs;
-            break;
-        default:
-            OGS_FATAL(
-                "Error !!! The index passed to "
-                "getBoundaryHeatExchangeCoeff for BHE is not correct. ");
-            break;
-    }
-    return exchange_coeff;
+    boundary_heat_exchange_coefficients[0] = 1.0 / _R_fig;
+    boundary_heat_exchange_coefficients[1] = 1.0 / _R_fog;
+    boundary_heat_exchange_coefficients[2] = 1.0 / _R_gg;
+    boundary_heat_exchange_coefficients[3] = 1.0 / _R_gs;
 }
 
 double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)

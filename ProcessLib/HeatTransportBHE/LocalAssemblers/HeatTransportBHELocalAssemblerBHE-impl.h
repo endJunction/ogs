@@ -59,6 +59,7 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
         _secondary_data.N[ip] = sm.N;
     }
 
+
     _R_matrix.setZero(bhe_unknowns_size, bhe_unknowns_size);
     _R_pi_s_matrix.setZero(bhe_unknowns_size, temperature_size);
     _R_s_matrix.setZero(temperature_size, temperature_size);
@@ -78,11 +79,10 @@ HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod, BHEType>::
             auto const& N = _ip_data[ip].N;
             auto const& w = _ip_data[ip].integration_weight;
 
-            // get coefficient of R matrix for corresponding BHE.
-            auto R_coeff = _bhe.getBoundaryHeatExchangeCoeff(idx_bhe_unknowns);
-
+            auto const& R =
+                _bhe.boundary_heat_exchange_coefficients[idx_bhe_unknowns];
             // calculate mass matrix for current unknown
-            matBHE_loc_R += N.transpose() * R_coeff * N * w;
+            matBHE_loc_R += N.transpose() * N * R * w;
         }  // end of loop over integration point
 
         // The following assembly action is according to Diersch (2013) FEFLOW
