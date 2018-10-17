@@ -17,6 +17,7 @@
 
 namespace ProcessLib
 {
+template <typename BHEType>
 class BHEInflowDirichletBoundaryCondition final : public BoundaryCondition
 {
 public:
@@ -26,7 +27,7 @@ public:
         std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
         int const variable_id,
         int const component_id,
-        ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe);
+        BHEType& bhe);
 
     void getEssentialBCValues(
         const double t, GlobalVector const& x,
@@ -44,14 +45,23 @@ private:
 
     NumLib::IndexValueVector<GlobalIndexType> _bc_values;
 
-    ProcessLib::HeatTransportBHE::BHE::BHETypes& _bhe;
+    BHEType& _bhe;
 };
 
-std::unique_ptr<BHEInflowDirichletBoundaryCondition>
+template <typename BHEType>
+std::unique_ptr<BHEInflowDirichletBoundaryCondition<BHEType>>
 createBHEInflowDirichletBoundaryCondition(
     std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
     MeshLib::Mesh const& bc_mesh,
-    std::vector<MeshLib::Node*> const& vec_outflow_bc_nodes,
-    int const variable_id, int const component_id,
-    ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe);
+    std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
+    int const variable_id, int const component_id, BHEType& bhe)
+{
+    DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
+
+    return std::make_unique<BHEInflowDirichletBoundaryCondition<BHEType>>(
+        std::move(in_out_global_indices), bc_mesh, vec_inflow_bc_nodes,
+        variable_id, component_id, bhe);
+}
 }  // namespace ProcessLib
+
+#include "BHEInflowDirichletBoundaryCondition-impl.h"

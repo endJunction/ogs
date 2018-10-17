@@ -7,22 +7,17 @@
  *
  */
 
-#include "BHEInflowDirichletBoundaryCondition.h"
-
-#include <algorithm>
-#include <logog/include/logog.hpp>
-#include <vector>
-#include "ProcessLib/Utils/ProcessUtils.h"
-
 namespace ProcessLib
 {
-BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
-    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
-    MeshLib::Mesh const& bc_mesh,
-    std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
-    int const variable_id,
-    int const component_id,
-    ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe)
+template <typename BHEType>
+BHEInflowDirichletBoundaryCondition<BHEType>::
+    BHEInflowDirichletBoundaryCondition(
+        std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
+        MeshLib::Mesh const& bc_mesh,
+        std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
+        int const variable_id,
+        int const component_id,
+        BHEType& bhe)
     : _bc_mesh(bc_mesh), _bhe(bhe)
 {
     DBUG(
@@ -57,7 +52,8 @@ BHEInflowDirichletBoundaryCondition::BHEInflowDirichletBoundaryCondition(
     }
 }
 
-void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
+template <typename BHEType>
+void BHEInflowDirichletBoundaryCondition<BHEType>::getEssentialBCValues(
     const double t, GlobalVector const& x,
     NumLib::IndexValueVector<GlobalIndexType>& bc_values) const
 {
@@ -74,14 +70,14 @@ void BHEInflowDirichletBoundaryCondition::getEssentialBCValues(
         bc_values.ids[i] = _bc_values.ids[i];
         // here call the corresponding BHE functions
         auto const tmp_T_out = x[_T_out_indices[i]];
-        bc_values.values[i] = boost::apply_visitor(
-            [&](auto& bhe) { return bhe.getTinByTout(tmp_T_out, t); }, _bhe);
+        bc_values.values[i] = _bhe.getTinByTout(tmp_T_out, t);
     }
 }
 
 // update new values and corresponding indices.
-void BHEInflowDirichletBoundaryCondition::preTimestep(const double /*t*/,
-                                                      const GlobalVector& x)
+template <typename BHEType>
+void BHEInflowDirichletBoundaryCondition<BHEType>::preTimestep(
+    const double /*t*/, const GlobalVector& x)
 {
     // for each BHE, the inflow temperature is dependent on
     // the ouflow temperature of the BHE.
@@ -95,18 +91,4 @@ void BHEInflowDirichletBoundaryCondition::preTimestep(const double /*t*/,
     }
 }
 
-std::unique_ptr<BHEInflowDirichletBoundaryCondition>
-createBHEInflowDirichletBoundaryCondition(
-    std::pair<GlobalIndexType, GlobalIndexType>&& in_out_global_indices,
-    MeshLib::Mesh const& bc_mesh,
-    std::vector<MeshLib::Node*> const& vec_inflow_bc_nodes,
-    int const variable_id, int const component_id,
-    ProcessLib::HeatTransportBHE::BHE::BHETypes& bhe)
-{
-    DBUG("Constructing BHEInflowDirichletBoundaryCondition.");
-
-    return std::make_unique<BHEInflowDirichletBoundaryCondition>(
-        std::move(in_out_global_indices), bc_mesh, vec_inflow_bc_nodes,
-        variable_id, component_id, bhe);
-}
 }  // namespace ProcessLib
