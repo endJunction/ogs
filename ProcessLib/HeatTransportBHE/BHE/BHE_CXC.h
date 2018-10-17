@@ -151,18 +151,6 @@ public:
 
     static constexpr int number_of_unknowns = 3;
 
-    void initialize();
-
-    /**
-     * calculate thermal resistance
-     */
-    void calcThermalResistances();
-
-    /**
-     * calculate heat transfer coefficient
-     */
-    void calcHeatTransferCoefficients();
-
     std::array<double, number_of_unknowns> pipeHeatCapacities() const
     {
         double const& rho_r = refrigerant_param.rho_r;
@@ -283,6 +271,19 @@ public:
 
     static constexpr std::pair<int, int> inflow_outflow_bc_component_ids[] = {
         {1, 0}};
+
+private:
+    void initialize();
+
+    /**
+     * calculate thermal resistance
+     */
+    void calcThermalResistances();
+
+    /**
+     * calculate heat transfer coefficient
+     */
+    void calcHeatTransferCoefficients();
 
 private:
     /**
