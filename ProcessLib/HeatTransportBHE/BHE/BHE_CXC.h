@@ -80,7 +80,8 @@ public:
                                       BHE when using Q_Curve_fixed_dT B.C.*/
     : BHEAbstract(borehole_geometry, pipe_geometry, refrigerant_param,
                   grout_param, extern_Ra_Rb, extern_def_thermal_resistances,
-                  std::move(bhe_curves), bound_type, if_flowrate_curve)
+                  std::move(bhe_curves), bound_type, false /*if_use_ext_Ra_Rb*/,
+                  false /*user_defined_R_vals*/, if_flowrate_curve)
     {
         Q_r = my_Qr;
 

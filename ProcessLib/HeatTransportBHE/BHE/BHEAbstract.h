@@ -127,11 +127,10 @@ public:
         std::map<std::string,
                  std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
             bhe_curves_,
-        BHE_BOUNDARY_TYPE my_bound_type =
-            BHE_BOUNDARY_TYPE::INVALID_BHE_BOUNDARY_TYPE,
-        bool if_use_ext_Ra_Rb = false,
-        bool user_defined_R_vals = false,
-        bool if_flowrate_curve = false)
+        BHE_BOUNDARY_TYPE my_bound_type,
+        bool if_use_ext_Ra_Rb,
+        bool user_defined_R_vals,
+        bool if_flowrate_curve)
         : boundary_type(my_bound_type),
           borehole_geometry(borehole_geometry_),
           pipe_param(pipe_param_),
