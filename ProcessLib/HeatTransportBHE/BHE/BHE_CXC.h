@@ -150,10 +150,6 @@ public:
     };
 
     static constexpr int number_of_unknowns = 3;
-    /**
-     * return the number of unknowns needed for CXC BHE
-     */
-    std::size_t getNumUnknowns() const { return number_of_unknowns; }
 
     void initialize();
 

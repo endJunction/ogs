@@ -156,10 +156,6 @@ public:
     };
 
     static constexpr int number_of_unknowns = 4;
-    /**
-     * return the number of unknowns needed for 1U BHE
-     */
-    std::size_t getNumUnknowns() const { return number_of_unknowns; }
 
     void initialize();
 
