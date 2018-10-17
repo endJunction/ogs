@@ -250,7 +250,7 @@ public:
      * if value positive, then injecting power
      * if value negative, then extracting power
      */
-    double power_in_watt_val;
+    double const power_in_watt_val;
 
     /**
      * temperature difference between inflow and
@@ -262,7 +262,7 @@ public:
      * threshold Q value for switching off the BHE
      * when using the Q_curve_fixed_dT B.C.
      */
-    double threshold;
+    double const threshold;
 
     /**
      * map strucutre that contains all the curves related to this BHE
