@@ -214,7 +214,7 @@ void HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom(
                 return a->getCoords()[2] < b->getCoords()[2];
             });
         auto const bc_bottom_node_id = (*bottom_top_nodes.first)->getID();
-        MeshLib::Node* const bc_top_node = *bottom_top_nodes.second;
+        auto const bc_top_node_id = (*bottom_top_nodes.second)->getID();
 
         auto get_global_bhe_bc_indices =
             [&](std::size_t const node_id,
@@ -236,10 +236,9 @@ void HeatTransportBHEProcess::createBHEBoundaryConditionTopBottom(
                     // Top, inflow.
                     bcs.addBoundaryCondition(
                         ProcessLib::createBHEInflowDirichletBoundaryCondition(
-                            get_global_bhe_bc_indices(bc_top_node->getID(),
+                            get_global_bhe_bc_indices(bc_top_node_id,
                                                       in_out_component_id),
-                            _mesh, {bc_top_node}, variable_id,
-                            in_out_component_id.first, bhe));
+                            bhe));
 
                     // Bottom, outflow.
                     bcs.addBoundaryCondition(
