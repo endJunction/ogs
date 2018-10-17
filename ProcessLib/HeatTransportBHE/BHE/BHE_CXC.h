@@ -285,15 +285,14 @@ private:
      */
     void calcThermalResistances();
 
-    double calculateThermalResistanceGrout(double R_adv_b_o1,
-                                           double R_con_o1) const;
+    double calculateThermalResistanceGrout(double Nu_out,
+                                           double lambda_r) const;
     double calculateThermalResistanceFf(double Nu_in,
                                         double Nu_out,
                                         double lambda_r) const;
-    double calculateThermalResistanceFog(double R_adv_b_o1,
-                                         double R_con_o1,
-                                         double R_con_b) const;
-    double calculateThermalResistanceGroutSoil(double chi, double R_g) const;
+    double calculateThermalResistanceFog(double Nu_out, double lambda_r) const;
+    double calculateThermalResistanceGroutSoil(double Nu_out,
+                                               double lambda_r) const;
 
     /**
      * calculate heat transfer coefficient

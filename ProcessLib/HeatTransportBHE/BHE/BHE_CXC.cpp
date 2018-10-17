@@ -29,49 +29,34 @@ void ProcessLib::HeatTransportBHE::BHE::BHE_CXC::initialize()
 
 void BHE_CXC::calcThermalResistances()
 {
-    double const& r_outer = pipe_param.r_outer;
-    double const& r_inner = pipe_param.r_inner;
-    double const& b_in = pipe_param.b_in;
-    double const& b_out = pipe_param.b_out;
-
     double const& Nu_in = flow_properties_in.nusselt_number;
     double const& Nu_out = flow_properties_out.nusselt_number;
     double const& lambda_r = refrigerant_param.lambda_r;
 
-    // thermal resistance due to advective flow of refrigerant in the pipes
-    // Eq. 58, 59, and 60 in Diersch_2011_CG
-    double const _R_adv_b_o1 = thermalResistanceMagicalOuverture(
-        Nu_out, lambda_r, r_outer - (r_inner + b_in), r_outer);
-
-    // thermal resistance due to thermal conductivity of the pip wall material
-    // Eq. 66 in Diersch_2011_CG
-    double const _R_con_o1 = thermalResistanceMagicalMur(
-        r_outer + b_out, r_outer, pipe_param.lambda_p_o);
-
-    // thermal resistance due to the grout transition
-    // Eq. 68
-    double const chi = chimereDimensionlessFactor(borehole_geometry.diameter,
-                                                  2.0 * (r_outer + b_out));
-
-    // thermal resistances of the grout
-    double const _R_g = calculateThermalResistanceGrout(_R_adv_b_o1, _R_con_o1);
-
-    // thermal resistances due to the grout transition
-    double const _R_con_b = chi * _R_g;
-
     double const _R_ff = calculateThermalResistanceFf(Nu_in, Nu_out, lambda_r);
-    double const _R_fog =
-        calculateThermalResistanceFog(_R_adv_b_o1, _R_con_o1, _R_con_b);
-    double const _R_gs = calculateThermalResistanceGroutSoil(chi, _R_g);
+    double const _R_fog = calculateThermalResistanceFog(Nu_out, lambda_r);
+    double const _R_gs = calculateThermalResistanceGroutSoil(Nu_out, lambda_r);
 
     calcHeatTransferCoefficients(_R_fog, _R_ff, _R_gs);
 }
 
-double BHE_CXC::calculateThermalResistanceGrout(double const R_adv_b_o1,
-                                                double const R_con_o1) const
+double BHE_CXC::calculateThermalResistanceGrout(double const Nu_out,
+                                                double const lambda_r) const
 {
     if (extern_Ra_Rb.use_extern_Ra_Rb)
     {
+        // thermal resistance due to advective flow of refrigerant in the pipes
+        // Eq. 58, 59, and 60 in Diersch_2011_CG
+        double const R_adv_b_o1 = thermalResistanceMagicalOuverture(
+            Nu_out, lambda_r,
+            pipe_param.r_outer - (pipe_param.r_inner + pipe_param.b_in),
+            pipe_param.r_outer);
+        // thermal resistance due to thermal conductivity of the pip wall
+        // material Eq. 66 in Diersch_2011_CG
+        double const R_con_o1 = thermalResistanceMagicalMur(
+            pipe_param.r_outer + pipe_param.b_out, pipe_param.r_outer,
+            pipe_param.lambda_p_o);
+
         return extern_Ra_Rb.ext_Rb - R_adv_b_o1 - R_con_o1;
     }
     // Eq. 69
@@ -113,24 +98,51 @@ double BHE_CXC::calculateThermalResistanceFf(double const Nu_in,
 }
 
 // Eq. 57
-double BHE_CXC::calculateThermalResistanceFog(double const R_adv_b_o1,
-                                              double const R_con_o1,
-                                              double const R_con_b) const
+double BHE_CXC::calculateThermalResistanceFog(double const Nu_out,
+                                              double const lambda_r) const
 {
     if (extern_def_thermal_resistances.if_use_defined_therm_resis)
         return extern_def_thermal_resistances.ext_Rfog;
 
+    // thermal resistance due to advective flow of refrigerant in the pipes
+    // Eq. 58, 59, and 60 in Diersch_2011_CG
+    double const R_adv_b_o1 = thermalResistanceMagicalOuverture(
+        Nu_out, lambda_r,
+        pipe_param.r_outer - (pipe_param.r_inner + pipe_param.b_in),
+        pipe_param.r_outer);
+    // thermal resistance due to thermal conductivity of the pip wall
+    // material Eq. 66 in Diersch_2011_CG
+    double const R_con_o1 =
+        thermalResistanceMagicalMur(pipe_param.r_outer + pipe_param.b_out,
+                                    pipe_param.r_outer, pipe_param.lambda_p_o);
+    // thermal resistance due to the grout transition
+    // Eq. 68
+    double const chi = chimereDimensionlessFactor(
+        borehole_geometry.diameter,
+        2.0 * (pipe_param.r_outer + pipe_param.b_out));
+
+    // thermal resistances of the grout
+    double const R_g = calculateThermalResistanceGrout(Nu_out, lambda_r);
+    double const R_con_b = chi * R_g;
     return R_adv_b_o1 + R_con_o1 + R_con_b;
 }
 
 // thermal resistance due to grout-soil exchange
-double BHE_CXC::calculateThermalResistanceGroutSoil(double const chi,
-                                                    double const R_g) const
+double BHE_CXC::calculateThermalResistanceGroutSoil(double const Nu_out,
+                                                    double const lambda_r) const
 {
     if (extern_def_thermal_resistances.if_use_defined_therm_resis)
     {
         return extern_def_thermal_resistances.ext_Rgs;
     }
+    // thermal resistance due to the grout transition
+    // Eq. 68
+    double const chi = chimereDimensionlessFactor(
+        borehole_geometry.diameter,
+        2.0 * (pipe_param.r_outer + pipe_param.b_out));
+
+    // thermal resistances of the grout
+    double const R_g = calculateThermalResistanceGrout(Nu_out, lambda_r);
     return (1 - chi) * R_g;
 }
 
