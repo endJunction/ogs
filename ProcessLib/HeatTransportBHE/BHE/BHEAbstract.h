@@ -158,19 +158,9 @@ public:
 
     /**
      * initialization calcultion,
-     * need to be overwritten.
+     * update all parameters based on the new flow rate
      */
     virtual void initialize() = 0;
-
-    /**
-     * update all parameters based on the new flow rate
-     * not necessarily needs to be overwritten.
-     */
-    virtual void updateFlowRate(double new_flow_rate)
-    {
-        Q_r = new_flow_rate;
-        initialize();
-    };
 
 public:
     /**

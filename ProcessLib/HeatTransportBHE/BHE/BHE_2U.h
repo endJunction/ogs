@@ -173,16 +173,6 @@ public:
 
     void initialize();
 
-    void updateFlowRateFromCurve(double current_time)
-    {
-        if (use_flowrate_curve)
-        {
-            double Q_r_tmp(0.0);
-            Q_r_tmp = flowrate_curve->getValue(current_time);
-            updateFlowRate(Q_r_tmp);
-        }
-    };
-
     /**
      * calculate thermal resistance
      */

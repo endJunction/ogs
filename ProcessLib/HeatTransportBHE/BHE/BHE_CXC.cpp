@@ -185,7 +185,8 @@ double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
                 // using the defined delta_T value
                 Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
                 // update all values dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out + delta_T_val;
             }
@@ -194,7 +195,8 @@ double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp = 1.0e-06;  // this has to be a small value to avoid
                                     // division by zero
                 // update all values dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out;
             }

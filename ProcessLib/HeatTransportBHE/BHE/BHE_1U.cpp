@@ -254,7 +254,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             {
                 Q_r_tmp = flowrate_curve->getValue(current_time);
 
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
             }
             else
                 Q_r_tmp = Q_r;
@@ -265,7 +266,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             {
                 Q_r_tmp = flowrate_curve->getValue(current_time);
 
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
             }
             T_in = T_out + delta_T_val;
             break;
@@ -287,7 +289,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp =
                     power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
                 // update all values dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out + (fac_dT * delta_T_val);
                 // print out updated flow rate
@@ -298,7 +301,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp = 1.0e-12;  // this has to be a small value to avoid
                                     // division by zero
                 // update all values dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out;
                 // print out updated flow rate
@@ -347,7 +351,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp =
                     power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
                 // update all values dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out + (fac_dT * delta_T_val);
                 // print out updated flow rate
@@ -358,7 +363,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp = 1.0e-12;  // this has to be a small value to avoid
                                     // division by zero
                 // update all values dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out;
                 // print out updated flow rate
@@ -402,7 +408,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 // Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time,
                 // &flag_valid);
                 Q_r_tmp = flowrate_curve->getValue(current_time);
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
             }
             else
                 Q_r_tmp = Q_r;
@@ -411,7 +418,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp = 1.0e-12;  // this has to be a small value to avoid
                                     // division by zero update all values
                                     // dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out;
                 // print out updated flow rate
@@ -420,7 +428,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             else
             {
                 Q_r_tmp = Q_r;
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the dT value based on fixed flow rate
                 delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
                 // calcuate the new T_in
@@ -439,7 +448,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 // Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time,
                 // &flag_valid);
                 Q_r_tmp = flowrate_curve->getValue(current_time);
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
             }
             else
                 Q_r_tmp = Q_r;
@@ -449,7 +459,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r_tmp = 1.0e-12;  // this has to be a small value to avoid
                                     // division by zero update all values
                                     // dependent on the flow rate
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the new T_in
                 T_in = T_out;
                 // print out updated flow rate
@@ -458,7 +469,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             else
             {
                 Q_r_tmp = Q_r;
-                updateFlowRate(Q_r_tmp);
+                Q_r = Q_r_tmp;
+                initialize();
                 // calculate the dT value based on fixed flow rate
                 delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
                 // calcuate the new T_in
