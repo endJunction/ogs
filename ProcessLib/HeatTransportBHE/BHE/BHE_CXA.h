@@ -127,18 +127,6 @@ public:
             flowrate_curve = it->second.get();
         }
 
-        constexpr double PI = boost::math::constants::pi<double>();
-
-        // cross section area calculation
-        CSA_i = PI * (pipe_geometry.r_outer * pipe_geometry.r_outer -
-                      (pipe_geometry.r_inner + pipe_geometry.b_in) *
-                          (pipe_geometry.r_inner + pipe_geometry.b_in));
-        CSA_o = PI * pipe_geometry.r_inner * pipe_geometry.r_inner;
-        CSA_g = PI * (0.25 * borehole_geometry.diameter *
-                          borehole_geometry.diameter -
-                      (pipe_geometry.r_outer + pipe_geometry.b_out) *
-                          (pipe_geometry.r_outer + pipe_geometry.b_out));
-
         // initialization calculation
         initialize();
     };
@@ -153,9 +141,9 @@ public:
         double const& rho_g = grout_param.rho_g;
         double const& heat_cap_g = grout_param.heat_cap_g;
 
-        return {{/*i1*/ rho_r * heat_cap_r * CSA_i,
-                 /*i2*/ rho_r * heat_cap_r * CSA_o,
-                 /*o1*/ (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g}};
+        return {{/*i1*/ rho_r * heat_cap_r,
+                 /*i2*/ rho_r * heat_cap_r,
+                 /*o1*/ (1.0 - porosity_g) * rho_g * heat_cap_g}};
     }
 
     std::array<double, number_of_unknowns> pipeHeatConductions() const
@@ -172,11 +160,11 @@ public:
         // 1) Diersch (2013) FEFLOW book on page 952, M.120-122, or
         // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 23-25.
         return {{// pipe i1, Eq. 23
-                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i,
+                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()),
                  // pipe o1, Eq. 24
-                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o,
+                 (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()),
                  // pipe g1, Eq. 25
-                 (1.0 - porosity_g) * lambda_g * CSA_g}};
+                 (1.0 - porosity_g) * lambda_g}};
     }
 
     std::array<Eigen::Vector3d, number_of_unknowns> pipeAdvectionVectors() const
@@ -184,9 +172,9 @@ public:
         double const& rho_r = refrigerant_param.rho_r;
         double const& heat_cap_r = refrigerant_param.heat_cap_r;
         return {{// pipe i1, Eq. 23
-                 {0, 0, -rho_r * heat_cap_r * _u(0) * CSA_i},
+                 {0, 0, -rho_r * heat_cap_r * _u(0)},
                  // pipe o1, Eq. 24
-                 {0, 0, rho_r * heat_cap_r * _u(1) * CSA_o},
+                 {0, 0, rho_r * heat_cap_r * _u(1)},
                  // pipe g1, Eq. 25
                  {0, 0, 0}}};
     }
@@ -263,6 +251,16 @@ public:
     /// 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97.
     std::array<double, number_of_unknowns> boundary_heat_exchange_coefficients;
 
+    static constexpr double pi = boost::math::constants::pi<double>();
+    std::array<double, number_of_unknowns> const cross_section_areas = {
+        {pi * (pipe_param.r_outer * pipe_param.r_outer -
+               (pipe_param.r_inner + pipe_param.b_in) *
+                   (pipe_param.r_inner + pipe_param.b_in)),
+         pi* pipe_param.r_inner* pipe_param.r_inner,
+         pi*(0.25 * borehole_geometry.diameter * borehole_geometry.diameter -
+             (pipe_param.r_outer + pipe_param.b_out) *
+                 (pipe_param.r_outer + pipe_param.b_out))}};
+
 private:
     void initialize();
 
@@ -302,10 +300,6 @@ private:
      */
     double _R_gs;
 
-    /**
-     * cross section area
-     */
-    double CSA_i, CSA_o, CSA_g;
     /**
      * Nusselt number
      */

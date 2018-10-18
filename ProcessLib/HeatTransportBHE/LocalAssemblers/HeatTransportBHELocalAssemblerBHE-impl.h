@@ -122,6 +122,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
     auto const& pipe_heat_capacities = _bhe.pipeHeatCapacities();
     auto const& pipe_heat_conductions = _bhe.pipeHeatConductions();
     auto const& pipe_advection_vectors = _bhe.pipeAdvectionVectors();
+    auto const& cross_section_areas = _bhe.cross_section_areas;
 
     // the mass and conductance matrix terms
     for (unsigned ip = 0; ip < n_integration_points; ip++)
@@ -141,6 +142,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
             auto const& lambda = pipe_heat_conductions[idx_bhe_unknowns];
             auto const& advection_vector =
                 pipe_advection_vectors[idx_bhe_unknowns];
+            auto const& A = cross_section_areas[idx_bhe_unknowns];
 
             int const single_bhe_unknowns_index =
                 bhe_unknowns_index +
@@ -150,7 +152,7 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
                 .template block<single_bhe_unknowns_size,
                                 single_bhe_unknowns_size>(
                     single_bhe_unknowns_index, single_bhe_unknowns_index)
-                .noalias() += N.transpose() * N * mass_coeff * w;
+                .noalias() += N.transpose() * N * mass_coeff * A * w;
 
             // local K
             // laplace part
@@ -158,14 +160,14 @@ void HeatTransportBHELocalAssemblerBHE<ShapeFunction, IntegrationMethod,
                 .template block<single_bhe_unknowns_size,
                                 single_bhe_unknowns_size>(
                     single_bhe_unknowns_index, single_bhe_unknowns_index)
-                .noalias() += dNdx.transpose() * dNdx * lambda * w;
+                .noalias() += dNdx.transpose() * dNdx * lambda * A * w;
             // advection part
             local_K
                 .template block<single_bhe_unknowns_size,
                                 single_bhe_unknowns_size>(
                     single_bhe_unknowns_index, single_bhe_unknowns_index)
                 .noalias() +=
-                N.transpose() * advection_vector.transpose() * dNdx * w;
+                N.transpose() * advection_vector.transpose() * dNdx * A * w;
         }
     }
 
