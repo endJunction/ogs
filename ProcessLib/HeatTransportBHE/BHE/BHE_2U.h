@@ -145,11 +145,6 @@ public:
 
         constexpr double PI = boost::math::constants::pi<double>();
         double const& D = borehole_geometry.diameter;
-        S_i = PI * 2.0 * pipe_geometry.r_outer;
-        S_o = PI * 2.0 * pipe_geometry.r_outer;
-        S_g1 = 0.5 * D;
-        S_g2 = D;
-        S_gs = 0.25 * PI * D;
 
         // cross section area calculation
         CSA_i = PI * pipe_geometry.r_inner * pipe_geometry.r_inner;
@@ -465,10 +460,6 @@ private:
      */
     const BHE_DISCHARGE_TYPE _discharge_type;
 
-    /**
-     * specific exchange surfaces S
-     */
-    double S_i, S_o, S_g1, S_g2, S_gs;
     /**
      * cross section area
      */

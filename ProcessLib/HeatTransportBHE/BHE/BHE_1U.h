@@ -137,14 +137,6 @@ public:
         // Table 1 in Diersch_2011_CG
         constexpr double PI = boost::math::constants::pi<double>();
 
-        S_i = PI * 2.0 * pipe_geometry.r_inner;
-        S_o = PI * 2.0 * pipe_geometry.r_inner;
-        S_g1 = borehole_geometry.diameter;
-        S_gs =
-            0.5 * PI *
-            borehole_geometry.diameter;  // Corrected value according to FEFLOW
-                                         // White Papers Vol V, Table 1-71
-
         // cross section area calculation
         CSA_i = CSA_o = PI * pipe_geometry.r_inner * pipe_geometry.r_inner;
         CSA_g1 = CSA_g2 = PI * (0.125 * borehole_geometry.diameter *
@@ -355,10 +347,6 @@ private:
      */
     double _R_gg;
 
-    /**
-     * specific exchange surfaces S
-     */
-    double S_i, S_o, S_g1, S_gs;
     /**
      * cross section area
      */

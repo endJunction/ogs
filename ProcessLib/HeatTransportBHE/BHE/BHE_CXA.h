@@ -128,10 +128,6 @@ public:
         }
 
         constexpr double PI = boost::math::constants::pi<double>();
-        // Table 1 in Diersch_2011_CG
-        S_i = PI * 2.0 * pipe_geometry.r_outer;
-        S_io = PI * 2.0 * pipe_geometry.r_inner;
-        S_gs = PI * borehole_geometry.diameter;
 
         // cross section area calculation
         CSA_i = PI * (pipe_geometry.r_outer * pipe_geometry.r_outer -
@@ -306,10 +302,6 @@ private:
      */
     double _R_gs;
 
-    /**
-     * specific exchange surfaces S
-     */
-    double S_i, S_io, S_gs;
     /**
      * cross section area
      */
