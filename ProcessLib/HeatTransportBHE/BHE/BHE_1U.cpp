@@ -198,26 +198,25 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
 
+    auto update_Q_r_and_initialize = [&](double const t) {
+        if (!use_flowrate_curve)
+            return;
+        Q_r = flowrate_curve->getValue(t);
+        initialize();
+    };
+
     if (boundary_type == BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
     {
         return inflow_temperature_curve->getValue(current_time);
     }
     if (boundary_type == BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY)
     {
-        if (use_flowrate_curve)
-        {
-            Q_r = flowrate_curve->getValue(current_time);
-            initialize();
-        }
+        update_Q_r_and_initialize(current_time);
         return power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;
     }
     if (boundary_type == BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY)
     {
-        if (use_flowrate_curve)
-        {
-            Q_r = flowrate_curve->getValue(current_time);
-            initialize();
-        }
+        update_Q_r_and_initialize(current_time);
         return T_out + delta_T_val;
     }
     if (boundary_type ==
@@ -354,13 +353,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             // << ", Q_elect: " << power_elect_tmp << std::endl;
         }
         // Assign Qr whether from curve or fixed value
-        if (use_flowrate_curve)
-        {
-            // Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time,
-            // &flag_valid);
-            Q_r = flowrate_curve->getValue(current_time);
-            initialize();
-        }
+        update_Q_r_and_initialize(current_time);
         if (std::fabs(power_tmp) < threshold)
         {
             Q_r = 1.0e-12;  // this has to be a small value to avoid
@@ -390,13 +383,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         double const power_tmp = power_in_watt_curve->getValue(current_time);
 
         // Assign Qr whether from curve or fixed value
-        if (use_flowrate_curve)
-        {
-            // Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time,
-            // &flag_valid);
-            Q_r = flowrate_curve->getValue(current_time);
-            initialize();
-        }
+        update_Q_r_and_initialize(current_time);
         // calculate the dT value based on fixed flow rate
         if (std::fabs(power_tmp) < threshold)
         {
