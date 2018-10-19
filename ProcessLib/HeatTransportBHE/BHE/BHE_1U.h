@@ -9,7 +9,10 @@
 
 #pragma once
 
+#include <boost/variant.hpp>
+
 #include "BHEAbstract.h"
+#include "FlowAndTemperatureControl.h"
 
 namespace ProcessLib
 {
@@ -74,7 +77,9 @@ public:
     : BHEAbstract(borehole_geometry, pipe_geometry, refrigerant_param,
                   grout_param, extern_Ra_Rb, extern_def_thermal_resistances,
                   std::move(bhe_curves), bound_type, false /*if_use_ext_Ra_Rb*/,
-                  false /*user_defined_R_vals*/, if_flowrate_curve, Q_r,
+                  false /*user_defined_R_vals*/, if_flowrate_curve,
+                  std::numeric_limits<
+                      double>::quiet_NaN() /* Q_r no longer used globally */,
                   power_in_watt, delta_T_val, threshold),
       _omega(omega)
     {
@@ -139,7 +144,37 @@ public:
         }
 
         updateHeatTransferCoefficients(Q_r);
-    };
+
+        // TODO (naumov) This is to be moved into createBHE/createProcess
+        // functions.
+        if (bound_type == BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
+        {
+            flowAndTemperatureControl =
+                FlowAndTemperatureControl<TemperatureCurveConstantFlow>{
+                    Q_r, inflow_temperature_curve};
+        }
+
+        if (boundary_type == BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY)
+        {
+            flowAndTemperatureControl =
+                FlowAndTemperatureControl<FixedPowerConstantFlow>{
+                    Q_r, power_in_watt_val, refrigerant_param.heat_cap_r,
+                    refrigerant_param.rho_r};
+        }
+        if (boundary_type == BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY &&
+            use_flowrate_curve)
+        {
+            flowAndTemperatureControl =
+                FlowAndTemperatureControl<FixedPowerFlowCurve>{
+                    flowrate_curve, power_in_watt_val,
+                    refrigerant_param.heat_cap_r, refrigerant_param.rho_r};
+        }
+    }
+
+    boost::variant<FlowAndTemperatureControl<TemperatureCurveConstantFlow>,
+                   FlowAndTemperatureControl<FixedPowerConstantFlow>,
+                   FlowAndTemperatureControl<FixedPowerFlowCurve>>
+        flowAndTemperatureControl;
 
     static constexpr int number_of_unknowns = 4;
 
