@@ -227,10 +227,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         // current_time, &flag_valid);
         double const power_tmp = power_in_watt_curve->getValue(current_time);
 
-        double const fac_dT = power_tmp < 0 ? -1 : 1;
         // if power value exceeds threshold, calculate new values
         if (std::fabs(power_tmp) > threshold)
         {
+            double const fac_dT = power_tmp < 0 ? -1 : 1;
             // calculate the corresponding flow rate needed using the defined
             // delta_T value
             Q_r = power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
@@ -261,8 +261,6 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         // current_time, &flag_valid);
         double const building_power_tmp =
             power_in_watt_curve->getValue(current_time);
-        double const fac_dT = building_power_tmp <= 0 ? -1 : 1;
-
         double power_tmp;
         double COP_tmp;
         if (building_power_tmp <= 0.0)
@@ -294,6 +292,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         // if power value exceeds threshold, calculate new values
         if (std::fabs(power_tmp) > threshold)
         {
+            double const fac_dT = building_power_tmp <= 0 ? -1 : 1;
+
             // calculate the corresponding flow rate needed using the defined
             // delta_T value
             Q_r = power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
