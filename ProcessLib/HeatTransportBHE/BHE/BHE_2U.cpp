@@ -222,7 +222,7 @@ void BHE_2U::calcHeatTransferCoefficients()
     boundary_heat_exchange_coefficients[4] = 1.0 / _R_gs;
 }
 
-double BHE_2U::getTinByTout(double T_out, double current_time = -1.0)
+double BHE_2U::getTinByTout(double const T_out, double const current_time)
 {
     double T_in(0.0);
     double power_tmp(0.0);

@@ -164,7 +164,7 @@ void BHE_CXC::calcHeatTransferCoefficients(double const R_fog,
     boundary_heat_exchange_coefficients[2] = 1.0 / R_gs;
 }
 
-double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
+double BHE_CXC::getTinByTout(double const T_out, double const current_time)
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;

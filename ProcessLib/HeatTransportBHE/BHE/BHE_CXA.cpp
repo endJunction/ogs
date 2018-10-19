@@ -163,7 +163,7 @@ void BHE_CXA::calcHeatTransferCoefficients()
     boundary_heat_exchange_coefficients[2] = 1.0 / _R_gs;
 }
 
-double BHE_CXA::getTinByTout(double T_out, double current_time = -1.0)
+double BHE_CXA::getTinByTout(double const T_out, double const current_time)
 {
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
