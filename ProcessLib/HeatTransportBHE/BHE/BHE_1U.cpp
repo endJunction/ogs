@@ -213,6 +213,38 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         return T_out;
     };
 
+    auto compute_cop_curve_power_cooling_heating =
+        [](double const building_power, double const T_out,
+           MathLib::PiecewiseLinearInterpolation* const heating_cop_curve,
+           MathLib::PiecewiseLinearInterpolation* const cooling_cop_curve) {
+            if (building_power <= 0.0)
+            {
+                // get COP value based on T_out in the curve
+                double const COP = heating_cop_curve->getValue(T_out);
+
+                // now calculate how much power needed from BHE
+                return building_power * (COP - 1.0) / COP;
+                // also how much power from electricity
+                // power_elect_tmp = building_power_tmp - power_tmp;
+                // print the amount of power needed
+                // std::cout << "COP: " << COP << ", Q_bhe: " << power_tmp
+                // << ", Q_elect: " << power_elect_tmp << std::endl;
+            }
+            else
+            {
+                // get COP value based on T_out in the curve
+                double const COP = cooling_cop_curve->getValue(T_out);
+
+                // now calculate how much power needed from BHE
+                return building_power * (COP + 1.0) / COP;
+                // also how much power from electricity
+                // power_elect_tmp = -building_power_tmp + power_tmp;
+                // print the amount of power needed
+                // std::cout << "COP: " << COP << ", Q_bhe: " << power_tmp
+                // << ", Q_elect: " << power_elect_tmp << std::endl;
+            }
+        };
+
     if (boundary_type == BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
     {
         return inflow_temperature_curve->getValue(current_time);
@@ -259,35 +291,8 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         // current_time, &flag_valid);
         double const building_power_tmp =
             power_in_watt_curve->getValue(current_time);
-        double power_tmp;
-        double COP_tmp;
-        if (building_power_tmp <= 0.0)
-        {
-            // get COP value based on T_out in the curve
-            COP_tmp = heating_cop_curve->getValue(T_out);
-
-            // now calculate how much power needed from BHE
-            power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
-            // also how much power from electricity
-            // power_elect_tmp = building_power_tmp - power_tmp;
-            // print the amount of power needed
-            // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
-            // << ", Q_elect: " << power_elect_tmp << std::endl;
-        }
-        else
-        {
-            // get COP value based on T_out in the curve
-            COP_tmp = cooling_cop_curve->getValue(T_out);
-
-            // now calculate how much power needed from BHE
-            power_tmp = building_power_tmp * (COP_tmp + 1.0) / COP_tmp;
-            // also how much power from electricity
-            // power_elect_tmp = -building_power_tmp + power_tmp;
-            // print the amount of power needed
-            // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
-            // << ", Q_elect: " << power_elect_tmp << std::endl;
-        }
-        if (std::fabs(power_tmp) < threshold)
+        double const power = compute_cop_curve_power_cooling_heating(
+            building_power_tmp, T_out, heating_cop_curve, cooling_cop_curve);
         if (std::fabs(power) < threshold)
         {
             return set_small_Q_r_return_Tout();
@@ -296,8 +301,7 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
 
         // calculate the corresponding flow rate needed using the defined
         // delta_T value
-        double const Q_r =
-            power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
+        double const Q_r = power / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
         // update all values dependent on the flow rate
         updateHeatTransferCoefficients(Q_r);
         // calculate the new T_in
@@ -314,41 +318,16 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         // current_time, &flag_valid);
         double const building_power_tmp =
             power_in_watt_curve->getValue(current_time);
-
-        double power_tmp;
-        double COP_tmp;
-        if (building_power_tmp <= 0)
-        {
-            // get COP value based on T_out in the curve
-            COP_tmp = heating_cop_curve->getValue(T_out);
-            // now calculate how much power needed from BHE
-            power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
-            // also how much power from electricity
-            // power_elect_tmp = building_power_tmp - power_tmp;
-            // print the amount of power needed
-            // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
-            // << ", Q_elect: " << power_elect_tmp << std::endl;
-        }
-        else
-        {
-            // get COP value based on T_out in the curve
-            COP_tmp = cooling_cop_curve->getValue(T_out);
-            // now calculate how much power needed from BHE
-            power_tmp = building_power_tmp * (COP_tmp + 1.0) / COP_tmp;
-            // also how much power from electricity
-            // power_elect_tmp = -building_power_tmp + power_tmp;
-            // print the amount of power needed
-            // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
-            // << ", Q_elect: " << power_elect_tmp << std::endl;
-        }
-        if (std::fabs(power_tmp) < threshold)
+        double const power = compute_cop_curve_power_cooling_heating(
+            building_power_tmp, T_out, heating_cop_curve, cooling_cop_curve);
+        if (std::fabs(power) < threshold)
         {
             return set_small_Q_r_return_Tout();
         }
         // Assign Qr whether from curve or fixed value
         update_Q_r_and_initialize(current_time);
         // calculate the dT value based on fixed flow rate
-        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
+        delta_T_val = power / Q_r / heat_cap_r / rho_r;
         // calcuate the new T_in
         return T_out + delta_T_val;
     }
