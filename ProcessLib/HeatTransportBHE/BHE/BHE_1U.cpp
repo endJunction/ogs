@@ -245,7 +245,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             else
                 fac_dT = 1.0;
             // if power value exceeds threshold, calculate new values
-            if (fabs(power_tmp) > threshold)
+            if (std::fabs(power_tmp) > threshold)
             {
                 // calculate the corresponding flow rate needed
                 // using the defined delta_T value
@@ -307,7 +307,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 fac_dT = 1.0;
             }
             // if power value exceeds threshold, calculate new values
-            if (fabs(power_tmp) > threshold)
+            if (std::fabs(power_tmp) > threshold)
             {
                 // calculate the corresponding flow rate needed
                 // using the defined delta_T value
@@ -376,7 +376,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             }
             else
                 Q_r_tmp = Q_r;
-            if (fabs(power_tmp) < threshold)
+            if (std::fabs(power_tmp) < threshold)
             {
                 Q_r_tmp = 1.0e-12;  // this has to be a small value to avoid
                                     // division by zero update all values
@@ -417,7 +417,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             else
                 Q_r_tmp = Q_r;
             // calculate the dT value based on fixed flow rate
-            if (fabs(power_tmp) < threshold)
+            if (std::fabs(power_tmp) < threshold)
             {
                 Q_r_tmp = 1.0e-12;  // this has to be a small value to avoid
                                     // division by zero update all values

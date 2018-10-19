@@ -187,7 +187,7 @@ double BHE_CXC::getTinByTout(double T_out, double current_time = -1.0)
             power_tmp = power_in_watt_curve->getValue(current_time);
 
             // if power value exceeds threshold, calculate new values
-            if (fabs(power_tmp) > threshold)
+            if (std::fabs(power_tmp) > threshold)
             {
                 // calculate the corresponding flow rate needed
                 // using the defined delta_T value
