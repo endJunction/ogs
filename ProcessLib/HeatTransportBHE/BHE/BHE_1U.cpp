@@ -205,6 +205,14 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         updateHeatTransferCoefficients(Q_r);
     };
 
+    auto set_small_Q_r_return_Tout = [&]() {
+        // this has to be a small value to avoid division by zero update all
+        // values dependent on the flow rate
+        updateHeatTransferCoefficients(1e-12);
+        // calculate the new T_in
+        return T_out;
+    };
+
     if (boundary_type == BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
     {
         return inflow_temperature_curve->getValue(current_time);
@@ -229,14 +237,7 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
 
         if (std::fabs(power_tmp) < threshold)
         {
-            double const Q_r = 1.0e-12;  // this has to be a small value to
-                                         // avoid division by zero
-            // update all values dependent on the flow rate
-            updateHeatTransferCoefficients(Q_r);
-            // calculate the new T_in
-            return T_out;
-            // print out updated flow rate
-            // std::cout << "Qr: " << Q_r_tmp << std::endl;
+            return set_small_Q_r_return_Tout();
         }
         double const fac_dT = power_tmp < 0 ? -1 : 1;
         // calculate the corresponding flow rate needed using the defined
@@ -287,15 +288,9 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // << ", Q_elect: " << power_elect_tmp << std::endl;
         }
         if (std::fabs(power_tmp) < threshold)
+        if (std::fabs(power) < threshold)
         {
-            double const Q_r = 1.0e-12;  // this has to be a small value to
-                                         // avoid division by zero
-            // update all values dependent on the flow rate
-            updateHeatTransferCoefficients(Q_r);
-            // calculate the new T_in
-            return T_out;
-            // print out updated flow rate
-            // std::cout << "Qr: " << Q_r_tmp << std::endl;
+            return set_small_Q_r_return_Tout();
         }
         double const fac_dT = building_power_tmp <= 0 ? -1 : 1;
 
@@ -348,14 +343,7 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         }
         if (std::fabs(power_tmp) < threshold)
         {
-            double const Q_r = 1.0e-12;  // this has to be a small value to
-                                         // avoid division by zero update all
-                                         // values dependent on the flow rate
-            updateHeatTransferCoefficients(Q_r);
-            // calculate the new T_in
-            return T_out;
-            // print out updated flow rate
-            // std::cout << "Qr: " << Q_r_tmp << std::endl;
+            return set_small_Q_r_return_Tout();
         }
         // Assign Qr whether from curve or fixed value
         update_Q_r_and_initialize(current_time);
@@ -375,14 +363,7 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         // calculate the dT value based on fixed flow rate
         if (std::fabs(power_tmp) < threshold)
         {
-            double const Q_r = 1.0e-12;  // this has to be a small value to
-                                         // avoid division by zero update all
-                                         // values dependent on the flow rate
-            updateHeatTransferCoefficients(Q_r);
-            // calculate the new T_in
-            return T_out;
-            // print out updated flow rate
-            // std::cout << "Qr: " << Q_r_tmp << std::endl;
+            return set_small_Q_r_return_Tout();
         }
         // Assign Qr whether from curve or fixed value
         update_Q_r_and_initialize(current_time);
