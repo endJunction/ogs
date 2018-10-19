@@ -59,8 +59,10 @@ public:
                  0.0 /* external defined borehole thermal resistance */,
                  0.0 /* external defined borehole thermal resistance */,
                  0.0 /* external defined borehole thermal resistance */},
-        double const Q_r = 21.86 /
-                           86400 /* total refrigerant flow discharge of BHE */,
+        double const Q_r = std::numeric_limits<double>::quiet_NaN()
+        /* total refrigerant flow discharge of BHE; TODO
+         * (haibing) Remove the default value */
+        ,
         double const omega = 0.06 /* pipe distance */,
         double const power_in_watt = 0.0 /* injected or extracted power */,
         double const delta_T_val =
@@ -134,8 +136,7 @@ public:
             inflow_temperature_curve = it->second.get();
         }
 
-        // initialization calculation
-        initialize();
+        updateHeatTransferCoefficients(Q_r);
     };
 
     static constexpr int number_of_unknowns = 4;
@@ -289,7 +290,12 @@ public:
              pipe_param.r_outer * pipe_param.r_outer)}};
 
 private:
-    void initialize();
+    // TODO (haibing) remove after removing the global Q_r variable. The new
+    // corresponding function is updateHeatTransferCoefficients takes the new
+    // flow rate as an argument.
+    void initialize() {}
+
+    void updateHeatTransferCoefficients(double const flow_rate);
 
     /**
      * calculate thermal resistance

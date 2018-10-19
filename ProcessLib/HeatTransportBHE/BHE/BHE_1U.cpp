@@ -14,10 +14,10 @@ using namespace ProcessLib::HeatTransportBHE::BHE;
 
 constexpr std::pair<int, int> BHE_1U::inflow_outflow_bc_component_ids[];
 
-void BHE_1U::initialize()
+void BHE_1U::updateHeatTransferCoefficients(double const flow_rate)
 
 {
-    double tmp_u = pipeFlowVelocity(Q_r, pipe_param.r_inner);
+    double tmp_u = pipeFlowVelocity(flow_rate, pipe_param.r_inner);
     _u(0) = tmp_u;
     _u(1) = tmp_u;
 
@@ -201,8 +201,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
     auto update_Q_r_and_initialize = [&](double const t) {
         if (!use_flowrate_curve)
             return;
-        Q_r = flowrate_curve->getValue(t);
-        initialize();
+        double const Q_r = flowrate_curve->getValue(t);
+        updateHeatTransferCoefficients(Q_r);
     };
 
     if (boundary_type == BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY)
@@ -233,9 +233,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             double const fac_dT = power_tmp < 0 ? -1 : 1;
             // calculate the corresponding flow rate needed using the defined
             // delta_T value
-            Q_r = power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
+            double const Q_r =
+                power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
             // update all values dependent on the flow rate
-            initialize();
+            updateHeatTransferCoefficients(Q_r);
             // calculate the new T_in
             return T_out + (fac_dT * delta_T_val);
             // print out updated flow rate
@@ -243,10 +244,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         }
         else
         {
-            Q_r = 1.0e-12;  // this has to be a small value to avoid
-                            // division by zero
+            double const Q_r = 1.0e-12;  // this has to be a small value to
+                                         // avoid division by zero
             // update all values dependent on the flow rate
-            initialize();
+            updateHeatTransferCoefficients(Q_r);
             // calculate the new T_in
             return T_out;
             // print out updated flow rate
@@ -296,9 +297,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
 
             // calculate the corresponding flow rate needed using the defined
             // delta_T value
-            Q_r = power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
+            double const Q_r =
+                power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
             // update all values dependent on the flow rate
-            initialize();
+            updateHeatTransferCoefficients(Q_r);
             // calculate the new T_in
             return T_out + (fac_dT * delta_T_val);
             // print out updated flow rate
@@ -306,10 +308,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         }
         else
         {
-            Q_r = 1.0e-12;  // this has to be a small value to avoid
-                            // division by zero
+            double const Q_r = 1.0e-12;  // this has to be a small value to
+                                         // avoid division by zero
             // update all values dependent on the flow rate
-            initialize();
+            updateHeatTransferCoefficients(Q_r);
             // calculate the new T_in
             return T_out;
             // print out updated flow rate
@@ -356,10 +358,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         update_Q_r_and_initialize(current_time);
         if (std::fabs(power_tmp) < threshold)
         {
-            Q_r = 1.0e-12;  // this has to be a small value to avoid
-                            // division by zero update all values dependent on
-                            // the flow rate
-            initialize();
+            double const Q_r = 1.0e-12;  // this has to be a small value to
+                                         // avoid division by zero update all
+                                         // values dependent on the flow rate
+            updateHeatTransferCoefficients(Q_r);
             // calculate the new T_in
             return T_out;
             // print out updated flow rate
@@ -367,7 +369,6 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         }
         else
         {
-            initialize();
             // calculate the dT value based on fixed flow rate
             delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
             // calcuate the new T_in
@@ -387,10 +388,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         // calculate the dT value based on fixed flow rate
         if (std::fabs(power_tmp) < threshold)
         {
-            Q_r = 1.0e-12;  // this has to be a small value to avoid
-                            // division by zero update all values dependent on
-                            // the flow rate
-            initialize();
+            double const Q_r = 1.0e-12;  // this has to be a small value to
+                                         // avoid division by zero update all
+                                         // values dependent on the flow rate
+            updateHeatTransferCoefficients(Q_r);
             // calculate the new T_in
             return T_out;
             // print out updated flow rate
@@ -398,7 +399,6 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
         }
         else
         {
-            initialize();
             // calculate the dT value based on fixed flow rate
             delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
             // calcuate the new T_in
