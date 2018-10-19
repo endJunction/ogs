@@ -227,22 +227,7 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         // current_time, &flag_valid);
         double const power_tmp = power_in_watt_curve->getValue(current_time);
 
-        // if power value exceeds threshold, calculate new values
-        if (std::fabs(power_tmp) > threshold)
-        {
-            double const fac_dT = power_tmp < 0 ? -1 : 1;
-            // calculate the corresponding flow rate needed using the defined
-            // delta_T value
-            double const Q_r =
-                power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
-            // update all values dependent on the flow rate
-            updateHeatTransferCoefficients(Q_r);
-            // calculate the new T_in
-            return T_out + (fac_dT * delta_T_val);
-            // print out updated flow rate
-            // std::cout << "Qr: " << Q_r_tmp << std::endl;
-        }
-        else
+        if (std::fabs(power_tmp) < threshold)
         {
             double const Q_r = 1.0e-12;  // this has to be a small value to
                                          // avoid division by zero
@@ -253,6 +238,17 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // print out updated flow rate
             // std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
+        double const fac_dT = power_tmp < 0 ? -1 : 1;
+        // calculate the corresponding flow rate needed using the defined
+        // delta_T value
+        double const Q_r =
+            power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
+        // update all values dependent on the flow rate
+        updateHeatTransferCoefficients(Q_r);
+        // calculate the new T_in
+        return T_out + (fac_dT * delta_T_val);
+        // print out updated flow rate
+        // std::cout << "Qr: " << Q_r_tmp << std::endl;
     }
     if (boundary_type ==
         BHE_BOUNDARY_TYPE::BUILDING_POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY)
@@ -290,23 +286,7 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
             // << ", Q_elect: " << power_elect_tmp << std::endl;
         }
-        // if power value exceeds threshold, calculate new values
-        if (std::fabs(power_tmp) > threshold)
-        {
-            double const fac_dT = building_power_tmp <= 0 ? -1 : 1;
-
-            // calculate the corresponding flow rate needed using the defined
-            // delta_T value
-            double const Q_r =
-                power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
-            // update all values dependent on the flow rate
-            updateHeatTransferCoefficients(Q_r);
-            // calculate the new T_in
-            return T_out + (fac_dT * delta_T_val);
-            // print out updated flow rate
-            // std::cout << "Qr: " << Q_r_tmp << std::endl;
-        }
-        else
+        if (std::fabs(power_tmp) < threshold)
         {
             double const Q_r = 1.0e-12;  // this has to be a small value to
                                          // avoid division by zero
@@ -317,6 +297,18 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // print out updated flow rate
             // std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
+        double const fac_dT = building_power_tmp <= 0 ? -1 : 1;
+
+        // calculate the corresponding flow rate needed using the defined
+        // delta_T value
+        double const Q_r =
+            power_tmp / (fac_dT * delta_T_val) / heat_cap_r / rho_r;
+        // update all values dependent on the flow rate
+        updateHeatTransferCoefficients(Q_r);
+        // calculate the new T_in
+        return T_out + (fac_dT * delta_T_val);
+        // print out updated flow rate
+        // std::cout << "Qr: " << Q_r_tmp << std::endl;
     }
     if (boundary_type ==
         BHE_BOUNDARY_TYPE::
@@ -367,13 +359,10 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // print out updated flow rate
             // std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
-        else
-        {
-            // calculate the dT value based on fixed flow rate
-            delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
-            // calcuate the new T_in
-            return T_out + delta_T_val;
-        }
+        // calculate the dT value based on fixed flow rate
+        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
+        // calcuate the new T_in
+        return T_out + delta_T_val;
     }
     if (boundary_type ==
         BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_FLOW_RATE_BOUNDARY)
@@ -397,13 +386,10 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // print out updated flow rate
             // std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
-        else
-        {
-            // calculate the dT value based on fixed flow rate
-            delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
-            // calcuate the new T_in
-            return T_out + delta_T_val;
-        }
+        // calculate the dT value based on fixed flow rate
+        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
+        // calcuate the new T_in
+        return T_out + delta_T_val;
     }
     return T_out;
 }
