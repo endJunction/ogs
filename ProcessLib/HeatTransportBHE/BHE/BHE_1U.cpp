@@ -346,8 +346,6 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
             // << ", Q_elect: " << power_elect_tmp << std::endl;
         }
-        // Assign Qr whether from curve or fixed value
-        update_Q_r_and_initialize(current_time);
         if (std::fabs(power_tmp) < threshold)
         {
             double const Q_r = 1.0e-12;  // this has to be a small value to
@@ -359,6 +357,8 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // print out updated flow rate
             // std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
+        // Assign Qr whether from curve or fixed value
+        update_Q_r_and_initialize(current_time);
         // calculate the dT value based on fixed flow rate
         delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
         // calcuate the new T_in
@@ -372,8 +372,6 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
         // current_time, &flag_valid);
         double const power_tmp = power_in_watt_curve->getValue(current_time);
 
-        // Assign Qr whether from curve or fixed value
-        update_Q_r_and_initialize(current_time);
         // calculate the dT value based on fixed flow rate
         if (std::fabs(power_tmp) < threshold)
         {
@@ -386,6 +384,8 @@ double BHE_1U::getTinByTout(double const T_out, double const current_time)
             // print out updated flow rate
             // std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
+        // Assign Qr whether from curve or fixed value
+        update_Q_r_and_initialize(current_time);
         // calculate the dT value based on fixed flow rate
         delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
         // calcuate the new T_in
