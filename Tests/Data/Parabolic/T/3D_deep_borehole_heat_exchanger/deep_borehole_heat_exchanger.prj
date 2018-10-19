@@ -89,7 +89,7 @@
                 <time_stepping>
                     <type>FixedTimeStepping</type>
                     <t_initial> 0.0 </t_initial>
-                    <t_end> 10368000 </t_end>
+                    <t_end> 600 </t_end>
                     <timesteps>
                         <pair>
                             <repeat>60</repeat>
