@@ -195,13 +195,7 @@ void BHE_1U::calcHeatTransferCoefficients()
 
 double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
 {
-    double T_in(0.0);
-    double power_tmp(0.0);
-    double building_power_tmp(0.0);
-    // double power_elect_tmp(0.0);
     double Q_r_tmp(0.0);
-    double COP_tmp(0.0);
-    double fac_dT = 1.0;
     double const& rho_r = refrigerant_param.rho_r;
     double const& heat_cap_r = refrigerant_param.heat_cap_r;
 
@@ -209,7 +203,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
     {
         case BHE_BOUNDARY_TYPE::FIXED_INFLOW_TEMP_CURVE_BOUNDARY:
         {
-            T_in = inflow_temperature_curve->getValue(current_time);
+            return inflow_temperature_curve->getValue(current_time);
         }
         break;
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY:
@@ -223,7 +217,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             }
             else
                 Q_r_tmp = Q_r;
-            T_in = power_in_watt_val / Q_r_tmp / heat_cap_r / rho_r + T_out;
+            return power_in_watt_val / Q_r_tmp / heat_cap_r / rho_r + T_out;
             break;
         }
         case BHE_BOUNDARY_TYPE::FIXED_TEMP_DIFF_BOUNDARY:
@@ -235,7 +229,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r = Q_r_tmp;
                 initialize();
             }
-            T_in = T_out + delta_T_val;
+            return T_out + delta_T_val;
             break;
         }
         case BHE_BOUNDARY_TYPE::POWER_IN_WATT_CURVE_FIXED_DT_BOUNDARY:
@@ -243,12 +237,10 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             // get the power value in the curve
             // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            power_tmp = power_in_watt_curve->getValue(current_time);
+            double const power_tmp =
+                power_in_watt_curve->getValue(current_time);
 
-            if (power_tmp < 0)
-                fac_dT = -1.0;
-            else
-                fac_dT = 1.0;
+            double const fac_dT = power_tmp < 0 ? -1 : 1;
             // if power value exceeds threshold, calculate new values
             if (std::fabs(power_tmp) > threshold)
             {
@@ -260,7 +252,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r = Q_r_tmp;
                 initialize();
                 // calculate the new T_in
-                T_in = T_out + (fac_dT * delta_T_val);
+                return T_out + (fac_dT * delta_T_val);
                 // print out updated flow rate
                 // std::cout << "Qr: " << Q_r_tmp << std::endl;
             }
@@ -272,7 +264,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r = Q_r_tmp;
                 initialize();
                 // calculate the new T_in
-                T_in = T_out;
+                return T_out;
                 // print out updated flow rate
                 // std::cout << "Qr: " << Q_r_tmp << std::endl;
             }
@@ -283,8 +275,12 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             // get the building power value in the curve
             // building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            building_power_tmp = power_in_watt_curve->getValue(current_time);
+            double const building_power_tmp =
+                power_in_watt_curve->getValue(current_time);
+            double const fac_dT = building_power_tmp <= 0 ? -1 : 1;
 
+            double power_tmp;
+            double COP_tmp;
             if (building_power_tmp <= 0.0)
             {
                 // get COP value based on T_out in the curve
@@ -297,7 +293,6 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 // print the amount of power needed
                 // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
                 // << ", Q_elect: " << power_elect_tmp << std::endl;
-                fac_dT = -1.0;
             }
             else
             {
@@ -311,7 +306,6 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 // print the amount of power needed
                 // std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp
                 // << ", Q_elect: " << power_elect_tmp << std::endl;
-                fac_dT = 1.0;
             }
             // if power value exceeds threshold, calculate new values
             if (std::fabs(power_tmp) > threshold)
@@ -324,7 +318,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r = Q_r_tmp;
                 initialize();
                 // calculate the new T_in
-                T_in = T_out + (fac_dT * delta_T_val);
+                return T_out + (fac_dT * delta_T_val);
                 // print out updated flow rate
                 // std::cout << "Qr: " << Q_r_tmp << std::endl;
             }
@@ -336,7 +330,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r = Q_r_tmp;
                 initialize();
                 // calculate the new T_in
-                T_in = T_out;
+                return T_out;
                 // print out updated flow rate
                 // std::cout << "Qr: " << Q_r_tmp << std::endl;
             }
@@ -348,8 +342,11 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             // get the building power value in the curve
             // building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            building_power_tmp = power_in_watt_curve->getValue(current_time);
+            double const building_power_tmp =
+                power_in_watt_curve->getValue(current_time);
 
+            double power_tmp;
+            double COP_tmp;
             if (building_power_tmp <= 0)
             {
                 // get COP value based on T_out in the curve
@@ -393,7 +390,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r = Q_r_tmp;
                 initialize();
                 // calculate the new T_in
-                T_in = T_out;
+                return T_out;
                 // print out updated flow rate
                 // std::cout << "Qr: " << Q_r_tmp << std::endl;
             }
@@ -405,7 +402,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 // calculate the dT value based on fixed flow rate
                 delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
                 // calcuate the new T_in
-                T_in = T_out + delta_T_val;
+                return T_out + delta_T_val;
             }
             break;
         }
@@ -414,7 +411,8 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
             // get the power value in the curve
             // power_tmp = GetCurveValue(power_in_watt_curve_idx, 0,
             // current_time, &flag_valid);
-            power_tmp = power_in_watt_curve->getValue(current_time);
+            double const power_tmp =
+                power_in_watt_curve->getValue(current_time);
 
             // Assign Qr whether from curve or fixed value
             if (use_flowrate_curve)
@@ -436,7 +434,7 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 Q_r = Q_r_tmp;
                 initialize();
                 // calculate the new T_in
-                T_in = T_out;
+                return T_out;
                 // print out updated flow rate
                 // std::cout << "Qr: " << Q_r_tmp << std::endl;
             }
@@ -448,14 +446,12 @@ double BHE_1U::getTinByTout(double T_out, double current_time = -1.0)
                 // calculate the dT value based on fixed flow rate
                 delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
                 // calcuate the new T_in
-                T_in = T_out + delta_T_val;
+                return T_out + delta_T_val;
             }
             break;
         }
         default:
-            T_in = T_out;
+            return T_out;
             break;
     }
-
-    return T_in;
 }
