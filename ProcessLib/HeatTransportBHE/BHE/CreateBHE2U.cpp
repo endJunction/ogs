@@ -68,10 +68,6 @@ BHE::BHE_2U createBHE2U(
     const double bhe_pipe_distance =
         bhe_conf.getConfigParameter<double>("bhe_pipe_distance");
 
-    auto const bhe_use_ext_therm_resis_conf =
-        bhe_conf.getConfigParameterOptional<bool>(
-            "bhe_use_external_therm_resis");
-
     // optional parameters
     double bhe_power_in_watt_val = 0.0;
     double bhe_intern_resistance = 1.0;
@@ -87,7 +83,9 @@ BHE::BHE_2U createBHE2U(
     // give default values to optional parameters
     // if the BHE is using external given thermal resistance values
     bool bhe_use_ext_therm_resis = false;
-    if (*bhe_use_ext_therm_resis_conf == true)
+    if (auto const bhe_use_ext_therm_resis_conf =
+            bhe_conf.getConfigParameterOptional<bool>(
+                "bhe_use_external_therm_resis"))
     {
         DBUG("If using external given thermal resistance values : %s",
              (*bhe_use_ext_therm_resis_conf) ? "true" : "false");
