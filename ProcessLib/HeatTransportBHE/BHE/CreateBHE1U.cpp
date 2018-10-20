@@ -139,6 +139,10 @@ BHE::BHE_1U createBHE1U(
     else if (bhe_bound_type_str.compare("POWER_IN_WATT") == 0)
     {
         bhe_bound_type = BHE_BOUNDARY_TYPE::POWER_IN_WATT_BOUNDARY;
+        // TODO (haibing) There is no point of getting an optional parameter but
+        // not checking it. The result is simple SEGV w/o proper error message.
+        // Either it is optional, then check for it, or it is not optional, then
+        // access the value through another ConfigTree getter.
         bhe_power_in_watt_val =
             bhe_conf
                 .getConfigParameterOptional<double>("bhe_power_in_watt_value")

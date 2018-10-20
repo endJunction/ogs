@@ -107,6 +107,8 @@ public:
             power_in_watt_curve = it->second.get();
         }
 
+        // TODO (haibing) Finding of the curves belongs into createBHE1U method.
+        // Pass a reference (or a pointer if needed) to the constructor.
         if (if_flowrate_curve)
         {
             use_flowrate_curve = true;
