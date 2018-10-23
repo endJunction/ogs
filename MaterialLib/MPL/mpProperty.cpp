@@ -220,6 +220,18 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     {
         return std::make_unique<BrooksCoreyRelPerm>(M);
     }
+    if (boost::iequals(property_type, "RelPermLiakopoulos"))
+    {
+        return std::make_unique<RelPermLiakopoulos>(M);
+    }
+    if (boost::iequals(property_type, "SaturationLiakopoulos"))
+    {
+        return std::make_unique<SaturationLiakopoulos>(M);
+    }
+    if (boost::iequals(property_type, "SaturationFredlund"))
+    {
+        return createSaturationFredlund(config, M);
+    }
     // If none of the above property types are found, OGS throws an error.
     OGS_FATAL(
         "The specified component property type \"%s\" was not "

@@ -56,7 +56,7 @@
               </process>
             </processes>
             <media>
-              <medium>
+              <medium id="0">
                 <phases>
                   <phase>
                     <name>solid</name>
@@ -186,12 +186,16 @@
                   </property>
                   <property>
                     <name>saturation</name>
-                    <type>SaturationLiakopoulos</type>
+                    <type>SaturationFredlund</type>
+                    <parameter_a>22</parameter_a>
+                    <parameter_n>-5</parameter_n>
+                    <parameter_m>2</parameter_m>
+                    <parameter_psi_r>1.0e5</parameter_psi_r>
                   </property>                  
                   <property>
                     <name>Fredlund_Parameters</name>
                     <type>Constant</type>
-                    <value> 1. 2. 2. </value>
+                    <value>2</value>
                   </property>                  
                   <property>
                     <name>compressibility</name>

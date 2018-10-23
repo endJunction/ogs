@@ -1,20 +1,24 @@
 /**
  * \author Norbert Grunwald
- * \date   18.09.2017
+ * \date   Oct 23, 2018
  * \brief
  *
  * \copyright
- * Copyright (c) 2012-2018, OpenGeoSys Community (http://www.opengeosys.org)
+ * Copyright (c) 2012-2017, OpenGeoSys Community (http://www.opengeosys.org)
  *            Distributed under a Modified BSD License.
  *              See accompanying file LICENSE.txt or
  *              http://www.opengeosys.org/project/license
  *
  */
-#pragma once
+
+#include "pUniversalConstants.h"
 
 namespace MaterialPropertyLib
 {
-static constexpr double gasConstant = 8.3144598;
-static constexpr double eulersNumber = 2.71828182845905;
+constexpr double gasConstant;
+constexpr double eulersNumber;
 
 }  // MaterialPropertyLib
+
+
+
