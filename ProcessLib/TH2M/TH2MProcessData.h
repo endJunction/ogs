@@ -37,10 +37,12 @@ struct TH2MProcessData
             material_,
         Eigen::Matrix<double, DisplacementDim, 1>
             specific_body_force_,
-        MaterialPropertyLib::Medium& medium_)
+            std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media_,
+            MeshLib::PropertyVector<int> const& material_ids_)
         : material{std::move(material_)},
           specific_body_force(std::move(specific_body_force_)),
-          medium(medium_)
+          media(media_),
+          material_ids(material_ids_)
     {
     }
 
@@ -52,7 +54,10 @@ struct TH2MProcessData
     /// It is usually used to apply gravitational forces.
     /// A vector of displacement dimension's length.
     Eigen::Matrix<double, DisplacementDim, 1> const specific_body_force;
-    MaterialPropertyLib::Medium& medium;
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media;
+
+    MeshLib::PropertyVector<int> const& material_ids;
+
     double dt = 0.0;
     double t = 0.0;
 

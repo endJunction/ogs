@@ -325,8 +325,16 @@ void ProjectData::parseMaterials(
         return;
     }
 
-    auto const medium_config = media_config->getConfigSubtree("medium");
-    _medium = std::make_unique<MaterialPropertyLib::Medium>(medium_config);
+    for (auto const& medium_config :
+           //! \ogs_file_param{material__media__medium}
+           media_config->getConfigSubtreeList("medium"))
+      {
+    auto const id = medium_config.getConfigAttribute<int>("id");
+
+    _media[id] = std::make_unique<MaterialPropertyLib::Medium>(medium_config);
+
+      }
+
 }
 
 void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
@@ -738,13 +746,13 @@ void ProjectData::parseProcesses(BaseLib::ConfigTree const& processes_config,
                     process = ProcessLib::TH2M::createTH2MProcess<2>(
                         *_mesh_vec[0], std::move(jacobian_assembler),
                         _process_variables, _parameters, integration_order,
-                        process_config, *_medium);
+                        process_config, _media);
                     break;
                 case 3:
                     process = ProcessLib::TH2M::createTH2MProcess<3>(
                         *_mesh_vec[0], std::move(jacobian_assembler),
                         _process_variables, _parameters, integration_order,
-                        process_config, *_medium);
+                        process_config, _media);
                     break;
                 default:
                     OGS_FATAL(

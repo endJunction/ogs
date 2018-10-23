@@ -66,7 +66,7 @@ std::unique_ptr<Process> createTH2MProcess(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    MaterialPropertyLib::Medium& medium)
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media)
 {
     //! \ogs_file_param{prj__processes__process__type}
     config.checkConfigParameter("type", "TH2M");
@@ -138,8 +138,15 @@ std::unique_ptr<Process> createTH2MProcess(
         std::copy_n(b.data(), b.size(), specific_body_force.data());
     }
 
+    auto const material_ids = materialIDs(mesh);
+
+    if (material_ids == nullptr)
+    {
+        OGS_FATAL("Requested material IDs not found.");
+    }
+
     TH2MProcessData<DisplacementDim> process_data{std::move(material),
-                                                  specific_body_force, medium};
+                                                  specific_body_force, media, *material_ids};
 
     SecondaryVariableCollection secondary_variables;
 
@@ -163,7 +170,7 @@ template std::unique_ptr<Process> createTH2MProcess<2>(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    MaterialPropertyLib::Medium& medium);
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media);
 
 template std::unique_ptr<Process> createTH2MProcess<3>(
     MeshLib::Mesh& mesh,
@@ -172,7 +179,7 @@ template std::unique_ptr<Process> createTH2MProcess<3>(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    MaterialPropertyLib::Medium& medium);
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media);
 
 }  // namespace TH2M
 }  // namespace ProcessLib

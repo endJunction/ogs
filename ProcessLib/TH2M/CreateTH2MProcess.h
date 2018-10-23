@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
 namespace BaseLib
 {
@@ -45,7 +46,7 @@ std::unique_ptr<Process> createTH2MProcess(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    MaterialPropertyLib::Medium& medium);
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media);
 
 extern template std::unique_ptr<Process> createTH2MProcess<2>(
     MeshLib::Mesh& mesh,
@@ -54,7 +55,7 @@ extern template std::unique_ptr<Process> createTH2MProcess<2>(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    MaterialPropertyLib::Medium& medium);
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media);
 
 extern template std::unique_ptr<Process> createTH2MProcess<3>(
     MeshLib::Mesh& mesh,
@@ -63,6 +64,6 @@ extern template std::unique_ptr<Process> createTH2MProcess<3>(
     std::vector<std::unique_ptr<ParameterBase>> const& parameters,
     unsigned const integration_order,
     BaseLib::ConfigTree const& config,
-    MaterialPropertyLib::Medium& medium);
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media);
 }  // namespace TH2M
 }  // namespace ProcessLib

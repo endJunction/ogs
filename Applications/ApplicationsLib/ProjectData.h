@@ -118,7 +118,7 @@ private:
     /// Buffer for each parameter config passed to the process.
     std::vector<std::unique_ptr<ProcessLib::ParameterBase>> _parameters;
 
-    std::unique_ptr<MaterialPropertyLib::Medium> _medium;
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> _media;
 
     /// The time loop used to solve this project's processes.
     std::unique_ptr<TimeLoop> _time_loop;
