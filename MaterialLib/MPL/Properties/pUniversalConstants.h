@@ -14,7 +14,7 @@
 
 namespace MaterialPropertyLib
 {
-static constexpr double gasConstant = 8.3144598;
-static constexpr double eulersNumber = 2.71828182845905;
+constexpr double gasConstant = 8.3144598;
+constexpr double eulersNumber = 2.71828182845905;
 
 }  // MaterialPropertyLib
