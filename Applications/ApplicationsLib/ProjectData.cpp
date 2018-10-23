@@ -329,9 +329,19 @@ void ProjectData::parseMaterials(
            //! \ogs_file_param{material__media__medium}
            media_config->getConfigSubtreeList("medium"))
       {
-    auto const id = medium_config.getConfigAttribute<int>("id");
+    auto const material_id = medium_config.getConfigAttribute<int>("id", 0);
 
-    _media[id] = std::make_unique<MaterialPropertyLib::Medium>(medium_config);
+    if (_media.find(material_id) !=
+        _media.end())
+    {
+        OGS_FATAL(
+            "Multiple media were specified for the same "
+            "material id %d. Keep in mind, that if no material id is "
+            "specified, it is assumed to be 0 by default.",
+            material_id);
+    }
+
+    _media[material_id] = std::make_unique<MaterialPropertyLib::Medium>(medium_config);
 
       }
 

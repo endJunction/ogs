@@ -76,7 +76,9 @@ public:
           _is_axially_symmetric(is_axially_symmetric)
     {
 
-        auto const material_id = _process_data.material_ids[_element.getID()];
+        auto const material_id = _process_data.material_ids
+                ? (*_process_data.material_ids)[_element.getID()]
+                : 0;
         try
         {
             medium = _process_data.media.at(material_id).get();

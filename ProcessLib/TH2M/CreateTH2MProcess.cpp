@@ -138,15 +138,8 @@ std::unique_ptr<Process> createTH2MProcess(
         std::copy_n(b.data(), b.size(), specific_body_force.data());
     }
 
-    auto const material_ids = materialIDs(mesh);
-
-    if (material_ids == nullptr)
-    {
-        OGS_FATAL("Requested material IDs not found.");
-    }
-
     TH2MProcessData<DisplacementDim> process_data{std::move(material),
-                                                  specific_body_force, media, *material_ids};
+                                                  specific_body_force, media, materialIDs(mesh)};
 
     SecondaryVariableCollection secondary_variables;
 

@@ -38,7 +38,7 @@ struct TH2MProcessData
         Eigen::Matrix<double, DisplacementDim, 1>
             specific_body_force_,
             std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media_,
-            MeshLib::PropertyVector<int> const& material_ids_)
+            MeshLib::PropertyVector<int> const* material_ids_)
         : material{std::move(material_)},
           specific_body_force(std::move(specific_body_force_)),
           media(media_),
@@ -56,7 +56,7 @@ struct TH2MProcessData
     Eigen::Matrix<double, DisplacementDim, 1> const specific_body_force;
     std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media;
 
-    MeshLib::PropertyVector<int> const& material_ids;
+    MeshLib::PropertyVector<int> const* const material_ids;
 
     double dt = 0.0;
     double t = 0.0;
