@@ -42,7 +42,7 @@ static constexpr std::array<double, 5> d = {{0.4071119e-02, 0.7198037e-04,
 PropertyDataType ViscosityCO2Fenghour::value(VariableArray const& vars)
 {
 
-    const double temperature = getScalar(vars[Variables::T]);
+    const double temperature = getScalar(vars[Variables::temperature]);
     const double epsilon_k = 251.196;  // I think it might be ok to hard-code
     // such rare material constants; It is not used anywhere else, and this
     // method here is specifically designed for carbon doxide...

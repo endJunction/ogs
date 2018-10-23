@@ -45,7 +45,7 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
     double k_ij(0);
     double am(0), bm(0);
 
-    const double temperature = getScalar(v[T]);
+    const double T = getScalar(v[temperature]);
 
     // A temporary component vector holds all the properties from
     // either the (up to two) phase components (if used as phase
@@ -103,7 +103,7 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
         const double omega =
             getScalar(temp_components[c]->property(acentric_factor));
 
-        const double alpha_Tr = alpha(temperature, T_crit, omega);
+        const double alpha_Tr = alpha(T, T_crit, omega);
         const double a_Tc = cohesionPressure(T_crit, p_crit);
 
         sqrt_a[c] = std::sqrt(a_Tc * alpha_Tr);
@@ -120,8 +120,8 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
         }
     }
 
-    const double pressure = getScalar(v[p_GR]);
-    const double RT = gasConstant * temperature;
+    const double pressure = getScalar(v[phase_pressure]);
+    const double RT = gasConstant * T;
 
     const double A = am * pressure / RT / RT;
     const double B = bm * pressure / RT;
@@ -145,7 +145,7 @@ PropertyDataType PengRobinson::value(VariableArray const& v)
         (numberRoots > 1 ? *std::max_element(std::begin(roots), std::end(roots))
                          : roots[0]);
 
-    const double value = M * pressure / Z / gasConstant / temperature;
+    const double value = M * pressure / Z / gasConstant / T;
     return value;
 }
 double kappa(const double omega)

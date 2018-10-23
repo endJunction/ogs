@@ -48,7 +48,7 @@ PropertyDataType ViscosityWaterIAPWS::value(VariableArray const& vars)
 {
 
     const double T_crit = getScalar(_component->property(critical_temperature));
-    const double T_red = getScalar(vars[T]) / T_crit;
+    const double T_red = getScalar(vars[temperature]) / T_crit;
     const double rho_crit = getScalar(_component->property(critical_density));
     const double rho = getScalar(_component->property(density), vars);
     const double rho_red = rho / rho_crit;

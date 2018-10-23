@@ -44,8 +44,8 @@ PropertyDataType IdealGasLaw::value(VariableArray const& v)
         molar_mass = getScalar(_component->property(PropertyEnum::molar_mass));
 
     const double R = gasConstant;
-    const double p = getScalar(v[Variables::p_GR]);
-    const double T = getScalar(v[Variables::T]);
+    const double p = getScalar(v[Variables::phase_pressure]);
+    const double T = getScalar(v[Variables::temperature]);
 
     const double density = p*molar_mass / R / T;
     return density;
@@ -58,12 +58,12 @@ PropertyDataType IdealGasLaw::dvalue(VariableArray const& v, Variables const pv)
 
     switch (pv)
     {
-    case Variables::p_GR:
+    case Variables::phase_pressure:
     {
         const double p = getScalar(v[pv]);
         return density / p;
     }
-    case Variables::T:
+    case Variables::temperature:
     {
         const double T = getScalar(v[pv]);
         return -density / T;

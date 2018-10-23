@@ -45,7 +45,7 @@ PropertyDataType LinearTemperature::value(VariableArray const& v)
     const double drho_dT = getScalar(_component->property(drhodT));
     const double T_ref = getScalar(_component->property(reference_temperature));
 
-    _value = rho_0 + drho_dT * (getScalar(v[T]) - T_ref);
+    _value = rho_0 + drho_dT * (getScalar(v[temperature]) - T_ref);
     return _value;
 }
 

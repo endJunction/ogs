@@ -46,15 +46,12 @@ using Tensor = std::array<double, 9>;
 */
 enum Variables : std::size_t
 {
-    p_GR,
-    p_LR,
-    p_cap,
+    phase_pressure,
+    capillary_pressure,
     gas_density,
     liquid_density,
-    T_S,
-    T_L,
-    T_G,
-    T,
+    temperature,
+    liquid_saturation,
     u,
     numberOfVariables
 };

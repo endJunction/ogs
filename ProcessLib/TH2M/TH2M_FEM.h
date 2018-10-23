@@ -356,10 +356,9 @@ public:
 
             // insert all primary variables into one object
             MPL::VariableArray variables;
-            variables[MPL::Variables::p_cap] = p_cap;
-            variables[MPL::Variables::p_GR] = p_GR;
-            variables[MPL::Variables::p_LR] = p_LR;
-            variables[MPL::Variables::T] = T;
+            variables[MPL::Variables::capillary_pressure] = p_cap;
+            variables[MPL::Variables::phase_pressure] = p_GR;
+            variables[MPL::Variables::temperature] = T;
             // todo: displacement
             // insert all primary variables into one object for GPML
 
@@ -1191,10 +1190,8 @@ public:
             const double p_LR = p_GR - p_cap;
             std::cout << "5 \n";
             MPL::VariableArray variables;
-            variables[MPL::Variables::p_cap] = p_cap;
-            variables[MPL::Variables::p_GR] = p_GR;
-            variables[MPL::Variables::p_LR] = p_LR;
-            variables[MPL::Variables::T] = T;
+            variables[MPL::Variables::capillary_pressure] = p_cap;
+            variables[MPL::Variables::temperature] = T;
 
             // material parameters
             auto& medium = _process_data.medium;
