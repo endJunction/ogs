@@ -14,7 +14,7 @@
                 <type>CentralDifferences</type>
                 <component_magnitudes>1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 
                 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0</component_magnitudes>
-                <relative_epsilons> 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 
+                <relative_epsilons> 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6 
                 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8</relative_epsilons>
             </jacobian_assembler> 
 
