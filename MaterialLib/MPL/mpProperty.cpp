@@ -36,11 +36,18 @@ PropertyDataType Property::value(VariableArray const& /*unused*/)
     return _value;
 }
 
- /// Default implementation: derivative of any constant property is zero.
- PropertyDataType Property::dvalue(VariableArray const&, Variables const pv)
- {
-     return 0.0;
- }
+/// Default implementation: derivative of any constant property is zero.
+PropertyDataType Property::dvalue(VariableArray const&, Variables const)
+{
+    return _dvalue;
+}
+
+/// Default implementation: 2nd derivative of any constant property is zero.
+PropertyDataType Property::ddvalue(VariableArray const&, Variables const pv1,
+        Variables const pv2)
+{
+    return 0.0;
+}
 
 void Property::notImplemented(std::string property, std::string material)
 {
