@@ -23,6 +23,9 @@ namespace MaterialPropertyLib
 Constant::Constant(PropertyDataType const& v)
 {
     _value = v;
+    _dvalue = boost::apply_visitor(
+        [](auto const& value) -> PropertyDataType { return decltype(value){}; },
+        v);
 };
 
 }  // namespace MaterialPropertyLib
