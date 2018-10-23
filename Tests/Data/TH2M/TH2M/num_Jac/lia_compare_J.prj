@@ -185,6 +185,16 @@
                     <value>1.0e-12</value>
                   </property>
                   <property>
+                    <name>relative_permeability</name>
+                    <type>Constant</type>
+                    <value>1 1</value>
+                  </property>
+                  <property>
+                    <name>residual_gas_saturation</name>
+                    <type>Constant</type>
+                    <value>0.1</value>
+                  </property>
+                  <property>
                     <name>saturation</name>
                     <type>SaturationFredlund</type>
                     <parameter_a>22</parameter_a>
