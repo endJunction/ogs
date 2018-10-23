@@ -11,8 +11,8 @@
  *
  */
 
-#include <MaterialLib/MPL/Properties/pBrooksCoreyRelPerm.h>
-#include "../mpMedium.h"
+#include "MaterialLib/MPL/Properties/pRelPermBrooksCorey.h"
+#include "MaterialLib/MPL/mpMedium.h"
 #include "pUniversalConstants.h"
 
 #include <iostream>
@@ -38,8 +38,8 @@ BrooksCoreyRelPerm::BrooksCoreyRelPerm(Component*) : _medium(0)
 PropertyDataType  BrooksCoreyRelPerm::value(VariableArray const& v)
 {
 
-    const double p_cap = getScalar(v[MaterialPropertyLib::p_cap]);
-    const double p_GR = getScalar(v[MaterialPropertyLib::p_GR]);
+    const double p_cap = getScalar(v[MaterialPropertyLib::capillary_pressure]);
+    const double p_GR = getScalar(v[MaterialPropertyLib::phase_pressure]);
 
     const double s_L_res =
             getScalar(_medium->property(residual_liquid_saturation));

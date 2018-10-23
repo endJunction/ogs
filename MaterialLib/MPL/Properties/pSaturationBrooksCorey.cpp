@@ -11,8 +11,8 @@
  *
  */
 
-#include <MaterialLib/MPL/Properties/pBrooksCoreySaturation.h>
-#include "../mpMedium.h"
+#include "MaterialLib/MPL/Properties/pSaturationBrooksCorey.h"
+#include "MaterialLib/MPL/mpMedium.h"
 #include "pUniversalConstants.h"
 
 #include <algorithm>
@@ -38,13 +38,17 @@ BrooksCoreySaturation::BrooksCoreySaturation(Component*) : _medium(0)
 PropertyDataType  BrooksCoreySaturation::value(VariableArray const& v)
 {
 
-    const double p_cap = getScalar(v[MaterialPropertyLib::Variables::p_cap]);
-    const double p_GR = getScalar(v[MaterialPropertyLib::Variables::p_GR]);
+    const double p_cap = getScalar(
+            v[MaterialPropertyLib::Variables::capillary_pressure]);
+    const double p = getScalar(
+            v[MaterialPropertyLib::Variables::phase_pressure]);
 
     const double s_L_res =
-            getScalar(_medium->property(PropertyEnum::residual_liquid_saturation));
+            getScalar(_medium->property(
+                    PropertyEnum::residual_liquid_saturation));
     const double s_L_max =
-            1 - getScalar(_medium->property(PropertyEnum::residual_gas_saturation));
+            1 - getScalar(_medium->property(
+                    PropertyEnum::residual_gas_saturation));
 
     const double p_b =
             getScalar(_medium->property(PropertyEnum::entry_pressure));
@@ -58,7 +62,7 @@ PropertyDataType  BrooksCoreySaturation::value(VariableArray const& v)
 PropertyDataType BrooksCoreySaturation::dvalue(VariableArray const& v, Variables const pv)
 {
 
-    assert((pv == Variables::p_cap) && "BrooksCoreySaturation::dvalue is implemented for "
+    assert((pv == Variables::capillary_pressure) && "BrooksCoreySaturation::dvalue is implemented for "
             " derivatives with respect to capillary pressure only.");
 
     const double p_c = getScalar(v[pv]);
