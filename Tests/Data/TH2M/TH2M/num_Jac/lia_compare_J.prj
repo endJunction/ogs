@@ -201,9 +201,23 @@
                     <parameter_n>-5</parameter_n>
                     <parameter_m>2</parameter_m>
                     <parameter_psi_r>1.0e5</parameter_psi_r>
+                  </property>
+                  <property>
+                    <name>residual_gas_saturation</name>
+                    <type>Constant</type>
+                    <value>0.2</value>
+                  </property>
+                  <property>
+                    <name>residual_liquid_saturation</name>
+                    <type>Constant</type>
+                    <value>0.2</value>
                   </property>                  
                   <property>
-                    <name>Fredlund_Parameters</name>
+                    <name>relative_permeability</name>
+                    <type>Brooks_Corey_1964_permeability</type>
+                  </property>
+                  <property>
+                    <name>brooks_corey_exponent</name>
                     <type>Constant</type>
                     <value>2</value>
                   </property>                  
