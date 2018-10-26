@@ -76,8 +76,22 @@ void SmallDeformationProcess<DisplacementDim>::constructDofTable()
     // Collect nodes which are not in the deactivated elements' list.
     _active_nodes.reserve(_mesh.getNodes().size());
     std::copy_if(begin(_mesh.getNodes()), end(_mesh.getNodes()),
-                 back_inserter(_active_nodes),
-                 [&](MeshLib::Node* const node) { return true; });
+                 back_inserter(_active_nodes), [&](MeshLib::Node* const node) {
+                     // An node is deactivated iff all of the neighbour elements
+                     // are deactivated.
+                     for (auto const* e : node->getElements())
+                     {
+                         if (e == nullptr)
+                         {
+                             continue;
+                         }
+                         if (!_process_data.isElementDeactivated(e->getID()))
+                         {
+                             return true;
+                         }
+                     }
+                     return false;
+                 });
 
     // Create single component dof in every of the mesh's nodes.
     _mesh_subset_all_nodes =

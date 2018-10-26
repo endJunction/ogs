@@ -19,7 +19,7 @@
                 <process_variable>displacement</process_variable>
             </process_variables>
             <secondary_variables>
-                <secondary_variable type="static" internal_name="sigma" output_name="sigma"/>
+                <!--secondary_variable type="static" internal_name="sigma" output_name="sigma"/-->
             </secondary_variables>
         </process>
     </processes>
@@ -38,7 +38,7 @@
                 <output>
                     <variables>
                         <variable>displacement</variable>
-                        <variable>sigma</variable>
+                        <!--variable>sigma</variable-->
                     </variables>
                 </output>
                 <time_stepping>
@@ -146,7 +146,7 @@
             <name>general_linear_solver</name>
             <lis>-i cg -p jacobi -tol 1e-16 -maxiter 10000</lis>
             <eigen>
-                <solver_type>CG</solver_type>
+                <solver_type>SparseLU</solver_type>
                 <precon_type>DIAGONAL</precon_type>
                 <max_iteration_step>10000</max_iteration_step>
                 <error_tolerance>1e-16</error_tolerance>
