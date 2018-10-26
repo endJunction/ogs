@@ -77,6 +77,8 @@ private:
     using LocalAssemblerInterface =
         SmallDeformationLocalAssemblerInterface<DisplacementDim>;
 
+    void constructDofTable() override;
+
     void initializeConcreteProcess(
         NumLib::LocalToGlobalIndexMap const& dof_table,
         MeshLib::Mesh const& mesh,
@@ -99,7 +101,11 @@ private:
                                      const double delta_t,
                                      int const process_id) override;
 
+    std::tuple<NumLib::LocalToGlobalIndexMap*, bool>
+    getDOFTableForExtrapolatorData() const override;
+
 private:
+    std::vector<MeshLib::Node*> _active_nodes;
     SmallDeformationProcessData<DisplacementDim> _process_data;
 
     std::vector<std::unique_ptr<LocalAssemblerInterface>> _local_assemblers;

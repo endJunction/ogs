@@ -71,6 +71,79 @@ bool SmallDeformationProcess<DisplacementDim>::isLinear() const
 }
 
 template <int DisplacementDim>
+void SmallDeformationProcess<DisplacementDim>::constructDofTable()
+{
+    // Collect nodes which are not in the deactivated elements' list.
+    _active_nodes.reserve(_mesh.getNodes().size());
+    std::copy_if(begin(_mesh.getNodes()), end(_mesh.getNodes()),
+                 back_inserter(_active_nodes),
+                 [&](MeshLib::Node* const node) { return true; });
+
+    // Create single component dof in every of the mesh's nodes.
+    _mesh_subset_all_nodes =
+        std::make_unique<MeshLib::MeshSubset>(_mesh, _active_nodes);
+
+    // Vector of mesh subsets.
+    std::vector<MeshLib::MeshSubset> all_mesh_subsets;
+
+    // TODO move the two data members somewhere else.
+    // for extrapolation of secondary variables
+    std::vector<MeshLib::MeshSubset> all_mesh_subsets_single_component{
+        *_mesh_subset_all_nodes};
+    _local_to_global_index_map_single_component =
+        std::make_unique<NumLib::LocalToGlobalIndexMap>(
+            std::move(all_mesh_subsets_single_component),
+            // by location order is needed for output
+            NumLib::ComponentOrder::BY_LOCATION);
+
+    // Vector of the number of variable components
+    std::vector<int> vec_var_n_components;
+    if (_use_monolithic_scheme)
+    {
+        int const monolithic_process_id = 0;
+        // Collect the mesh subsets in a vector for each variables' components.
+        for (ProcessVariable const& pv :
+             getProcessVariables(monolithic_process_id))
+        {
+            std::generate_n(std::back_inserter(all_mesh_subsets),
+                            pv.getNumberOfComponents(),
+                            [&]() { return *_mesh_subset_all_nodes; });
+        }
+
+        // Create a vector of the number of variable components
+        for (ProcessVariable const& pv :
+             getProcessVariables(monolithic_process_id))
+        {
+            vec_var_n_components.push_back(pv.getNumberOfComponents());
+        }
+    }
+    else  // for staggered scheme
+    {
+        int const displacement_process_id = 0;
+        // Assuming that all equations of the coupled process use the same
+        // element order. Other cases can be considered by overloading this
+        // member function in the derived class.
+
+        // Collect the mesh subsets in a vector for each variables' components.
+        std::generate_n(std::back_inserter(all_mesh_subsets),
+                        getProcessVariables(displacement_process_id)[0]
+                            .get()
+                            .getNumberOfComponents(),
+                        [&]() { return *_mesh_subset_all_nodes; });
+
+        // Create a vector of the number of variable components.
+        vec_var_n_components.push_back(
+            getProcessVariables(displacement_process_id)[0]
+                .get()
+                .getNumberOfComponents());
+    }
+    _local_to_global_index_map =
+        std::make_unique<NumLib::LocalToGlobalIndexMap>(
+            std::move(all_mesh_subsets), vec_var_n_components,
+            NumLib::ComponentOrder::BY_LOCATION);
+}
+
+template <int DisplacementDim>
 void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
     NumLib::LocalToGlobalIndexMap const& dof_table,
     MeshLib::Mesh const& mesh,
@@ -82,16 +155,6 @@ void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
         DisplacementDim, SmallDeformationLocalAssembler>(
         mesh.getElements(), dof_table, _local_assemblers,
         mesh.isAxiallySymmetric(), integration_order, _process_data);
-
-    // TODO move the two data members somewhere else.
-    // for extrapolation of secondary variables
-    std::vector<MeshLib::MeshSubset> all_mesh_subsets_single_component{
-        *_mesh_subset_all_nodes};
-    _local_to_global_index_map_single_component =
-        std::make_unique<NumLib::LocalToGlobalIndexMap>(
-            std::move(all_mesh_subsets_single_component),
-            // by location order is needed for output
-            NumLib::ComponentOrder::BY_LOCATION);
 
     _secondary_variables.addSecondaryVariable(
         "free_energy_density",
@@ -296,6 +359,14 @@ void SmallDeformationProcess<DisplacementDim>::postTimestepConcreteProcess(
         material_forces, _local_assemblers, *_local_to_global_index_map, x);
 
     material_forces->copyValues(*_material_forces);
+}
+
+template <int DisplacementDim>
+std::tuple<NumLib::LocalToGlobalIndexMap*, bool>
+SmallDeformationProcess<DisplacementDim>::getDOFTableForExtrapolatorData() const
+{
+    const bool manage_storage = false;
+    return {_local_to_global_index_map_single_component.get(), manage_storage};
 }
 
 template class SmallDeformationProcess<2>;

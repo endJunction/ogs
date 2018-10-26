@@ -290,6 +290,12 @@ void Process::initializeExtrapolator()
 
     std::tie(dof_table_single_component, manage_storage) =
         getDOFTableForExtrapolatorData();
+    if (dof_table_single_component == nullptr)
+    {
+        OGS_FATAL(
+            "DOF table for extrapolation is not pointing to a valid object. "
+            "Something bad happened.");
+    }
 
     std::unique_ptr<NumLib::Extrapolator> extrapolator(
         new NumLib::LocalLinearLeastSquaresExtrapolator(
