@@ -21,44 +21,69 @@
 
 namespace MaterialPropertyLib
 {
-BrooksCoreyRelPerm::BrooksCoreyRelPerm(Medium* m) : _medium(m){};
+RelPermBrooksCorey::RelPermBrooksCorey(Medium* m,
+        const double residual_liquid_saturation,
+        const double residual_gas_saturation,
+        const double exponent)
+
+: _medium(m),
+  _residual_liquid_saturation(residual_liquid_saturation),
+  _residual_gas_saturation(residual_gas_saturation),
+  _exponent(exponent){};
 /// These constructors throw errors, since the property is not
 /// implemented on phase or component scales.
-BrooksCoreyRelPerm::BrooksCoreyRelPerm(Phase*) : _medium(0)
-{
-    notImplemented("BrooksCoreyRelPerm", "Phase");
-}
-BrooksCoreyRelPerm::BrooksCoreyRelPerm(Component*) : _medium(0)
-{
-    notImplemented("BrooksCoreyRelPerm", "Component");
-}
+
 
 /**
  */
-PropertyDataType  BrooksCoreyRelPerm::value(VariableArray const& v)
+PropertyDataType  RelPermBrooksCorey::value(VariableArray const& v)
 {
 
-    const double p_cap = getScalar(v[MaterialPropertyLib::capillary_pressure]);
-    const double p_GR = getScalar(v[MaterialPropertyLib::phase_pressure]);
+    const double s_L = getScalar(v[MaterialPropertyLib::liquid_saturation]);
 
-    const double s_L_res =
-            getScalar(_medium->property(residual_liquid_saturation));
-    const double s_L_max =
-            1 - getScalar(_medium->property(residual_gas_saturation));
-    const double s_L =
-            getScalar(_medium->property(saturation), v);
-
-    const double lambda =
-            getScalar(_medium->property(brooks_corey_exponent));
+    const double s_L_res = _residual_liquid_saturation;
+    const double s_L_max = 1. - _residual_gas_saturation;
+    const double lambda = _exponent;
 
     const double s_eff = (s_L - s_L_res)/(s_L_max - s_L_res);
 
     const double k_rel_LR = std::pow(s_eff, (2.+3.*lambda)/lambda);
     const double k_rel_GR = (1.-s_eff)*(1. - s_eff) * (1. - std::pow(s_eff, (2.+lambda)/lambda));
 
-    const Pair value = {k_rel_LR, k_rel_GR};
+    const Pair kRel = {k_rel_LR, k_rel_GR};
 
-    return value;
+    return kRel;
+}
+
+PropertyDataType  RelPermBrooksCorey::dvalue(VariableArray const& v,
+        Variables const pv)
+{
+    assert((pv == Variables::liquid_saturation) &&
+                "RelPermBrooksCorey::dvalue is implemented for "
+                " derivatives with respect to liquid saturation only.");
+
+    const double s_L = getScalar(v[MaterialPropertyLib::liquid_saturation]);
+
+    const double s_L_res = _residual_liquid_saturation;
+    const double s_L_max = 1. - _residual_gas_saturation;
+    const double lambda =_exponent;
+
+    const double s_eff = (s_L - s_L_res)/(s_L_max - s_L_res);
+    const double dsedsL = 1. / (s_L_max - s_L_res);
+
+    const double dk_rel_LRdse = (3*lambda + 2.)/lambda *
+            std::pow(s_eff, 2./lambda + 2.);
+    const double dk_rel_LRdsL = dk_rel_LRdse * dsedsL;
+
+    const double _2L_L = (2.* lambda) / lambda;
+    const double dk_rel_GRdse = -2.*(1-s_eff)*
+            (1. - std::pow(s_eff, _2L_L)) - _2L_L * std::pow(s_eff, _2L_L-1.) *
+            (1. - s_eff) * (1. - s_eff);
+    const double dk_rel_GRdsL = dk_rel_GRdse * dsedsL;
+
+    const Pair dkReldsL = {dk_rel_LRdsL, dk_rel_GRdsL};
+
+    return dkReldsL;
 }
 
 }  // MaterialPropertyLib

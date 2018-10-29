@@ -20,25 +20,57 @@ class Medium;
 class Phase;
 class Component;
 
-class BrooksCoreyRelPerm final : public Property
+class RelPermBrooksCorey final : public Property
 {
 private:
     /// A pointer to the phase object.
     Medium* _medium;
-
+    const double _residual_liquid_saturation;
+    const double _residual_gas_saturation;
+    const double _exponent;
 
 public:
     /// Constructor passing a pointer to the medium.
-    BrooksCoreyRelPerm(Medium*);
-    /// Constructor passing a pointer to a phase.
-    BrooksCoreyRelPerm(Phase*);
-    /// Constructor passing a pointer to a component.
-    BrooksCoreyRelPerm(Component*);
+    RelPermBrooksCorey(Medium*, const double, const double, const double);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
     PropertyDataType value(VariableArray const&) override;
+    PropertyDataType dvalue(VariableArray const&, Variables const) override;
+
 };
+
+template <typename MaterialType>
+std::unique_ptr<RelPermBrooksCorey> createRelPermBrooksCorey(
+    BaseLib::ConfigTree const&, MaterialType)
+{
+    OGS_FATAL(
+        "The RelPermBrooksCorey property is implemented only on 'media' "
+        "scale.");
+}
+
+template <>
+inline std::unique_ptr<RelPermBrooksCorey> createRelPermBrooksCorey<Medium*>(
+    BaseLib::ConfigTree const& config, Medium* medium)
+{
+    // check is reading the parameter, not peeking it...
+    //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey}
+    // config.checkConfigParameter("type", "RelPermBrooksCorey");
+    DBUG("Create RelPermBrooksCorey medium property");
+
+    auto const residual_liquid_saturation =
+        //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey__residual_liquid_saturation}
+        config.getConfigParameter<double>("residual_liquid_saturation");
+    auto const residual_gas_saturation =
+        //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey__residual_gas_saturation}
+        config.getConfigParameter<double>("residual_gas_saturation");
+    auto const exponent =
+        //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey__lambda}
+        config.getConfigParameter<double>("lambda");
+
+    return std::make_unique<RelPermBrooksCorey>(medium,
+            residual_liquid_saturation, residual_gas_saturation, exponent);
+}
 
 
 }  // MaterialPropertyLib

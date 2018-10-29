@@ -223,9 +223,9 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     {
         return std::make_unique<BrooksCoreySaturation>(M);
     }
-    if (boost::iequals(property_type, "Brooks_Corey_1964_permeability"))
+    if (boost::iequals(property_type, "RelPermBrooksCorey"))
     {
-        return std::make_unique<BrooksCoreyRelPerm>(M);
+        return createRelPermBrooksCorey(config, M);
     }
     if (boost::iequals(property_type, "RelPermLiakopoulos"))
     {
