@@ -171,6 +171,10 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     /// which replaces either Medium*, Phase*, or Component*.
     /// Note that most property constructors (only those that request material
     /// pointers) must be overloaded for any type of material.
+    if (boost::iequals(property_type, "BilinearTemperaturePressure"))
+    {
+        return createBilinearTemperaturePressure(config, M);
+    }
     if (boost::iequals(property_type, "LinearTemperature"))
     {
         return std::make_unique<LinearTemperature>(M);

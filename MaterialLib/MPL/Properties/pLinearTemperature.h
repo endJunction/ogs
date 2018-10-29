@@ -1,6 +1,6 @@
 /**
  * \author Norbert Grunwald
- * \date   11.09.2017
+ * \date   Oct 19, 2018
  * \brief
  *
  * \copyright
