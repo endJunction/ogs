@@ -680,6 +680,8 @@ public:
             ip_data.pressure_gas_linear = p_GR;
             ip_data.pressure_cap_linear = p_cap;
             ip_data.pressure_wet = p_LR;
+            ip_data.rel_perm_gas = k_rel_GR;
+            ip_data.rel_perm_liquid = k_rel_LR;
             ip_data.density_gas = rho_GR;
             ip_data.density_liquid = rho_LR;
             ip_data.saturation = s_L;
@@ -1494,6 +1496,8 @@ public:
             const auto Sps = (alpha_B - phi) * beta_p_SR;
             const auto STs = (alpha_B - phi) * beta_T_SR;
 
+            ip_data.rel_perm_gas = k_rel_GR;
+            ip_data.rel_perm_liquid = k_rel_LR;
 
             /*
              *  Residuum and its derivatives
@@ -2335,6 +2339,8 @@ public:
             ip_data.pressure_gas_linear = p_GR;
             ip_data.pressure_cap_linear = p_cap;
             ip_data.pressure_wet = p_LR;
+            ip_data.rel_perm_gas = k_rel_GR;
+            ip_data.rel_perm_liquid = k_rel_LR;
             ip_data.density_gas = rho_GR;
             ip_data.density_liquid = rho_LR;
             ip_data.saturation = s_L;
@@ -3000,6 +3006,46 @@ private:
 
         return cache;
     }
+
+    std::vector<double> const& getIntPtRelPermGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& cache) const override
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        cache.resize(n_integration_points);
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].rel_perm_gas;
+        }
+
+        return cache;
+    }
+
+
+    std::vector<double> const& getIntPtRelPermLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& cache) const override
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        cache.resize(n_integration_points);
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].rel_perm_liquid;
+        }
+
+        return cache;
+    }
+
 
     std::vector<double> const& getIntPtDensityGas(
         const double /*t*/,

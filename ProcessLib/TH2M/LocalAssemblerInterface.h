@@ -55,6 +55,18 @@ struct LocalAssemblerInterface : public ProcessLib::LocalAssemblerInterface,
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& /*cache*/) const = 0;
 
+    virtual std::vector<double> const& getIntPtRelPermGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
+    virtual std::vector<double> const& getIntPtRelPermLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
     virtual std::vector<double> const& getIntPtDensityGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,

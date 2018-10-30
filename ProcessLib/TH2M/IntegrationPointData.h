@@ -74,6 +74,8 @@ struct IntegrationPointData final
     // respect to each integration point
     double saturation;
     double pressure_wet;
+    double rel_perm_gas;
+    double rel_perm_liquid;
     double density_gas;
     double density_liquid;
     double pressure_gas_linear;
