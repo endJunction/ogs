@@ -160,6 +160,16 @@
                     <type>Constant</type>
                     <value>1.0e-12</value>
                 </property>
+
+                  <property>
+                    <name>saturation</name>
+                    <type>SaturationLiakopoulos</type>
+                  </property>   
+                  <property>
+                    <name>relative_permeability</name>
+                    <type>RelPermLiakopoulos</type>
+                  </property>
+
                 <property>
                     <name>compressibility</name>
                     <type>Constant</type>

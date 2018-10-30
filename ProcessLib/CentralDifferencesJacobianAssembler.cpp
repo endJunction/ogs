@@ -197,6 +197,27 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
         local_Jac.noalias() += local_K * dx_dx;
     }
+
+    auto local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
+    auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
+    auto const local_b =
+                 MathLib::toVector<Eigen::VectorXd>(local_b_data, num_r_c);
+
+    auto res = local_M * local_xdot + local_K * local_x - local_b;
+
+
+        std::cout << " local_x:\n" << local_x << "\n";
+        std::cout << "\n=======================\n";
+        std::cout << " local_M_data : \n" << local_M << "\n";
+        std::cout << " local_K_data : \n" << local_K << "\n";
+        std::cout << " local_b_data : \n" << local_b << "\n";
+        std::cout << "\n=======================\n";
+        std::cout << "          res : \n" << res << "\n";
+        std::cout << "\n=======================\n";
+
+        OGS_FATAL("HALTET ein!");
+
+
 }
 
 std::unique_ptr<CentralDifferencesJacobianAssembler>

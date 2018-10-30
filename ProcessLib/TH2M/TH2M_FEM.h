@@ -1344,6 +1344,7 @@ public:
 
             permeability_tensor.diagonal().setConstant(permeability);
 
+            variables[MPL::Variables::liquid_saturation] = sL;
             auto const k_rel_LR = MPL::getPair(medium->property(
                     MPL::PropertyEnum::relative_permeability), variables)[0];
             auto const k_rel_GR = MPL::getPair(medium->property(
@@ -1523,7 +1524,7 @@ public:
             ip_data.velocity_gas.noalias() = w_GS;
 
 
-#define OUTPUT_IP
+#define nOUTPUT_IP
 #ifdef OUTPUT_IP
             std::cout << "==================================\n";
             std::cout << "            rho_SR : " << rho_SR << " \n";
@@ -1826,6 +1827,9 @@ public:
             dre_dT -= NpT * beta_T_R * p_GR_dot * Np * w; // E3
 
         }
+
+        std::cout << " Residuum: \n" << r << "\n";
+        OGS_FATAL("Stop.");
 
 
 #if 0
