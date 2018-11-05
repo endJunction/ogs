@@ -75,7 +75,7 @@ AddTest(
     GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_yy stress_yy 1e-8 5e-15
     GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_xy stress_xy 5e-8 1e-15
     GLOB single_fracture_constK_pcs_0_ts_*.vtu stress_zz stress_zz 1e-16 0
-    GLOB single_fracture_constK_pcs_0_ts_*.vtu velocity velocity 1e-16 0
+    GLOB single_fracture_constK_pcs_0_ts_*.vtu velocity velocity 1e-15 0
 )
 
 AddTest(

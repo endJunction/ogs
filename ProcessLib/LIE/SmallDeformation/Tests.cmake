@@ -92,7 +92,7 @@ AddTest(
     GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu displacement displacement 1e-16 0
     GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu displacement_jump1 displacement_jump1 1e-16 0
     GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu sigma_xx sigma_xx 1e-6 0
-    GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu sigma_yy sigma_yy 1e-6 0
+    GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu sigma_yy sigma_yy 2e-6 0
     GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu sigma_zz sigma_zz 1e-6 0
     GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu sigma_xy sigma_xy 1e-6 0
     GLOB cohesive_zone_load_path_pcs_0_ts_*.vtu f_stress_n_analytical f_stress_n 5e2 5e-6
