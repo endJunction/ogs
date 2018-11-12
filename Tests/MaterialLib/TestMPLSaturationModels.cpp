@@ -188,3 +188,85 @@ TEST(MPL, SaturationFredlund)
     }
 
 } // TEST(MPL, SaturationFredlund)
+
+TEST(MPL, SaturationBrooksCorey)
+{
+
+    std::stringstream m;
+    m << "<medium>\n";
+    m << "<phases></phases>\n";
+    m << "<properties><property>\n";
+    m << "<name>saturation</name>\n";
+    m << "<type>SaturationBrooksCorey</type>\n";
+    m << "<residual_liquid_saturation>0.1</residual_liquid_saturation>\n";
+    m << "<residual_gas_saturation>0.2</residual_gas_saturation>\n";
+    m << "<lambda>2.0</lambda>\n";
+    m << "<entry_pressure>5000.0</entry_pressure>\n";
+    m << "</property></properties>\n";
+    m << "</medium>\n";
+
+    auto medium = createTestMaterial(m.str());
+
+
+    std::vector<double> p_cap = {
+            5.0E+03,6.0E+03,7.0E+03,8.0E+03,9.0E+03,1.0E+04,1.2E+04,1.4E+04,
+            1.6E+04,1.8E+04,2.0E+04,2.5E+04,3.0E+04,3.5E+04,4.0E+04,4.5E+04,
+            5.0E+04,1.0E+05,1.5E+05,2.0E+05,2.5E+05,3.0E+05,3.5E+05,4.0E+05,
+            4.5E+05,5.0E+05};
+
+    std::vector<double> sL_expected = {
+            8.00000000000000E-01,5.86111111111111E-01,4.57142857142857E-01,
+            3.73437500000000E-01,3.16049382716049E-01,2.75000000000000E-01,
+            2.21527777777777E-01,1.89285714285714E-01,1.68359375000000E-01,
+            1.54012345679012E-01,1.43750000000000E-01,1.28000000000000E-01,
+            1.19444444444444E-01,1.14285714285714E-01,1.10937500000000E-01,
+            1.08641975308642E-01,1.07000000000000E-01,1.01750000000000E-01,
+            1.00777777777777E-01,1.00437500000000E-01,1.00280000000000E-01,
+            1.00194444444444E-01,1.00142857142857E-01,1.00109375000000E-01,
+            1.00086419753086E-01,1.00070000000000E-01};
+
+    std::vector<double> dsLdpc_expected = {
+            -2.80000000000000E-04,-1.62037037037037E-04,-1.02040816326530E-04,
+            -6.83593750000000E-05,-4.80109739368998E-05,-3.50000000000000E-05,
+            -2.02546296296296E-05,-1.27551020408163E-05,-8.54492187500000E-06,
+            -6.00137174211248E-06,-4.37500000000000E-06,-2.24000000000000E-06,
+            -1.29629629629629E-06,-8.16326530612244E-07,-5.46875000000000E-07,
+            -3.84087791495198E-07,-2.80000000000000E-07,-3.50000000000000E-08,
+            -1.03703703703703E-08,-4.37500000000000E-09,-2.24000000000000E-09,
+            -1.29629629629629E-09,-8.16326530612244E-10,-5.46875000000000E-10,
+            -3.84087791495199E-10,-2.80000000000000E-10};
+
+    std::vector<double> d2sLdpc2_expected = {
+            1.68000000000000E-07,8.10185185185185E-08,4.37317784256559E-08,
+            2.56347656250000E-08,1.60036579789666E-08,1.05000000000000E-08,
+            5.06365740740740E-09,2.73323615160349E-09,1.60217285156250E-09,
+            1.00022862368541E-09,6.56250000000000E-10,2.68800000000000E-10,
+            1.29629629629629E-10,6.99708454810495E-11,4.10156250000000E-11,
+            2.56058527663465E-11,1.68000000000000E-11,1.05000000000000E-12,
+            2.07407407407407E-13,6.56250000000000E-14,2.68800000000000E-14,
+            1.29629629629629E-14,6.99708454810495E-15,4.10156250000000E-15,
+            2.56058527663466E-15,1.68000000000000E-15};
+
+
+    for (size_t i= 0; i < p_cap.size(); i++)
+    {
+        MPL::VariableArray variables;
+        variables[MPL::Variables::capillary_pressure] = p_cap[i];
+
+        auto const sL = MPL::getScalar(medium.property(
+                MPL::PropertyEnum::saturation), variables);
+        auto const dsLdpc = MPL::getScalarDerivative(medium.property(
+                MPL::PropertyEnum::saturation), variables,
+                MPL::Variables::capillary_pressure);
+        auto const d2sLdpc2 = MPL::getScalarDerivative(medium.property(
+                MPL::PropertyEnum::saturation), variables,
+                MPL::Variables::capillary_pressure,
+                MPL::Variables::capillary_pressure);
+
+        ASSERT_NEAR(sL, sL_expected[i], 1.e-12);
+        ASSERT_NEAR(dsLdpc, dsLdpc_expected[i], 1.e-12);
+        ASSERT_NEAR(d2sLdpc2, d2sLdpc2_expected[i], 1.e-12);
+
+    }
+
+} // TEST(MPL, SaturationBrooksCorey)

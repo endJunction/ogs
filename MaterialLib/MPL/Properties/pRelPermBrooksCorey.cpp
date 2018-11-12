@@ -30,9 +30,6 @@ RelPermBrooksCorey::RelPermBrooksCorey(Medium* m,
   _residual_liquid_saturation(residual_liquid_saturation),
   _residual_gas_saturation(residual_gas_saturation),
   _exponent(exponent){};
-/// These constructors throw errors, since the property is not
-/// implemented on phase or component scales.
-
 
 /**
  */

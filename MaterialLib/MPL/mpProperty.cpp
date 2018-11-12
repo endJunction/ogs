@@ -223,10 +223,6 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     {
         return std::make_unique<PengRobinson>(M);
     }
-    if (boost::iequals(property_type, "Brooks_Corey_1964_saturation"))
-    {
-        return std::make_unique<BrooksCoreySaturation>(M);
-    }
     if (boost::iequals(property_type, "RelPermBrooksCorey"))
     {
         return createRelPermBrooksCorey(config, M);
@@ -242,6 +238,10 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     if (boost::iequals(property_type, "SaturationFredlund"))
     {
         return createSaturationFredlund(config, M);
+    }
+    if (boost::iequals(property_type, "SaturationBrooksCorey"))
+    {
+        return createSaturationBrooksCorey(config, M);
     }
     // If none of the above property types are found, OGS throws an error.
     OGS_FATAL(
