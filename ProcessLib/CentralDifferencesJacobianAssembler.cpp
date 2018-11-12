@@ -31,14 +31,14 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     std::vector<double>& local_Jac_data)
 {
     // TODO do not check in every call.
-    if (local_x_data.size() % _absolute_epsilons.size() != 0)
-    {
-        OGS_FATAL(
-            "The number of specified epsilons (%u) and the number of local "
-            "d.o.f.s (%u) do not match, i.e., the latter is not divisable by "
-            "the former.",
-            _absolute_epsilons.size(), local_x_data.size());
-    }
+//    if (local_x_data.size() % _absolute_epsilons.size() != 0)
+//    {
+//        OGS_FATAL(
+//            "The number of specified epsilons (%u) and the number of local "
+//            "d.o.f.s (%u) do not match, i.e., the latter is not divisable by "
+//            "the former.",
+//            _absolute_epsilons.size(), local_x_data.size());
+//    }
 
     auto const num_r_c =
         static_cast<Eigen::MatrixXd::Index>(local_x_data.size());
@@ -131,8 +131,9 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     for (Eigen::MatrixXd::Index i = 0; i < num_r_c; ++i)
     {
         // assume that local_x_data is ordered by component.
-        auto const component = i / num_dofs_per_component;
-        auto const eps = _absolute_epsilons[component];
+//        auto const component = i / num_dofs_per_component;
+//        auto const eps = _absolute_epsilons[component];
+        auto const eps = 1.0e-8;
 
         local_x_perturbed_data_[i] += eps;
         local_assembler.assemble(t, local_x_perturbed_data_, local_M_data,
@@ -203,19 +204,26 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     auto const local_b =
                  MathLib::toVector<Eigen::VectorXd>(local_b_data, num_r_c);
 
-    auto res = local_M * local_xdot + local_K * local_x - local_b;
+    auto res = (local_M * local_xdot + local_K * local_x - local_b).eval();
 
 
-        std::cout << " local_x:\n" << local_x << "\n";
-        std::cout << "\n=======================\n";
-        std::cout << " local_M_data : \n" << local_M << "\n";
-        std::cout << " local_K_data : \n" << local_K << "\n";
-        std::cout << " local_b_data : \n" << local_b << "\n";
-        std::cout << "\n=======================\n";
-        std::cout << "          res : \n" << res << "\n";
-        std::cout << "\n=======================\n";
+//    std::cout << " local_x_dot:\n" << local_xdot << "\n";
+//    std::cout << " local_x:\n" << local_x << "\n";
+//
+//    std::cout << "\n=======================\n";
+//    std::cout << " local_M_data : \n" << local_M << "\n";
+//    std::cout << " local_K_data : \n" << local_K << "\n";
+//    std::cout << " local_b_data : \n" << local_b << "\n";
+//    std::cout << "\n=======================\n";
+//    std::cout << "          res : \n" << res << "\n";
+//    std::cout << "\n=======================\n";
 
-        OGS_FATAL("HALTET ein!");
+//    std::cout << " Residuum (numerical): \n";
+//    std::cout << " res: \n" << res << "\n";
+//    std::cout << " ================= \n";
+
+//
+//    OGS_FATAL("HALTET ein!");
 
 
 }
