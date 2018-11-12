@@ -9,7 +9,7 @@
 <name>TH2M_process</name>
 <type>TH2M</type>
 <integration_order>3</integration_order>
-
+<!--
 <jacobian_assembler>
 <type>CentralDifferences</type>
 <component_magnitudes>1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 
@@ -17,7 +17,7 @@
 <relative_epsilons> 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 
 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8</relative_epsilons>
 </jacobian_assembler>
-
+-->
 <dimension>2</dimension>
 <constitutive_relation>
 <type>LinearElasticIsotropic</type>

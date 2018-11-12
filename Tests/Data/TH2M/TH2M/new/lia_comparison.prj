@@ -9,13 +9,32 @@
 <name>TH2M_process</name>
 <type>TH2M</type>
 <integration_order>3</integration_order>
-
+<!--
 <jacobian_assembler>
 <type>CentralDifferences</type>
 <component_magnitudes>1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 
 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0</component_magnitudes>
 <relative_epsilons> 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 
 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8</relative_epsilons>
+</jacobian_assembler>
+-->
+
+<jacobian_assembler>
+<type>CompareJacobians</type>
+<jacobian_assembler>
+<type>Analytical</type>
+</jacobian_assembler>
+<reference_jacobian_assembler>
+<type>CentralDifferences</type>
+<component_magnitudes>1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 
+1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0</component_magnitudes>
+<relative_epsilons> 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 
+1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8</relative_epsilons>
+</reference_jacobian_assembler>
+<abs_tol>1e-4</abs_tol>
+<rel_tol>1e-5</rel_tol>
+<fail_on_error>false</fail_on_error>
+<log_file>j_comparison.py</log_file>
 </jacobian_assembler>
 
 <dimension>2</dimension>
@@ -242,7 +261,7 @@
 <time_stepping>
 <type>FixedTimeStepping</type>
 <t_initial>0</t_initial>
-<t_end>1</t_end>
+<t_end>10</t_end>
 <timesteps>
 <pair><repeat>10</repeat><delta_t>1</delta_t></pair>                        
 <pair><repeat>10</repeat><delta_t>2</delta_t></pair>                        

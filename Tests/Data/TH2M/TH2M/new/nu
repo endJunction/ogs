@@ -1,0 +1,1336 @@
+info: This is OpenGeoSys-6 version 6.1.0-1351-g6bc0571.
+info: OGS started on 2018-11-01 14:14:45+0100.
+debug: Project configuration from file 'lia_numerical.prj' read.
+warning: Consider switching from mesh and geometry input to multiple meshes input. See https://www.opengeosys.org/docs/tools/model-preparation/constructmeshesfromgeometry/ tool for conversion.
+debug: Reading mesh file 'column_1e2_quad8.vtu'.
+debug: Reading geometry file 'column.gml'.
+debug: Project configuration from file 'column.gml' read.
+debug: The search length for mesh "column_1e2_quad8" is 1.000000e-09.
+debug: Creating mesh from geometry column_geometry left.
+debug: Found 30 elements in the mesh
+debug: Creating mesh from geometry column_geometry right.
+debug: Found 30 elements in the mesh
+debug: Creating mesh from geometry column_geometry bottom.
+debug: Found 1 elements in the mesh
+debug: Creating mesh from geometry column_geometry top.
+debug: Found 1 elements in the mesh
+debug: Reading curves configuration.
+debug: Reading parameters:
+info: ConstantParameter: E
+debug: Using value 1e+10 for constant parameter.
+info: ConstantParameter: nu
+debug: Using value 0.3 for constant parameter.
+info: ConstantParameter: rho_sr
+debug: Using value 2000 for constant parameter.
+info: ConstantParameter: displacement_0
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: displacement_ini
+debug: Using following values for the constant parameter:
+debug: 	0
+debug: 	0
+info: ConstantParameter: T_0
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: T_1
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: p_Cap_ini
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: p_Cap_boundary
+debug: Using following values for the constant parameter:
+debug: 	0
+info: ConstantParameter: atmospheric
+debug: Using following values for the constant parameter:
+debug: 	1000
+info: ConstantParameter: Dirichlet_left
+debug: Using value 0 for constant parameter.
+info: ConstantParameter: Dirichlet_bottom
+debug: Using value 0 for constant parameter.
+info: ConstantParameter: Dirichlet_front
+debug: Using value 0 for constant parameter.
+info: ConstantParameter: Dirichlet_top
+debug: Using value 1 for constant parameter.
+info: ConstantParameter: Neumann_force_top
+debug: Using value 0.02 for constant parameter.
+info: ConstantParameter: displacementTop
+debug: Using value -0.05 for constant parameter.
+info: CurveScaledParameter: displacementRamp
+debug: Using curve timeRamp
+debug: Using parameter displacementTop
+debug: Found parameter `displacementTop'.
+debug: Parse process variables:
+debug: Found parameter `displacement_ini'.
+debug: Constructing process variable displacement
+debug: Found mesh 'column_geometry_left' with id 1.
+debug: Found mesh 'column_geometry_bottom' with id 3.
+info: No source terms found.
+debug: Found parameter `T_0'.
+debug: Constructing process variable temperature
+debug: Found mesh 'column_geometry_bottom' with id 3.
+debug: Found mesh 'column_geometry_top' with id 4.
+info: No source terms found.
+debug: Found parameter `atmospheric'.
+debug: Constructing process variable gas_pressure
+debug: Found mesh 'column_geometry_bottom' with id 3.
+debug: Found mesh 'column_geometry_top' with id 4.
+info: No source terms found.
+debug: Found parameter `p_Cap_ini'.
+debug: Constructing process variable capillary_pressure
+debug: Found mesh 'column_geometry_bottom' with id 3.
+info: No source terms found.
+debug: Reading materials:
+debug: Reading processes:
+debug: Create TH2MProcess.
+debug: Found process variable 'gas_pressure' for config tag <gas_pressure>.
+debug: Found process variable 'capillary_pressure' for config tag <capillary_pressure>.
+debug: Found process variable 'temperature' for config tag <temperature>.
+debug: Found process variable 'displacement' for config tag <displacement>.
+debug: Associate gas pressure with process variable 'gas_pressure'.
+debug: Associate capillary pressure with process variable 'capillary_pressure'.
+debug: Associate temperature with process variable 'temperature'.
+debug: Associate displacement with process variable 'displacement'.
+debug: Create LinearElasticIsotropic material
+debug: Found parameter `E'.
+debug: Use 'E' as youngs_modulus parameter.
+debug: Found parameter `nu'.
+debug: Use 'nu' as poissons_ratio parameter.
+debug: Reading linear solver configuration.
+debug: Reading linear solver configuration.
+debug: Reading time loop configuration.
+debug: Parse output configuration:
+debug: adding output variable `displacement'
+debug: adding output variable `temperature'
+debug: adding output variable `capillary_pressure'
+debug: adding output variable `gas_pressure'
+debug: adding output variable `sigma_eff'
+debug: adding output variable `epsilon'
+debug: adding output variable `velocity_gas'
+debug: adding output variable `velocity_liquid'
+debug: adding output variable `pressure_gas_linear'
+debug: adding output variable `pressure_cap_linear'
+debug: adding output variable `pressure_wet'
+debug: adding output variable `rel_perm_gas'
+debug: adding output variable `rel_perm_liquid'
+debug: adding output variable `density_gas'
+debug: adding output variable `density_liquid'
+debug: adding output variable `saturation'
+info: Initialize processes.
+debug: Initialize process.
+debug: Construct dof mappings.
+debug: TH2M dof table construction..
+debug: Compute sparsity pattern
+debug: Initialize the extrapolator
+debug: Create local assemblers.
+debug: Create local assemblers.
+debug: Shapefunction order: 2
+debug: Calling local assembler builder for all mesh elements.
+debug: Initialize boundary conditions.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter atmospheric
+debug: Found parameter `atmospheric'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 0 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter atmospheric
+debug: Found parameter `atmospheric'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 0 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter p_Cap_boundary
+debug: Found parameter `p_Cap_boundary'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 1 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter T_1
+debug: Found parameter `T_1'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 2 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter T_1
+debug: Found parameter `T_1'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 2 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter displacement_0
+debug: Found parameter `displacement_0'.
+debug: Found 61 nodes for Dirichlet BCs for the variable 3 and component 0
+debug: Construct reduced local to global index map.
+debug: Constructing DirichletBoundaryCondition from config.
+debug: Using parameter displacement_0
+debug: Found parameter `displacement_0'.
+debug: Found 3 nodes for Dirichlet BCs for the variable 3 and component 1
+debug: Construct reduced local to global index map.
+info: Solve processes.
+debug: Set the initial condition of variable gas_pressure of process 0.
+debug: Set the initial condition of variable capillary_pressure of process 0.
+debug: Set the initial condition of variable temperature of process 0.
+debug: Set the initial condition of variable displacement of process 0.
+debug: PreTimestep TH2MProcess.
+debug: Process output data.
+debug:   process variable gas_pressure
+debug:   process variable capillary_pressure
+debug:   process variable temperature
+debug:   process variable displacement
+debug:   secondary variable density_gas
+debug: Computing new singular value decomposition
+debug:   secondary variable density_liquid
+debug:   secondary variable epsilon
+debug:   secondary variable pressure_cap_linear
+debug:   secondary variable pressure_gas_linear
+debug:   secondary variable pressure_wet
+debug:   secondary variable rel_perm_gas
+debug:   secondary variable rel_perm_liquid
+debug:   secondary variable saturation
+debug:   secondary variable sigma_eff
+debug:   secondary variable velocity_gas
+debug:   secondary variable velocity_liquid
+debug: output to new_pcs_0_ts_0_t_0.000000.vtu
+info: [time] Output of timestep 0 took 0.00974107 s.
+debug: Writing output to 'new_pcs_0_ts_0_t_0.000000.vtu'.
+info: === Time stepping at step #1 and time 1 with step size 1
+debug: PreTimestep TH2MProcess.
+debug: Assemble the Jacobian of TH2M for the monolithic scheme.
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+ 5.68434e-14
+    -2222.22
+-2.27374e-13
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+9.66338e-13
+   -2222.22
+3.41061e-13
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+3.41061e-13
+   -2222.22
+4.54747e-13
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+ 4.54747e-13
+    -2222.22
+-1.02318e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+7.38964e-13
+   -2222.22
+2.27374e-13
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-2.27374e-13
+    -2222.22
+-4.54747e-13
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-6.82121e-13
+    -2222.22
+ 5.68434e-13
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-6.82121e-13
+    -2222.22
+-1.25056e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+2.27374e-13
+   -2222.22
+5.11591e-12
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-3.97904e-13
+    -2222.22
+ 1.81899e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-2.72848e-12
+    -2222.22
+ -6.0254e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-1.42109e-12
+    -2222.22
+ 1.93268e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+4.37694e-12
+   -2222.22
+6.13909e-12
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-1.98952e-12
+    -2222.22
+-2.95586e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-7.95808e-13
+    -2222.22
+ 3.29692e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+-1.7053e-13
+   -2222.22
+1.25056e-12
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+          0
+   -2222.22
+1.13687e-12
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-3.41061e-13
+    -2222.22
+ 2.95586e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-3.75167e-12
+    -2222.22
+-5.68434e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-3.97904e-13
+    -2222.22
+ 3.29692e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+ 1.19371e-12
+    -2222.22
+-1.25056e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-1.53477e-12
+    -2222.22
+ -6.0254e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+ 7.56017e-12
+    -2222.22
+-2.16005e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-5.74119e-12
+    -2222.22
+ 8.52651e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-1.98952e-12
+    -2222.22
+-1.13687e-13
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+1.27898e-11
+   -2222.22
+5.79803e-12
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+7.95808e-13
+   -2222.22
+ 6.9349e-12
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+ 1.98952e-12
+    -2222.22
+-1.22782e-11
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+ -2.725e-12
+ -2.725e-12
+  2.725e-12
+  2.725e-12
+ -0.0004905
+ -0.0004905
+  0.0004905
+  0.0004905
+          0
+          0
+          0
+          0
+    555.556
+   -555.556
+   -555.556
+    555.556
+ 8.6402e-12
+   -2222.22
+2.05773e-11
+    2222.22
+    1661.76
+    1661.76
+   -1671.57
+   -1671.57
+    6686.29
+      19.62
+   -6647.05
+      19.62
+ ================= 
+ Residuum (numerical): 
+ res: 
+  -2.725e-12
+  -2.725e-12
+   2.725e-12
+   2.725e-12
+  -0.0004905
+  -0.0004905
+   0.0004905
+   0.0004905
+           0
+           0
+           0
+           0
+     555.556
+    -555.556
+    -555.556
+     555.556
+-4.03588e-12
+    -2222.22
+ 7.04858e-12
+     2222.22
+     1661.76
+     1661.76
+    -1671.57
+    -1671.57
+     6686.29
+       19.62
+    -6647.05
+       19.62
+ ================= 
+info: [time] Assembly took 3.57396 s.
+info: [time] Applying Dirichlet BCs took 0.00351119 s.
+info: ------------------------------------------------------------------
+info: *** Eigen solver computation
+info: -> scale
+info: -> solve with SparseLU
+info: ------------------------------------------------------------------
+info: [time] Linear solver took 0.085664 s.
+info: Convergence criterion, component 0: |dx|=1.3080e-09, |x|=7.8740e+05, |dx|/|x|=1.6612e-15
+info: Convergence criterion, component 1: |dx|=6.7687e+04, |x|=6.7687e+04, |dx|/|x|=1.0000e+00
+info: Convergence criterion, component 2: |dx|=0.0000e+00, |x|=0.0000e+00, |dx|/|x|=nan
+info: Convergence criterion, component 3: |dx|=4.2846e-06, |x|=4.2846e-06, |dx|/|x|=1.0000e+00
+info: Convergence criterion, component 4: |dx|=2.7954e-05, |x|=2.7954e-05, |dx|/|x|=1.0000e+00
+info: [time] Iteration #1 took 3.66428 s.
+debug: Assemble the Jacobian of TH2M for the monolithic scheme.
+ Residuum (numerical): 
+ res: 
+  5.7925e-09
+ 5.79271e-09
+ 1.98486e-08
+ 1.98479e-08
+ 0.000407912
+ 0.000407944
+-0.000417865
+-0.000417863
+           0
+           0
+           0
+           0
+     2.66756
+ 3.45769e-05
+    -2.57393
+   -0.386815
+  9.4154e-09
+-0.000248978
+      -6.081
+      6.3744
+     301.796
+     281.674
+    -274.885
+    -291.103
+     1182.33
+  0.00179292
+    -1140.96
+  0.00179283
+ ================= 
+ Residuum (numerical): 
+ res: 
+ 9.20843e-08
+ 9.20865e-08
+ 1.54328e-07
+ 1.54325e-07
+ 0.000305718
+ 0.000305717
+-0.000536574
+-0.000536577
+           0
+           0
+           0
+           0
+     1.45948
+     2.57351
+    -1.89334
+    -1.26343
+       6.081
+ -0.00618857
+    -6.20759
+   -0.743442
+     291.097
+     274.879
+     -269.23
+    -278.955
+     1140.97
+    0.019299
+    -1099.95
+   0.0192987
+ ================= 
+ Residuum (numerical): 
+ res: 
+ 3.39169e-07
+ 3.39172e-07
+ 4.63969e-07
+ 4.63966e-07
+  4.2566e-05
+ 4.25571e-05
+-0.000830302
+-0.000830304
+           0
+           0
+           0
+           0
+    0.581453
+     1.88657
+    -1.12978
+    -1.22237
+     6.20759
+  -0.0327991
+    -4.10781
+    -2.18286
+     278.933
+     269.208
+    -262.402
+    -267.082
+     1100.02
+    0.062701
+    -1059.95
+   0.0627009
+ ================= 
+ Residuum (numerical): 
+ res: 
+ 7.82909e-07
+ 7.82912e-07
+ 9.78479e-07
+ 9.78477e-07
+-0.000417418
+-0.000417425
+ -0.00132873
+ -0.00132873
+           0
+           0
+           0
+           0
+    0.167935
+     1.10173
+    -0.58689
+   -0.762366
+     4.10781
+  -0.0993807
+    -2.20068
+    -1.72815
+     267.031
+     262.351
+    -254.343
+    -256.047
+     1060.15
+    0.135577
+    -1020.57
+    0.135577
+ ================= 
+ Residuum (numerical): 
+ res: 
+1.44457e-06
+1.44458e-06
+1.71606e-06
+1.71606e-06
+-0.00109549
+-0.00109549
+-0.00205006
+-0.00205006
+          0
+          0
+          0
+          0
+  0.0304119
+   0.512432
+  -0.302403
+  -0.343061
+    2.20068
+  -0.226859
+  -0.983819
+  -0.887384
+    255.952
+    254.248
+   -245.468
+   -245.715
+    1020.94
+   0.239214
+   -981.597
+   0.239214
+ ================= 
+ Residuum (numerical): 
+ res: 
+2.33749e-06
+2.33749e-06
+2.68808e-06
+2.68808e-06
+-0.00200496
+-0.00200496
+-0.00300568
+-0.00300568
+          0
+          0
+          0
+          0
+  0.0322989
+   0.145734
+  -0.209995
+ -0.0429339
+   0.983819
+  -0.436616
+  -0.348275
+  -0.124032
+    245.561
+    245.314
+   -236.188
+   -235.847
+    982.206
+   0.373619
+   -942.973
+   0.373619
+ ================= 
+ Residuum (numerical): 
+ res: 
+3.46973e-06
+3.46973e-06
+3.90119e-06
+3.90119e-06
+-0.00315384
+-0.00315384
+-0.00420228
+-0.00420228
+          0
