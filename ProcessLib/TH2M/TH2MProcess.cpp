@@ -136,6 +136,11 @@ void TH2MProcess<DisplacementDim>::initializeConcreteProcess(
                          &LocalAssemblerInterface::getIntPtEpsilon));
 
     Base::_secondary_variables.addSecondaryVariable(
+        "time",
+        makeExtrapolator(1, getExtrapolator(), _local_assemblers,
+                         &LocalAssemblerInterface::getIntPtTime));
+
+    Base::_secondary_variables.addSecondaryVariable(
         "saturation",
         makeExtrapolator(1, getExtrapolator(), _local_assemblers,
                          &LocalAssemblerInterface::getIntPtSaturation));

@@ -698,6 +698,8 @@ public:
             ip_data.density_liquid = rho_LR;
             ip_data.saturation = sL;
 
+            ip_data.time = t;
+
             ip_data.velocity_liquid.noalias() = w_LS;
             ip_data.velocity_gas.noalias() = w_GS;
 
@@ -964,6 +966,7 @@ public:
 
             Bg.noalias() += rho_GR * rho_GR * k_over_mu_GR * gravity_operator;
 
+
 #ifdef DBG_OUTPUT
             std::cout << "   Bg:\n " << Bg << " \n";
             std::cout << "==================================\n";
@@ -1014,9 +1017,6 @@ public:
         std::cout << "Aepc : \n" << Aepc << "\n";
         std::cout << "Ket=(AeT+LeT)  : \n" << KeT << "\n";
 #endif
-
-
-
 
 #ifdef DBG_OUTPUT
 
@@ -1124,7 +1124,7 @@ public:
                 J.template block<displacement_size, displacement_size>(
                         displacement_index, displacement_index);
 
-        // resuduum segments
+        // residuum segments
         auto rg =  r.template segment<gas_pressure_size>(gas_pressure_index);
         auto rl =  r.template segment<cap_pressure_size>(cap_pressure_index);
         auto re =  r.template segment<temperature_size>(temperature_index);
@@ -1626,7 +1626,7 @@ public:
                     rho_GR * b * w; // G6
 
             // residuum implemented as -r (?)
-            rg *= -1.0;
+        //    rg *= -1.0;
 
             // Gas phase equation, gas pressure derivatives
             drg_dpg += NpT * sG * cG1 * (drhoGRdpGR * p_GR_dot + rho_GR/dt) *
@@ -1693,7 +1693,7 @@ public:
                     rho_LR * b * w;
 
             // residuum implemented as -r (?)
-            rl *= -1.0;
+         //   rl *= -1.0;
 
             drl_dpg += NpT * sL * cL1 * (rho_LR / dt + drhoLRdpGR * p_GR_dot) *
                     Np * w; // L1
@@ -1768,12 +1768,12 @@ public:
             ru += B.transpose() * sigma_eff * w;
             ru -= NuT * rho * b * w;
             ru -= B.transpose() * alpha_B * identity2 * Np * w *
-                    gas_phase_pressure_dot; // U1
+                    gas_phase_pressure; // U1
             ru += B.transpose() * alpha_B * identity2 * sL * Np * w *
-                    capillary_pressure_dot; // U2
+                    capillary_pressure; // U2
 
             // residuum implemented as -r (?)
-            ru *= -1.0;
+       //     ru *= -1.0;
 
             dru_dpg -= B.transpose() * alpha_B * identity2 * Np * w; // U2
             dru_dpg -= NuT * drhodpGR * b * Np * w; // U4
@@ -1811,7 +1811,7 @@ public:
             re += gradNpT * lambda_eff * gradNp * w * temperature; // E7
 
             // residuum implemented as -r (?)
-            re *= -1.0;
+      //      re *= -1.0;
 
             dre_dpg += NpT * drhocpdpGR * T_dot * Np * w; // E1
             dre_dpg -= NpT * beta_T_R / dt * T * Np * w; // E3
@@ -1828,8 +1828,26 @@ public:
 
         }
 
-        std::cout << " Residuum: \n" << r << "\n";
-        OGS_FATAL("Stop.");
+        std::cout << " Residuum (analytical): \n";
+        std::cout << " rg: \n" << rg << "\n";
+        std::cout <<  rl << "\n";
+        std::cout <<  re << "\n";
+        std::cout <<  ru << "\n";
+        std::cout << " ================= \n";
+
+//
+//        std::cout << " p_GR_dot: \n" << gas_phase_pressure_dot << "\n";
+//        std::cout << " p_cap_dot: \n" << capillary_pressure_dot << "\n";
+//        std::cout << " T_dot: \n" << temperature_dot << "\n";
+//        std::cout << " u_dot: \n" << displacement_dot << "\n";
+//        std::cout << " p_GR: \n" << gas_phase_pressure << "\n";
+//        std::cout << " p_cap: \n" << capillary_pressure << "\n";
+//        std::cout << " T: \n" << temperature << "\n";
+//        std::cout << " u: \n" << displacement << "\n";
+//
+//
+//        std::cout << " Residuum: \n" << r << "\n";
+//                OGS_FATAL("Stop.");
 
 
 #if 0
@@ -3081,6 +3099,25 @@ private:
             auto const& eps = _ip_data[ip].eps;
             cache_mat.col(ip) =
                 MathLib::KelvinVector::kelvinVectorToSymmetricTensor(eps);
+        }
+
+        return cache;
+    }
+
+    std::vector<double> const& getIntPtTime(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& cache) const override
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        cache.clear();
+        cache.resize(n_integration_points);
+        for (unsigned ip = 0; ip < n_integration_points; ++ip)
+        {
+            cache[ip] = _ip_data[ip].time;
         }
 
         return cache;
