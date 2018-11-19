@@ -16,18 +16,22 @@
 #include "MaterialLib/MPL/Properties/pUniversalConstants.h"
 #include "MathLib/MathTools.h"
 
+#include <iostream>
+
 namespace MaterialPropertyLib
 {
 /// This constructor throws an error since it was used for a medium
 /// property while it is a component property.
 SaturationFredlund::SaturationFredlund(Medium* m,
                                                double const s_max,
+                                               double const s_min,
                                                double const parameter_a,
                                                double const parameter_n,
                                                double const parameter_m,
                                                double const parameter_psi_r)
     : _medium(m),
       _s_max(s_max),
+      _s_min(s_min),
       _parameter_a(parameter_a),
       _parameter_n(parameter_n),
       _parameter_m(parameter_m),
@@ -42,16 +46,19 @@ PropertyDataType SaturationFredlund::value(VariableArray const& v)
     double const pc = std::max(0., getScalar(v[capillary_pressure]));
 
     const double s_max = _s_max;
+    const double s_min = _s_min;
     const double a = _parameter_a;
     const double n = _parameter_n;
     const double m = _parameter_m;
     const double psi_r = _parameter_psi_r;
 
     const double A = eulersNumber + std::pow(pc/a, n);
-    const double B = s_max * std::pow(std::log(A), -m);
+    const double B = 1.0 / std::pow(std::log(A), m);
     const double C = 1. - std::log(1 + pc/psi_r) / std::log(1 + 1.e9/psi_r);
 
-    return B*C;
+    const double s_eff = B*C;
+    const double s_L = s_eff * (s_max - s_min) + s_min;
+    return s_L;
 }
 
 PropertyDataType SaturationFredlund::dvalue(VariableArray const& v,
@@ -64,6 +71,7 @@ PropertyDataType SaturationFredlund::dvalue(VariableArray const& v,
     double const pc = std::max(0., getScalar(v[capillary_pressure]));
 
     const double s_max = _s_max;
+    const double s_min = _s_min;
     const double a = _parameter_a;
     const double n = _parameter_n;
     const double m = _parameter_m;
@@ -78,7 +86,9 @@ PropertyDataType SaturationFredlund::dvalue(VariableArray const& v,
     const double dB = D * std::pow(std::log(A),-m-1.);
     const double dC = -1./((pc+psi_r)*std::log((psi_r + 1.e9)/psi_r));
 
-    return dB*C + dC*B;
+    const double ds_eff_dpc = dB*C + dC*B;
+    const double ds_L_dpc = ds_eff_dpc * (s_max - s_min);
+    return ds_L_dpc;
 }
 
 PropertyDataType SaturationFredlund::ddvalue(VariableArray const& v,
@@ -86,13 +96,14 @@ PropertyDataType SaturationFredlund::ddvalue(VariableArray const& v,
                                                 Variables const pv2)
 {
     assert((pv1 == Variables::capillary_pressure) &&
-            (pv1 == Variables::capillary_pressure) &&
+            (pv2 == Variables::capillary_pressure) &&
             "SaturationFredlund::ddvalue is implemented for 2nd derivatives"
             "with respect to capillary pressure only.");
 
     double const pc = std::max(0., getScalar(v[capillary_pressure]));
 
     const double s_max = _s_max;
+    const double s_min = _s_min;
     const double a = _parameter_a;
     const double n = _parameter_n;
     const double m = _parameter_m;
@@ -115,7 +126,7 @@ PropertyDataType SaturationFredlund::ddvalue(VariableArray const& v,
 
     const double d2sldpc2 = ddB*C + 2*dC*dB + B*ddC;
 
-    return d2sldpc2;
+    return d2sldpc2 * (s_max - s_min);
 }
 
 }  // namespace MaterialPropertyLib

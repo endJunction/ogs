@@ -27,6 +27,7 @@ class SaturationFredlund final : public Property
 public:
     /// Constructor passing a pointer to the medium.
     SaturationFredlund(Medium* m, double const s_max,
+            double const s_min,
             double const parameter_a,
             double const parameter_n,
             double const parameter_m,
@@ -44,6 +45,7 @@ public:
 private:
     Medium* _medium;
     double const _s_max;
+    double const _s_min;
     double const _parameter_a;
     double const _parameter_n;
     double const _parameter_m;
@@ -70,8 +72,11 @@ inline std::unique_ptr<SaturationFredlund> createSaturationFredlund<Medium*>(
     DBUG("Create SaturationFredlund medium property");
 
     auto const s_max =
-        //! \ogs_file_param{prj__media__medium__properties__property__SaturationFredlund__parameter_a}
+        //! \ogs_file_param{prj__media__medium__properties__property__SaturationFredlund__s_max}
         config.getConfigParameter<double>("s_max");
+    auto const s_min =
+        //! \ogs_file_param{prj__media__medium__properties__property__SaturationFredlund__s_min}
+        config.getConfigParameter<double>("s_min");
     auto const parameter_a =
         //! \ogs_file_param{prj__media__medium__properties__property__SaturationFredlund__parameter_a}
         config.getConfigParameter<double>("parameter_a");
@@ -86,7 +91,7 @@ inline std::unique_ptr<SaturationFredlund> createSaturationFredlund<Medium*>(
         config.getConfigParameter<double>("parameter_psi_r");
 
     return std::make_unique<SaturationFredlund>(medium,
-            s_max, parameter_a,parameter_n,parameter_m,parameter_psi_r );
+            s_max, s_min, parameter_a,parameter_n,parameter_m,parameter_psi_r );
 }
 
 }  // MaterialPropertyLib
