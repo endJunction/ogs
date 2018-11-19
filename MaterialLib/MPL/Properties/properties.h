@@ -17,6 +17,7 @@
 #include "pConstant.h"
 #include "pIdealGasLaw.h"
 #include "pLinearTemperature.h"
+#include "pLinearPressure.h"
 #include "pPengRobinson.h"
 #include "pSaturationBrooksCorey.h"
 #include "pSaturationFredlund.h"

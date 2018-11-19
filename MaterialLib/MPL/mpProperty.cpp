@@ -179,6 +179,10 @@ std::unique_ptr<Property> selectProperty(BaseLib::ConfigTree const& config,
     {
         return std::make_unique<LinearTemperature>(M);
     }
+    if (boost::iequals(property_type, "LinearPressure"))
+    {
+        return createLinearPressure(config, M);
+    }
     if (boost::iequals(property_type, "LinearEpsilon"))
     {
         OGS_FATAL("TODO: Implementation of %s property!!", property_type.c_str());
