@@ -31,7 +31,8 @@ std::unique_ptr<Process> createTwoPhaseFlowWithPPProcess(
     BaseLib::ConfigTree const& config,
     std::map<std::string,
              std::unique_ptr<MathLib::PiecewiseLinearInterpolation>> const&
-        curves)
+        curves,
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media)
 {
     //! \ogs_file_param{prj__processes__process__type}
     config.checkConfigParameter("type", "TWOPHASE_FLOW_PP");
@@ -92,7 +93,8 @@ std::unique_ptr<Process> createTwoPhaseFlowWithPPProcess(
                                                    parameters);
 
     TwoPhaseFlowWithPPProcessData process_data{
-        specific_body_force, has_gravity, mass_lumping, temperature, std::move(material)};
+        specific_body_force, has_gravity, mass_lumping, temperature,
+        std::move(material), media, materialIDs(mesh)};
 
     return std::make_unique<TwoPhaseFlowWithPPProcess>(
         mesh, std::move(jacobian_assembler), parameters, integration_order,

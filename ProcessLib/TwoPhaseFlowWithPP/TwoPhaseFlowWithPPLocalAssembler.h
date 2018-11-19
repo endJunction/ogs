@@ -27,6 +27,8 @@ namespace ProcessLib
 {
 namespace TwoPhaseFlowWithPP
 {
+namespace MPL = MaterialPropertyLib;
+
 template <typename NodalRowVectorType, typename GlobalDimNodalMatrixType,
           typename NodalMatrixType>
 struct IntegrationPointData final
@@ -82,6 +84,18 @@ public:
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& /*cache*/) const = 0;
 
+    virtual std::vector<double> const& getIntPtRelPermGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
+    virtual std::vector<double> const& getIntPtRelPermLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
     virtual std::vector<double> const& getIntPtVelocityGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
@@ -132,9 +146,13 @@ public:
           _pressure_wet(
               std::vector<double>(_integration_method.getNumberOfPoints())),
           _density_gas(
-                  std::vector<double>(_integration_method.getNumberOfPoints())),
+              std::vector<double>(_integration_method.getNumberOfPoints())),
           _density_liquid(
-                  std::vector<double>(_integration_method.getNumberOfPoints())),
+              std::vector<double>(_integration_method.getNumberOfPoints())),
+          _rel_perm_gas(
+              std::vector<double>(_integration_method.getNumberOfPoints())),
+          _rel_perm_liquid(
+              std::vector<double>(_integration_method.getNumberOfPoints())),
           _velocity_gas(
                   std::vector<double>(GlobalDim*_integration_method.getNumberOfPoints())),
           _velocity_liquid(
@@ -147,6 +165,25 @@ public:
             initShapeMatrices<ShapeFunction, ShapeMatricesType,
                               IntegrationMethod, GlobalDim>(
                 element, is_axially_symmetric, _integration_method);
+
+        auto const material_id = _process_data.material_ids
+                ? (*_process_data.material_ids)[_element.getID()]
+                : 0;
+        try
+        {
+            medium = _process_data.media.at(material_id).get();
+            if (medium==nullptr)
+            {
+                OGS_FATAL("Medium for material ID %d was not created.",
+                        material_id);
+            }
+        }
+        catch(std::out_of_range)
+        {
+            OGS_FATAL("Requested material ID %d not found in MPL::media.",
+                    material_id);
+        }
+
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             auto const& sm = shape_matrices[ip];
@@ -213,6 +250,26 @@ public:
         return _density_liquid;
     }
 
+    std::vector<double> const& getIntPtRelPermGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_rel_perm_gas.empty());
+        return _rel_perm_gas;
+    }
+
+    std::vector<double> const& getIntPtRelPermLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_rel_perm_liquid.empty());
+        return _rel_perm_liquid;
+    }
+
     std::vector<double> const& getIntPtVelocityGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
@@ -237,6 +294,8 @@ public:
 private:
     MeshLib::Element const& _element;
 
+    MPL::Medium const* medium = nullptr;
+
     IntegrationMethod const _integration_method;
 
     TwoPhaseFlowWithPPProcessData const& _process_data;
@@ -252,6 +311,8 @@ private:
     std::vector<double> _saturation;
     std::vector<double> _density_gas;
     std::vector<double> _density_liquid;
+    std::vector<double> _rel_perm_gas;
+    std::vector<double> _rel_perm_liquid;
     std::vector<double> _velocity_gas;
     std::vector<double> _velocity_liquid;
 

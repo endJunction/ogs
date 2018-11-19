@@ -11,6 +11,7 @@
 
 #include "MathLib/InterpolationAlgorithms/PiecewiseLinearInterpolation.h"
 #include "NumLib/DOF/LocalToGlobalIndexMap.h"
+#include "MaterialLib/MPL/mpMedium.h"
 #include "ProcessLib/Process.h"
 #include "TwoPhaseFlowWithPPLocalAssembler.h"
 

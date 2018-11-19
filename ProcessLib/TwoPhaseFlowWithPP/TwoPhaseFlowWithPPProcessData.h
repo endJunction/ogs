@@ -9,7 +9,10 @@
 
 #pragma once
 #include "TwoPhaseFlowWithPPMaterialProperties.h"
-
+namespace MaterialPropertyLib
+{
+class Medium;
+}
 namespace ProcessLib
 {
 template <typename T>
@@ -24,12 +27,16 @@ struct TwoPhaseFlowWithPPProcessData
         bool const has_gravity_,
         bool const has_mass_lumping_,
         Parameter<double> const& temperature_,
-        std::unique_ptr<TwoPhaseFlowWithPPMaterialProperties>&& material_)
+        std::unique_ptr<TwoPhaseFlowWithPPMaterialProperties>&& material_,
+        std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media_,
+        MeshLib::PropertyVector<int> const* material_ids_)
         : specific_body_force(specific_body_force_),
           has_gravity(has_gravity_),
           has_mass_lumping(has_mass_lumping_),
           temperature(temperature_),
-          material(std::move(material_))
+          material(std::move(material_)),
+          media(media_),
+          material_ids(material_ids_)
 
     {
     }
@@ -39,7 +46,9 @@ struct TwoPhaseFlowWithPPProcessData
           has_gravity(other.has_gravity),
           has_mass_lumping(other.has_mass_lumping),
           temperature(other.temperature),
-          material(std::move(other.material))
+          material(std::move(other.material)),
+          media(other.media),
+          material_ids(other.material_ids)
     {
     }
 
@@ -64,6 +73,8 @@ struct TwoPhaseFlowWithPPProcessData
     bool const has_mass_lumping;
     Parameter<double> const& temperature;
     std::unique_ptr<TwoPhaseFlowWithPPMaterialProperties> material;
+    std::map<int, std::unique_ptr<MaterialPropertyLib::Medium>> const& media;
+    MeshLib::PropertyVector<int> const* const material_ids;
 };
 
 }  // namespace TwoPhaseFlowWithPP
