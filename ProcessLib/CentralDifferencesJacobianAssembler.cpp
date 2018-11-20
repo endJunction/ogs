@@ -131,9 +131,9 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
     for (Eigen::MatrixXd::Index i = 0; i < num_r_c; ++i)
     {
         // assume that local_x_data is ordered by component.
-//        auto const component = i / num_dofs_per_component;
-//        auto const eps = _absolute_epsilons[component];
-        auto const eps = 1.0e-8;
+        auto const component = i / num_dofs_per_component;
+        auto const eps = _absolute_epsilons[component];
+//        auto const eps = 1.0e-8;
 
         local_x_perturbed_data_[i] += eps;
         local_assembler.assemble(t, local_x_perturbed_data_, local_M_data,
@@ -199,12 +199,16 @@ void CentralDifferencesJacobianAssembler::assembleWithJacobian(
         local_Jac.noalias() += local_K * dx_dx;
     }
 
-    auto local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
-    auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
-    auto const local_b =
-                 MathLib::toVector<Eigen::VectorXd>(local_b_data, num_r_c);
+//    auto local_M = MathLib::toMatrix(local_M_data, num_r_c, num_r_c);
+//    auto local_K = MathLib::toMatrix(local_K_data, num_r_c, num_r_c);
+//    auto const local_b =
+//                 MathLib::toVector<Eigen::VectorXd>(local_b_data, num_r_c);
+//
+//    auto res = (local_M * local_xdot + local_K * local_x - local_b).eval();
 
-    auto res = (local_M * local_xdot + local_K * local_x - local_b).eval();
+//        std::cout << "\n=======================\n";
+//        std::cout << " local_J : \n" << local_Jac << "\n";
+//        std::cout << "\n=======================\n";
 
 
 //    std::cout << " local_x_dot:\n" << local_xdot << "\n";
