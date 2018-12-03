@@ -68,7 +68,12 @@ PropertyDataType SaturationFredlund::dvalue(VariableArray const& v,
            "SaturationFredlund::dvalue is implemented for derivatives with "
            "respect to capillary pressure only.");
 
-    double const pc = std::max(0., getScalar(v[capillary_pressure]));
+    double const pc = getScalar(v[capillary_pressure]);
+
+    if (pc <= 0.)
+    {
+    	return 0.;
+    }
 
     const double s_max = _s_max;
     const double s_min = _s_min;
@@ -100,7 +105,12 @@ PropertyDataType SaturationFredlund::ddvalue(VariableArray const& v,
             "SaturationFredlund::ddvalue is implemented for 2nd derivatives"
             "with respect to capillary pressure only.");
 
-    double const pc = std::max(0., getScalar(v[capillary_pressure]));
+    double const pc = getScalar(v[capillary_pressure]);
+
+    if (pc <= 0.)
+    {
+    	return 0.;
+    }
 
     const double s_max = _s_max;
     const double s_min = _s_min;
