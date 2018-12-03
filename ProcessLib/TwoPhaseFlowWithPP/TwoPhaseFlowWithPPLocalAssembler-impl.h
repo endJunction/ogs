@@ -190,6 +190,8 @@ void TwoPhaseFlowWithPPLocalAssembler<
         _pressure_wet[ip] = p_LR;
         _density_gas[ip] = rho_GR;
         _density_liquid[ip] = rho_LR;
+        _viscosity_gas[ip] = mu_GR;
+        _viscosity_liquid[ip] = mu_LR;
         _rel_perm_gas[ip] = k_rel_GR;
         _rel_perm_liquid[ip] = k_rel_LR;
 

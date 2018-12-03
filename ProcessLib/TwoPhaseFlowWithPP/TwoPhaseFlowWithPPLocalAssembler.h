@@ -84,6 +84,18 @@ public:
         NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
         std::vector<double>& /*cache*/) const = 0;
 
+    virtual std::vector<double> const& getIntPtViscosityGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
+    virtual std::vector<double> const& getIntPtViscosityLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const = 0;
+
     virtual std::vector<double> const& getIntPtRelPermGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
@@ -149,6 +161,10 @@ public:
               std::vector<double>(_integration_method.getNumberOfPoints())),
           _density_liquid(
               std::vector<double>(_integration_method.getNumberOfPoints())),
+	      _viscosity_gas(
+	          std::vector<double>(_integration_method.getNumberOfPoints())),
+	      _viscosity_liquid(
+	          std::vector<double>(_integration_method.getNumberOfPoints())),
           _rel_perm_gas(
               std::vector<double>(_integration_method.getNumberOfPoints())),
           _rel_perm_liquid(
@@ -250,6 +266,26 @@ public:
         return _density_liquid;
     }
 
+    std::vector<double> const& getIntPtViscosityGas(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_viscosity_gas.empty());
+        return _viscosity_gas;
+    }
+
+    std::vector<double> const& getIntPtViscosityLiquid(
+        const double /*t*/,
+        GlobalVector const& /*current_solution*/,
+        NumLib::LocalToGlobalIndexMap const& /*dof_table*/,
+        std::vector<double>& /*cache*/) const override
+    {
+        assert(!_viscosity_liquid.empty());
+        return _viscosity_liquid;
+    }
+
     std::vector<double> const& getIntPtRelPermGas(
         const double /*t*/,
         GlobalVector const& /*current_solution*/,
@@ -311,6 +347,8 @@ private:
     std::vector<double> _saturation;
     std::vector<double> _density_gas;
     std::vector<double> _density_liquid;
+    std::vector<double> _viscosity_gas;
+    std::vector<double> _viscosity_liquid;
     std::vector<double> _rel_perm_gas;
     std::vector<double> _rel_perm_liquid;
     std::vector<double> _velocity_gas;

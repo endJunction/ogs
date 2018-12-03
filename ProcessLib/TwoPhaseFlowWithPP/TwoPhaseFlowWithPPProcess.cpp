@@ -82,6 +82,18 @@ void TwoPhaseFlowWithPPProcess::initializeConcreteProcess(
             &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtDensityLiquid));
 
     _secondary_variables.addSecondaryVariable(
+        "viscosity_gas",
+        makeExtrapolator(
+            1, getExtrapolator(), _local_assemblers,
+            &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtViscosityGas));
+
+    _secondary_variables.addSecondaryVariable(
+        "viscosity_liquid",
+        makeExtrapolator(
+            1, getExtrapolator(), _local_assemblers,
+            &TwoPhaseFlowWithPPLocalAssemblerInterface::getIntPtViscosityLiquid));
+
+    _secondary_variables.addSecondaryVariable(
         "rel_perm_gas",
         makeExtrapolator(
             1, getExtrapolator(), _local_assemblers,

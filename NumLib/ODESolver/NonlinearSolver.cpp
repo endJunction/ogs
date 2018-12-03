@@ -172,6 +172,7 @@ void NonlinearSolver<NonlinearSolverTag::Newton>::assemble(
     //      equation every time and could not forget it.
 }
 
+//static int count = 0;
 bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
     GlobalVector& x,
     std::function<void(unsigned, GlobalVector const&)> const& postIterationCallback)
@@ -229,6 +230,8 @@ bool NonlinearSolver<NonlinearSolverTag::Newton>::solve(
         if (!sys.isLinear() && _convergence_criterion->hasResidualCheck())
             _convergence_criterion->checkResidual(res);
 
+	//J.write("/tmp/J." + std::to_string(count++));
+	
         BaseLib::RunTime time_linear_solver;
         time_linear_solver.start();
         bool iteration_succeeded = _linear_solver.solve(J, res, minus_delta_x);
