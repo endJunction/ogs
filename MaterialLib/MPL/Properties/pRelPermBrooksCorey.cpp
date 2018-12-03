@@ -23,12 +23,16 @@ namespace MaterialPropertyLib
 {
 RelPermBrooksCorey::RelPermBrooksCorey(Medium* m,
         const double residual_liquid_saturation,
-        const double residual_gas_saturation,
+		const double residual_gas_saturation,
+		const double k_rel_min_liquid,
+		const double k_rel_min_gas,
         const double exponent)
 
 : _medium(m),
   _residual_liquid_saturation(residual_liquid_saturation),
   _residual_gas_saturation(residual_gas_saturation),
+  _k_rel_min_liquid(k_rel_min_liquid),
+  _k_rel_min_gas(k_rel_min_gas),
   _exponent(exponent){};
 
 /**
@@ -40,14 +44,27 @@ PropertyDataType  RelPermBrooksCorey::value(VariableArray const& v)
 
     const double s_L_res = _residual_liquid_saturation;
     const double s_L_max = 1. - _residual_gas_saturation;
+    const double k_rel_min_LR = _k_rel_min_liquid;
+    const double k_rel_min_GR = _k_rel_min_gas;
+
     const double lambda = _exponent;
 
     const double s_eff = (s_L - s_L_res)/(s_L_max - s_L_res);
 
+    if (s_eff > 1.0)
+    {
+    	return Pair {{1.0, 0.0}};
+    }
+    if (s_eff < 0.0)
+    {
+    	return Pair {{0.0, 1.0}};
+    }
+
     const double k_rel_LR = std::pow(s_eff, (2.+3.*lambda)/lambda);
     const double k_rel_GR = (1.-s_eff)*(1. - s_eff) * (1. - std::pow(s_eff, (2.+lambda)/lambda));
 
-    const Pair kRel = {k_rel_LR, k_rel_GR};
+    const Pair kRel = {std::max(k_rel_LR, k_rel_min_LR),
+    		std::max(k_rel_GR, k_rel_min_GR)};
 
     return kRel;
 }

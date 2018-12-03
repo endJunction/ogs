@@ -27,11 +27,14 @@ private:
     Medium* _medium;
     const double _residual_liquid_saturation;
     const double _residual_gas_saturation;
+    const double _k_rel_min_liquid;
+    const double _k_rel_min_gas;
     const double _exponent;
 
 public:
     /// Constructor passing a pointer to the medium.
-    RelPermBrooksCorey(Medium*, const double, const double, const double);
+    RelPermBrooksCorey(Medium*, const double, const double,
+    		const double, const double, const double);
 
     /// This method overrides the base class implementation and
     /// actually computes and sets the property _value.
@@ -64,12 +67,19 @@ inline std::unique_ptr<RelPermBrooksCorey> createRelPermBrooksCorey<Medium*>(
     auto const residual_gas_saturation =
         //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey__residual_gas_saturation}
         config.getConfigParameter<double>("residual_gas_saturation");
+    auto const k_rel_min_liquid =
+        //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey__k_rel_min_liquid}
+        config.getConfigParameter<double>("k_rel_min_liquid");
+    auto const k_rel_min_gas =
+        //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey__k_rel_min_gas}
+        config.getConfigParameter<double>("k_rel_min_gas");
     auto const exponent =
         //! \ogs_file_param{prj__media__medium__properties__property__RelPermBrooksCorey__lambda}
         config.getConfigParameter<double>("lambda");
 
     return std::make_unique<RelPermBrooksCorey>(medium,
-            residual_liquid_saturation, residual_gas_saturation, exponent);
+            residual_liquid_saturation, residual_gas_saturation,
+			k_rel_min_liquid, k_rel_min_gas, exponent);
 }
 
 
