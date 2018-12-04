@@ -63,7 +63,6 @@ public:
     using ShapeMatrices = typename ShapeMatricesType::ShapeMatrices;
     using BMatricesType = BMatrixPolicyType<ShapeFunction, DisplacementDim>;
 
-    using BMatrixType = typename BMatricesType::BMatrixType;
     using StiffnessMatrixType = typename BMatricesType::StiffnessMatrixType;
     using NodalForceVectorType = typename BMatricesType::NodalForceVectorType;
     using NodalDisplacementVectorType =
@@ -335,10 +334,6 @@ public:
             auto const x_coord =
                 interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
                     _element, N);
-            auto const B = LinearBMatrix::computeBMatrix<
-                DisplacementDim, ShapeFunction::NPOINTS,
-                typename BMatricesType::BMatrixType>(dNdx, N, x_coord,
-                                                     _is_axially_symmetric);
             auto const& eps_prev = _ip_data[ip].eps_prev;
             auto const& sigma_prev = _ip_data[ip].sigma_prev;
 
@@ -348,10 +343,14 @@ public:
             auto& state = _ip_data[ip].material_state_variables;
             double const& damage_prev = _ip_data[ip].damage_prev;
 
-            eps.noalias() =
-                B *
+            auto u =
                 Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
                     local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
+
+            eps.noalias() =
+                LinearBMatrix::computeStrain<DisplacementDim,
+                                             ShapeFunction::NPOINTS>(
+                    u, dNdx, N, x_coord, _is_axially_symmetric);
 
             // sigma is for plastic part only.
             std::unique_ptr<
@@ -544,7 +543,6 @@ public:
         {
             x_position.setIntegrationPoint(ip);
             auto const& w = _ip_data[ip].integration_weight;
-            auto const& N = _ip_data[ip].N;
             auto const& dNdx = _ip_data[ip].dNdx;
             auto const& d = _ip_data[ip].damage;
 
@@ -553,6 +551,9 @@ public:
                                         ShapeFunction::NPOINTS>(u, dNdx);
             crack_volume += div_u * d * w;
         }
+        // TODO (naumov) Under the assumption, that the damage does not cross
+        // the domain boindary the above calculation is correct. Otherwise
+        // boundary integral of u*d must be subtracted from the crack_volume.
     }
 
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(
