@@ -25,8 +25,7 @@
 #include "NumLib/Fem/ShapeMatrixPolicy.h"
 #include "NumLib/Function/Interpolation.h"
 #include "ProcessLib/Deformation/BMatrixPolicy.h"
-#include "ProcessLib/Deformation/GMatrix.h"
-#include "ProcessLib/Deformation/GMatrixPolicy.h"
+#include "ProcessLib/Deformation/Divergence.h"
 #include "ProcessLib/Deformation/LinearBMatrix.h"
 #include "ProcessLib/LocalAssemblerTraits.h"
 #include "ProcessLib/Parameter/Parameter.h"
@@ -69,10 +68,6 @@ public:
     using NodalForceVectorType = typename BMatricesType::NodalForceVectorType;
     using NodalDisplacementVectorType =
         typename BMatricesType::NodalForceVectorType;
-
-    using GMatricesType = GMatrixPolicyType<ShapeFunction, DisplacementDim>;
-    using GradientVectorType = typename GMatricesType::GradientVectorType;
-    using GradientMatrixType = typename GMatricesType::GradientMatrixType;
 
     SmallDeformationNonlocalLocalAssembler(
         SmallDeformationNonlocalLocalAssembler const&) = delete;
@@ -461,7 +456,6 @@ public:
                                                      _is_axially_symmetric);
 
             auto& sigma = _ip_data[ip].sigma;
-            auto sigma_r = _ip_data[ip].sigma;  // TODO (naumov) not a ref?
             auto& C = _ip_data[ip].C;
             double& damage = _ip_data[ip].damage;
 
@@ -511,9 +505,7 @@ public:
                 sigma = sigma * (1. - damage);
             }
 
-            sigma_r = sigma;
-
-            local_b.noalias() -= B.transpose() * sigma_r * w;
+            local_b.noalias() -= B.transpose() * sigma * w;
             local_Jac.noalias() += B.transpose() * C * (1. - damage) * B * w;
         }
     }
@@ -556,19 +548,10 @@ public:
             auto const& dNdx = _ip_data[ip].dNdx;
             auto const& d = _ip_data[ip].damage;
 
-            auto const& x_coord =
-                interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
-                    _element, N);
-            GradientMatrixType G(DisplacementDim * DisplacementDim +
-                                     (DisplacementDim == 2 ? 1 : 0),
-                                 DisplacementDim * ShapeFunction::NPOINTS);
-            Deformation::computeGMatrix<DisplacementDim,
-                                        ShapeFunction::NPOINTS>(
-                dNdx, G, _is_axially_symmetric, N, x_coord);
-
-            // TODO (naumov) Simplify divergence(u) computation.
-            auto const Gu = (G * u).eval();
-            crack_volume += (Gu[0] + Gu[3]) * d * w;
+            double const div_u =
+                Deformation::divergence<DisplacementDim,
+                                        ShapeFunction::NPOINTS>(u, dNdx);
+            crack_volume += div_u * d * w;
         }
     }
 
