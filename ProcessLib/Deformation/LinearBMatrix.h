@@ -125,5 +125,47 @@ MathLib::KelvinVector::KelvinVectorType<3> computeStrain(
 
     return strain;
 }
+
+// Overload for 2D case.
+template <int DisplacementDim,
+          int NPOINTS,
+          typename N_Type,
+          typename DNDX_Type,
+          typename std::enable_if_t<DisplacementDim == 2>* = nullptr>
+Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> const computeInternalForces(
+    MathLib::KelvinVector::KelvinVectorType<DisplacementDim> const& sigma,
+    DNDX_Type const& dNdx,
+    N_Type const& N,
+    const double radius,
+    const bool is_axially_symmetric)
+{
+    Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> forces;
+    forces.template segment<NPOINTS>(0 * NPOINTS) =
+        (dNdx.row(0) * sigma[0] + dNdx.row(1) * (sigma[3] / std::sqrt(2.)))
+            .transpose();
+    forces.template segment<NPOINTS>(1 * NPOINTS) =
+        (dNdx.row(1) * sigma[1] + dNdx.row(0) * (sigma[3] / std::sqrt(2.)))
+            .transpose();
+
+    return forces;
+}
+
+// Overload for 3D case.
+template <int DisplacementDim,
+          int NPOINTS,
+          typename N_Type,
+          typename DNDX_Type,
+          typename std::enable_if_t<DisplacementDim == 3>* = nullptr>
+Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> const computeInternalForces(
+    MathLib::KelvinVector::KelvinVectorType<DisplacementDim> const& sigma,
+    DNDX_Type const& dNdx,
+    N_Type const& N,
+    const double radius,
+    const bool is_axially_symmetric)
+{
+    Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> forces;
+
+    return forces;
+}
 }  // namespace LinearBMatrix
 }  // namespace ProcessLib

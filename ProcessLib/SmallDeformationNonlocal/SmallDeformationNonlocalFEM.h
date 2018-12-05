@@ -504,7 +504,11 @@ public:
                 sigma = sigma * (1. - damage);
             }
 
-            local_b.noalias() -= B.transpose() * sigma * w;
+            local_b.noalias() -=
+                LinearBMatrix::computeInternalForces<DisplacementDim,
+                                                     ShapeFunction::NPOINTS>(
+                    sigma, dNdx, N, x_coord, _is_axially_symmetric) *
+                w;
             local_Jac.noalias() += B.transpose() * C * (1. - damage) * B * w;
         }
     }
