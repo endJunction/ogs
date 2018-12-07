@@ -167,5 +167,59 @@ Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> const computeInternalForces(
 
     return forces;
 }
+
+// Overload for 2D case.
+template <int DisplacementDim,
+          int NPOINTS,
+          typename N_Type,
+          typename DNDX_Type,
+          typename std::enable_if_t<DisplacementDim == 2>* = nullptr>
+Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> const computeBCBProduct(
+    MathLib::KelvinVector::KelvinMatrixType<DisplacementDim> const& C,
+    DNDX_Type const& dNdx,
+    N_Type const& N,
+    const double radius,
+    const bool is_axially_symmetric)
+{
+    // Intermediate matrix holding the B^T * C product.
+    Eigen::Matrix<double, DisplacementDim * NPOINTS, 4> bc;
+    for (int i = 0; i < 4; ++i)
+    {
+        // TODO if is_axially_symmetric
+        bc.template block<NPOINTS, 1>(0 * NPOINTS, i) =
+            dNdx.row(0) * C(0, i) + dNdx.row(1) * (C(3, i) / std::sqrt(2.));
+
+        bc.template block<NPOINTS, 1>(1 * NPOINTS, i) =
+            dNdx.row(0) * (C(3, i) / std::sqrt(2.)) + dNdx.row(1) * C(1, i);
+    }
+
+    Eigen::Matrix<double, DisplacementDim * NPOINTS, DisplacementDim * NPOINTS> bcb;
+    forces.template segment<NPOINTS>(0 * NPOINTS) =
+        (dNdx.row(0) * sigma[0] + dNdx.row(1) * (sigma[3] / std::sqrt(2.)))
+            .transpose();
+    forces.template segment<NPOINTS>(1 * NPOINTS) =
+        (dNdx.row(1) * sigma[1] + dNdx.row(0) * (sigma[3] / std::sqrt(2.)))
+            .transpose();
+
+    return bcb;
+}
+
+// Overload for 3D case.
+template <int DisplacementDim,
+          int NPOINTS,
+          typename N_Type,
+          typename DNDX_Type,
+          typename std::enable_if_t<DisplacementDim == 3>* = nullptr>
+Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> const computeInternalForces(
+    MathLib::KelvinVector::KelvinVectorType<DisplacementDim> const& sigma,
+    DNDX_Type const& dNdx,
+    N_Type const& N,
+    const double radius,
+    const bool is_axially_symmetric)
+{
+    Eigen::Matrix<double, DisplacementDim * NPOINTS, 1> forces;
+
+    return forces;
+}
 }  // namespace LinearBMatrix
 }  // namespace ProcessLib
