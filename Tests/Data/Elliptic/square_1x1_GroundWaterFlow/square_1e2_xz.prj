@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <OpenGeoSysProject>
-    <mesh>square_1x1_quad_1e2.vtu</mesh>
-    <geometry>square_1x1.gml</geometry>
+    <mesh>square_1x1_xz_quad_1e2.vtu</mesh>
+    <geometry>square_1x1_xz.gml</geometry>
+    <search_length_algorithm>
+        <type>fixed</type>
+        <value>1e-2</value>
+    </search_length_algorithm>
     <processes>
         <process>
             <name>GW23</name>
@@ -41,7 +45,7 @@
         </processes>
         <output>
             <type>VTK</type>
-            <prefix>square_1e2</prefix>
+            <prefix>square_1e2_xz</prefix>
         </output>
     </time_loop>
     <nonlinear_solvers>

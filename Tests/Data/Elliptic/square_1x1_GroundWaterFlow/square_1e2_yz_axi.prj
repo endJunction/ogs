@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <OpenGeoSysProject>
-    <mesh axially_symmetric="true">square_1x1_quad_1e2.vtu</mesh>
-    <geometry>square_1x1_axi.gml</geometry>
+    <mesh axially_symmetric="true">square_1x1_yz_quad_1e2.vtu</mesh>
+    <geometry>square_1x1_yz_axi.gml</geometry>
     <processes>
         <process>
             <name>GW23</name>
@@ -41,7 +41,7 @@
         </processes>
         <output>
             <type>VTK</type>
-            <prefix>square_1e2_axi</prefix>
+            <prefix>square_1e2_yz_axi</prefix>
         </output>
     </time_loop>
     <nonlinear_solvers>
