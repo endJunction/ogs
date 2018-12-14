@@ -189,11 +189,11 @@ void RichardsMechanicsLocalAssembler<
                                           typename BMatricesType::BMatrixType>(
                 dNdx_u, N_u, x_coord, _is_axially_symmetric);
 
-        double p_cap_ip;
+        // double const p_atm = 0; // p_cap = p_GR - p_LR, whith p_GR = p_atm
+        auto& p_cap_ip = _ip_data[ip].p_cap;
         NumLib::shapeFunctionInterpolate(-p_L, N_p, p_cap_ip);
 
         auto& eps = _ip_data[ip].eps;
-        auto& S_L = _ip_data[ip].saturation;
 
         auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
         auto const rho_SR = _process_data.solid_density(t, x_position)[0];
@@ -209,12 +209,13 @@ void RichardsMechanicsLocalAssembler<
             MathLib::KelvinVector::KelvinVectorDimensions<
                 DisplacementDim>::value>::identity2;
 
+        auto& S_L = _ip_data[ip].saturation;
         S_L = _process_data.flow_material->getSaturation(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);
-
-        double const dS_L_dp_cap =
-            _process_data.flow_material->getSaturationDerivative(
-                material_id, t, x_position, -p_cap_ip, temperature, S_L);
+        auto const& p_cap_ip_prev = _ip_data[ip].p_cap_prev;
+        double const S_L_prev = _process_data.flow_material->getSaturation(
+            material_id, t, x_position, -p_cap_ip_prev, temperature,
+            p_cap_ip_prev);
 
         double const k_rel =
             _process_data.flow_material->getRelativePermeability(
@@ -251,20 +252,21 @@ void RichardsMechanicsLocalAssembler<
         // pressure equation, pressure part.
         //
         double const a0 = S_L * (alpha - porosity) / K_SR;
-        // Volumetric average specific storage of the solid and fluid phases.
-        double const specific_storage =
-            dS_L_dp_cap * (p_cap_ip * a0 - porosity) +
-            S_L * (porosity / K_LR + a0);
+        double const a_s = porosity - p_cap_ip * a0;
+        double const a_p = S_L * (porosity / K_LR + a0);
+
         M.template block<pressure_size, pressure_size>(pressure_index,
                                                        pressure_index)
-            .noalias() += N_p.transpose() * rho_LR * specific_storage * N_p * w;
+            .noalias() += N_p.transpose() * rho_LR * a_p * N_p * w;
 
         K.template block<pressure_size, pressure_size>(pressure_index,
                                                        pressure_index)
             .noalias() += dNdx_p.transpose() * rho_K_over_mu * dNdx_p * w;
 
+        double const S_L_dot = (S_L - S_L_prev) / dt;
         rhs.template segment<pressure_size>(pressure_index).noalias() +=
-            dNdx_p.transpose() * rho_LR * rho_K_over_mu * b * w;
+            dNdx_p.transpose() * rho_LR * rho_K_over_mu * b * w -
+            N_p.transpose() * rho_LR * a_s * S_L_dot * w;
 
         //
         // displacement equation, pressure part
@@ -381,7 +383,9 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
                                           typename BMatricesType::BMatrixType>(
                 dNdx_u, N_u, x_coord, _is_axially_symmetric);
 
-        double p_cap_ip;
+        auto& p_cap_ip = _ip_data[ip].p_cap;
+        auto const& p_cap_ip_prev = _ip_data[ip].p_cap_prev;
+        // double const p_atm = 0; // p_cap = p_GR - p_LR, whith p_GR = p_atm
         NumLib::shapeFunctionInterpolate(-p_L, N_p, p_cap_ip);
 
         double p_cap_dot_ip;
@@ -398,7 +402,6 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
         }
 
         auto& eps = _ip_data[ip].eps;
-        auto& S_L = _ip_data[ip].saturation;
         auto const& sigma_eff = _ip_data[ip].sigma_eff;
 
         auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
@@ -416,15 +419,16 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
             MathLib::KelvinVector::KelvinVectorDimensions<
                 DisplacementDim>::value>::identity2;
 
+        auto& S_L = _ip_data[ip].saturation;
         S_L = _process_data.flow_material->getSaturation(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);
+        double const S_L_prev = _process_data.flow_material->getSaturation(
+            material_id, t, x_position, -p_cap_ip_prev, temperature,
+            p_cap_ip_prev);
+
 
         double const dS_L_dp_cap =
             _process_data.flow_material->getSaturationDerivative(
-                material_id, t, x_position, -p_cap_ip, temperature, S_L);
-
-        double const d2S_L_dp_cap_2 =
-            _process_data.flow_material->getSaturationDerivative2(
                 material_id, t, x_position, -p_cap_ip, temperature, S_L);
 
         double const k_rel =
@@ -495,28 +499,33 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
         laplace_p.noalias() +=
             dNdx_p.transpose() * k_rel * rho_Ki_over_mu * dNdx_p * w;
 
-        double const a0 = (alpha - porosity) / K_SR;
-        double const specific_storage =
-            dS_L_dp_cap * (p_cap_ip * S_L * a0 - porosity) +
-            S_L * (porosity / K_LR + S_L * a0);
+        double const a0 = S_L * (alpha - porosity) / K_SR;
+        double const a_s = porosity - p_cap_ip * a0;
+        double const a_p = S_L * (porosity / K_LR + a0);
 
-        double const dspecific_storage_dp_cap =
-            d2S_L_dp_cap_2 * (p_cap_ip * S_L * a0 - porosity) +
-            dS_L_dp_cap *
-                (porosity / K_LR + a0 * 3 * S_L + dS_L_dp_cap * p_cap_ip * a0);
+        double const da_p_dp_cap = dS_L_dp_cap * (porosity / K_LR + 2 * a0);
+        double const da_s_dp_cap = -a0 * (1 + dS_L_dp_cap / S_L);
 
-        storage_p.noalias() +=
-            N_p.transpose() * rho_LR * specific_storage * N_p * w;
+        storage_p.noalias() += N_p.transpose() * rho_LR * a_p * N_p * w;
 
         local_Jac
             .template block<pressure_size, pressure_size>(pressure_index,
                                                           pressure_index)
-            .noalias() += N_p.transpose() * rho_LR * p_cap_dot_ip *
-                          dspecific_storage_dp_cap * N_p * w;
+            .noalias() += N_p.transpose() * rho_LR * da_p_dp_cap * N_p * w;
+
+        double const S_L_dot = (S_L - S_L_prev) / dt;
+        local_Jac
+            .template block<pressure_size, pressure_size>(pressure_index,
+                                                          pressure_index)
+            .noalias() -= N_p.transpose() * rho_LR *
+                          (S_L_dot * da_s_dp_cap + a_s / dt * dS_L_dp_cap) *
+                          N_p * w;
 
         /* In the derivation there is a div(du/dt) term in the Jacobian, but
          * this implementation increases the total runtime by 1%. Maybe a very
          * large step is needed to see the increase of efficiency.
+         * TODO (naumov) Use divergence operator from ProcessLib::Deformation
+         * when SmallDeformationNonlocal is merged.
         double div_u_dot = 0;
         for (int i = 0; i < DisplacementDim; ++i)
         {
@@ -550,7 +559,10 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
                           dk_rel_dS_l * dS_L_dp_cap * N_p * w;
 
         local_rhs.template segment<pressure_size>(pressure_index).noalias() +=
-            dNdx_p.transpose() * rho_LR * k_rel * rho_Ki_over_mu * b * w;
+            // body forces
+            dNdx_p.transpose() * rho_LR * k_rel * rho_Ki_over_mu * b * w -
+            // saturation part
+            N_p.transpose() * rho_LR * a_s * S_L_dot * w;
     }
 
     // pressure equation, pressure part.
@@ -858,7 +870,7 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
         auto const& N_p = _ip_data[ip].N_p;
         auto const temperature = _process_data.temperature(t, x_position)[0];
 
-        double p_cap_ip;
+        auto& p_cap_ip = _ip_data[ip].p_cap;
         NumLib::shapeFunctionInterpolate(-p_L, N_p, p_cap_ip);
         auto& S_L = _ip_data[ip].saturation;
         S_L = _process_data.flow_material->getSaturation(

@@ -55,6 +55,7 @@ struct IntegrationPointData final
     typename ShapeMatricesTypePressure::GlobalDimNodalMatrixType dNdx_p;
 
     double saturation;
+    double p_cap, p_cap_prev;
 
     MaterialLib::Solids::MechanicsBase<DisplacementDim> const& solid_material;
     std::unique_ptr<typename MaterialLib::Solids::MechanicsBase<
@@ -66,6 +67,7 @@ struct IntegrationPointData final
     {
         eps_prev = eps;
         sigma_eff_prev = sigma_eff;
+        p_cap_prev = p_cap;
         material_state_variables->pushBackState();
     }
 
