@@ -51,11 +51,11 @@ PropertyDataType  RelPermBrooksCorey::value(VariableArray const& v)
 
     const double s_eff = (s_L - s_L_res)/(s_L_max - s_L_res);
 
-    if (s_eff > 1.0)
+    if (s_eff >= 1.0)
     {
     	return Pair {{1.0, 0.0}};
     }
-    if (s_eff < 0.0)
+    if (s_eff <= 0.0)
     {
     	return Pair {{0.0, 1.0}};
     }
@@ -95,7 +95,7 @@ PropertyDataType  RelPermBrooksCorey::dvalue(VariableArray const& v,
             (1. - s_eff) * (1. - s_eff);
     const double dk_rel_GRdsL = dk_rel_GRdse * dsedsL;
 
-    const Pair dkReldsL = {dk_rel_LRdsL, dk_rel_GRdsL};
+    const Pair dkReldsL = {{dk_rel_LRdsL, dk_rel_GRdsL}};
 
     return dkReldsL;
 }
