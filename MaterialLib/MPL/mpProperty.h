@@ -63,6 +63,10 @@ public:
     /// This virtual method will compute the derivative of a property
     /// with respect to the given variables pv.
     virtual PropertyDataType dvalue(VariableArray const&, Variables const pv);
+    /// This virtual method will compute the second derivative of a
+    /// property with respect to the given variables pv1 and pv2.
+    virtual PropertyDataType ddvalue(VariableArray const&, Variables const pv1,
+                                     Variables const pv2);
 
 };  // class Property
 
@@ -121,12 +125,46 @@ inline Pair getPair(Property& p, VariableArray const& v)
     return boost::get<Pair>(p.value(v));
 }
 
+/// This method forces the computation of a value of type
+/// Vector and returns it
+inline Vector getVector(Property& p)
+{
+    assert((getType(p) == PropertyDataTypeName::nVector) &&
+           "The requested "
+           "value type is not of type 'Vector'");
+    return boost::get<Vector>(p.value());
+}
+
+/// This method forces the computation of a value of type
+/// Vector and returns it
+inline Vector getVector(Property& p, VariableArray const& v)
+{
+    return boost::get<Vector>(p.value(v));
+}
+/// This method forces the computation the derivative of a value,
+/// returns a pair of double values. The derivative is computed with
+/// respect to variable pv.
+inline Pair getPairDerivative(Property& p, VariableArray const& v,
+                              Variables const pv)
+{
+    return boost::get<Pair>(p.dvalue(v, pv));
+}
+
 /// This method forces the computation the derivative of a value,
 /// returns a double value. The derivative is computed with respect
 /// to variable pv.
 inline double getScalarDerivative(Property& p, VariableArray const& v, Variables const pv)
 {
     return boost::get<double>(p.dvalue(v,pv));
+}
+
+/// This method forces the computation the second derivative of a value,
+/// returns a double value. The derivative is computed with respect
+/// to variables pv1 and pv2.
+inline double getScalarDerivative(Property& p, VariableArray const& v,
+                                  Variables const pv1, Variables const pv2)
+{
+    return boost::get<double>(p.ddvalue(v, pv1, pv2));
 }
 
 /// This method returns a value of type string from the
