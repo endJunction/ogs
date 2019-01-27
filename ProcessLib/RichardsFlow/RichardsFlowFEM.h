@@ -48,6 +48,13 @@ struct IntegrationPointData final
     double const integration_weight;
     NodalMatrixType const mass_operator;
 
+    double p, p_prev;
+
+    void pushBackState()
+    {
+        p_prev = p;
+    }
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 const unsigned NUM_NODAL_DOF = 1;
@@ -167,7 +174,7 @@ public:
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             pos.setIntegrationPoint(ip);
-            double p_int_pt = 0.0;
+            double& p_int_pt = _ip_data[ip].p;
             NumLib::shapeFunctionInterpolate(local_x, _ip_data[ip].N, p_int_pt);
             const double& temperature = _process_data.temperature(t, pos)[0];
             auto const porosity = _process_data.material->getPorosity(
@@ -179,16 +186,12 @@ public:
                 material_id, t, pos, p_int_pt, temperature, pc_int_pt);
             _saturation[ip] = Sw;
 
-            double const dSw_dpc =
-                _process_data.material->getSaturationDerivative(
-                    material_id, t, pos, p_int_pt, temperature, Sw);
-
             // \TODO Extend to pressure dependent density.
             double const drhow_dp(0.0);
             auto const storage = _process_data.material->getStorage(
                 material_id, t, pos, p_int_pt, temperature, 0);
             double const mass_mat_coeff =
-                storage * Sw + porosity * Sw * drhow_dp - porosity * dSw_dpc;
+                storage * Sw + porosity * Sw * drhow_dp;
 
             local_M.noalias() += mass_mat_coeff * _ip_data[ip].mass_operator;
 
@@ -201,6 +204,14 @@ public:
                                  _ip_data[ip].dNdx *
                                  _ip_data[ip].integration_weight * (k_rel / mu);
 
+            double const& p_int_pt_prev = _ip_data[ip].p_prev;
+            double const pc_int_pt_prev = -p_int_pt_prev;
+            double const Sw_prev = _process_data.material->getSaturation(
+                material_id, t, pos, p_int_pt_prev, temperature, pc_int_pt_prev);
+            double const Sw_dot = (Sw - Sw_prev) / _process_data.dt;
+
+            local_b.noalias() += -_ip_data[ip].N.transpose() * porosity *
+                                 Sw_dot * _ip_data[ip].integration_weight;
             if (_process_data.has_gravity)
             {
                 auto const rho_w = _process_data.material->getFluidDensity(
@@ -222,6 +233,19 @@ public:
                 local_M(idx_ml, idx_ml) = mass_lump_val;
             }
         }  // end of mass lumping
+    }
+
+    void preTimestepConcrete(std::vector<double> const& /*local_x*/,
+                             double const /*t*/,
+                             double const /*delta_t*/) override
+    {
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            _ip_data[ip].pushBackState();
+        }
     }
 
     Eigen::Map<const Eigen::RowVectorXd> getShapeMatrix(

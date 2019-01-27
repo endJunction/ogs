@@ -103,5 +103,20 @@ void RichardsFlowProcess::assembleWithJacobianConcreteProcess(
         xdot, dxdot_dx, dx_dx, M, K, b, Jac, _coupled_solutions);
 }
 
+void RichardsFlowProcess::preTimestepConcreteProcess(GlobalVector const& x,
+                                                     double const t,
+                                                     double const dt,
+                                                     int const process_id)
+{
+    DBUG("PreTimestep RichardsFlowProcess.");
+    _process_data.dt = dt;
+
+    ProcessLib::ProcessVariable const& pv = getProcessVariables(process_id)[0];
+    GlobalExecutor::executeSelectedMemberOnDereferenced(
+        &LocalAssemblerInterface::preTimestep, _local_assemblers,
+        pv.getActiveElementIDs(), *_local_to_global_index_map, x, t, dt);
+}
+
+
 }  // namespace RichardsFlow
 }  // namespace ProcessLib

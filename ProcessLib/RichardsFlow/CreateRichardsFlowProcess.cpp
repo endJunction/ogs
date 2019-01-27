@@ -95,9 +95,10 @@ std::unique_ptr<Process> createRichardsFlowProcess(
     std::unique_ptr<RichardsFlowMaterialProperties> material =
         createRichardsFlowMaterialProperties(mat_config, material_ids,
                                              parameters);
-    RichardsFlowProcessData process_data{std::move(material),
-                                         specific_body_force, has_gravity,
-                                         mass_lumping, temperature};
+    RichardsFlowProcessData process_data{
+        std::move(material), specific_body_force, temperature,
+        has_gravity,         mass_lumping,
+    };
 
     return std::make_unique<RichardsFlowProcess>(
         mesh, std::move(jacobian_assembler), parameters, integration_order,

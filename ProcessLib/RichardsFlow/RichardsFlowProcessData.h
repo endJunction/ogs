@@ -22,25 +22,18 @@ struct RichardsFlowProcessData
     RichardsFlowProcessData(
         std::unique_ptr<RichardsFlowMaterialProperties>&& material_,
         Eigen::VectorXd const specific_body_force_,
+        ParameterLib::Parameter<double> const& temperature_,
         bool const has_gravity_,
-        bool const has_mass_lumping_,
-        ParameterLib::Parameter<double> const& temperature_)
+        bool const has_mass_lumping_)
         : material(std::move(material_)),
           specific_body_force(specific_body_force_),
+          temperature(temperature_),
           has_gravity(has_gravity_),
-          has_mass_lumping(has_mass_lumping_),
-          temperature(temperature_)
+          has_mass_lumping(has_mass_lumping_)
     {
     }
 
-    RichardsFlowProcessData(RichardsFlowProcessData&& other)
-        : material(std::move(other.material)),
-          specific_body_force(other.specific_body_force),
-          has_gravity(other.has_gravity),
-          has_mass_lumping(other.has_mass_lumping),
-          temperature(other.temperature)
-    {
-    }
+    RichardsFlowProcessData(RichardsFlowProcessData&&) = default;
 
     //! Copies are forbidden.
     RichardsFlowProcessData(RichardsFlowProcessData const&) = delete;
@@ -53,9 +46,10 @@ struct RichardsFlowProcessData
 
     std::unique_ptr<RichardsFlowMaterialProperties> material;
     Eigen::VectorXd const specific_body_force;
+    ParameterLib::Parameter<double> const& temperature;
+    double dt;
     bool const has_gravity;
     bool const has_mass_lumping;
-    ParameterLib::Parameter<double> const& temperature;
 };
 
 }  // namespace RichardsFlow
