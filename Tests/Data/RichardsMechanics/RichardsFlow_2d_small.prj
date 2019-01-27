@@ -89,13 +89,13 @@
                 <time_stepping>
                     <type>FixedTimeStepping</type>
                     <t_initial>0</t_initial>
-                    <t_end>2000</t_end>
+                    <t_end>10000</t_end>
                     <timesteps>
                         <pair>
                             <repeat>1</repeat>
                             <delta_t>1</delta_t>
                         </pair>
-                        <pair>
+                        <!--pair>
                             <repeat>1</repeat>
                             <delta_t>2</delta_t>
                         </pair>
@@ -110,7 +110,7 @@
                         <pair>
                             <repeat>50</repeat>
                             <delta_t>20</delta_t>
-                        </pair>
+                        </pair-->
                     </timesteps>
                 </time_stepping>
             </process>
@@ -124,7 +124,7 @@
             </meshes>
             <timesteps>
                 <pair>
-                    <repeat>9</repeat>
+                    <repeat>900000</repeat>
                     <each_steps>1</each_steps>
                 </pair>
                 <pair>

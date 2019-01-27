@@ -100,7 +100,7 @@
                             <repeat>1</repeat>
                             <delta_t>1</delta_t>
                         </pair>
-                        <pair>
+                        <!--pair>
                             <repeat>1</repeat>
                             <delta_t>2</delta_t>
                         </pair>
@@ -115,7 +115,7 @@
                         <pair>
                             <repeat>50</repeat>
                             <delta_t>20</delta_t>
-                        </pair>
+                        </pair-->
                     </timesteps>
                 </time_stepping>
             </process>
@@ -125,7 +125,7 @@
             <prefix>RichardsFlow_2d_quasinewton</prefix>
             <timesteps>
                 <pair>
-                    <repeat>9</repeat>
+                    <repeat>900000</repeat>
                     <each_steps>1</each_steps>
                 </pair>
                 <pair>
