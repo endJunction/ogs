@@ -26,26 +26,33 @@ namespace RichardsMechanics
 {
 template <int DisplacementDim>
 Eigen::Matrix<double, DisplacementDim, DisplacementDim> intrinsicPermeability(
-    double const t, ParameterLib::SpatialPosition const& x_position,
-    int const material_id,
-    RichardsFlow::RichardsFlowMaterialProperties const& material)
+    std::vector<double> const& values)
 {
-    const Eigen::MatrixXd& permeability =
-        material.getPermeability(material_id, t, x_position, DisplacementDim);
-    if (permeability.rows() == DisplacementDim)
+    switch (values.size())
     {
-        return permeability;
+        case 1:
+        {
+            return values[0] * Eigen::Matrix<double, DisplacementDim,
+                                             DisplacementDim>::Identity();
+        }
+        case DisplacementDim:
+        {
+            return Eigen::Map<Eigen::Matrix<double, DisplacementDim, 1> const>(
+                       values.data())
+                .asDiagonal();
+        }
+        case (DisplacementDim * DisplacementDim):
+        {
+            return Eigen::Map<
+                Eigen::Matrix<double, DisplacementDim, DisplacementDim> const>(
+                values.data());
+        }
+        default:
+            assert(false ||
+                   "Parameter must be a scalar, diagonal, or full "
+                   "tensor depending on spatial dimension.");
+            return {};
     }
-    if (permeability.rows() == 1)
-    {
-        return Eigen::Matrix<double, DisplacementDim,
-                             DisplacementDim>::Identity() *
-               permeability(0, 0);
-    }
-
-    OGS_FATAL(
-        "Intrinsic permeability dimension is neither %d nor one, but %dx%d.",
-        DisplacementDim, permeability.rows(), permeability.cols());
 }
 
 template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
@@ -224,10 +231,11 @@ void RichardsMechanicsLocalAssembler<
         double const mu = _process_data.flow_material->getFluidViscosity(
             -p_cap_ip, temperature);
 
+        auto const K_intrinsic = intrinsicPermeability<DisplacementDim>(
+            _process_data.intrinsic_permeability(t, x_position));
+
         GlobalDimMatrixType const rho_K_over_mu =
-            intrinsicPermeability<DisplacementDim>(
-                t, x_position, material_id, *_process_data.flow_material) *
-            (rho_LR * k_rel / mu);
+            K_intrinsic * (rho_LR * k_rel / mu);
 
         //
         // displacement equation, displacement part
@@ -438,10 +446,11 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
         double const mu = _process_data.flow_material->getFluidViscosity(
             -p_cap_ip, temperature);
 
+        auto const K_intrinsic = intrinsicPermeability<DisplacementDim>(
+            _process_data.intrinsic_permeability(t, x_position));
+
         GlobalDimMatrixType const rho_Ki_over_mu =
-            intrinsicPermeability<DisplacementDim>(
-                t, x_position, material_id, *_process_data.flow_material) *
-            (rho_LR / mu);
+            K_intrinsic * (rho_LR / mu);
 
         //
         // displacement equation, displacement part
@@ -687,11 +696,12 @@ std::vector<double> const& RichardsMechanicsLocalAssembler<
         NumLib::shapeFunctionInterpolate(-p_L, N_p, p_cap_ip);
 
         auto const temperature = _process_data.temperature(t, x_position)[0];
-        GlobalDimMatrixType const K_over_mu =
-            intrinsicPermeability<DisplacementDim>(
-                t, x_position, material_id, *_process_data.flow_material) /
-            _process_data.flow_material->getFluidViscosity(-p_cap_ip,
-                                                           temperature);
+        auto const mu = _process_data.flow_material->getFluidViscosity(
+            -p_cap_ip, temperature);
+        auto const K_intrinsic = intrinsicPermeability<DisplacementDim>(
+            _process_data.intrinsic_permeability(t, x_position));
+        GlobalDimMatrixType const Ki_over_mu = K_intrinsic / mu;
+		// TODO shouldn't it be Ki * Krel / mu???????????????????????
         auto const rho_LR = _process_data.flow_material->getFluidDensity(
             -p_cap_ip, temperature);
         auto const& b = _process_data.specific_body_force;
@@ -699,7 +709,7 @@ std::vector<double> const& RichardsMechanicsLocalAssembler<
         // Compute the velocity
         auto const& dNdx_p = _ip_data[ip].dNdx_p;
         cache_matrix.col(ip).noalias() =
-            -K_over_mu * dNdx_p * p_L - rho_LR * K_over_mu * b;
+            -Ki_over_mu * dNdx_p * p_L - rho_LR * Ki_over_mu * b;
     }
 
     return cache;
