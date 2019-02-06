@@ -186,6 +186,10 @@ public:
                 material_id, t, pos, p_int_pt, temperature, pc_int_pt);
             _saturation[ip] = Sw;
 
+            double const dSw_dp_cap =
+                _process_data.material->getSaturationDerivative(
+                    material_id, t, pos, p_int_pt, temperature, Sw);
+
             // \TODO Extend to pressure dependent density.
             double const drhow_dp(0.0);
             auto const storage = _process_data.material->getStorage(
@@ -201,14 +205,18 @@ public:
             auto const mu = _process_data.material->getFluidViscosity(
                 p_int_pt, temperature);
             local_K.noalias() += _ip_data[ip].dNdx.transpose() * permeability *
-                                 _ip_data[ip].dNdx *
-                                 _ip_data[ip].integration_weight * (k_rel / mu);
+                                     _ip_data[ip].dNdx *
+                                     _ip_data[ip].integration_weight *
+                                     (k_rel / mu) +
+                                 _ip_data[ip].N.transpose() * dSw_dp_cap /
+                                     _process_data.dt * _ip_data[ip].N;
 
             double const& p_int_pt_prev = _ip_data[ip].p_prev;
             double const pc_int_pt_prev = -p_int_pt_prev;
             double const Sw_prev = _process_data.material->getSaturation(
                 material_id, t, pos, p_int_pt_prev, temperature, pc_int_pt_prev);
-            double const Sw_dot = (Sw - Sw_prev) / _process_data.dt;
+            double const Sw_dot =
+                (Sw - Sw_prev + dSw_dp_cap * p_int_pt) / _process_data.dt;
 
             local_b.noalias() += -_ip_data[ip].N.transpose() * porosity *
                                  Sw_dot * _ip_data[ip].integration_weight;
