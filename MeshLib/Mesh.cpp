@@ -36,6 +36,7 @@ Mesh::Mesh(std::string name,
            std::vector<Element*>
                elements,
            Properties const& properties,
+           bool const renumber_nodes_and_elements,
            const std::size_t n_base_nodes)
     : _id(_counter_value - 1),
       _mesh_dimension(0),
@@ -48,11 +49,17 @@ Mesh::Mesh(std::string name,
       _properties(properties)
 {
     assert(_n_base_nodes <= _nodes.size());
-    this->resetNodeIDs();
-    this->resetElementIDs();
+    if (renumber_nodes_and_elements)
+    {
+        this->resetNodeIDs();
+    }
     if (_n_base_nodes == 0)
     {
         recalculateMaxBaseNodeId();
+    }
+    if (renumber_nodes_and_elements)
+    {
+        this->resetElementIDs();
     }
     if ((_n_base_nodes == 0 && hasNonlinearElement()) || isNonlinear())
         this->checkNonlinearNodeIDs();

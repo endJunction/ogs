@@ -136,11 +136,12 @@ std::unique_ptr<Mesh> createQuadraticOrderMesh(Mesh const& linear_mesh)
     std::copy(unique_nodes.begin(), unique_nodes.end(),
               std::back_inserter(quadratic_mesh_nodes));
 
+    constexpr bool renumber_nodes_and_elements = true;
     return std::make_unique<MeshLib::Mesh>(
         linear_mesh.getName(), quadratic_mesh_nodes, quadratic_elements,
         linear_mesh.getProperties().excludeCopyProperties(
             std::vector<MeshLib::MeshItemType>(1, MeshLib::MeshItemType::Node)),
-        linear_mesh.getNumberOfNodes());
+        renumber_nodes_and_elements, linear_mesh.getNumberOfNodes());
 }
 
 }  // namespace MeshLib

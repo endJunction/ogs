@@ -63,10 +63,11 @@ public:
          std::vector<Element*>
              elements,
          Properties const& properties = Properties(),
+         bool const renumber_nodes_and_elements = true,
          const std::size_t n_base_nodes = 0);
 
     /// Copy constructor
-    Mesh(const Mesh &mesh);
+    Mesh(const Mesh& mesh);
 
     /// Destructor
     virtual ~Mesh();
