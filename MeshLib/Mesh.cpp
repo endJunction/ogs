@@ -28,6 +28,24 @@
 #include "Elements/Pyramid.h"
 #include "Elements/Prism.h"
 
+namespace {
+/// Returns the first mismatching element, or input vector size.
+template <typename T>
+std::size_t findFirstMismatchingElementId(std::vector<T*> const& vector)
+{
+    std::size_t const vector_size = vector.size();
+    for (std::size_t i = 0; i < vector_size; ++i)
+    {
+        auto const id = vector[i]->getID();
+        if (i != id)
+        {
+            return i;
+        }
+    }
+    return vector_size;
+}
+}  // namespace
+
 namespace MeshLib
 {
 Mesh::Mesh(std::string name,
@@ -51,7 +69,7 @@ Mesh::Mesh(std::string name,
     assert(_n_base_nodes <= _nodes.size());
     if (renumber_nodes_and_elements)
     {
-        this->resetNodeIDs();
+        resetNodeIDs();
     }
     if (_n_base_nodes == 0)
     {
@@ -59,8 +77,25 @@ Mesh::Mesh(std::string name,
     }
     if (renumber_nodes_and_elements)
     {
-        this->resetElementIDs();
+        resetElementIDs();
     }
+    if (!renumber_nodes_and_elements)
+    {
+        auto const node_position = findFirstMismatchingElementId(_nodes);
+        if (node_position != _nodes.size())
+        {
+            OGS_FATAL("Node at position %d has a different node id %d.",
+                      node_position, _nodes[node_position]->getID());
+        }
+
+        auto const element_position = findFirstMismatchingElementId(_elements);
+        if (element_position != _elements.size())
+        {
+            OGS_FATAL("element at position %d has a different element id %d.",
+                      element_position, _elements[element_position]->getID());
+        }
+    }
+
     if ((_n_base_nodes == 0 && hasNonlinearElement()) || isNonlinear())
         this->checkNonlinearNodeIDs();
     this->setDimension();

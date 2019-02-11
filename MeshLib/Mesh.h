@@ -53,6 +53,12 @@ public:
     ///                      the vector and set "n_base_nodes" argument.
     /// @param elements      An array of mesh elements.
     /// @param properties    Mesh properties.
+    /// @param renumber_nodes_and_elements if set, the node ids and element ids
+    ///                      will be renumbered in the order of appearence in
+    ///                      the corresponding vectors. Default is true.
+    ///                      Disabling the renumbering is possible if the node's
+    ///                      or element's position in the vectors corresponds to
+    ///                      their ids.
     /// @param n_base_nodes  The number of base nodes. This is an optional
     ///                      parameter for nonlinear case.  If the parameter is
     ///                      set to zero, we consider there are no nonlinear
