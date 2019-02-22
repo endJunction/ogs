@@ -158,6 +158,16 @@ void RichardsMechanicsLocalAssembler<
     auto const material_id =
         _process_data.flow_material->getMaterialID(_element.getID());
 
+    NodalVectorType alpha_ =
+        _process_data.biot_coefficient.getNodalValuesOnElement(_element, t);
+    NodalVectorType rho_SR_ =
+        _process_data.solid_density.getNodalValuesOnElement(_element, t);
+    NodalVectorType K_SR_ =
+        _process_data.solid_bulk_modulus.getNodalValuesOnElement(_element, t);
+    NodalVectorType K_LR_ =
+        _process_data.fluid_bulk_modulus.getNodalValuesOnElement(_element, t);
+    NodalVectorType temperature_ =
+        _process_data.temperature.getNodalValuesOnElement(_element, t);
     SpatialPosition x_position;
     x_position.setElementID(_element.getID());
 
@@ -192,11 +202,11 @@ void RichardsMechanicsLocalAssembler<
         auto& eps = _ip_data[ip].eps;
         auto& S_L = _ip_data[ip].saturation;
 
-        auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
-        auto const rho_SR = _process_data.solid_density(t, x_position)[0];
-        auto const K_SR = _process_data.solid_bulk_modulus(t, x_position)[0];
-        auto const K_LR = _process_data.fluid_bulk_modulus(t, x_position)[0];
-        auto const temperature = _process_data.temperature(t, x_position)[0];
+        double const alpha = alpha_.dot(N_u);
+        double const rho_SR = rho_SR_.dot(N_u);
+        double const K_SR = K_SR_.dot(N_u);
+        double const K_LR = K_LR_.dot(N_u);
+        double const temperature = temperature_.dot(N_u);
         auto const porosity = _process_data.flow_material->getPorosity(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);
         auto const rho_LR = _process_data.flow_material->getFluidDensity(
@@ -350,6 +360,16 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
     auto const material_id =
         _process_data.flow_material->getMaterialID(_element.getID());
 
+    NodalVectorType alpha_ =
+        _process_data.biot_coefficient.getNodalValuesOnElement(_element, t);
+    NodalVectorType rho_SR_ =
+        _process_data.solid_density.getNodalValuesOnElement(_element, t);
+    NodalVectorType K_SR_ =
+        _process_data.solid_bulk_modulus.getNodalValuesOnElement(_element, t);
+    NodalVectorType K_LR_ =
+        _process_data.fluid_bulk_modulus.getNodalValuesOnElement(_element, t);
+    NodalVectorType temperature_ =
+        _process_data.temperature.getNodalValuesOnElement(_element, t);
     SpatialPosition x_position;
     x_position.setElementID(_element.getID());
 
@@ -398,11 +418,11 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
         auto& S_L = _ip_data[ip].saturation;
         auto const& sigma_eff = _ip_data[ip].sigma_eff;
 
-        auto const alpha = _process_data.biot_coefficient(t, x_position)[0];
-        auto const rho_SR = _process_data.solid_density(t, x_position)[0];
-        auto const K_SR = _process_data.solid_bulk_modulus(t, x_position)[0];
-        auto const K_LR = _process_data.fluid_bulk_modulus(t, x_position)[0];
-        auto const temperature = _process_data.temperature(t, x_position)[0];
+        double const alpha = alpha_.dot(N_u);
+        double const rho_SR = rho_SR_.dot(N_u);
+        double const K_SR = K_SR_.dot(N_u);
+        double const K_LR = K_LR_.dot(N_u);
+        double const temperature = temperature_.dot(N_u);
 
         auto const porosity = _process_data.flow_material->getPorosity(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);

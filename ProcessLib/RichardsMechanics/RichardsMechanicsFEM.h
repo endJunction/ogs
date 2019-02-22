@@ -56,6 +56,9 @@ public:
         MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
     using Invariants = MathLib::KelvinVector::Invariants<KelvinVectorSize>;
 
+    using NodalVectorType =
+        typename ShapeMatricesTypeDisplacement::NodalVectorType;
+
     RichardsMechanicsLocalAssembler(RichardsMechanicsLocalAssembler const&) =
         delete;
     RichardsMechanicsLocalAssembler(RichardsMechanicsLocalAssembler&&) = delete;
