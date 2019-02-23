@@ -368,4 +368,4 @@ private:
     void mergeSurfaces(std::vector<std::string> const & geo_names,
             std::string & merged_geo_name, std::vector<std::size_t> const& pnt_offsets);
 };
-} // end namespace
+}  // namespace GeoLib
