@@ -251,7 +251,7 @@ void GEOObjects::addSurfaceVec(
 {
     _sfc_vecs.push_back(
         new SurfaceVec(name, std::move(sfc), std::move(sfc_names)));
-    if (!sfc || !sfc->empty())
+    if (_sfc_vecs.back()->size() == 0)
     {
         _callbacks->addSurfaceVec(name);
     }
