@@ -105,6 +105,9 @@ pipeline {
           }
           steps {
             script {
+              sh 'echo ld lib path: $LD_LIBRARY_PATH'
+              sh 'echo Workspace: ${WORKSPACE}'
+              sh 'echo Workspace: $WORKSPACE'
               sh 'git submodule sync'
               configure {
                 cmakeOptions =
