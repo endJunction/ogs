@@ -43,9 +43,9 @@
             <process ref="SD">
                 <nonlinear_solver>basic_newton</nonlinear_solver>
                 <convergence_criterion>
-                    <type>Residual</type>
+                    <type>PerComponentDeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <abstol>1e-11</abstol>
+                    <reltols>1e-15 1e-15 1e-15 1e-15 1e-15 1e-15</reltols>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
@@ -56,8 +56,8 @@
                     <t_end>1</t_end>
                     <timesteps>
                         <pair>
-                            <repeat>10</repeat>
-                            <delta_t>.1</delta_t>
+                            <repeat>100</repeat>
+                            <delta_t>.01</delta_t>
                         </pair>
                     </timesteps>
                 </time_stepping>
@@ -68,8 +68,8 @@
             <prefix>single_joint_displacement_controlled</prefix>
             <timesteps>
                 <pair>
-                    <repeat>1</repeat>
-                    <each_steps>10</each_steps>
+                    <repeat>100000</repeat>
+                    <each_steps>1</each_steps>
                 </pair>
             </timesteps>
             <variables>
@@ -189,7 +189,7 @@
         <nonlinear_solver>
             <name>basic_newton</name>
             <type>Newton</type>
-            <max_iter>1000</max_iter>
+            <max_iter>100</max_iter>
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
