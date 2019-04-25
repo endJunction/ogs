@@ -90,7 +90,7 @@ AddTest(
         TESTER vtkdiff
         DIFF_DATA
         t1_1Dsource_pcs_0_ts_1_t_1.000000.vtu t1_1Dsource_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    		REQUIREMENTS NOT OGS_USE_MPI
+        REQUIREMENTS NOT OGS_USE_MPI
 )
 
 AddTest(
@@ -101,7 +101,7 @@ AddTest(
         TESTER vtkdiff
         DIFF_DATA
         t1_1Dsteady_pcs_0_ts_1_t_1.000000.vtu t1_1Dsteady_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    		REQUIREMENTS NOT OGS_USE_MPI
+        REQUIREMENTS NOT OGS_USE_MPI
 )
 
 AddTest(
@@ -113,7 +113,7 @@ AddTest(
         DIFF_DATA
         t2_1D1bt_pcs_0_ts_500_t_21600.000000.vtu t2_1D1bt_pcs_0_ts_500_t_21600.000000.vtu temperature temperature 10e-12 0.0
         t2_1D1bt_pcs_0_ts_1000_t_43200.000000.vtu t2_1D1bt_pcs_0_ts_1000_t_43200.000000.vtu temperature temperature 10e-12 0.0
-    		REQUIREMENTS NOT OGS_USE_MPI
+        REQUIREMENTS NOT OGS_USE_MPI
 )
 
 AddTest(
@@ -125,5 +125,5 @@ AddTest(
         DIFF_DATA
         t2_1D2bt_pcs_0_ts_3000_t_7776.000000.vtu t2_1D2bt_pcs_0_ts_3000_t_7776.000000.vtu temperature temperature 10e-12 0.0
         t2_1D2bt_pcs_0_ts_1500_t_3888.000000.vtu t2_1D2bt_pcs_0_ts_1500_t_3888.000000.vtu temperature temperature 10e-12 0.0
-    		REQUIREMENTS NOT OGS_USE_MPI
+        REQUIREMENTS NOT OGS_USE_MPI
 )
