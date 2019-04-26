@@ -96,7 +96,7 @@
                 <convergence_criterion>
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltol>1.e-9</reltol>
+                    <reltol>1.0e-9</reltol>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
