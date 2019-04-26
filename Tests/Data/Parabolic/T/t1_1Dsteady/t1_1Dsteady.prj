@@ -13,7 +13,7 @@
             <process_variables>
                 <process_variable>temperature</process_variable>
             </process_variables>
-            <secondary_variables>  
+            <secondary_variables>
             </secondary_variables>
         </process>
     </processes>

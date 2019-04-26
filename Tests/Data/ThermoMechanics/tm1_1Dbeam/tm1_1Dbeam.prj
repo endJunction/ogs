@@ -16,14 +16,12 @@
             <linear_thermal_expansion_coefficient>alpha</linear_thermal_expansion_coefficient>
             <specific_heat_capacity>c</specific_heat_capacity>
             <thermal_conductivity>lambda</thermal_conductivity>
-           
             <specific_body_force>0 0 -9.81</specific_body_force>
             <process_variables>
                 <temperature>temperature</temperature>
                 <displacement>displacement</displacement>
             </process_variables>
             <secondary_variables>
-                
                 <secondary_variable type="static" internal_name="epsilon" output_name="epsilon"/>
                 <secondary_variable type="static" internal_name="sigma" output_name="sigma"/>
             </secondary_variables>
