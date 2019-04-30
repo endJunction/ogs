@@ -70,7 +70,7 @@
                 <convergence_criterion>
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltol>1e-5</reltol>
+                    <reltol>1e-9</reltol>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
@@ -95,7 +95,7 @@
                 <convergence_criterion>
                     <type>PerComponentDeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltols> 1e-5 1e+15 1e+15 </reltols>
+                    <reltols> 1e-9 1e+15 1e+15 </reltols>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>

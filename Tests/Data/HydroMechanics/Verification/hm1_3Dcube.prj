@@ -51,7 +51,7 @@
                     <!-- convergence criterion for the first process -->
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltol> 1.0e-9 </reltol>
+                    <reltol> 1.0e-12 </reltol>
                 </convergence_criterion>
                 <convergence_criterion>
                     <!-- convergence criterion for the second process -->
@@ -70,7 +70,7 @@
                 <convergence_criterion>
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltol>1.0e-9</reltol>
+                    <reltol>1.0e-12</reltol>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
