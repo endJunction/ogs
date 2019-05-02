@@ -132,6 +132,8 @@ public:
                 _process_data.material_ids,
                 e.getID());
 
+        ParameterLib::SpatialPosition x_position;
+
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             _ip_data.emplace_back(solid_material);
@@ -147,8 +149,30 @@ public:
             static const int kelvin_vector_size =
                 MathLib::KelvinVector::KelvinVectorDimensions<
                     DisplacementDim>::value;
+
             // Initialize current time step values
-            ip_data.sigma.setZero(kelvin_vector_size);
+            if (_process_data.reference_sigma)
+            {
+                x_position.setCoordinates(MathLib::Point3d(
+                    interpolateCoordinates<ShapeFunction, ShapeMatricesType>(
+                        e, ip_data.N)));
+                std::vector<double> sigma_ref_vector =
+                    (*_process_data.reference_sigma)(
+                        std::numeric_limits<
+                            double>::quiet_NaN() /* time independent */,
+                        x_position);
+                typename BMatricesType::KelvinVectorType const sigma_ref =
+                    Eigen::Map<typename BMatricesType::KelvinVectorType>(
+                        sigma_ref_vector.data(),
+                        MathLib::KelvinVector::KelvinVectorDimensions<
+                            DisplacementDim>::value,
+                        1);
+                ip_data.sigma = sigma_ref;
+            }
+            else
+            {
+                ip_data.sigma.setZero(kelvin_vector_size);
+            }
             ip_data.eps.setZero(kelvin_vector_size);
 
             // Previous time step values are not initialized and are set later.
@@ -272,6 +296,24 @@ public:
             auto const& b = _process_data.specific_body_force;
             local_b.noalias() -=
                 (B.transpose() * sigma - N_u_op.transpose() * rho * b) * w;
+            if (_process_data.reference_sigma)
+            {
+                x_position.setCoordinates(MathLib::Point3d(
+                    interpolateCoordinates<ShapeFunction, ShapeMatricesType>(
+                        _element, N)));
+                std::vector<double> sigma_ref_vector =
+                    (*_process_data.reference_sigma)(
+                        std::numeric_limits<
+                            double>::quiet_NaN() /* time independent */,
+                        x_position);
+                typename BMatricesType::KelvinVectorType const sigma_ref =
+                    Eigen::Map<typename BMatricesType::KelvinVectorType>(
+                        sigma_ref_vector.data(),
+                        MathLib::KelvinVector::KelvinVectorDimensions<
+                            DisplacementDim>::value,
+                        1);
+                local_b.noalias() += B.transpose() * sigma_ref * w;
+            }
             local_Jac.noalias() += B.transpose() * C * B * w;
         }
     }

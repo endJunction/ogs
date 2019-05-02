@@ -101,9 +101,25 @@ std::unique_ptr<Process> createSmallDeformationProcess(
         config.getConfigParameter<double>(
             "reference_temperature", std::numeric_limits<double>::quiet_NaN());
 
+    // Reference variables
+    ParameterLib::Parameter<double> const* reference_sigma = nullptr;
+    const auto& reference_variables_config =
+        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__reference_variables}
+        config.getConfigSubtreeOptional("reference_variables");
+    if (reference_variables_config)
+    {
+        reference_sigma = &ParameterLib::findParameter<double>(
+            *reference_variables_config,
+            //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__reference_variables__sigma}
+            "sigma", parameters,
+            MathLib::KelvinVector::KelvinVectorDimensions<
+                DisplacementDim>::value);
+    }
+
     SmallDeformationProcessData<DisplacementDim> process_data{
-        materialIDs(mesh), std::move(solid_constitutive_relations),
-        solid_density, specific_body_force, reference_temperature};
+        materialIDs(mesh),     std::move(solid_constitutive_relations),
+        solid_density,         specific_body_force,
+        reference_temperature, reference_sigma};
 
     SecondaryVariableCollection secondary_variables;
 
