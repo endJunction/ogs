@@ -47,6 +47,8 @@ struct RichardsMechanicsProcessData
         ParameterLib::Parameter<double> const& solid_density_,
         ParameterLib::Parameter<double> const& solid_bulk_modulus_,
         ParameterLib::Parameter<double> const& temperature_,
+        ParameterLib::Parameter<double> const* const sigma_0neq_,
+        ParameterLib::Parameter<double> const* const pressure_0neq_,
         Eigen::Matrix<double, DisplacementDim, 1>
             specific_body_force_)
         : material_ids(material_ids_),
@@ -57,6 +59,8 @@ struct RichardsMechanicsProcessData
           solid_density(solid_density_),
           solid_bulk_modulus(solid_bulk_modulus_),
           temperature(temperature_),
+          sigma_0neq(sigma_0neq_),
+          pressure_0neq(pressure_0neq_),
           specific_body_force(std::move(specific_body_force_))
     {
     }
@@ -98,6 +102,9 @@ struct RichardsMechanicsProcessData
     /// Specific body forces applied to solid and fluid.
     /// It is usually used to apply gravitational forces.
     /// A vector of displacement dimension's length.
+    ParameterLib::Parameter<double> const* const sigma_0neq;
+    ParameterLib::Parameter<double> const* const pressure_0neq;
+
     Eigen::Matrix<double, DisplacementDim, 1> const specific_body_force;
     double dt = 0.0;
     double t = 0.0;

@@ -187,6 +187,28 @@ std::unique_ptr<Process> createRichardsMechanicsProcess(
         ProcessLib::RichardsFlow::createRichardsFlowMaterialProperties(
             flow_material_config, material_ids, parameters);
 
+    // Non-equilibrium state variables. All of them are optional.
+    ParameterLib::Parameter<double> const* sigma_0neq = nullptr;
+    ParameterLib::Parameter<double> const* pressure_0neq = nullptr;
+    const auto& reference_variables_config =
+        //! \ogs_file_param{prj__processes__process__RICHARDS_MECHANICS__nonequilibrium_state}
+        config.getConfigSubtreeOptional("nonequilibrium_state");
+    if (reference_variables_config)
+    {
+        sigma_0neq = &ParameterLib::findParameter<double>(
+            *reference_variables_config,
+            //! \ogs_file_param{prj__processes__process__RICHARDS_MECHANICS__nonequilibrium_state__sigma}
+            "sigma", parameters,
+            MathLib::KelvinVector::KelvinVectorDimensions<
+                DisplacementDim>::value);
+        pressure_0neq = &ParameterLib::findParameter<double>(
+            *reference_variables_config,
+            //! \ogs_file_param{prj__processes__process__RICHARDS_MECHANICS__nonequilibrium_state__pressure}
+            "pressure", parameters,
+            MathLib::KelvinVector::KelvinVectorDimensions<
+                DisplacementDim>::value);
+    }
+
     RichardsMechanicsProcessData<DisplacementDim> process_data{
         material_ids,
         std::move(flow_material),
@@ -196,6 +218,8 @@ std::unique_ptr<Process> createRichardsMechanicsProcess(
         solid_density,
         solid_bulk_modulus,
         temperature,
+        sigma_0neq,
+        pressure_0neq,
         specific_body_force};
 
     SecondaryVariableCollection secondary_variables;

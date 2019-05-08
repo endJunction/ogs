@@ -112,6 +112,33 @@ RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
         ip_data.N_p = shape_matrices_p[ip].N;
         ip_data.dNdx_p = shape_matrices_p[ip].dNdx;
 
+        // Initialize with ip-data with non-eqilibrium state variables if
+        // available.
+        ParameterLib::SpatialPosition x_position;
+        x_position.setCoordinates(MathLib::Point3d(
+            interpolateCoordinates<ShapeFunction, ShapeMatricesType>(
+                e, ip_data.N)));
+        if (_process_data.sigma_0neq)
+        {
+            std::vector<double> sigma_ref_vector = (*_process_data.sigma_0neq)(
+                std::numeric_limits<double>::quiet_NaN() /* time independent */,
+                x_position);
+            typename BMatricesType::KelvinVectorType const sigma_ref =
+                Eigen::Map<typename BMatricesType::KelvinVectorType>(
+                    sigma_ref_vector.data(),
+                    MathLib::KelvinVector::KelvinVectorDimensions<
+                        DisplacementDim>::value,
+                    1);
+            ip_data.sigma_eff = sigma_ref;
+        }
+        if (_process_data.pressure_0neq)
+        {
+            std::vector<double> sigma_ref_vector = (*_process_data
+                                                         .pressure_0neq)(
+                std::numeric_limits<double>::quiet_NaN() /* time independent */,
+                x_position);
+            ip_data.sigma_eff = sigma_ref;
+        }
         _secondary_data.N_u[ip] = shape_matrices_u[ip].N;
     }
 }
