@@ -51,13 +51,13 @@
                     <!-- convergence criterion for the first process -->
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltol> 1.0e-9 </reltol>
+                    <reltol> 1.0e-15 </reltol>
                 </convergence_criterion>
                 <convergence_criterion>
                     <!-- convergence criterion for the second process -->
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltol> 1.0e-9  </reltol>
+                    <reltol> 1.0e-15  </reltol>
                 </convergence_criterion>
             </convergence_criteria>
         </global_process_coupling>
@@ -65,12 +65,12 @@
             <process ref="HM">
                 <!--For the equations of pressure-->
                 <nonlinear_solver>
-                    basic_newton_pressure
-                </nonlinear_solver>
+		    basic_newton_pressure
+		</nonlinear_solver>
                 <convergence_criterion>
                     <type>DeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltol>1e-9</reltol>
+                    <reltol>1e-15</reltol>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
@@ -90,12 +90,12 @@
             <process ref="HM">
                 <!--For the equations of deformation-->
                 <nonlinear_solver>
-                    basic_newton_displacement
-                </nonlinear_solver>
+		    basic_newton_displacement
+		</nonlinear_solver>
                 <convergence_criterion>
                     <type>PerComponentDeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltols> 1e-9 1e+15 1e+15 </reltols>
+                    <reltols> 1e-15 1e+15 1e+15 </reltols>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
@@ -123,8 +123,9 @@
                     <each_steps> 1 </each_steps>
                 </pair>
             </timesteps>
+
             <variables>
-                <variable>pressure</variable>
+            		<variable>pressure</variable>
                 <variable>displacement</variable>
                 <variable>sigma_xx</variable>
                 <variable>sigma_yy</variable>

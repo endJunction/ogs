@@ -55,7 +55,7 @@ AddTest(
 )
 AddTest(
     NAME HydroMechanics_hm1_1Dbeam
-    PATH HydroMechanics/Verification/hm1_1Dbeam
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm1_1Dbeam.prj
     WRAPPER time
@@ -77,7 +77,7 @@ AddTest(
 
 AddTest(
     NAME HydroMechanics_hm1_2Dsquare
-    PATH HydroMechanics/Verification/hm1_2Dsquare
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm1_2Dsquare.prj
     WRAPPER time
@@ -99,7 +99,7 @@ AddTest(
 
 AddTest(
     NAME HydroMechanics_hm1_3Dcube
-    PATH HydroMechanics/Verification/hm1_3Dcube
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm1_3Dcube.prj
     WRAPPER time
@@ -121,7 +121,7 @@ AddTest(
 
 AddTest(
     NAME HydroMechanics_hm1_3Dgravity
-    PATH HydroMechanics/Verification/hm1_3Dgravity
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm1_3Dgravity.prj
     WRAPPER time
@@ -143,73 +143,73 @@ AddTest(
 
 AddTest(
     NAME HydroMechanics_hm2_1D1bt
-    PATH HydroMechanics/Verification/hm2_1D1bt
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm2_1D1bt.prj
     WRAPPER time
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu pressure pressure 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu displacement displacement 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_xx sigma_xx 3.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_yy sigma_yy 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_zz sigma_zz 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_xy sigma_xy 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_xz sigma_xz 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_yz sigma_yz 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu epsilon_xx epsilon_xx 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu epsilon_yy epsilon_yy 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu epsilon_zz epsilon_zz 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu pressure pressure 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu displacement displacement 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_xx sigma_xx 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_yy sigma_yy 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_zz sigma_zz 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_xy sigma_xy 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_xz sigma_xz 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_yz sigma_yz 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu epsilon_xx epsilon_xx 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu epsilon_yy epsilon_yy 1.0e-5 0.0
-    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu epsilon_zz epsilon_zz 1.0e-5 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu pressure pressure 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu displacement displacement 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_xx sigma_xx 3.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_yy sigma_yy 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_zz sigma_zz 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_xy sigma_xy 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_xz sigma_xz 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu sigma_yz sigma_yz 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu epsilon_xx epsilon_xx 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu epsilon_yy epsilon_yy 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu hm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu epsilon_zz epsilon_zz 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu pressure pressure 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu displacement displacement 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_xx sigma_xx 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_yy sigma_yy 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_zz sigma_zz 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_xy sigma_xy 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_xz sigma_xz 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu sigma_yz sigma_yz 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu epsilon_xx epsilon_xx 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu epsilon_yy epsilon_yy 1.0e-11 0.0
+    hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu hm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu epsilon_zz epsilon_zz 1.0e-11 0.0
 )
 
 AddTest(
     NAME HydroMechanics_hm2_1D2bt
-    PATH HydroMechanics/Verification/hm2_1D2bt
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm2_1D2bt.prj
     WRAPPER time
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu pressure pressure 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu displacement displacement 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_xx sigma_xx 2.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_yy sigma_yy 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_zz sigma_zz 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_xy sigma_xy 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_xz sigma_xz 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_yz sigma_yz 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu epsilon_xx epsilon_xx 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu epsilon_yy epsilon_yy 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu epsilon_zz epsilon_zz 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu pressure pressure 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu displacement displacement 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_xx sigma_xx 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_yy sigma_yy 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_zz sigma_zz 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_xy sigma_xy 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_xz sigma_xz 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_yz sigma_yz 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu epsilon_xx epsilon_xx 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu epsilon_yy epsilon_yy 1.0e-5 0.0
-    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu epsilon_zz epsilon_zz 1.0e-5 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu pressure pressure 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu displacement displacement 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_xx sigma_xx 2.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_yy sigma_yy 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_zz sigma_zz 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_xy sigma_xy 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_xz sigma_xz 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu sigma_yz sigma_yz 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu epsilon_xx epsilon_xx 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu epsilon_yy epsilon_yy 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu hm2_1D2bt_pcs_0_ts_125_t_5.000000.vtu epsilon_zz epsilon_zz 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu pressure pressure 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu displacement displacement 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_xx sigma_xx 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_yy sigma_yy 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_zz sigma_zz 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_xy sigma_xy 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_xz sigma_xz 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu sigma_yz sigma_yz 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu epsilon_xx epsilon_xx 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu epsilon_yy epsilon_yy 1.0e-11 0.0
+    hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu hm2_1D2bt_pcs_0_ts_250_t_10.000000.vtu epsilon_zz epsilon_zz 1.0e-11 0.0
 )
 
 AddTest(
     NAME HydroMechanics_hm2_1Dbiot
-    PATH HydroMechanics/Verification/hm2_1Dbiot
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm2_1Dbiot.prj
     WRAPPER time
@@ -242,7 +242,7 @@ AddTest(
 
 AddTest(
     NAME HydroMechanics_hm2_1Dcolumn1
-    PATH HydroMechanics/Verification/hm2_1Dcolumn1
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm2_1Dcolumn1.prj
     WRAPPER time
@@ -275,7 +275,7 @@ AddTest(
 
 AddTest(
     NAME HydroMechanics_hm2_1Dcolumn2
-    PATH HydroMechanics/Verification/hm2_1Dcolumn2
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm2_1Dcolumn2.prj
     WRAPPER time
@@ -308,7 +308,7 @@ AddTest(
 
 AddTest(
     NAME HydroMechanics_hm2_2Dmandel
-    PATH HydroMechanics/Verification/hm2_2Dmandel
+    PATH HydroMechanics/Verification
     EXECUTABLE ogs
     EXECUTABLE_ARGS hm2_2Dmandel.prj
     WRAPPER time
