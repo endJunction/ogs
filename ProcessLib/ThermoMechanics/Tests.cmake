@@ -22,8 +22,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-10 0.0
+    tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_1Dbeam_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -36,8 +36,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-11 0.0
+    tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixa_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -50,8 +50,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-11 0.0
+    tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu tm1_1Dfixb_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -64,8 +64,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-11 0.0
+    tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu tm1_2Dbeam_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -78,8 +78,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-11 0.0
+    tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_2Dsquare_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -92,8 +92,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu temperature temperature 5e-11 0.0
+    tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu tm1_3Dcube_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -106,8 +106,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-11 0.0
+    tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu tm1_3Dgravity_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -120,8 +120,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-11 0.0
+    tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu tm1_3Dorigin_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -134,8 +134,8 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu temperature temperature 10e-12 0.0
-    tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu displacement displacement 10e-12 0.0
+    tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu temperature temperature 1e-11 0.0
+    tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu tm1_3Dsquare_pcs_0_ts_1_t_1.000000.vtu displacement displacement 1e-11 0.0
 )
 
 AddTest(
@@ -148,10 +148,10 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu temperature temperature 10e-12 0.0
-    tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu displacement displacement 10e-12 0.0
-    tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu temperature temperature 10e-12 0.0
-    tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu displacement displacement 10e-12 0.0
+    tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu temperature temperature 1e-10 0.0
+    tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu tm2_1D1bt_pcs_0_ts_50_t_5.000000.vtu displacement displacement 1e-10 0.0
+    tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu temperature temperature 1e-10 0.0
+    tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu tm2_1D1bt_pcs_0_ts_100_t_10.000000.vtu displacement displacement 1e-10 0.0
 )
 
 AddTest(
@@ -164,10 +164,10 @@ AddTest(
     REQUIREMENTS NOT (OGS_USE_LIS OR OGS_USE_MPI)
     RUNTIME 17
     DIFF_DATA
-    tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu temperature temperature 10e-12 0.0
-    tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu displacement displacement 10e-12 0.0
-    tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu temperature temperature 10e-12 0.0
-    tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu displacement displacement 10e-12 0.0
+    tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu temperature temperature 1e-10 0.0
+    tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu tm2_1Dfixc_pcs_0_ts_50_t_5.000000.vtu displacement displacement 1e-11 0.0
+    tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu temperature temperature 1e-10 0.0
+    tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu tm2_1Dfixc_pcs_0_ts_100_t_10.000000.vtu displacement displacement 1e-11 0.0
 )
 #--
 
