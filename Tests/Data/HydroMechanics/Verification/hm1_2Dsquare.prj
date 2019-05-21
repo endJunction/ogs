@@ -124,7 +124,7 @@
                 </pair>
             </timesteps>
             <variables>
-            	  <variable>pressure</variable>
+                <variable>pressure</variable>
                 <variable>displacement</variable>
                 <variable>sigma_xx</variable>
                 <variable>sigma_yy</variable>
