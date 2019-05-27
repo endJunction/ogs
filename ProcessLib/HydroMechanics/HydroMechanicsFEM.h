@@ -50,6 +50,12 @@ struct IntegrationPointData final
     typename BMatricesType::KelvinVectorType sigma_eff, sigma_eff_prev;
     typename BMatricesType::KelvinVectorType eps, eps_prev;
 
+    /// Non-equilibrium initial stress.
+    typename BMatricesType::KelvinVectorType sigma_neq =
+        BMatricesType::KelvinVectorType::Zero(
+            MathLib::KelvinVector::KelvinVectorDimensions<
+                DisplacementDim>::value);
+
     typename ShapeMatrixTypeDisplacement::NodalRowVectorType N_u;
     typename ShapeMatrixTypeDisplacement::GlobalDimNodalMatrixType dNdx_u;
 

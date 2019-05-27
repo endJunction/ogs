@@ -59,6 +59,8 @@ HydroMechanicsLocalAssembler<ShapeFunctionDisplacement, ShapeFunctionPressure,
             _process_data.solid_materials, _process_data.material_ids,
             e.getID());
 
+    ParameterLib::SpatialPosition x_position;
+
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
         _ip_data.emplace_back(solid_material);
@@ -69,15 +71,30 @@ HydroMechanicsLocalAssembler<ShapeFunctionDisplacement, ShapeFunctionPressure,
             sm_u.integralMeasure * sm_u.detJ;
 
         // Initialize current time step values
-        static const int kelvin_vector_size =
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value;
-        ip_data.sigma_eff.setZero(kelvin_vector_size);
-        ip_data.eps.setZero(kelvin_vector_size);
+        if (_process_data.nonequilibrium_stress)
+        {
+            // Computation of non-equilibrium stress.
+            x_position.setCoordinates(MathLib::Point3d(
+                interpolateCoordinates<ShapeFunctionDisplacement,
+                                       ShapeMatricesTypeDisplacement>(
+                    e, ip_data.N_u)));
+            std::vector<double> sigma_neq_data = (*_process_data
+                                                       .nonequilibrium_stress)(
+                std::numeric_limits<double>::quiet_NaN() /* time independent */,
+                x_position);
+            ip_data.sigma_neq =
+                Eigen::Map<typename BMatricesType::KelvinVectorType>(
+                    sigma_neq_data.data(), KelvinVectorSize, 1);
+        }
+        // Initialization from non-equilibrium sigma, which is zero by
+        // default, or is set to some value.
+        ip_data.sigma_eff = ip_data.sigma_neq;
+
+        ip_data.eps.setZero(KelvinVectorSize);
 
         // Previous time step values are not initialized and are set later.
-        ip_data.eps_prev.resize(kelvin_vector_size);
-        ip_data.sigma_eff_prev.resize(kelvin_vector_size);
+        ip_data.eps_prev.resize(KelvinVectorSize);
+        ip_data.sigma_eff_prev.resize(KelvinVectorSize);
 
         ip_data.N_u_op = ShapeMatricesTypeDisplacement::template MatrixType<
             DisplacementDim, displacement_size>::Zero(DisplacementDim,
@@ -190,6 +207,7 @@ void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
 
         auto& eps = _ip_data[ip].eps;
         auto const& sigma_eff = _ip_data[ip].sigma_eff;
+        auto const& sigma_neq = _ip_data[ip].sigma_neq;
 
         double const S = _process_data.specific_storage(t, x_position)[0];
         double const K_over_mu =
@@ -219,8 +237,9 @@ void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
 
         double const rho = rho_sr * (1 - porosity) + porosity * rho_fr;
         local_rhs.template segment<displacement_size>(displacement_index)
-            .noalias() -=
-            (B.transpose() * sigma_eff - N_u_op.transpose() * rho * b) * w;
+            .noalias() -= (B.transpose() * (sigma_eff - sigma_neq) -
+                           N_u_op.transpose() * rho * b) *
+                          w;
 
         //
         // displacement equation, pressure part
