@@ -421,6 +421,11 @@ private:
                              ShapeFunctionDisplacement::NPOINTS>;
     std::vector<IpData, Eigen::aligned_allocator<IpData>> _ip_data;
 
+    // Non-equilibrium pressure values of the element, initialized by default
+    // to zero unless non-equilibrium pressure parameter is present.
+    typename ShapeMatricesTypePressure::NodalVectorType p_neq =
+        ShapeMatricesTypePressure::NodalVectorType::Zero(pressure_size);
+
     IntegrationMethod _integration_method;
     MeshLib::Element const& _element;
     bool const _is_axially_symmetric;

@@ -61,6 +61,17 @@ HydroMechanicsLocalAssembler<ShapeFunctionDisplacement, ShapeFunctionPressure,
 
     ParameterLib::SpatialPosition x_position;
 
+    if (_process_data.nonequilibrium_pressure)
+    {
+        // Temporary copy of the element to get node values for pressure nodes.
+        auto const pressure_element =
+            static_cast<typename ShapeFunctionPressure::MeshElement const&>(
+                _element);
+        p_neq = _process_data.nonequilibrium_pressure->getNodalValuesOnElement(
+            pressure_element,
+            /* time-independent */ std::numeric_limits<double>::quiet_NaN());
+    }
+
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
         _ip_data.emplace_back(solid_material);
