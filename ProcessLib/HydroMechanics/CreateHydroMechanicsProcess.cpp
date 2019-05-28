@@ -188,7 +188,7 @@ std::unique_ptr<Process> createHydroMechanicsProcess(
         config.getConfigParameter<double>(
             "reference_temperature", std::numeric_limits<double>::quiet_NaN());
 
-    // Non-equilibrium variables
+    // Optional non-equilibrium variables
     ParameterLib::Parameter<double> const* nonequilibrium_stress = nullptr;
     ParameterLib::Parameter<double> const* nonequilibrium_pressure = nullptr;
     const auto& nonequilibrium_state_variables_config =
@@ -196,16 +196,27 @@ std::unique_ptr<Process> createHydroMechanicsProcess(
         config.getConfigSubtreeOptional("nonequilibrium_state_variables");
     if (nonequilibrium_state_variables_config)
     {
-        nonequilibrium_stress = &ParameterLib::findParameter<double>(
-            *nonequilibrium_state_variables_config,
-            //! \ogs_file_param_special{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_state_variables__stress}
-            "stress", parameters,
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value);
-        nonequilibrium_pressure = &ParameterLib::findParameter<double>(
-            *nonequilibrium_state_variables_config,
-            //! \ogs_file_param_special{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_state_variables__pressure}
-            "pressure", parameters, 1);
+        auto const stress_parameter_name =
+            nonequilibrium_state_variables_config
+                //! \ogs_file_param_special{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_state_variables__stress}
+                ->getConfigParameterOptional<std::string>("stress");
+        if (stress_parameter_name)
+        {
+            nonequilibrium_stress = &ParameterLib::findParameter<double>(
+                *stress_parameter_name, parameters,
+                MathLib::KelvinVector::KelvinVectorDimensions<
+                    DisplacementDim>::value,
+                &mesh);
+        }
+        auto const pressure_parameter_name =
+            nonequilibrium_state_variables_config
+                //! \ogs_file_param_special{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_state_variables__pressure}
+                ->getConfigParameterOptional<std::string>("pressure");
+        if (pressure_parameter_name)
+        {
+            nonequilibrium_pressure = &ParameterLib::findParameter<double>(
+                *pressure_parameter_name, parameters, 1, &mesh);
+        }
     }
 
     HydroMechanicsProcessData<DisplacementDim> process_data{
