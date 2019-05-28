@@ -281,11 +281,11 @@ void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
 
     // pressure equation
     local_rhs.template segment<pressure_size>(pressure_index).noalias() -=
-        laplace_p * p + storage_p * p_dot + Kup.transpose() * u_dot;
+        laplace_p * (p - p_neq) + storage_p * p_dot + Kup.transpose() * u_dot;
 
     // displacement equation
     local_rhs.template segment<displacement_size>(displacement_index)
-        .noalias() += Kup * p;
+        .noalias() += Kup * (p - p_neq);
 }
 
 template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
