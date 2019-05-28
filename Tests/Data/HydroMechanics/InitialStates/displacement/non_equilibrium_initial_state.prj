@@ -43,7 +43,6 @@
             </secondary_variables>
             <nonequilibrium_state_variables>
                 <stress>nonequilibrium_stress</stress>
-                <pressure>nonequilibrium_pressure</pressure>
             </nonequilibrium_state_variables>
         </process>
     </processes>
@@ -96,12 +95,6 @@
             <expression>2200*9.81*0.8*(y-100)</expression>
             <expression>-0.5*1e6+2200*9.81*(y-100)</expression>
             <expression>0</expression>
-            <expression>0</expression>
-        </parameter>
-        <parameter>
-            <mesh>soil_column_q8</mesh>
-            <name>nonequilibrium_pressure</name>
-            <type>Function</type>
             <expression>0</expression>
         </parameter>
         <parameter>
