@@ -271,7 +271,9 @@ void HydroMechanicsProcess<DisplacementDim>::initializeBoundaryConditions()
 }
 
 template <int DisplacementDim>
-void setInitialConditionsConcreteProcess(GlobalVector const& x, double const t)
+void HydroMechanicsProcess<
+    DisplacementDim>::setInitialConditionsConcreteProcess(GlobalVector& x,
+                                                          double const t)
 {
     //
     // Add non-equilibrium pressure to the process variable.
