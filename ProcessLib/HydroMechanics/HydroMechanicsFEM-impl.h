@@ -59,32 +59,54 @@ HydroMechanicsLocalAssembler<ShapeFunctionDisplacement, ShapeFunctionPressure,
             _process_data.solid_materials, _process_data.material_ids,
             e.getID());
 
-    ParameterLib::SpatialPosition x_position;
-
     if (_process_data.nonequilibrium_pressure)
     {
-        // Temporary copy of the element to get node values for pressure nodes.
-        auto const pressure_element =
-            static_cast<typename ShapeFunctionPressure::MeshElement const&>(
-                _element);
-        p_neq = _process_data.nonequilibrium_pressure->getNodalValuesOnElement(
-            pressure_element,
-            /* time-independent */ std::numeric_limits<double>::quiet_NaN());
+        // TODO (naumov): Use proper time value to get the parameter value.
+        double const t = std::numeric_limits<double>::quiet_NaN();
+        p_neq = _process_data.nonequilibrium_pressure
+                    ->getNodalValuesOnElement(_element, t)
+                    .template topRows<
+                        ShapeFunctionPressure::MeshElement::n_all_nodes>();
     }
 
     for (unsigned ip = 0; ip < n_integration_points; ip++)
     {
         _ip_data.emplace_back(solid_material);
         auto& ip_data = _ip_data[ip];
+
+        //
+        // The shape matrices
+        //
         auto const& sm_u = shape_matrices_u[ip];
         _ip_data[ip].integration_weight =
             _integration_method.getWeightedPoint(ip).getWeight() *
             sm_u.integralMeasure * sm_u.detJ;
+        ip_data.N_u_op = ShapeMatricesTypeDisplacement::template MatrixType<
+            DisplacementDim, displacement_size>::Zero(DisplacementDim,
+                                                      displacement_size);
+        for (int i = 0; i < DisplacementDim; ++i)
+        {
+            ip_data.N_u_op
+                .template block<1, displacement_size / DisplacementDim>(
+                    i, i * displacement_size / DisplacementDim)
+                .noalias() = sm_u.N;
+        }
 
+        ip_data.N_u = sm_u.N;
+        ip_data.dNdx_u = sm_u.dNdx;
+
+        ip_data.N_p = shape_matrices_p[ip].N;
+        ip_data.dNdx_p = shape_matrices_p[ip].dNdx;
+
+        _secondary_data.N_u[ip] = shape_matrices_u[ip].N;
+
+        //
         // Initialize current time step values
+        //
         if (_process_data.nonequilibrium_stress)
         {
             // Computation of non-equilibrium stress.
+            ParameterLib::SpatialPosition x_position;
             x_position.setCoordinates(MathLib::Point3d(
                 interpolateCoordinates<ShapeFunctionDisplacement,
                                        ShapeMatricesTypeDisplacement>(
@@ -106,25 +128,6 @@ HydroMechanicsLocalAssembler<ShapeFunctionDisplacement, ShapeFunctionPressure,
         // Previous time step values are not initialized and are set later.
         ip_data.eps_prev.resize(KelvinVectorSize);
         ip_data.sigma_eff_prev.resize(KelvinVectorSize);
-
-        ip_data.N_u_op = ShapeMatricesTypeDisplacement::template MatrixType<
-            DisplacementDim, displacement_size>::Zero(DisplacementDim,
-                                                      displacement_size);
-        for (int i = 0; i < DisplacementDim; ++i)
-        {
-            ip_data.N_u_op
-                .template block<1, displacement_size / DisplacementDim>(
-                    i, i * displacement_size / DisplacementDim)
-                .noalias() = sm_u.N;
-        }
-
-        ip_data.N_u = sm_u.N;
-        ip_data.dNdx_u = sm_u.dNdx;
-
-        ip_data.N_p = shape_matrices_p[ip].N;
-        ip_data.dNdx_p = shape_matrices_p[ip].dNdx;
-
-        _secondary_data.N_u[ip] = shape_matrices_u[ip].N;
     }
 }
 

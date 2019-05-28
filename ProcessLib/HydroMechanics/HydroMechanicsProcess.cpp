@@ -301,7 +301,7 @@ void HydroMechanicsProcess<
             MeshLib::Location const l(mesh_id, MeshLib::MeshItemType::Node,
                                       node->getID());
             pos.setNodeID(node->getID());
-            auto const& p_neq_value = p_neq(t, pos)[pressure_component_id];
+            double const p_neq_value = p_neq(t, pos)[pressure_component_id];
 
             auto global_index =
                 std::abs(_local_to_global_index_map->getGlobalIndex(
