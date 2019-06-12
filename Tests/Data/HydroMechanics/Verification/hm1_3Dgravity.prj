@@ -95,7 +95,7 @@
                 <convergence_criterion>
                     <type>PerComponentDeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <reltols> 1e+15 1e+15 1.0e-9 </reltols>
+                    <reltols> 5e-10 1e-4 1.0e-15 </reltols>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
@@ -378,7 +378,7 @@
                 <solver_type>CG</solver_type>
                 <precon_type>DIAGONAL</precon_type>
                 <max_iteration_step>10000</max_iteration_step>
-                <error_tolerance>1e-10</error_tolerance>
+                <error_tolerance>1e-16</error_tolerance>
             </eigen>
             <petsc>
                 <prefix>hm</prefix>
@@ -392,7 +392,7 @@
                 <solver_type>CG</solver_type>
                 <precon_type>DIAGONAL</precon_type>
                 <max_iteration_step>10000</max_iteration_step>
-                <error_tolerance>1e-2</error_tolerance>
+                <error_tolerance>1e-20</error_tolerance>
             </eigen>
             <petsc>
                 <prefix>hm</prefix>

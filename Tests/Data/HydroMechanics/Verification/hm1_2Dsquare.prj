@@ -304,7 +304,7 @@
                 <solver_type>CG</solver_type>
                 <precon_type>DIAGONAL</precon_type>
                 <max_iteration_step>10000</max_iteration_step>
-                <error_tolerance>1e-10</error_tolerance>
+                <error_tolerance>1e-15</error_tolerance>
             </eigen>
             <petsc>
                 <prefix>hm</prefix>
@@ -318,7 +318,7 @@
                 <solver_type>CG</solver_type>
                 <precon_type>DIAGONAL</precon_type>
                 <max_iteration_step>10000</max_iteration_step>
-                <error_tolerance>1e-2</error_tolerance>
+                <error_tolerance>1e-20</error_tolerance>
             </eigen>
             <petsc>
                 <prefix>hm</prefix>
