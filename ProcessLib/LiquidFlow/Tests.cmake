@@ -105,7 +105,7 @@ AddTest(
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu pressure pressure 1e-9 0.0
+    h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu pressure pressure 5e-8 0.0
 )
 
 AddTest(
@@ -127,7 +127,7 @@ AddTest(
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    h1_3Dhydstat_pcs_0_ts_1_t_1.000000.vtu h1_3Dhydstat_pcs_0_ts_1_t_1.000000.vtu pressure pressure 10e-12 0.0
+    h1_3Dhydstat_pcs_0_ts_1_t_1.000000.vtu h1_3Dhydstat_pcs_0_ts_1_t_1.000000.vtu pressure pressure 1e-5 0.0
 )
 
 AddTest(
@@ -138,8 +138,8 @@ AddTest(
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    h2_1D1bt_pcs_0_ts_500_t_21600.000000.vtu h2_1D1bt_pcs_0_ts_500_t_21600.000000.vtu pressure pressure 10e-12 0.0
-		h2_1D1bt_pcs_0_ts_1000_t_43200.000000.vtu h2_1D1bt_pcs_0_ts_1000_t_43200.000000.vtu pressure pressure 10e-12 0.0
+    h2_1D1bt_pcs_0_ts_500_t_21600.000000.vtu h2_1D1bt_pcs_0_ts_500_t_21600.000000.vtu pressure pressure 1e-5 0.0
+    h2_1D1bt_pcs_0_ts_1000_t_43200.000000.vtu h2_1D1bt_pcs_0_ts_1000_t_43200.000000.vtu pressure pressure 1e-5 0.0
 )
 
 AddTest(
@@ -150,8 +150,8 @@ AddTest(
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    h2_1D2bt_pcs_0_ts_1500_t_3888.000000.vtu h2_1D2bt_pcs_0_ts_1500_t_3888.000000.vtu pressure pressure 10e-12 0.0
-		h2_1D2bt_pcs_0_ts_3000_t_7776.000000.vtu h2_1D2bt_pcs_0_ts_3000_t_7776.000000.vtu pressure pressure 10e-12 0.0
+    h2_1D2bt_pcs_0_ts_1500_t_3888.000000.vtu h2_1D2bt_pcs_0_ts_1500_t_3888.000000.vtu pressure pressure 1e-5 0.0
+    h2_1D2bt_pcs_0_ts_3000_t_7776.000000.vtu h2_1D2bt_pcs_0_ts_3000_t_7776.000000.vtu pressure pressure 1e-5 0.0
 )
 
 #===============================================================================
