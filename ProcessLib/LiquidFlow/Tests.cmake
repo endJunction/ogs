@@ -105,7 +105,7 @@ AddTest(
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu pressure pressure 10e-12 0.0
+    h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu h1_1Dsource_pcs_0_ts_1_t_1.000000.vtu pressure pressure 1e-9 0.0
 )
 
 AddTest(
@@ -116,7 +116,7 @@ AddTest(
     TESTER vtkdiff
     REQUIREMENTS NOT OGS_USE_MPI
     DIFF_DATA
-    h1_1Dsteady_pcs_0_ts_1_t_1.000000.vtu h1_1Dsteady_pcs_0_ts_1_t_1.000000.vtu pressure pressure 10e-12 0.0
+    h1_1Dsteady_pcs_0_ts_1_t_1.000000.vtu h1_1Dsteady_pcs_0_ts_1_t_1.000000.vtu pressure pressure 1e-9 0.0
 )
 
 AddTest(
