@@ -76,6 +76,10 @@
                     <type>Constant</type>
                     <value>0.1</value>
                 </property>
+                <property>
+                    <name>permeability</name>
+                    <parameter>kappa1</parameter>
+                </property>
             </properties>
         </medium>
     </media>

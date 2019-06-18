@@ -26,9 +26,21 @@
 namespace
 {
 std::unique_ptr<MaterialPropertyLib::Property> createProperty(
+    std::vector<std::unique_ptr<ParameterLib::ParameterBase>> const& parameters,
     BaseLib::ConfigTree const& config)
 {
     using namespace MaterialPropertyLib;
+    // A property could be referencing a parameter.
+    //! \ogs_file_param{properties__property__parameter}
+    auto const parameter_name =
+        config.getConfigParameterOptional<std::string>("parameter");
+    if (parameter_name)
+    {
+        auto const& parameter = ParameterLib::findParameter<double>(
+            *parameter_name, parameters, 0 /*arbitrary dimension*/);
+        return std::make_unique<Parameter>(parameter);
+    }
+
     // Parsing the property type:
     //! \ogs_file_param{properties__property__type}
     auto const property_type = config.getConfigParameter<std::string>("type");
