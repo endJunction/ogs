@@ -101,8 +101,12 @@
             <mesh>soil_column_q8</mesh>
             <name>nonequilibrium_stress</name>
             <type>Function</type>
-            <expression>-0.8*2200*9.81*(100-y)</expression>
-            <expression>-0.5*1e6-2200*9.81*(100-y)</expression>
+            <expression>var rho_eff := 2200*(1-0.1)+1000*0.1;
+                        var gHy := 9.81*(100-y);
+                        (0.1/(1-0.1))*(rho_eff*gHy - 0.7*1000*gHy + 0.5e6) + gHy*0.7*1000 </expression>
+            <expression>var rho_eff := 2200*(1-0.1)+1000*0.1;
+                        var gHy := 9.81*(100-y);
+                        -gHy*(2200*(1-0.1) + 1000*0.1) + 0.7*gHy*1000 - 0.5*1e6 </expression>
             <expression>0</expression>
             <expression>0</expression>
         </parameter>
@@ -110,7 +114,8 @@
             <mesh>soil_column_q8</mesh>
             <name>nonequilibrium_pressure</name>
             <type>Function</type>
-            <expression>0.8*1000*9.81*(100-y)</expression>
+            <expression>var gHy := 9.81*(100-y);
+                        gHy*1000</expression>
         </parameter>
         <parameter>
             <name>E</name>
@@ -125,7 +130,7 @@
         <parameter>
             <name>k</name>
             <type>Constant</type>
-            <value>1e-12</value>
+            <value>1</value>
         </parameter>
         <parameter>
             <name>S</name>
@@ -135,12 +140,12 @@
         <parameter>
             <name>mu</name>
             <type>Constant</type>
-            <value>1e-3</value>
+            <value>1e-6</value>
         </parameter>
         <parameter>
             <name>alpha</name>
             <type>Constant</type>
-            <value>1</value>
+            <value>0.7</value>
         </parameter>
         <parameter>
             <name>phi</name>
@@ -173,11 +178,6 @@
             <values>0 0</values>
         </parameter>
         <parameter>
-            <name>Zero</name>
-            <type>Constant</type>
-            <value>0.</value>
-        </parameter>
-        <parameter>
             <name>maximum_top_pressure</name>
             <type>Constant</type>
             <value>-1e6</value>
@@ -187,23 +187,6 @@
             <type>CurveScaled</type>
             <curve>top_load_ramp</curve>
             <parameter>maximum_top_pressure</parameter>
-        </parameter>
-        <parameter>
-            <mesh>soil_column_left</mesh>
-            <name>side_load</name>
-            <type>Function</type>
-            <expression>0.8*2200.0*9.81*(100.0-y)</expression>
-        </parameter>
-        <parameter>
-            <mesh>soil_column_left</mesh>
-            <name>HS_pressure</name>
-            <type>Function</type>
-            <expression>0.8*1000.0*9.81*(100.0-y)</expression>
-        </parameter>
-        <parameter>
-            <name>flow_in</name>
-            <type>Constant</type>
-            <value>1e-6</value>
         </parameter>
     </parameters>
     <curves>
@@ -224,13 +207,19 @@
                     <mesh>soil_column_bottom</mesh>
                     <type>Dirichlet</type>
                     <component>1</component>
-                    <parameter>Zero</parameter>
+                    <parameter>zero</parameter>
                 </boundary_condition>
                 <boundary_condition>
                     <mesh>soil_column_right</mesh>
                     <type>Dirichlet</type>
                     <component>0</component>
-                    <parameter>Zero</parameter>
+                    <parameter>zero</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <mesh>soil_column_left</mesh>
+                    <type>Dirichlet</type>
+                    <component>0</component>
+                    <parameter>zero</parameter>
                 </boundary_condition>
                 <boundary_condition>
                     <mesh>soil_column_top</mesh>
@@ -238,31 +227,19 @@
                     <component>1</component>
                     <parameter>top_load</parameter>
                 </boundary_condition>
-                <boundary_condition>
-                    <mesh>soil_column_left</mesh>
-                    <type>Neumann</type>
-                    <component>0</component>
-                    <parameter>zero</parameter>
-                </boundary_condition>
             </boundary_conditions>
         </process_variable>
         <process_variable>
             <name>pressure</name>
             <components>1</components>
             <order>1</order>
-            <initial_condition>Zero</initial_condition>
+            <initial_condition>zero</initial_condition>
             <boundary_conditions>
                 <boundary_condition>
-                    <mesh>soil_column_left</mesh>
+                    <mesh>soil_column_top</mesh>
                     <type>Dirichlet</type>
                     <component>0</component>
-                    <parameter>Zero</parameter>
-                </boundary_condition>
-                <boundary_condition>
-                    <mesh>soil_column_right</mesh>
-                    <type>Neumann</type>
-                    <component>0</component>
-                    <parameter>flow_in</parameter>
+                    <parameter>zero</parameter>
                 </boundary_condition>
             </boundary_conditions>
         </process_variable>
