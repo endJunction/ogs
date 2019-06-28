@@ -172,17 +172,6 @@
                         var gHy := 9.81*(100-y);
             (0.1/(1-0.1))*(rho_eff*gHy - 0.7*1000*gHy + 1e6) + gHy*0.7*1000</expression>
         </parameter>
-        <parameter>
-            <mesh>soil_column_left</mesh>
-            <name>HS_pressure</name>
-            <type>Function</type>
-            <expression>0.8*1000.0*9.81*(100.0-y)</expression>
-        </parameter>
-        <parameter>
-            <name>flow_in</name>
-            <type>Constant</type>
-            <value>1e-6</value>
-        </parameter>
     </parameters>
     <curves>
         <curve>
