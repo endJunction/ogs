@@ -125,7 +125,7 @@
         <parameter>
             <name>nu</name>
             <type>Constant</type>
-            <value>.1</value>
+            <value>0.1</value>
         </parameter>
         <parameter>
             <name>k</name>
