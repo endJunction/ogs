@@ -42,7 +42,8 @@ struct ThermoMechanicsProcessData
             linear_thermal_expansion_coefficient_,
         ParameterLib::Parameter<double> const& specific_heat_capacity_,
         ParameterLib::Parameter<double> const& thermal_conductivity_,
-        Eigen::Matrix<double, DisplacementDim, 1> const& specific_body_force_)
+        Eigen::Matrix<double, DisplacementDim, 1> const& specific_body_force_,
+        ParameterLib::Parameter<double> const* const nonequilibrium_stress_)
         : material_ids(material_ids_),
           solid_materials{std::move(solid_materials_)},
           reference_solid_density(reference_solid_density_),
@@ -50,6 +51,7 @@ struct ThermoMechanicsProcessData
               linear_thermal_expansion_coefficient_),
           specific_heat_capacity(specific_heat_capacity_),
           thermal_conductivity(thermal_conductivity_),
+          nonequilibrium_stress(nonequilibrium_stress_),
           specific_body_force(specific_body_force_)
     {
     }
@@ -76,6 +78,7 @@ struct ThermoMechanicsProcessData
     ParameterLib::Parameter<double> const& reference_solid_density;
     ParameterLib::Parameter<double> const& linear_thermal_expansion_coefficient;
     ParameterLib::Parameter<double> const& specific_heat_capacity;
+    ParameterLib::Parameter<double> const* const nonequilibrium_stress;
     ParameterLib::Parameter<double> const&
         thermal_conductivity;  // TODO To be changed as a matrix type variable.
     Eigen::Matrix<double, DisplacementDim, 1> const specific_body_force;
