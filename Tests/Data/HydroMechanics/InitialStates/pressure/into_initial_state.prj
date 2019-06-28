@@ -168,6 +168,7 @@
             <mesh>soil_column_left</mesh>
             <name>side_load</name>
             <type>Function</type>
+            <!-- Equals the total sigma_xx which includes alpha*p. -->
             <expression>var rho_eff := 2200*(1-0.1)+1000*0.1;
                         var gHy := 9.81*(100-y);
             (0.1/(1-0.1))*(rho_eff*gHy - 0.7*1000*gHy + 0.0*1e6) + gHy*0.7*1000</expression>
