@@ -103,7 +103,7 @@
             <type>Function</type>
             <expression>var rho_eff := 2200*(1-0.1)+1000*0.1;
                         var gHy := 9.81*(100-y);
-                        (0.1/(1-0.1))*(rho_eff*gHy - 0.7*1000*gHy + 0.5e6) + gHy*0.7*1000 </expression>
+                        -(0.1/(1-0.1))*(rho_eff*gHy - 0.7*1000*gHy + 0.5*1e6)</expression>
             <expression>var rho_eff := 2200*(1-0.1)+1000*0.1;
                         var gHy := 9.81*(100-y);
                         -gHy*rho_eff + 0.7*gHy*1000 - 0.5*1e6 </expression>
@@ -211,12 +211,6 @@
                 </boundary_condition>
                 <boundary_condition>
                     <mesh>soil_column_right</mesh>
-                    <type>Dirichlet</type>
-                    <component>0</component>
-                    <parameter>zero</parameter>
-                </boundary_condition>
-                <boundary_condition>
-                    <mesh>soil_column_left</mesh>
                     <type>Dirichlet</type>
                     <component>0</component>
                     <parameter>zero</parameter>
