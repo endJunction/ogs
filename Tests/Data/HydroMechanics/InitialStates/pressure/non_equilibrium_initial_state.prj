@@ -103,7 +103,7 @@
             <type>Function</type>
             <expression>var rho_eff := 2200*(1-0.1)+1000*0.1;
                         var gHy := 9.81*(100-y);
-                        -(0.1/(1-0.1))*(rho_eff*gHy - 0.7*1000*gHy + 0.5*1e6)</expression>
+                        -(0.1/(1-0.1))*(rho_eff*gHy - 0.7*1000*gHy + 0.0*1e6)</expression>
             <expression>var rho_eff := 2200*(1-0.1)+1000*0.1;
                         var gHy := 9.81*(100-y);
                         -gHy*rho_eff + 0.7*gHy*1000 - 0.5*1e6 </expression>
