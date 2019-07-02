@@ -91,6 +91,21 @@ inline void setFractureProperty(int const dim, MeshLib::Element const& e,
     computeRotationMatrix(e, n, dim, frac_prop.R);
     DBUG("Normal vector of the fracture element %d: [%g, %g, %g]", e.getID(),
          n[0], n[1], n[2]);
+    DBUG("Rotation matrix of the fracture element %d:", e.getID());
+    DBUG("{");
+    if (dim == 2)
+    {
+        DBUG("\n%.16g %.16g\n%.16g %.16g", frac_prop.R(0, 0), frac_prop.R(0, 1),
+             frac_prop.R(1, 0), frac_prop.R(1, 1));
+    }
+    if (dim == 3)
+    {
+        DBUG("\n%.16g %.16g %.16g\n%.16g %.16g %.16g\n%.16g %.16g %.16g",
+             frac_prop.R(0, 0), frac_prop.R(0, 1), frac_prop.R(0, 2),
+             frac_prop.R(1, 0), frac_prop.R(1, 1), frac_prop.R(1, 2),
+             frac_prop.R(2, 0), frac_prop.R(2, 1), frac_prop.R(2, 2));
+    }
+    DBUG("}");
 }
 
 inline BranchProperty createBranchProperty(MeshLib::Node const& branchNode,
