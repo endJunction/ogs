@@ -300,6 +300,8 @@ std::unique_ptr<Process> createHydroMechanicsProcess(
         MathLib::KelvinVector::KelvinVectorDimensions<GlobalDim>::value, &mesh);
     DBUG("Use '%s' as initial effective stress parameter.",
          initial_effective_stress.name.c_str());
+    // TODO (naumov) Test assumption about the constant initial effective
+    // stress.
 
     // initial effective stress in fracture
     auto& initial_fracture_effective_stress = ParameterLib::findParameter<
