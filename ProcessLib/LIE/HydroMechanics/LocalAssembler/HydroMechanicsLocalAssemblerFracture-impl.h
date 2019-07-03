@@ -118,12 +118,27 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         ip_data.permeability_state =
             frac_prop.permeability_model->getNewState();
 
-        auto const initial_effective_stress =
-            _process_data.initial_fracture_effective_stress(0, x_position);
+        auto const matrix_initial_effective_stress =
+            _process_data.initial_effective_stress(0, x_position);
+        using namespace MathLib::KelvinVector;
+
+        KelvinVectorType<GlobalDim> const matrix_stress0 =
+            Eigen::Map<KelvinVectorType<GlobalDim> const>(
+                matrix_initial_effective_stress.data(),
+                matrix_initial_effective_stress.size());
+        // Rotate using fracture property, rotation matrix.
+        auto const& R = frac_prop.R;
+        auto const initial_effective_stress_vector =
+            (R.transpose() *
+             kelvinVectorToTensor(matrix_stress0)
+                 .template topLeftCorner<GlobalDim, GlobalDim>() *
+             R)
+                .template bottomRows<1>()
+                .eval();
         for (int i = 0; i < GlobalDim; i++)
         {
-            ip_data.sigma_eff[i] = initial_effective_stress[i];
-            ip_data.sigma_eff_prev[i] = initial_effective_stress[i];
+            ip_data.sigma_eff[i] = initial_effective_stress_vector[i];
+            ip_data.sigma_eff_prev[i] = initial_effective_stress_vector[i];
         }
     }
 }
