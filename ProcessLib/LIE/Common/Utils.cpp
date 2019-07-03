@@ -54,6 +54,7 @@ void computeRotationMatrix(MeshLib::Element const& e, Eigen::Vector3d const& n,
         R.resize(3, 3);
         R << u[0], u[1], u[2], v[0], v[1], v[2], n[0], n[1], n[2];
     }
+    // TODO (naumov) Check orthognormality of the system.
 }
 
 }  // namespace LIE
