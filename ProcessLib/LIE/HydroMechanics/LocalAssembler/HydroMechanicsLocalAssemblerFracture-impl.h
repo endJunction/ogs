@@ -140,6 +140,14 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             ip_data.sigma_eff[i] = initial_effective_stress_vector[i];
             ip_data.sigma_eff_prev[i] = initial_effective_stress_vector[i];
         }
+        if (_process_data.p0 != nullptr)
+        {
+            auto const p0 = (*_process_data.p0)(0, x_position)[0];
+            auto const alpha_f = frac_prop.biot_coefficient(0, x_position)[0];
+
+            ip_data.sigma_eff.coeffRef(GlobalDim - 1) += alpha_f * p0; // - alpha_m * p0
+            ip_data.sigma_eff_prev.coeffRef(GlobalDim - 1) += alpha_f * p0; // - alpha_m * p0
+        }
     }
 }
 
