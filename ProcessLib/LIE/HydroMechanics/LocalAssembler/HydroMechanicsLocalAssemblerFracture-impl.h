@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include "HydroMechanicsLocalAssemblerFracture.h"
 
 #include "MaterialLib/FractureModels/FractureIdentity2.h"
@@ -126,6 +128,9 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             Eigen::Map<KelvinVectorType<GlobalDim> const>(
                 matrix_initial_effective_stress.data(),
                 matrix_initial_effective_stress.size());
+        std::cerr << "sigma_0 matrix Kelvin:\n" << matrix_stress0 << "\n";
+        std::cerr << "sigma_0 matrix Tensor:\n"
+                  << kelvinVectorToTensor(matrix_stress0) << "\n";
         // Rotate using fracture property, rotation matrix.
         auto const& R = frac_prop.R;
         auto const initial_effective_stress_vector =
@@ -135,6 +140,10 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
              R)
                 .template bottomRows<1>()
                 .eval();
+        std::cerr << "sigma_0 fracture vector:\n"
+                  << initial_effective_stress_vector
+                  << "\n";
+
         for (int i = 0; i < GlobalDim; i++)
         {
             ip_data.sigma_eff[i] = initial_effective_stress_vector[i];
@@ -148,6 +157,9 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             ip_data.sigma_eff.coeffRef(GlobalDim - 1) += alpha_f * p0; // - alpha_m * p0
             ip_data.sigma_eff_prev.coeffRef(GlobalDim - 1) += alpha_f * p0; // - alpha_m * p0
         }
+        std::cerr << "sigma_eff fracture vector:\n"
+                  << ip_data.sigma_eff
+                  << "\n";
     }
 }
 
