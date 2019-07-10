@@ -1,0 +1,15 @@
+@Behaviour<generic> 'src/libBehaviour.so' 'MohrCoulombAbboSloan';
+@ExternalStateVariable "Temperature" 293.15;
+@ImposedStrain 'EXX' {0 : 0, 1 : -1e-3, 2 : 0};
+@ImposedStrain 'EYY' {0 : 0, 2 : 0};
+@ImposedStrain 'EZZ' {0 : 0, 2 : 0};
+@Times {0.,2 in 50};
+
+@MaterialProperty<constant> 'YoungModulus' 150.0e6;
+@MaterialProperty<constant> 'PoissonRatio' 0.2;
+@MaterialProperty<constant> 'Cohesion' 1.4e3;
+@MaterialProperty<constant> 'FrictionAngle' 20.;
+@MaterialProperty<constant> 'DilatancyAngle' 5.;
+@MaterialProperty<constant> 'TransitionAngle' 27.;
+@MaterialProperty<constant> 'TensionCutOffParameter' 0.5e3;
+
