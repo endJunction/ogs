@@ -266,6 +266,7 @@ MFront<DisplacementDim>::integrateStress(
         static_cast<MaterialStateVariables const&>(material_state_variables));
     auto& behaviour_data = state->_behaviour_data;
 
+    mgis::behaviour::revert(behaviour_data);  // copies bd.s0 to bd.s1
     // TODO add a test of material behaviour where the value of dt matters.
     behaviour_data.dt = dt;
     behaviour_data.rdt = 1.0;
@@ -300,7 +301,9 @@ MFront<DisplacementDim>::integrateStress(
     auto const status = mgis::behaviour::integrate(v, _behaviour);
     if (status != 1)
     {
-        OGS_FATAL("Integration failed with status %i.", status);
+        // mgis::behaviour::revert(behaviour_data);  // copies bd.s0 to bd.s1
+        ERR("Integration failed with status %i.", status);
+        return {};
     }
 
     KelvinVector sigma;
