@@ -18,6 +18,10 @@
 #include "NumLib/DOF/GlobalMatrixProviders.h"
 #include "ConvergenceCriterion.h"
 
+namespace ProcessLib
+{
+extern bool repeat_timestep;
+}
 namespace NumLib
 {
 void NonlinearSolver<NonlinearSolverTag::Picard>::assemble(
@@ -232,6 +236,13 @@ NonlinearSolverStatus NonlinearSolver<NonlinearSolverTag::Newton>::solve(
         sys.getJacobian(J);
         INFO("[time] Assembly took %g s.", time_assembly.elapsed());
 
+        if (ProcessLib::repeat_timestep)
+        {
+            ProcessLib::repeat_timestep = false;
+            error_norms_met = false;
+            iteration = _maxiter;
+            break;
+        }
         minus_delta_x.setZero();
 
         timer_dirichlet.start();

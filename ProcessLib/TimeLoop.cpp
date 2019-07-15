@@ -68,6 +68,9 @@ void setEquationSystem(NumLib::NonlinearSolverBase& nonlinear_solver,
 
 namespace ProcessLib
 {
+bool repeat_timestep = false;
+bool timestep_rejected = false;
+
 template <NumLib::ODESystemTag ODETag>
 void setTimeDiscretizedODESystem(
     ProcessData& process_data,
@@ -297,10 +300,12 @@ double TimeLoop::computeTimeStepping(const double prev_dt, double& t,
             all_process_steps_accepted = false;
         }
 
+        timestep_rejected = false;
         if (!ppd.nonlinear_solver_status.error_norms_met)
         {
             WARN("Time step will be rejected due to nonlinear solver diverged");
             all_process_steps_accepted = false;
+            timestep_rejected = true;
         }
 
         if (timestepper->getTimeStep().dt() >
@@ -351,9 +356,9 @@ double TimeLoop::computeTimeStepping(const double prev_dt, double& t,
                                      std::numeric_limits<double>::epsilon())
             {
                 WARN(
-                    "Time step %d was rejected %d times "
+                    "Time step %d with dt = %g was rejected %d times "
                     "and it will be repeated with a reduced step size.",
-                    accepted_steps + 1, _repeating_times_of_rejected_step);
+                    accepted_steps + 1, dt, _repeating_times_of_rejected_step);
                 time_disc->popState(x);
             }
         }
