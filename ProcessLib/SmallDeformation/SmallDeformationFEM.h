@@ -307,8 +307,11 @@ public:
 
             if (!solution)
             {
-                ERR("Computation of local constitutive relation failed.");
+                ERR("Computation of local constitutive relation failed for "
+                    "element %d, integration point %d.",
+                    _element.getID(), ip);
                 ProcessLib::repeat_timestep = true;
+
                 return;
             }
 
