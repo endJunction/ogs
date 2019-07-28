@@ -322,7 +322,7 @@ NonlinearSolverStatus NonlinearSolver<NonlinearSolverTag::Newton>::solve(
         INFO("[time] Iteration #%u took %g s.", iteration,
              time_iteration.elapsed());
 
-        if (error_norms_met)
+        if (error_norms_met || ProcessLib::repeat_timestep)
         {
             break;
         }
