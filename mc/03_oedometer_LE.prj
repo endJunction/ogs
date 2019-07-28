@@ -60,9 +60,9 @@
 				<type>IterationNumberBasedTimeStepping</type>
 				<t_initial>0.0</t_initial>
 				<t_end>240e3</t_end>
-				<initial_dt>1000</initial_dt>
+				<initial_dt>30000</initial_dt>
 				<minimum_dt>1e-4</minimum_dt>
-				<maximum_dt>1e4</maximum_dt>
+				<maximum_dt>1e5</maximum_dt>
                 <number_iterations>1   10  20 </number_iterations>
 				<multiplier>       1.1 0.9 0.5</multiplier>		  
 			</time_stepping>	
