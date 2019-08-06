@@ -102,9 +102,15 @@ std::unique_ptr<Process> createSmallDeformationProcess(
         config.getConfigParameter<double>(
             "reference_temperature", std::numeric_limits<double>::quiet_NaN());
 
+    // Equilibration of initial state flag
+    const auto& equilibrate_initial_state =
+        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__equilibrate_initial_state}
+        config.getConfigParameter<bool>("equilibrate_initial_state", false);
+
     SmallDeformationProcessData<DisplacementDim> process_data{
-        materialIDs(mesh), std::move(solid_constitutive_relations),
-        solid_density, specific_body_force, reference_temperature};
+        materialIDs(mesh),     std::move(solid_constitutive_relations),
+        solid_density,         specific_body_force,
+        reference_temperature, equilibrate_initial_state};
 
     SecondaryVariableCollection secondary_variables;
 

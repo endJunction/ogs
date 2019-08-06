@@ -44,11 +44,9 @@ struct SmallDeformationProcessData
     /// A vector of displacement dimension's length.
     Eigen::Matrix<double, DisplacementDim, 1> const specific_body_force;
 
-    ParameterLib::Parameter<double> const* const nonequilibrium_stress =
-        nullptr;
     double const reference_temperature =
         std::numeric_limits<double>::quiet_NaN();
-
+    bool const equilibrate_initial_state;
     double dt = std::numeric_limits<double>::quiet_NaN();
     double t = std::numeric_limits<double>::quiet_NaN();
 };
