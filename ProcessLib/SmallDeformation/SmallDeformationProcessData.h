@@ -39,7 +39,6 @@ struct SmallDeformationProcessData
         solid_materials;
     /// Solid's density. A scalar quantity, ParameterLib::Parameter<double>.
     ParameterLib::Parameter<double> const& solid_density;
-
     /// Specific body forces applied to the solid.
     /// It is usually used to apply gravitational forces.
     /// A vector of displacement dimension's length.
