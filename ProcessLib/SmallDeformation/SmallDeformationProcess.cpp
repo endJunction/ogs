@@ -13,6 +13,7 @@
 #include <nlohmann/json.hpp>
 
 #include "BaseLib/Functional.h"
+#include "NumLib/DOF/GlobalMatrixProviders.h"
 #include "ProcessLib/Output/IntegrationPointWriter.h"
 #include "ProcessLib/Process.h"
 #include "ProcessLib/SmallDeformation/CreateLocalAssemblers.h"
@@ -78,8 +79,7 @@ bool SmallDeformationProcess<DisplacementDim>::isLinear() const
 
 template <int DisplacementDim>
 void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
-    NumLib::LocalToGlobalIndexMap const& dof_table,
-    MeshLib::Mesh const& mesh,
+    NumLib::LocalToGlobalIndexMap const& dof_table, MeshLib::Mesh const& mesh,
     unsigned const integration_order)
 {
     using nlohmann::json;
@@ -239,6 +239,37 @@ void SmallDeformationProcess<DisplacementDim>::initializeConcreteProcess(
 }
 
 template <int DisplacementDim>
+void SmallDeformationProcess<
+    DisplacementDim>::setInitialConditionsConcreteProcess(GlobalVector const& x,
+                                                          double const t)
+{
+    DBUG("Set initial conditions SmallDeformationProcess.");
+
+    // Compute the out of balance forces if requested.
+    if (_process_data.equilibrate_initial_state)
+    {
+        const int process_id = 0;
+
+        _out_of_balance_forces =
+            &NumLib::GlobalVectorProvider::provider.getVector(
+                getMatrixSpecifications(process_id));
+        _out_of_balance_forces->setZero();
+
+        ProcessLib::ProcessVariable const& pv =
+            getProcessVariables(process_id)[0];
+
+        std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>>
+            dof_table = {std::ref(*_local_to_global_index_map)};
+
+        GlobalExecutor::executeSelectedMemberDereferenced(
+            _global_assembler,
+            &VectorMatrixAssembler::computeOutOfBalanceForces,
+            _local_assemblers, pv.getActiveElementIDs(), dof_table, t, x,
+            *_out_of_balance_forces, _coupled_solutions);
+    }
+}
+
+template <int DisplacementDim>
 void SmallDeformationProcess<DisplacementDim>::assembleConcreteProcess(
     const double t, GlobalVector const& x, GlobalMatrix& M, GlobalMatrix& K,
     GlobalVector& b)
@@ -281,6 +312,14 @@ void SmallDeformationProcess<DisplacementDim>::
 
     transformVariableFromGlobalVector(b, 0, *_local_to_global_index_map,
                                       *_nodal_forces, std::negate<double>());
+
+    // Subtract out of balance forces from the rhs if requested.
+    if (_process_data.equilibrate_initial_state)
+    {
+        assert(_out_of_balance_forces != nullptr);
+        MathLib::LinAlg::setLocalAccessibleVector(b);
+        MathLib::LinAlg::axpy(b, -1, *_out_of_balance_forces);
+    }
 }
 
 template <int DisplacementDim>

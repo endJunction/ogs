@@ -180,7 +180,6 @@ public:
 
         return 0;
     }
-
     void initializeConcrete() override
     {
         unsigned const n_integration_points =
@@ -189,6 +188,80 @@ public:
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             _ip_data[ip].pushBackState();
+        }
+    }
+
+    void computeOutOfBalanceForces(double const t,
+                                   std::vector<double> const& local_x,
+                                   std::vector<double>& local_f_oob) override
+    {
+        auto const local_matrix_size = local_x.size();
+
+        auto f_oob = MathLib::createZeroedVector<NodalDisplacementVectorType>(
+            local_f_oob, local_matrix_size);
+
+        unsigned const n_integration_points =
+            _integration_method.getNumberOfPoints();
+
+        ParameterLib::SpatialPosition x_position;
+        x_position.setElementID(_element.getID());
+
+        for (unsigned ip = 0; ip < n_integration_points; ip++)
+        {
+            x_position.setIntegrationPoint(ip);
+            auto const& w = _ip_data[ip].integration_weight;
+            auto const& N = _ip_data[ip].N;
+            auto const& dNdx = _ip_data[ip].dNdx;
+
+            typename ShapeMatricesType::template MatrixType<DisplacementDim,
+                                                            displacement_size>
+                N_u_op = ShapeMatricesType::template MatrixType<
+                    DisplacementDim,
+                    displacement_size>::Zero(DisplacementDim,
+                                             displacement_size);
+            for (int i = 0; i < DisplacementDim; ++i)
+            {
+                N_u_op
+                    .template block<1, displacement_size / DisplacementDim>(
+                        i, i * displacement_size / DisplacementDim)
+                    .noalias() = N;
+            }
+
+            auto const x_coord =
+                interpolateXCoordinate<ShapeFunction, ShapeMatricesType>(
+                    _element, N);
+            auto const B = LinearBMatrix::computeBMatrix<
+                DisplacementDim, ShapeFunction::NPOINTS,
+                typename BMatricesType::BMatrixType>(dNdx, N, x_coord,
+                                                     _is_axially_symmetric);
+
+            auto const& eps_prev = _ip_data[ip].eps_prev;
+            auto const& sigma_prev = _ip_data[ip].sigma_prev;
+
+            auto& eps = _ip_data[ip].eps;
+            auto& sigma = _ip_data[ip].sigma;
+            auto& state = _ip_data[ip].material_state_variables;
+
+            eps.noalias() =
+                B *
+                Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
+                    local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
+
+            auto&& solution = _ip_data[ip].solid_material.integrateStress(
+                t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
+                *state, _process_data.reference_temperature);
+
+            if (!solution)
+            {
+                OGS_FATAL("Computation of local constitutive relation failed.");
+            }
+
+            std::tie(sigma, std::ignore, std::ignore) = std::move(*solution);
+
+            auto const rho = _process_data.solid_density(t, x_position)[0];
+            auto const& b = _process_data.specific_body_force;
+            f_oob.noalias() -=
+                (B.transpose() * sigma - N_u_op.transpose() * rho * b) * w;
         }
     }
 

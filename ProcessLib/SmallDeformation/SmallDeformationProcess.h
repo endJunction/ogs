@@ -46,8 +46,10 @@ private:
 
     void initializeConcreteProcess(
         NumLib::LocalToGlobalIndexMap const& dof_table,
-        MeshLib::Mesh const& mesh,
-        unsigned const integration_order) override;
+        MeshLib::Mesh const& mesh, unsigned const integration_order) override;
+
+    void setInitialConditionsConcreteProcess(GlobalVector const& x,
+                                             double const t) override;
 
     void assembleConcreteProcess(
         const double t, GlobalVector const& x, GlobalMatrix& M, GlobalMatrix& K,
@@ -75,6 +77,7 @@ private:
         _local_to_global_index_map_single_component;
     MeshLib::PropertyVector<double>* _nodal_forces = nullptr;
     MeshLib::PropertyVector<double>* _material_forces = nullptr;
+    GlobalVector* _out_of_balance_forces = nullptr;
 };
 
 extern template class SmallDeformationProcess<2>;
