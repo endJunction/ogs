@@ -39,8 +39,10 @@
 #include "ProcessLib/DeactivatedSubdomain.h"
 
 // PhreeqcIO
+#ifdef OGS_BUILD_PROCESS_COMPONENTTRANSPORT
 #include "ChemistryLib/CreatePhreeqcIO.h"
 #include "ProcessLib/ComponentTransport/ComponentTransportProcess.h"
+#endif
 
 // FileIO
 #include "GeoLib/IO/XmlIO/Boost/BoostXmlGmlInterface.h"
