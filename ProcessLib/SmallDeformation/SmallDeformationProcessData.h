@@ -16,6 +16,8 @@
 
 #include "ParameterLib/Parameter.h"
 
+#include "NonequilibriumInitialState.h"
+
 namespace MaterialLib
 {
 namespace Solids
@@ -39,6 +41,7 @@ struct SmallDeformationProcessData
         solid_materials;
     /// Solid's density. A scalar quantity, ParameterLib::Parameter<double>.
     ParameterLib::Parameter<double> const& solid_density;
+
     /// Specific body forces applied to the solid.
     /// It is usually used to apply gravitational forces.
     /// A vector of displacement dimension's length.
@@ -46,7 +49,10 @@ struct SmallDeformationProcessData
 
     double const reference_temperature =
         std::numeric_limits<double>::quiet_NaN();
-    bool const equilibrate_initial_state;
+
+    std::unique_ptr<NonequilibriumInitialState const>
+        nonequilibrium_initial_state = nullptr;
+
     double dt = std::numeric_limits<double>::quiet_NaN();
     double t = std::numeric_limits<double>::quiet_NaN();
 };

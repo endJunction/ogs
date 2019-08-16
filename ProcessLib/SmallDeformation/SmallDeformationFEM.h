@@ -206,6 +206,10 @@ public:
         ParameterLib::SpatialPosition x_position;
         x_position.setElementID(_element.getID());
 
+        auto const& nonequilibrium_stress =
+            *_process_data.nonequilibrium_initial_state->parameter_map.at(
+                "stress");
+
         for (unsigned ip = 0; ip < n_integration_points; ip++)
         {
             x_position.setIntegrationPoint(ip);
@@ -213,6 +217,17 @@ public:
             auto const& N = _ip_data[ip].N;
             auto const& dNdx = _ip_data[ip].dNdx;
 
+            // Computation of non-equilibrium stress.
+            x_position.setCoordinates(MathLib::Point3d(
+                interpolateCoordinates<ShapeFunction, ShapeMatricesType>(
+                    _element, N)));
+            std::vector<double> sigma_neq_data =
+                nonequilibrium_stress(t, x_position);
+            auto const sigma_neq =
+                Eigen::Map<typename BMatricesType::KelvinVectorType>(
+                    sigma_neq_data.data(),
+                    MathLib::KelvinVector::size<DisplacementDim>(),
+                    1);
             typename ShapeMatricesType::template MatrixType<DisplacementDim,
                                                             displacement_size>
                 N_u_op = ShapeMatricesType::template MatrixType<
@@ -235,33 +250,10 @@ public:
                 typename BMatricesType::BMatrixType>(dNdx, N, x_coord,
                                                      _is_axially_symmetric);
 
-            auto const& eps_prev = _ip_data[ip].eps_prev;
-            auto const& sigma_prev = _ip_data[ip].sigma_prev;
-
-            auto& eps = _ip_data[ip].eps;
-            auto& sigma = _ip_data[ip].sigma;
-            auto& state = _ip_data[ip].material_state_variables;
-
-            eps.noalias() =
-                B *
-                Eigen::Map<typename BMatricesType::NodalForceVectorType const>(
-                    local_x.data(), ShapeFunction::NPOINTS * DisplacementDim);
-
-            auto&& solution = _ip_data[ip].solid_material.integrateStress(
-                t, x_position, _process_data.dt, eps_prev, eps, sigma_prev,
-                *state, _process_data.reference_temperature);
-
-            if (!solution)
-            {
-                OGS_FATAL("Computation of local constitutive relation failed.");
-            }
-
-            std::tie(sigma, std::ignore, std::ignore) = std::move(*solution);
-
             auto const rho = _process_data.solid_density(t, x_position)[0];
             auto const& b = _process_data.specific_body_force;
             f_oob.noalias() -=
-                (B.transpose() * sigma - N_u_op.transpose() * rho * b) * w;
+                (B.transpose() * sigma_neq - N_u_op.transpose() * rho * b) * w;
         }
     }
 

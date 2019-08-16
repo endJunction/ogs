@@ -26,7 +26,12 @@
                 <secondary_variable type="static" internal_name="sigma" output_name="sigma"/>
                 <secondary_variable type="static" internal_name="epsilon" output_name="epsilon"/>
             </secondary_variables>
-            <equilibrate_initial_state>true</equilibrate_initial_state>
+            <nonequilibrium_initial_state>
+                <stress>nonequilibrium_stress</stress>
+                <equilibrate_process_variables>
+                    <process_variable>displacement</process_variable>
+                </equilibrate_process_variables>
+            </nonequilibrium_initial_state>
         </process>
     </processes>
     <time_loop>
@@ -71,6 +76,15 @@
         </output>
     </time_loop>
     <parameters>
+        <parameter>
+            <mesh>soil_column_q8</mesh>
+            <name>nonequilibrium_stress</name>
+            <type>Function</type>
+            <expression>2200*9.81*0.8*(y-100)</expression>
+            <expression>-0.5*1e6+2200*9.81*(y-100)</expression>
+            <expression>0</expression>
+            <expression>0</expression>
+        </parameter>
         <parameter>
             <name>E</name>
             <type>Constant</type>

@@ -16,6 +16,7 @@
 #include "ProcessLib/Output/CreateSecondaryVariables.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
 
+#include "NonequilibriumInitialState.h"
 #include "SmallDeformationProcess.h"
 #include "SmallDeformationProcessData.h"
 
@@ -102,15 +103,19 @@ std::unique_ptr<Process> createSmallDeformationProcess(
         config.getConfigParameter<double>(
             "reference_temperature", std::numeric_limits<double>::quiet_NaN());
 
-    // Equilibration of initial state flag
-    const auto& equilibrate_initial_state =
-        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__equilibrate_initial_state}
-        config.getConfigParameter<bool>("equilibrate_initial_state", false);
+    // Non-equilibrium initial state.
+    auto nonequilibrium_initial_state = createNonequilibriumInitialState(
+        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state}
+        config.getConfigSubtreeOptional("nonequilibrium_initial_state"),
+        //! \ogs_file_param_special{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__stress}
+        {{"stress", MathLib::KelvinVector::KelvinVectorDimensions<
+                        DisplacementDim>::value}},  // variables,
+        parameters, mesh);
 
     SmallDeformationProcessData<DisplacementDim> process_data{
         materialIDs(mesh),     std::move(solid_constitutive_relations),
         solid_density,         specific_body_force,
-        reference_temperature, equilibrate_initial_state};
+        reference_temperature, std::move(nonequilibrium_initial_state)};
 
     SecondaryVariableCollection secondary_variables;
 
