@@ -129,6 +129,10 @@ public:
         unsigned const integration_order,
         HydroMechanicsProcessData<DisplacementDim>& process_data);
 
+    void computeOutOfBalanceForces(double const t,
+                                   std::vector<double> const& local_x,
+                                   std::vector<double>& local_f_oob) override;
+
     void assemble(double const /*t*/, std::vector<double> const& /*local_x*/,
                   std::vector<double>& /*local_M_data*/,
                   std::vector<double>& /*local_K_data*/,
