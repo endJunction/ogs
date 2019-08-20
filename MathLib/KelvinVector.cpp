@@ -30,7 +30,6 @@ double Invariants<4>::determinant(Eigen::Matrix<double, 4, 1> const& v)
     return v(2) * (v(0) * v(1) - v(3) * v(3) / 2.);
 }
 
-template <>
 Eigen::Matrix<double, 4, 1, Eigen::ColMajor, 4, 1> inverse(
     Eigen::Matrix<double, 4, 1, Eigen::ColMajor, 4, 1> const& v)
 {
@@ -44,7 +43,6 @@ Eigen::Matrix<double, 4, 1, Eigen::ColMajor, 4, 1> inverse(
     return inv / Invariants<4>::determinant(v);
 }
 
-template <>
 Eigen::Matrix<double, 6, 1, Eigen::ColMajor, 6, 1> inverse(
     Eigen::Matrix<double, 6, 1, Eigen::ColMajor, 6, 1> const& v)
 {
@@ -60,7 +58,6 @@ Eigen::Matrix<double, 6, 1, Eigen::ColMajor, 6, 1> inverse(
     return inv / Invariants<6>::determinant(v);
 }
 
-template <>
 Eigen::Matrix<double, 3, 3> kelvinVectorToTensor(
     Eigen::Matrix<double, 4, 1, Eigen::ColMajor, 4, 1> const& v)
 {
@@ -70,7 +67,6 @@ Eigen::Matrix<double, 3, 3> kelvinVectorToTensor(
     return m;
 }
 
-template <>
 Eigen::Matrix<double, 3, 3> kelvinVectorToTensor(
     Eigen::Matrix<double, 6, 1, Eigen::ColMajor, 6, 1> const& v)
 {
@@ -81,7 +77,6 @@ Eigen::Matrix<double, 3, 3> kelvinVectorToTensor(
     return m;
 }
 
-template <>
 Eigen::Matrix<double, 3, 3> kelvinVectorToTensor(Eigen::Matrix<double,
                                                                Eigen::Dynamic,
                                                                1,
@@ -138,7 +133,6 @@ KelvinVectorType<3> tensorToKelvin<3>(Eigen::Matrix<double, 3, 3> const& m)
     return v;
 }
 
-template <>
 Eigen::Matrix<double, 4, 1> kelvinVectorToSymmetricTensor(
     Eigen::Matrix<double, 4, 1, Eigen::ColMajor, 4, 1> const& v)
 {
@@ -147,7 +141,6 @@ Eigen::Matrix<double, 4, 1> kelvinVectorToSymmetricTensor(
     return m;
 }
 
-template <>
 Eigen::Matrix<double, 6, 1> kelvinVectorToSymmetricTensor(
     Eigen::Matrix<double, 6, 1, Eigen::ColMajor, 6, 1> const& v)
 {
@@ -157,7 +150,6 @@ Eigen::Matrix<double, 6, 1> kelvinVectorToSymmetricTensor(
     return m;
 }
 
-template <>
 Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor, Eigen::Dynamic, 1>
 kelvinVectorToSymmetricTensor(Eigen::Matrix<double,
                                             Eigen::Dynamic,
