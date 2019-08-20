@@ -276,6 +276,41 @@ void HydroMechanicsProcess<DisplacementDim>::initializeBoundaryConditions()
 }
 
 template <int DisplacementDim>
+void HydroMechanicsProcess<
+    DisplacementDim>::setInitialConditionsConcreteProcess(GlobalVector const& x,
+                                                          double const t)
+{
+    DBUG("Set initial conditions HydroMechanicsProcess.");
+
+    // Compute the out of balance forces if requested.
+    if (_process_data.nonequilibrium_initial_state)
+    {
+        if (!_use_monolithic_scheme)
+        {
+            OGS_FATAL(
+                "Out of balance forces computation is not implemented for "
+                "staggered scheme.");
+        }
+
+        const int process_id = 0;
+
+        _out_of_balance_forces =
+            &NumLib::GlobalVectorProvider::provider.getVector(
+                getMatrixSpecifications(process_id));
+        _out_of_balance_forces->setZero();
+
+        std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>>
+            dof_table = {std::ref(*_local_to_global_index_map)};
+
+        GlobalExecutor::executeMemberDereferenced(
+            _global_assembler,
+            &VectorMatrixAssembler::computeOutOfBalanceForces,
+            _local_assemblers, dof_table, t, x, *_out_of_balance_forces,
+            _coupled_solutions);
+    }
+}
+
+template <int DisplacementDim>
 void HydroMechanicsProcess<DisplacementDim>::assembleConcreteProcess(
     const double t, GlobalVector const& x, GlobalMatrix& M, GlobalMatrix& K,
     GlobalVector& b)

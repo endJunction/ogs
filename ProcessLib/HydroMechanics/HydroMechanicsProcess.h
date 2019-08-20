@@ -71,6 +71,9 @@ private:
 
     void initializeBoundaryConditions() override;
 
+    void setInitialConditionsConcreteProcess(GlobalVector const& x,
+                                             double const t) override;
+
     void assembleConcreteProcess(const double t, GlobalVector const& x,
                                  GlobalMatrix& M, GlobalMatrix& K,
                                  GlobalVector& b) override;
@@ -134,6 +137,7 @@ private:
 
     MeshLib::PropertyVector<double>* _nodal_forces = nullptr;
     MeshLib::PropertyVector<double>* _hydraulic_flow = nullptr;
+    GlobalVector* _out_of_balance_forces = nullptr;
 };
 
 extern template class HydroMechanicsProcess<2>;

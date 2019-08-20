@@ -13,7 +13,7 @@
 
 #include "MaterialLib/SolidModels/CreateConstitutiveRelation.h"
 #include "ParameterLib/Utils.h"
-#include "ProcessLib/NonequilibriumInitialState.h"
+#include "ProcessLib/CreateNonequilibriumInitialState.h"
 #include "ProcessLib/Output/CreateSecondaryVariables.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
 
@@ -108,8 +108,8 @@ std::unique_ptr<Process> createSmallDeformationProcess(
         //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state}
         config.getConfigSubtreeOptional("nonequilibrium_initial_state"),
         //! \ogs_file_param_special{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__stress}
-        {{"stress", MathLib::KelvinVector::KelvinVectorDimensions<
-                        DisplacementDim>::value}},  // variables,
+        {{"stress",
+          MathLib::KelvinVector::size<DisplacementDim>()}},  // variables,
         parameters, mesh);
 
     SmallDeformationProcessData<DisplacementDim> process_data{

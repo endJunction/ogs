@@ -13,7 +13,9 @@
 
 #include "MaterialLib/SolidModels/CreateConstitutiveRelation.h"
 #include "MaterialLib/SolidModels/MechanicsBase.h"
+#include "MathLib/KelvinVector.h"
 #include "ParameterLib/Utils.h"
+#include "ProcessLib/CreateNonequilibriumInitialState.h"
 #include "ProcessLib/Output/CreateSecondaryVariables.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
 
@@ -187,6 +189,15 @@ std::unique_ptr<Process> createHydroMechanicsProcess(
         //! \ogs_file_param{prj__processes__process__HYDRO_MECHANICS__reference_temperature}
         config.getConfigParameter<double>(
             "reference_temperature", std::numeric_limits<double>::quiet_NaN());
+
+    // Non-equilibrium initial state.
+    auto nonequilibrium_initial_state = createNonequilibriumInitialState(
+        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state}
+        config.getConfigSubtreeOptional("nonequilibrium_initial_state"),
+        //! \ogs_file_param_special{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__stress}
+        {{"stress", MathLib::KelvinVector::size<DisplacementDim>()},
+         {"pressure", 1}},  // variables,
+        parameters, mesh);
 
     HydroMechanicsProcessData<DisplacementDim> process_data{
         materialIDs(mesh),      std::move(solid_constitutive_relations),

@@ -9,12 +9,14 @@
 
 #pragma once
 
-#include "ParameterLib/Parameter.h"
 
 #include <memory>
 #include <utility>
 
 #include <Eigen/Dense>
+
+#include "ParameterLib/Parameter.h"
+#include "ProcessLib/NonequilibriumInitialState.h"
 
 namespace MaterialLib
 {
@@ -62,6 +64,9 @@ struct HydroMechanicsProcessData
     Eigen::Matrix<double, DisplacementDim, 1> const specific_body_force;
     double const reference_temperature =
         std::numeric_limits<double>::quiet_NaN();
+
+    std::unique_ptr<NonequilibriumInitialState const>
+        nonequilibrium_initial_state = nullptr;
 
     MeshLib::PropertyVector<double>* pressure_interpolated = nullptr;
     double dt = std::numeric_limits<double>::quiet_NaN();

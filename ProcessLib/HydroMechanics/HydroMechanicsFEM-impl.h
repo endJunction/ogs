@@ -104,6 +104,71 @@ template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
 void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
                                   ShapeFunctionPressure, IntegrationMethod,
                                   DisplacementDim>::
+    computeOutOfBalanceForces(double const t,
+                              std::vector<double> const& local_x,
+                              std::vector<double>& local_f_oob)
+{
+    assert(local_x.size() == pressure_size + displacement_size);
+
+    auto f_oob = MathLib::createZeroedVector<
+        typename ShapeMatricesTypeDisplacement::template VectorType<
+            displacement_size + pressure_size>>(
+        local_f_oob, displacement_size + pressure_size);
+
+    unsigned const n_integration_points =
+        _integration_method.getNumberOfPoints();
+
+    ParameterLib::SpatialPosition x_position;
+    x_position.setElementID(_element.getID());
+
+    auto const& nonequilibrium_stress =
+        *_process_data.nonequilibrium_initial_state->parameter_map.at("stress");
+
+    for (unsigned ip = 0; ip < n_integration_points; ip++)
+    {
+        x_position.setIntegrationPoint(ip);
+        auto const& w = _ip_data[ip].integration_weight;
+        auto const& N_u = _ip_data[ip].N_u;
+        auto const& dNdx_u = _ip_data[ip].dNdx_u;
+        auto const& N_u_op = _ip_data[ip].N_u_op;
+
+        // Computation of non-equilibrium stress.
+        x_position.setCoordinates(MathLib::Point3d(
+            interpolateCoordinates<ShapeFunctionDisplacement,
+                                   ShapeMatricesTypeDisplacement>(_element,
+                                                                  N_u)));
+        std::vector<double> sigma_neq_data =
+            nonequilibrium_stress(t, x_position);
+        auto const sigma_neq =
+            Eigen::Map<typename BMatricesType::KelvinVectorType>(
+                sigma_neq_data.data(),
+                MathLib::KelvinVector::KelvinVectorDimensions<
+                    DisplacementDim>::value,
+                1);
+
+        auto const x_coord =
+            interpolateXCoordinate<ShapeFunctionDisplacement,
+                                   ShapeMatricesTypeDisplacement>(_element,
+                                                                  N_u);
+        auto const B =
+            LinearBMatrix::computeBMatrix<DisplacementDim,
+                                          ShapeFunctionDisplacement::NPOINTS,
+                                          typename BMatricesType::BMatrixType>(
+                dNdx_u, N_u, x_coord, _is_axially_symmetric);
+
+        auto const rho = _process_data.solid_density(t, x_position)[0];
+        auto const& b = _process_data.specific_body_force;
+        f_oob.template segment<displacement_size>(displacement_index)
+            .noalias() -=
+            (B.transpose() * sigma_neq - N_u_op.transpose() * rho * b) * w;
+    }
+}
+
+template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
+          typename IntegrationMethod, int DisplacementDim>
+void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
+                                  ShapeFunctionPressure, IntegrationMethod,
+                                  DisplacementDim>::
     assembleWithJacobian(double const t, std::vector<double> const& local_x,
                          std::vector<double> const& local_xdot,
                          const double /*dxdot_dx*/, const double /*dx_dx*/,
