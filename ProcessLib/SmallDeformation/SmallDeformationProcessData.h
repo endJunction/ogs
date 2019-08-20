@@ -15,8 +15,7 @@
 #include <Eigen/Eigen>
 
 #include "ParameterLib/Parameter.h"
-
-#include "NonequilibriumInitialState.h"
+#include "ProcessLib/NonequilibriumInitialState.h"
 
 namespace MaterialLib
 {

@@ -16,8 +16,6 @@
 
 namespace ProcessLib
 {
-namespace SmallDeformation
-{
 struct NonequilibriumInitialState
 {
     std::map<std::string, ParameterLib::Parameter<double> const*> const
@@ -86,5 +84,4 @@ createNonequilibriumInitialState(
     return std::make_unique<NonequilibriumInitialState>(
         NonequilibriumInitialState{std::move(name_parameter_map)});
 }
-}  // namespace SmallDeformation
 }  // namespace ProcessLib

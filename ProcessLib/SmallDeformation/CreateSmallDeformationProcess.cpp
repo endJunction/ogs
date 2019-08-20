@@ -13,10 +13,10 @@
 
 #include "MaterialLib/SolidModels/CreateConstitutiveRelation.h"
 #include "ParameterLib/Utils.h"
+#include "ProcessLib/NonequilibriumInitialState.h"
 #include "ProcessLib/Output/CreateSecondaryVariables.h"
 #include "ProcessLib/Utils/ProcessUtils.h"
 
-#include "NonequilibriumInitialState.h"
 #include "SmallDeformationProcess.h"
 #include "SmallDeformationProcessData.h"
 
