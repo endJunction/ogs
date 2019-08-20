@@ -56,8 +56,7 @@ ThermoMechanicsLocalAssembler<ShapeFunction, IntegrationMethod,
             shape_matrices[ip].integralMeasure * shape_matrices[ip].detJ;
 
         static const int kelvin_vector_size =
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value;
+            MathLib::KelvinVector::size<DisplacementDim>();
         // Initialize current time step values
         ip_data.sigma.setZero(kelvin_vector_size);
         ip_data.eps.setZero(kelvin_vector_size);
@@ -205,8 +204,7 @@ void ThermoMechanicsLocalAssembler<ShapeFunction, IntegrationMethod,
         eps.noalias() = B * u;
 
         using Invariants = MathLib::KelvinVector::Invariants<
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value>;
+            MathLib::KelvinVector::size<DisplacementDim>()>;
 
         // assume isotropic thermal expansion
         const double T_ip = N.dot(T);  // T at integration point
@@ -411,8 +409,7 @@ void ThermoMechanicsLocalAssembler<ShapeFunction, IntegrationMethod,
         eps.noalias() = B * u;
 
         using Invariants = MathLib::KelvinVector::Invariants<
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value>;
+            MathLib::KelvinVector::size<DisplacementDim>()>;
 
         // assume isotropic thermal expansion
         eps_m.noalias() =
@@ -548,7 +545,7 @@ ThermoMechanicsLocalAssembler<ShapeFunction, IntegrationMethod,
                               DisplacementDim>::setSigma(double const* values)
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
@@ -573,7 +570,7 @@ std::vector<double> ThermoMechanicsLocalAssembler<
     ShapeFunction, IntegrationMethod, DisplacementDim>::getSigma() const
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
@@ -602,7 +599,7 @@ std::vector<double> const& ThermoMechanicsLocalAssembler<
                   std::vector<double>& cache) const
 {
     static const int kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
@@ -628,7 +625,7 @@ ThermoMechanicsLocalAssembler<ShapeFunction, IntegrationMethod,
                               DisplacementDim>::setEpsilon(double const* values)
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
@@ -652,7 +649,7 @@ std::vector<double> ThermoMechanicsLocalAssembler<
     ShapeFunction, IntegrationMethod, DisplacementDim>::getEpsilon() const
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
@@ -681,7 +678,7 @@ std::vector<double> const& ThermoMechanicsLocalAssembler<
                     std::vector<double>& cache) const
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
@@ -707,7 +704,7 @@ std::size_t ThermoMechanicsLocalAssembler<
     DisplacementDim>::setEpsilonMechanical(double const* values)
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 
@@ -732,7 +729,7 @@ ThermoMechanicsLocalAssembler<ShapeFunction, IntegrationMethod,
                               DisplacementDim>::getEpsilonMechanical() const
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     unsigned const n_integration_points =
         _integration_method.getNumberOfPoints();
 

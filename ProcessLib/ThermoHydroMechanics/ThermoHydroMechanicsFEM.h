@@ -60,7 +60,7 @@ public:
         typename ShapeMatricesTypePressure::GlobalDimVectorType;
 
     static int const KelvinVectorSize =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     using Invariants = MathLib::KelvinVector::Invariants<KelvinVectorSize>;
 
     ThermoHydroMechanicsLocalAssembler(
@@ -144,8 +144,7 @@ private:
     std::size_t setSigma(double const* values)
     {
         auto const kelvin_vector_size =
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value;
+            MathLib::KelvinVector::size<DisplacementDim>();
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
@@ -170,8 +169,7 @@ private:
     std::vector<double> getSigma() const override
     {
         auto const kelvin_vector_size =
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value;
+            MathLib::KelvinVector::size<DisplacementDim>();
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
@@ -197,8 +195,7 @@ private:
         std::vector<double>& cache) const override
     {
         static const int kelvin_vector_size =
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value;
+            MathLib::KelvinVector::size<DisplacementDim>();
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 
@@ -224,8 +221,7 @@ private:
         std::vector<double>& cache) const override
     {
         auto const kelvin_vector_size =
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value;
+            MathLib::KelvinVector::size<DisplacementDim>();
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 

@@ -205,8 +205,7 @@ void RichardsMechanicsLocalAssembler<
             -p_cap_ip, temperature);
         auto const& b = _process_data.specific_body_force;
         auto const& identity2 = MathLib::KelvinVector::Invariants<
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value>::identity2;
+            MathLib::KelvinVector::size<DisplacementDim>()>::identity2;
 
         S_L = _process_data.flow_material->getSaturation(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);
@@ -419,8 +418,7 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
             -p_cap_ip, temperature);
         auto const& b = _process_data.specific_body_force;
         auto const& identity2 = MathLib::KelvinVector::Invariants<
-            MathLib::KelvinVector::KelvinVectorDimensions<
-                DisplacementDim>::value>::identity2;
+            MathLib::KelvinVector::size<DisplacementDim>()>::identity2;
 
         S_L = _process_data.flow_material->getSaturation(
             material_id, t, x_position, -p_cap_ip, temperature, p_cap_ip);
@@ -596,7 +594,7 @@ std::vector<double> const& RichardsMechanicsLocalAssembler<
                   std::vector<double>& cache) const
 {
     static const int kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     auto const num_intpts = _ip_data.size();
 
     cache.clear();
@@ -625,7 +623,7 @@ std::vector<double> const& RichardsMechanicsLocalAssembler<
                     std::vector<double>& cache) const
 {
     auto const kelvin_vector_size =
-        MathLib::KelvinVector::KelvinVectorDimensions<DisplacementDim>::value;
+        MathLib::KelvinVector::size<DisplacementDim>();
     auto const num_intpts = _ip_data.size();
 
     cache.clear();
