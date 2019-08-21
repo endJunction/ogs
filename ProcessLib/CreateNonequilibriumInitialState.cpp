@@ -50,29 +50,19 @@ std::unique_ptr<NonequilibriumInitialState> createNonequilibriumInitialState(
         }
 
         name_parameter_map[*parameter_name] = &parameter;
-
-        /*
-        const auto& equilibrate_process_variables_config =
-            //!
-        \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__equilibrate_process_variables}
-            config.getConfigSubtree("equilibrate_process_variables");
-        for (
-            auto const& pv :
-            //!
-        \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__equilibrate_process_variables__process_variable}
-            equilibrate_process_variables_config.getConfigSubtreeList(
-                "process_variable"))
-        {
-            auto const name = pv.getValue<std::string>();
-        }
-        */
     }
-    /*
-    const auto& equilibrate_initial_state =
-        //!
-    \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__equilibrate_initial_state}
-        config.getConfigParameter<bool>("equilibrate_initial_state", false);
-        */
+
+    const auto& equilibrate_process_variables_config =
+        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__equilibrate_process_variables}
+        config->getConfigSubtree("equilibrate_process_variables");
+    for (
+        auto const& pv :
+        //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__equilibrate_process_variables__process_variable}
+        equilibrate_process_variables_config.getConfigSubtreeList(
+            "process_variable"))
+    {
+        auto const name = pv.getValue<std::string>();
+    }
     return std::make_unique<NonequilibriumInitialState>(
         NonequilibriumInitialState{std::move(name_parameter_map)});
 }
