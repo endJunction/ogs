@@ -18,7 +18,7 @@ namespace ProcessLib
 std::unique_ptr<NonequilibriumInitialState> createNonequilibriumInitialState(
     boost::optional<BaseLib::ConfigTree> const& config,
     std::vector<std::pair<std::string, int>> const& tag_names_and_components,
-    // std::vector<ProcessVariable> const& variables,
+    std::vector<ProcessVariable> const& process_variables,
     std::vector<std::unique_ptr<ParameterLib::ParameterBase>> const& parameters,
     MeshLib::Mesh const& mesh)
 {
@@ -49,9 +49,10 @@ std::unique_ptr<NonequilibriumInitialState> createNonequilibriumInitialState(
                       tag_name.c_str());
         }
 
-        name_parameter_map[*parameter_name] = &parameter;
+        name_parameter_map[tag_name] = &parameter;
     }
 
+    std::vector<std::reference_wrapper<ProcessVariable>> variables;
     const auto& equilibrate_process_variables_config =
         //! \ogs_file_param{prj__processes__process__SMALL_DEFORMATION__nonequilibrium_initial_state__equilibrate_process_variables}
         config->getConfigSubtree("equilibrate_process_variables");
@@ -63,6 +64,7 @@ std::unique_ptr<NonequilibriumInitialState> createNonequilibriumInitialState(
     {
         auto const name = pv.getValue<std::string>();
     }
+
     return std::make_unique<NonequilibriumInitialState>(
         NonequilibriumInitialState{std::move(name_parameter_map)});
 }

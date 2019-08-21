@@ -41,10 +41,14 @@
                 <secondary_variable type="static" internal_name="epsilon_xy" output_name="epsilon_xy"/>
                 <secondary_variable type="static" internal_name="velocity" output_name="velocity"/>
             </secondary_variables>
-            <nonequilibrium_state_variables>
+            <nonequilibrium_initial_state>
                 <stress>nonequilibrium_stress</stress>
                 <pressure>nonequilibrium_pressure</pressure>
-            </nonequilibrium_state_variables>
+                <equilibrate_process_variables>
+                    <process_variable>displacement</process_variable>
+                    <process_variable>pressure</process_variable>
+                </equilibrate_process_variables>
+            </nonequilibrium_initial_state>
         </process>
     </processes>
     <time_loop>
@@ -278,7 +282,25 @@
         </vtkdiff>
         <vtkdiff>
             <file>non_equilibrium_initial_state_pcs_0_ts_1_t_2.000000.vtu</file>
-            <field>sigma</field>
+            <field>sigma_xx</field>
+            <absolute_tolerance>1e-7</absolute_tolerance>
+            <relative_tolerance>0</relative_tolerance>
+        </vtkdiff>
+        <vtkdiff>
+            <file>non_equilibrium_initial_state_pcs_0_ts_1_t_2.000000.vtu</file>
+            <field>sigma_yy</field>
+            <absolute_tolerance>1e-7</absolute_tolerance>
+            <relative_tolerance>0</relative_tolerance>
+        </vtkdiff>
+        <vtkdiff>
+            <file>non_equilibrium_initial_state_pcs_0_ts_1_t_2.000000.vtu</file>
+            <field>sigma_zz</field>
+            <absolute_tolerance>1e-7</absolute_tolerance>
+            <relative_tolerance>0</relative_tolerance>
+        </vtkdiff>
+        <vtkdiff>
+            <file>non_equilibrium_initial_state_pcs_0_ts_1_t_2.000000.vtu</file>
+            <field>sigma_xy</field>
             <absolute_tolerance>1e-7</absolute_tolerance>
             <relative_tolerance>0</relative_tolerance>
         </vtkdiff>

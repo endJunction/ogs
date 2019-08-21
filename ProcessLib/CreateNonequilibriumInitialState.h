@@ -40,7 +40,7 @@ namespace ProcessLib
 std::unique_ptr<NonequilibriumInitialState> createNonequilibriumInitialState(
     boost::optional<BaseLib::ConfigTree> const& config,
     std::vector<std::pair<std::string, int>> const& tag_names_and_components,
-    // std::vector<ProcessVariable> const& variables,
+    std::vector<ProcessVariable> const& process_variables,
     std::vector<std::unique_ptr<ParameterLib::ParameterBase>> const& parameters,
     MeshLib::Mesh const& mesh);
 }  // namespace ProcessLib
