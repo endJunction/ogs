@@ -232,6 +232,7 @@ NonlinearSolverStatus NonlinearSolver<NonlinearSolverTag::Newton>::solve(
         sys.getJacobian(J);
         INFO("[time] Assembly took %g s.", time_assembly.elapsed());
 
+        // TODO (naumov) Foobs from this residuum.
         minus_delta_x.setZero();
 
         timer_dirichlet.start();
