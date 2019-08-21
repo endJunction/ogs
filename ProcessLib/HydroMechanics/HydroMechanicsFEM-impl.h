@@ -142,8 +142,7 @@ void HydroMechanicsLocalAssembler<ShapeFunctionDisplacement,
         auto const sigma_neq =
             Eigen::Map<typename BMatricesType::KelvinVectorType>(
                 sigma_neq_data.data(),
-                MathLib::KelvinVector::KelvinVectorDimensions<
-                    DisplacementDim>::value,
+                MathLib::KelvinVector::size<DisplacementDim>(),
                 1);
 
         auto const x_coord =
