@@ -41,9 +41,12 @@
                 <secondary_variable type="static" internal_name="epsilon_xy" output_name="epsilon_xy"/>
                 <secondary_variable type="static" internal_name="velocity" output_name="velocity"/>
             </secondary_variables>
-            <nonequilibrium_state_variables>
+            <nonequilibrium_initial_state>
                 <stress>nonequilibrium_stress</stress>
-            </nonequilibrium_state_variables>
+                <equilibrate_process_variables>
+                    <process_variable>displacement</process_variable>
+                </equilibrate_process_variables>
+            </nonequilibrium_initial_state>
         </process>
     </processes>
     <time_loop>
