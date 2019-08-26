@@ -22,6 +22,27 @@ namespace Solids
 {
 namespace MFront
 {
+inline void printState(mgis::behaviour::State const& state)
+{
+    auto print_vector = [](std::string msg, std::vector<double> const& v) {
+        std::stringstream ss;
+        ss << "\t" << msg << ": ";
+        ss << std::setprecision(16);
+        for (std::size_t i = 0; i < v.size(); ++i)
+        {
+            ss << v[i] << " ";
+        }
+        INFO(ss.str().c_str());
+    };
+    INFO("State %x {", &state);
+    print_vector("gradients", state.gradients);
+    print_vector("thermodynamic_forces", state.thermodynamic_forces);
+    print_vector("material_properties", state.material_properties);
+    print_vector("internal_state_variables", state.internal_state_variables);
+    print_vector("external_state_variables", state.external_state_variables);
+    INFO("}");
+}
+
 /// Converts MGIS kinematic to a string representation.
 const char* toString(mgis::behaviour::Behaviour::Kinematic);
 
