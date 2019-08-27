@@ -98,6 +98,13 @@ void LocalAssemblerInterface::initialize(
     initializeConcrete();
 }
 
+void LocalAssemblerInterface::computeOutOfBalanceForces(
+    double const /*t*/,
+    std::vector<double> const& /*local_x*/,
+    std::vector<double>& /*local_b_data*/)
+{
+}
+
 void LocalAssemblerInterface::preTimestep(
     std::size_t const mesh_item_id,
     NumLib::LocalToGlobalIndexMap const& dof_table, GlobalVector const& x,

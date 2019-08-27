@@ -35,6 +35,15 @@ public:
     explicit VectorMatrixAssembler(
         std::unique_ptr<AbstractJacobianAssembler>&& jacobian_assembler);
 
+    void computeOutOfBalanceForces(
+        const std::size_t mesh_item_id,
+        LocalAssemblerInterface& local_assembler,
+        std::vector<
+            std::reference_wrapper<NumLib::LocalToGlobalIndexMap>> const&
+            dof_tables,
+        const double t, const GlobalVector& x, GlobalVector& f_oob,
+        CoupledSolutionsForStaggeredScheme const* const cpl_xs);
+
     void preAssemble(const std::size_t mesh_item_id,
                      LocalAssemblerInterface& local_assembler,
                      const NumLib::LocalToGlobalIndexMap& dof_table,

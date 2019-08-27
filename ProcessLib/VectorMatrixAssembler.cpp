@@ -27,6 +27,45 @@ VectorMatrixAssembler::VectorMatrixAssembler(
 {
 }
 
+void VectorMatrixAssembler::computeOutOfBalanceForces(
+    const std::size_t mesh_item_id, LocalAssemblerInterface& local_assembler,
+    std::vector<std::reference_wrapper<NumLib::LocalToGlobalIndexMap>> const&
+        dof_tables,
+    const double t, const GlobalVector& x, GlobalVector& f_oob,
+    CoupledSolutionsForStaggeredScheme const* const cpl_xs)
+{
+    std::vector<std::vector<GlobalIndexType>> indices_of_processes;
+    indices_of_processes.reserve(dof_tables.size());
+    for (auto dof_table : dof_tables)
+    {
+        indices_of_processes.emplace_back(
+            NumLib::getIndices(mesh_item_id, dof_table.get()));
+    }
+
+    auto const& indices = (cpl_xs == nullptr)
+                              ? indices_of_processes[0]
+                              : indices_of_processes[cpl_xs->process_id];
+    _local_b_data.clear();
+
+    if (cpl_xs == nullptr)
+    {
+        auto const local_x = x.get(indices);
+        local_assembler.computeOutOfBalanceForces(t, local_x, _local_b_data);
+    }
+    else
+    {
+        OGS_FATAL(
+            "Computation of out-of-balance forces is not implemented for the "
+            "staggered scheme.");
+    }
+
+    if (!_local_b_data.empty())
+    {
+        assert(_local_b_data.size() == indices.size());
+        f_oob.add(indices, _local_b_data);
+    }
+}
+
 void VectorMatrixAssembler::preAssemble(
     const std::size_t mesh_item_id, LocalAssemblerInterface& local_assembler,
     const NumLib::LocalToGlobalIndexMap& dof_table, const double t,

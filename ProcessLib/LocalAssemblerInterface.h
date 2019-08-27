@@ -42,6 +42,10 @@ public:
     virtual void initialize(std::size_t const mesh_item_id,
                             NumLib::LocalToGlobalIndexMap const& dof_table);
 
+    virtual void computeOutOfBalanceForces(double const t,
+                                           std::vector<double> const& local_x,
+                                           std::vector<double>& local_b_data);
+
     virtual void preAssemble(double const /*t*/,
                              std::vector<double> const& /*local_x*/){};
 
