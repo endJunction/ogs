@@ -29,6 +29,9 @@
 
 namespace ProcessLib
 {
+extern bool repeat_timestep;
+extern bool timestep_rejected;
+
 namespace RichardsMechanics
 {
 /// Used for the extrapolation of the integration point values. It is ordered
@@ -102,6 +105,9 @@ public:
     void postTimestepConcrete(std::vector<double> const& /*local_x*/
                               ) override
     {
+        if (ProcessLib::timestep_rejected)
+            return;
+
         unsigned const n_integration_points =
             _integration_method.getNumberOfPoints();
 

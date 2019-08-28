@@ -235,13 +235,22 @@ void RichardsMechanicsLocalAssembler<
 
         auto C = _ip_data[ip].updateConstitutiveRelation(t, x_position, dt, u,
                                                          temperature);
+        if (!C)
+        {
+            ERR("Computation of local constitutive relation failed for "
+                "element %d, integration point %d.",
+                _element.getID(), ip);
+            ProcessLib::repeat_timestep = true;
+
+            return;
+        }
 
         //
         // displacement equation, displacement part
         //
         K.template block<displacement_size, displacement_size>(
              displacement_index, displacement_index)
-            .noalias() += B.transpose() * C * B * w;
+            .noalias() += B.transpose() * *C * B * w;
 
         double const rho = rho_SR * (1 - porosity) + S_L * porosity * rho_LR;
         rhs.template segment<displacement_size>(displacement_index).noalias() +=
@@ -453,11 +462,20 @@ void RichardsMechanicsLocalAssembler<ShapeFunctionDisplacement,
 
         auto C = _ip_data[ip].updateConstitutiveRelation(t, x_position, dt, u,
                                                          temperature);
+        if (!C)
+        {
+            ERR("Computation of local constitutive relation failed for "
+                "element %d, integration point %d.",
+                _element.getID(), ip);
+            ProcessLib::repeat_timestep = true;
+
+            return;
+        }
 
         local_Jac
             .template block<displacement_size, displacement_size>(
                 displacement_index, displacement_index)
-            .noalias() += B.transpose() * C * B * w;
+            .noalias() += B.transpose() * *C * B * w;
 
         double const rho = rho_SR * (1 - porosity) + S_L * porosity * rho_LR;
         local_rhs.template segment<displacement_size>(displacement_index)
