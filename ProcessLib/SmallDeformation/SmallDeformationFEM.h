@@ -31,6 +31,8 @@
 
 namespace ProcessLib
 {
+extern bool repeat_timestep;
+
 namespace SmallDeformation
 {
 template <typename BMatricesType, typename ShapeMatricesType,
@@ -305,7 +307,9 @@ public:
 
             if (!solution)
             {
-                OGS_FATAL("Computation of local constitutive relation failed.");
+                ERR("Computation of local constitutive relation failed.");
+                ProcessLib::repeat_timestep = true;
+                return;
             }
 
             MathLib::KelvinVector::KelvinMatrixType<DisplacementDim> C;
