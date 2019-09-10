@@ -821,7 +821,7 @@ MeshLib::Element* MeshRevision::constructFourNodeElement(
     std::vector<MeshLib::Node*> const& nodes,
     unsigned min_elem_dim) const
 {
-    auto** new_nodes = new MeshLib::Node*[4];
+    std::array<Node*, 4> new_nodes;
     unsigned count(0);
     new_nodes[count++] = nodes[element->getNode(0)->getID()];
     for (unsigned i=1; i<element->getNumberOfBaseNodes(); ++i)
@@ -846,30 +846,48 @@ MeshLib::Element* MeshRevision::constructFourNodeElement(
     }
 
     // test if quad or tet
-    const bool isQuad(MathLib::isCoplanar(*new_nodes[0], *new_nodes[1],
-                                          *new_nodes[2], *new_nodes[3]));
-    if (isQuad && min_elem_dim < 3)
-    {
-        MeshLib::Element* elem (new MeshLib::Quad(new_nodes));
-        for (unsigned i=1; i<3; ++i)
-        {
-            if (elem->validate().none())
-            {
-                return elem;
-            }
-
-            // change node order if not convex
-            MeshLib::Node* tmp = new_nodes[i + 1];
-            new_nodes[i + 1] = new_nodes[i];
-            new_nodes[i] = tmp;
-        }
-        return elem;
-    }
+    const bool isQuad = MathLib::isCoplanar(*new_nodes[0], *new_nodes[1],
+                                            *new_nodes[2], *new_nodes[3]);
     if (!isQuad)
     {
-        return new MeshLib::Tet(new_nodes);
+        auto* element_nodes = new MeshLib::Node*[new_nodes.size()];
+        std::copy(begin(new_nodes), end(new_nodes), element_nodes);
+
+        return new MeshLib::Tet(element_nodes);
     }
-    // is quad but min elem dim == 3
+
+    if (min_elem_dim >= 3)
+        return nullptr;
+
+    auto create_valid_quad_element =
+        [](std::array<Node*, 4> const& nodes) -> MeshLib::Element* {
+        auto* element_nodes = new MeshLib::Node*[nodes.size()];
+        std::copy(begin(nodes), end(nodes), element_nodes);
+
+        MeshLib::Element* elem(new MeshLib::Quad(element_nodes));
+        if (elem->validate().any())
+        {
+            delete[] element_nodes;
+            return nullptr;
+        }
+        return elem;
+    };
+
+    if (auto* element = create_valid_quad_element(new_nodes))
+        return element;
+
+    // try different permutations of the nodes
+    for (int i = 1; i < 3; ++i)
+    {
+        // change node order
+        MeshLib::Node* tmp = new_nodes[i + 1];
+        new_nodes[i + 1] = new_nodes[i];
+        new_nodes[i] = tmp;
+
+        if (auto* element = create_valid_quad_element(new_nodes))
+            return element;
+    }
+    // permutations failed to create a valid element.
     return nullptr;
 }
 
