@@ -12,31 +12,26 @@
 
 template <typename T>
 PropertyVector<T>* Properties::createNewPropertyVector(
-    std::string const& name,
+    std::string_view const name,
     MeshItemType mesh_item_type,
     std::size_t n_components)
 {
-    std::map<std::string, PropertyVectorBase*>::const_iterator it(
-        _properties.find(name)
-    );
-    if (it != _properties.end()) {
+    if (auto const it = _properties.find(name); it != cend(_properties))
+    {
         ERR("A property of the name '%s' is already assigned to the mesh.",
-            name.c_str());
+            name.data());
         return nullptr;
     }
-    auto entry_info(
-        _properties.insert(
-            std::make_pair(
-                name, new PropertyVector<T>(name, mesh_item_type, n_components)
-            )
-        )
-    );
+    auto entry_info = _properties.insert(
+        std::make_pair(std::string{name},
+                       new PropertyVector<T>(std::string{name}, mesh_item_type,
+                                             n_components)));
     return static_cast<PropertyVector<T>*>((entry_info.first)->second);
 }
 
 template <typename T>
 PropertyVector<T>* Properties::createNewPropertyVector(
-    std::string const& name,
+    std::string_view const name,
     std::size_t n_prop_groups,
     std::vector<std::size_t> const& item2group_mapping,
     MeshItemType mesh_item_type,
@@ -44,12 +39,10 @@ PropertyVector<T>* Properties::createNewPropertyVector(
 {
     // check if there is already a PropertyVector with the same name and
     // mesh_item_type
-    std::map<std::string, PropertyVectorBase*>::const_iterator it(
-        _properties.find(name)
-    );
-    if (it != _properties.end()) {
+    if (auto const it = _properties.find(name); it != cend(_properties))
+    {
         ERR("A property of the name '%s' already assigned to the mesh.",
-            name.c_str());
+            name.data());
         return nullptr;
     }
 
@@ -75,7 +68,7 @@ PropertyVector<T>* Properties::createNewPropertyVector(
 }
 
 template <typename T>
-bool Properties::existsPropertyVector(std::string const& name) const
+bool Properties::existsPropertyVector(std::string_view const name) const
 {
     auto it(_properties.find(name));
     // Check that a PropertyVector with the approriate name exists.
@@ -88,7 +81,7 @@ bool Properties::existsPropertyVector(std::string const& name) const
 }
 
 template <typename T>
-bool Properties::existsPropertyVector(std::string const& name,
+bool Properties::existsPropertyVector(std::string_view const name,
                                       MeshItemType const mesh_item_type,
                                       int const number_of_components) const
 {
@@ -116,55 +109,55 @@ bool Properties::existsPropertyVector(std::string const& name,
 
 template <typename T>
 PropertyVector<T> const* Properties::getPropertyVector(
-    std::string const& name) const
+    std::string_view const name) const
 {
     auto it(_properties.find(name));
     if (it == _properties.end())
     {
         OGS_FATAL(
             "The PropertyVector '%s' is not available in the mesh.",
-            name.c_str());
+            name.data());
     }
     if (!dynamic_cast<PropertyVector<T> const*>(it->second))
     {
         OGS_FATAL(
             "The PropertyVector '%s' has a different type than the requested "
             "PropertyVector.",
-            name.c_str());
+            name.data());
     }
     return dynamic_cast<PropertyVector<T> const*>(it->second);
 }
 
 template <typename T>
-PropertyVector<T>* Properties::getPropertyVector(std::string const& name)
+PropertyVector<T>* Properties::getPropertyVector(std::string_view const name)
 {
     auto it(_properties.find(name));
     if (it == _properties.end())
     {
         OGS_FATAL(
             "A PropertyVector with the specified name '%s' is not available.",
-            name.c_str());
+            name.data());
     }
     if (!dynamic_cast<PropertyVector<T>*>(it->second))
     {
         OGS_FATAL(
             "The PropertyVector '%s' has a different type than the requested "
             "PropertyVector.",
-            name.c_str());
+            name.data());
     }
     return dynamic_cast<PropertyVector<T>*>(it->second);
 }
 
 template <typename T>
 PropertyVector<T> const* Properties::getPropertyVector(
-    std::string const& name, MeshItemType const item_type,
+    std::string_view const name, MeshItemType const item_type,
     int const n_components) const
 {
     auto const it = _properties.find(name);
     if (it == _properties.end())
     {
         OGS_FATAL("A PropertyVector with name '%s' does not exist in the mesh.",
-                  name.c_str());
+                  name.data());
     }
 
     auto property = dynamic_cast<PropertyVector<T>*>(it->second);
@@ -173,26 +166,26 @@ PropertyVector<T> const* Properties::getPropertyVector(
         OGS_FATAL(
             "Could not cast the data type of the PropertyVector '%s' to "
             "requested data type.",
-            name.c_str());
+            name.data());
     }
     if (property->getMeshItemType() != item_type)
     {
         OGS_FATAL(
             "The PropertyVector '%s' has type '%s'. A '%s' field is requested.",
-            name.c_str(), toString(property->getMeshItemType()),
+            name.data(), toString(property->getMeshItemType()),
             toString(item_type));
     }
     if (property->getNumberOfComponents() != n_components)
     {
         OGS_FATAL(
             "PropertyVector '%s' has %d components, %d components are needed.",
-            name.c_str(), property->getNumberOfComponents(), n_components);
+            name.data(), property->getNumberOfComponents(), n_components);
     }
     return property;
 }
 
 template <typename T>
-PropertyVector<T>* Properties::getPropertyVector(std::string const& name,
+PropertyVector<T>* Properties::getPropertyVector(std::string_view const name,
                                                  MeshItemType const item_type,
                                                  int const n_components)
 {
@@ -200,7 +193,7 @@ PropertyVector<T>* Properties::getPropertyVector(std::string const& name,
     if (it == _properties.end())
     {
         OGS_FATAL("A PropertyVector with name '%s' does not exist in the mesh.",
-                  name.c_str());
+                  name.data());
     }
 
     auto property = dynamic_cast<PropertyVector<T>*>(it->second);
@@ -209,20 +202,20 @@ PropertyVector<T>* Properties::getPropertyVector(std::string const& name,
         OGS_FATAL(
             "Could not cast the data type of the PropertyVector '%s' to "
             "requested data type.",
-            name.c_str());
+            name.data());
     }
     if (property->getMeshItemType() != item_type)
     {
         OGS_FATAL(
             "The PropertyVector '%s' has type '%s'. A '%s' field is requested.",
-            name.c_str(), toString(property->getMeshItemType()),
+            name.data(), toString(property->getMeshItemType()),
             toString(item_type));
     }
     if (property->getNumberOfComponents() != n_components)
     {
         OGS_FATAL(
             "PropertyVector '%s' has %d components, %d components are needed.",
-            name.c_str(), property->getNumberOfComponents(), n_components);
+            name.data(), property->getNumberOfComponents(), n_components);
     }
     return property;
 }

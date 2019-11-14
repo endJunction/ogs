@@ -13,13 +13,12 @@
 #pragma once
 
 #include <cstdlib>
-#include <string>
-#include <map>
-
 #include <logog/include/logog.hpp>
+#include <map>
+#include <string>
+#include <string_view>
 
 #include "Location.h"
-
 #include "PropertyVector.h"
 
 namespace MeshLib
@@ -50,7 +49,7 @@ public:
     /// @return A pointer to a PropertyVector on success and a nullptr
     /// otherwise.
     template <typename T>
-    PropertyVector<T>* createNewPropertyVector(std::string const& name,
+    PropertyVector<T>* createNewPropertyVector(std::string_view const name,
                                                MeshItemType mesh_item_type,
                                                std::size_t n_components = 1);
 
@@ -72,7 +71,7 @@ public:
     /// otherwise.
     template <typename T>
     PropertyVector<T>* createNewPropertyVector(
-        std::string const& name,
+        std::string_view const name,
         std::size_t n_prop_groups,
         std::vector<std::size_t> const& item2group_mapping,
         MeshItemType mesh_item_type,
@@ -82,30 +81,30 @@ public:
     /// exists.
     /// @param name name of the requested property vector
     template <typename T>
-    bool existsPropertyVector(std::string const& name) const;
+    bool existsPropertyVector(std::string_view const name) const;
 
     /// Checks if a property vector with given type \c T, \c name, \c
     /// mesh_item_type, and \c number_of_components exists.
     template <typename T>
-    bool existsPropertyVector(std::string const& property_name,
+    bool existsPropertyVector(std::string_view const property_name,
                               MeshItemType const mesh_item_type,
                               int const number_of_components) const;
 
     /// Returns a property vector with given \c name or aborts calling OGS_FATAL
     /// if no such property vector exists.
     template <typename T>
-    PropertyVector<T> const* getPropertyVector(std::string const& name) const;
+    PropertyVector<T> const* getPropertyVector(std::string_view const name) const;
 
     /// Returns a property vector with given \c name or aborts calling OGS_FATAL
     /// if no such property vector exists.
     template <typename T>
-    PropertyVector<T>* getPropertyVector(std::string const& name);
+    PropertyVector<T>* getPropertyVector(std::string_view const name);
 
     /// Returns a property vector with given \c name, \c item_type and \c
     /// number_of_components or aborts calling OGS_FATAL if no such property
     /// vector exists.
     template <typename T>
-    PropertyVector<T> const* getPropertyVector(std::string const& name,
+    PropertyVector<T> const* getPropertyVector(std::string_view const name,
                                                MeshItemType const item_type,
                                                int const n_components) const;
 
@@ -113,16 +112,16 @@ public:
     /// given \c name, \c item_type and \c number_of_components or calls
     /// OGS_FATAL if no such property vector exists.
     template <typename T>
-    PropertyVector<T>* getPropertyVector(std::string const& name,
+    PropertyVector<T>* getPropertyVector(std::string_view const name,
                                          MeshItemType const item_type,
                                          int const n_components);
 
-    void removePropertyVector(std::string const& name);
+    void removePropertyVector(std::string_view const name);
 
     /// Check if a PropertyVector accessible by the name is already
     /// stored within the Properties object.
     /// @param name the name of the property (for instance porosity)
-    bool hasPropertyVector(std::string const& name) const;
+    bool hasPropertyVector(std::string_view const name) const;
 
     std::vector<std::string> getPropertyVectorNames() const;
     std::vector<std::string> getPropertyVectorNames(
@@ -154,7 +153,7 @@ public:
 private:
     /// A mapping from property's name to the stored object of any type.
     /// See addProperty() and getProperty() documentation.
-    std::map<std::string, PropertyVectorBase*> _properties;
+    std::map<std::string, PropertyVectorBase*, std::less<>> _properties;
 }; // end class
 
 #include "Properties-impl.h"

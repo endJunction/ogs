@@ -14,21 +14,18 @@
 
 namespace MeshLib
 {
-
-void Properties::removePropertyVector(std::string const& name)
+void Properties::removePropertyVector(std::string_view const name)
 {
-    std::map<std::string, PropertyVectorBase*>::const_iterator it(
-        _properties.find(name)
-    );
+    auto const it = _properties.find(name);
     if (it == _properties.end()) {
-        WARN("A property of the name '%s' does not exist.", name.c_str());
+        WARN("A property of the name '%s' does not exist.", name.data());
         return;
     }
     delete it->second;
     _properties.erase(it);
 }
 
-bool Properties::hasPropertyVector(std::string const& name) const
+bool Properties::hasPropertyVector(std::string_view const name) const
 {
     return _properties.find(name) != _properties.end();
 }
