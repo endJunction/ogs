@@ -43,3 +43,6 @@
 [submodule "ThirdParty/container-maker"]
 	path = ThirdParty/container-maker
 	url = https://github.com/ufz/ogs-container-maker.git
+[submodule "ThirdParty/googlebenchmark"]
+	path = ThirdParty/googlebenchmark
+	url = git@github.com:google/benchmark.git
