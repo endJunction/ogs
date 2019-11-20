@@ -22,10 +22,10 @@ PropertyVector<T>* Properties::createNewPropertyVector(
             name.data());
         return nullptr;
     }
-    auto entry_info = _properties.insert(
-        std::make_pair(std::string{name},
-                       new PropertyVector<T>(std::string{name}, mesh_item_type,
-                                             n_components)));
+    auto const entry_info = _properties.insert(
+        {std::string{name},
+         new PropertyVector<T>(std::string{name}, mesh_item_type,
+                               n_components)});
     return static_cast<PropertyVector<T>*>((entry_info.first)->second);
 }
 
@@ -55,15 +55,11 @@ PropertyVector<T>* Properties::createNewPropertyVector(
         }
     }
 
-    auto entry_info(
-        _properties.insert(
-            std::pair<std::string, PropertyVectorBase*>(
-                name,
-                new PropertyVector<T>(n_prop_groups,
-                    item2group_mapping, name, mesh_item_type, n_components)
-            )
-        )
-    );
+    auto entry_info = _properties.insert(
+        {std::string{name},
+         new PropertyVector<T>(n_prop_groups, item2group_mapping,
+                               std::string{name}, mesh_item_type,
+                               n_components)});
     return static_cast<PropertyVector<T>*>((entry_info.first)->second);
 }
 
