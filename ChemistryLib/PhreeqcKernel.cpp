@@ -33,10 +33,13 @@ PhreeqcKernel::PhreeqcKernel(std::size_t const num_chemical_systems,
     : _initial_aqueous_solution(aqueous_solution.getInitialAqueousSolution()),
       _reaction_rates(std::move(reaction_rates))
 {
-    initializePhreeqcGeneralSettings();
+    phreeqc = std::make_unique<Phreeqc>();
 
-    loadDatabase(database);
+    phreeqc->initializePhreeqcGeneralSettings();
 
+    phreeqc->loadDatabase(database);
+
+    /*
     // solution
     for (std::size_t chemical_system_id = 0;
          chemical_system_id < num_chemical_systems;
@@ -78,18 +81,7 @@ PhreeqcKernel::PhreeqcKernel(std::size_t const num_chemical_systems,
 
         _process_id_to_master_map[transport_process_id] = master_species;
     }
-}
-
-void PhreeqcKernel::loadDatabase(std::string const& database)
-{
-    std::ifstream in(database);
-    if (!in)
-    {
-        OGS_FATAL("Unable to open database file '%s'.", database.c_str());
-    }
-    assert(phrq_io->get_istream() == nullptr);
-    phrq_io->push_istream(&in, false);
-    read_database();
+    */
 }
 
 void PhreeqcKernel::reinitializeRates()

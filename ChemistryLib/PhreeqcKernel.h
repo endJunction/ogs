@@ -28,7 +28,7 @@ namespace PhreeqcKernelData
 class AqueousSolution;
 class ReactionRate;
 
-class PhreeqcKernel final : public ChemicalSolverInterface, private Phreeqc
+class PhreeqcKernel final : public ChemicalSolverInterface
 {
 public:
     PhreeqcKernel(std::size_t const num_chemical_systems,
@@ -59,10 +59,7 @@ public:
         std::size_t const node_id);
 
 private:
-    void initializePhreeqcGeneralSettings() { do_initialize(); }
-
-    void loadDatabase(std::string const& database);
-
+    std::unique_ptr<PhreeqcK> phreeqc;
     void reinitializeRates();
 
     void setConvergenceTolerance() { convergence_tolerance = 1e-12; }
