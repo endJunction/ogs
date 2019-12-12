@@ -10,20 +10,17 @@
 
 #pragma once
 
-#include "PK.h"
+#include "ThirdParty/iphreeqc/src/src/phreeqcpp/Phreeqc.h"
 
 namespace ChemistryLib
 {
 namespace PhreeqcKernelData
 {
-void PhreeqcK::initializePhreeqcGeneralSettings()
+struct PK;
 {
-    return impl->initializePhreeqcGeneralSettings();
-}
+    void initializePhreeqcGeneralSettings();
 
-void PhreeqcK::loadDatabase(std::string const& database)
-{
-    return impl->loadDatabase(database);
-}
+    void loadDatabase(std::string const& database);
+};
 }  // namespace PhreeqcKernelData
 }  // namespace ChemistryLib

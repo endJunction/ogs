@@ -8,9 +8,9 @@
  *
  */
 
-#pragma once
-
 #include "PK.h"
+
+#include <iostream>
 
 namespace ChemistryLib
 {
@@ -18,12 +18,21 @@ namespace PhreeqcKernelData
 {
 void PhreeqcK::initializePhreeqcGeneralSettings()
 {
-    return impl->initializePhreeqcGeneralSettings();
+    do_initialize();
 }
 
 void PhreeqcK::loadDatabase(std::string const& database)
 {
-    return impl->loadDatabase(database);
+    std::ifstream in(database);
+    if (!in)
+    {
+        std::cerr << "Unable to open database file " << database;
+        std::terminate();
+    }
+    assert(phrq_io->get_istream() == nullptr);
+    phrq_io->push_istream(&in, false);
+    read_database();
 }
+
 }  // namespace PhreeqcKernelData
 }  // namespace ChemistryLib

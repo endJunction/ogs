@@ -18,6 +18,8 @@
 
 #include "ThirdParty/iphreeqc/src/src/phreeqcpp/cxxKinetics.h"
 
+#include "PhreeqcK.h"
+
 namespace ChemistryLib
 {
 namespace PhreeqcKernelData
