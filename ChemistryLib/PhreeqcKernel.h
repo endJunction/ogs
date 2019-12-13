@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "ChemicalSolverInterface.h"
+#include "PhreeqcK.h"
 #include "PhreeqcKernelData/KineticReactant.h"
 
 class cxxSolution;
