@@ -39,7 +39,6 @@ PhreeqcKernel::PhreeqcKernel(std::size_t const num_chemical_systems,
 
     phreeqc->loadDatabase(database);
 
-    /*
     // solution
     for (std::size_t chemical_system_id = 0;
          chemical_system_id < num_chemical_systems;
@@ -81,7 +80,6 @@ PhreeqcKernel::PhreeqcKernel(std::size_t const num_chemical_systems,
 
         _process_id_to_master_map[transport_process_id] = master_species;
     }
-    */
 }
 
 void PhreeqcKernel::reinitializeRates()
