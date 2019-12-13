@@ -33,7 +33,7 @@ PhreeqcKernel::PhreeqcKernel(std::size_t const num_chemical_systems,
     : _initial_aqueous_solution(aqueous_solution.getInitialAqueousSolution()),
       _reaction_rates(std::move(reaction_rates))
 {
-    phreeqc = std::make_unique<Phreeqc>();
+    phreeqc = std::make_unique<PhreeqcK>();
 
     phreeqc->initializePhreeqcGeneralSettings();
 
