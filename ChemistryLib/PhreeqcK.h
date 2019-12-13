@@ -24,6 +24,8 @@ public:
     void loadDatabase(std::string const& database);
     void setConvergenceTolerance();
     void configureOutputSettings();
+    void addRxnSolution(int const chemical_system_id,
+                        cxxSolution const* const solution);
 
 private:
     PK* impl;

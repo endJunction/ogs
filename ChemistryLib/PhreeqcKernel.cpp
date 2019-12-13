@@ -45,8 +45,8 @@ PhreeqcKernel::PhreeqcKernel(std::size_t const num_chemical_systems,
          ++chemical_system_id)
     {
         aqueous_solution.setChemicalSystemID(chemical_system_id);
-        Rxn_solution_map.emplace(chemical_system_id,
-                                 *aqueous_solution.castToBaseClass());
+        phreeqc->addRxnSolution(chemical_system_id,
+                                *aqueous_solution.castToBaseClass());
     }
     use.Set_solution_in(true);
 

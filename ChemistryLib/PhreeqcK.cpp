@@ -35,5 +35,12 @@ void PhreeqcK::configureOutputSettings()
 {
     return impl->configureOutputSettings();
 }
+
+void PhreeqcK::addRxnSolution(int const chemical_system_id,
+                              cxxSolution const* const solution)
+{
+    return impl->addRxnSolution(chemical_system_id, solution);
+}
+
 }  // namespace PhreeqcKernelData
 }  // namespace ChemistryLib

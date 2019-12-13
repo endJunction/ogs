@@ -44,5 +44,11 @@ void PK::configureOutputSettings()
     pr.all = false;
 }
 
+void PK::addRxnSolution(int const chemical_system_id,
+                        cxxSolution const* const solution)
+{
+    Rxn_solution_map.emplace(chemical_system_id, *solution);
+}
+
 }  // namespace PhreeqcKernelData
 }  // namespace ChemistryLib
