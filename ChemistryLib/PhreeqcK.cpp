@@ -25,5 +25,15 @@ void PhreeqcK::loadDatabase(std::string const& database)
 {
     return impl->loadDatabase(database);
 }
+
+void PhreeqcK::setConvergenceTolerance()
+{
+    return impl->setConvergenceTolerance();
+}
+
+void PhreeqcK::configureOutputSettings()
+{
+    return impl->configureOutputSettings();
+}
 }  // namespace PhreeqcKernelData
 }  // namespace ChemistryLib

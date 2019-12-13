@@ -22,6 +22,8 @@ class PhreeqcK
 public:
     void initializePhreeqcGeneralSettings();
     void loadDatabase(std::string const& database);
+    void setConvergenceTolerance();
+    void configureOutputSettings();
 
 private:
     PK* impl;

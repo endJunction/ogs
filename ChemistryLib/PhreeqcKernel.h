@@ -62,10 +62,6 @@ private:
     std::unique_ptr<PhreeqcK> phreeqc;
     void reinitializeRates();
 
-    void setConvergenceTolerance() { convergence_tolerance = 1e-12; }
-
-    void configureOutputSettings() { pr.all = false; }
-
     cxxISolution* getOrCreateInitialAqueousSolution(
         cxxSolution& aqueous_solution);
 

@@ -34,5 +34,15 @@ void PK::loadDatabase(std::string const& database)
     read_database();
 }
 
+void PK::setConvergenceTolerance()
+{
+    convergence_tolerance = 1e-12;
+}
+
+void PK::configureOutputSettings()
+{
+    pr.all = false;
+}
+
 }  // namespace PhreeqcKernelData
 }  // namespace ChemistryLib

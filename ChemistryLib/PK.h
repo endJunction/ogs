@@ -20,6 +20,8 @@ struct PK : private Phreeqc
 {
     void initializePhreeqcGeneralSettings();
     void loadDatabase(std::string const& database);
+    void setConvergenceTolerance();
+    void configureOutputSettings();
 };
 }  // namespace PhreeqcKernelData
 }  // namespace ChemistryLib
