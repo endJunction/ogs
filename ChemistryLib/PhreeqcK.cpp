@@ -8,7 +8,7 @@
  *
  */
 
-#pragma once
+#include "PhreeqcK.h"
 
 #include "PK.h"
 

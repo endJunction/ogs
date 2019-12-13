@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <string>
+
 namespace ChemistryLib
 {
 namespace PhreeqcKernelData
@@ -19,7 +21,6 @@ class PhreeqcK
 {
 public:
     void initializePhreeqcGeneralSettings();
-
     void loadDatabase(std::string const& database);
 
 private:

@@ -16,10 +16,9 @@ namespace ChemistryLib
 {
 namespace PhreeqcKernelData
 {
-struct PK;
+struct PK : private Phreeqc
 {
     void initializePhreeqcGeneralSettings();
-
     void loadDatabase(std::string const& database);
 };
 }  // namespace PhreeqcKernelData

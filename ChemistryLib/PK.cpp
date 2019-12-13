@@ -16,12 +16,12 @@ namespace ChemistryLib
 {
 namespace PhreeqcKernelData
 {
-void PhreeqcK::initializePhreeqcGeneralSettings()
+void PK::initializePhreeqcGeneralSettings()
 {
     do_initialize();
 }
 
-void PhreeqcK::loadDatabase(std::string const& database)
+void PK::loadDatabase(std::string const& database)
 {
     std::ifstream in(database);
     if (!in)
