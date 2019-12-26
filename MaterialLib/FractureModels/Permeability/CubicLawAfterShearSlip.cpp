@@ -37,7 +37,7 @@ void CubicLawAfterShearSlip::setShearSlipState(PermeabilityState& state,
                                                bool const value) const
 {
     assert(dynamic_cast<CubicLawAfterShearSlipState*>(&state) != nullptr);
-    static_cast<CubicLawAfterShearSlipState&>(state).shear_slip_occured = value;
+    static_cast<CubicLawAfterShearSlipState&>(state).shear_slip_occured |= value;
 }
 
 bool CubicLawAfterShearSlip::shearSlipOccured(
