@@ -48,7 +48,7 @@ std::unique_ptr<MaterialPropertyLib::Phase> createPhase(
                      }))
     {
         ERR("Phase type should be one of:");
-        for (auto const type : allowed_phase_types)
+        for (auto const& type : allowed_phase_types)
         {
             ERR(type.c_str());
         }
