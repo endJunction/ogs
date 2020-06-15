@@ -99,6 +99,51 @@ std::size_t setIntegrationPointKelvinVectorData(
     return n_integration_points;
 }
 
+template <int VectorDim, typename IntegrationPointData,
+          typename MemberType>
+std::vector<double> getIntegrationPointVectorData(
+    std::vector<IntegrationPointData,
+                Eigen::aligned_allocator<IntegrationPointData>> const& ip_data,
+    MemberType member)
+{
+    auto const n_integration_points = ip_data.size();
+
+    std::vector<double> ip_vector_values;
+    auto cache_mat = MathLib::createZeroedMatrix<
+        Eigen::Matrix<double, Eigen::Dynamic, VectorDim, Eigen::RowMajor>>(
+        ip_vector_values, n_integration_points, VectorDim);
+
+    for (unsigned ip = 0; ip < n_integration_points; ++ip)
+    {
+        cache_mat.row(ip) = ip_data[ip].*member;
+    }
+
+    return ip_vector_values;
+}
+
+template <int VectorDim, typename IntegrationPointData,
+          typename MemberType>
+std::size_t setIntegrationPointVectorData(
+    double const* values,
+    std::vector<IntegrationPointData,
+                Eigen::aligned_allocator<IntegrationPointData>>& ip_data,
+    MemberType member)
+{
+    auto const n_integration_points = ip_data.size();
+
+    auto vector_values =
+        Eigen::Map<Eigen::Matrix<double, VectorDim, Eigen::Dynamic,
+                                 Eigen::ColMajor> const>(
+            values, VectorDim, n_integration_points);
+
+    for (unsigned ip = 0; ip < n_integration_points; ++ip)
+    {
+        ip_data[ip].*member = vector_values.col(ip);
+    }
+
+    return n_integration_points;
+}
+
 template <typename IntegrationPointData, typename MemberType>
 std::vector<double> const& getIntegrationPointScalarData(
     std::vector<IntegrationPointData,
