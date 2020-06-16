@@ -71,6 +71,13 @@ public:
     }
 
 private:
+    std::size_t setIPDataInitialConditions(
+        std::string const& name, double const* values,
+        int const integration_order) override;
+
+    std::size_t setSigma(double const* values);
+    std::vector<double> getSigma() const override;
+
     void assembleWithJacobianConcrete(double const t, double const dt,
                                       Eigen::VectorXd const& local_x,
                                       Eigen::VectorXd const& local_xdot,

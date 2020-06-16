@@ -11,12 +11,10 @@
 #pragma once
 
 #include "HydroMechanicsLocalAssemblerFracture.h"
-
 #include "MaterialLib/FractureModels/FractureIdentity2.h"
-
-#include "ProcessLib/Utils/InitShapeMatrices.h"
-
 #include "ProcessLib/LIE/Common/LevelSetFunction.h"
+#include "ProcessLib/Utils/InitShapeMatrices.h"
+#include "ProcessLib/Utils/SetOrGetIntegrationPointData.h"
 
 namespace ProcessLib
 {
@@ -433,6 +431,52 @@ void HydroMechanicsLocalAssemblerFracture<
         (*_process_data.mesh_prop_velocity)[element_id * 3 + i] =
             ele_velocity[i];
     }
+}
+
+template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
+          typename IntegrationMethod, int DisplacementDim>
+std::size_t HydroMechanicsLocalAssemblerFracture<
+    ShapeFunctionDisplacement, ShapeFunctionPressure, IntegrationMethod,
+    DisplacementDim>::setIPDataInitialConditions(std::string const& name,
+                                                 double const* values,
+                                                 int const integration_order)
+{
+    if (integration_order !=
+        static_cast<int>(_integration_method.getIntegrationOrder()))
+    {
+        OGS_FATAL(
+            "Setting integration point initial conditions; The integration "
+            "order of the local assembler for element {:d} is different from "
+            "the integration order in the initial condition.",
+            _element.getID());
+    }
+
+    if (name == "sigma_ip")
+    {
+        return setSigma(values);
+    }
+
+    return 0;
+}
+
+template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
+          typename IntegrationMethod, int DisplacementDim>
+std::size_t HydroMechanicsLocalAssemblerFracture<
+    ShapeFunctionDisplacement, ShapeFunctionPressure, IntegrationMethod,
+    DisplacementDim>::setSigma(double const* values)
+{
+    return ProcessLib::setIntegrationPointVectorData<DisplacementDim>(
+        values, _ip_data, &IntegrationPointDataType::sigma_eff);
+}
+
+template <typename ShapeFunctionDisplacement, typename ShapeFunctionPressure,
+          typename IntegrationMethod, int DisplacementDim>
+std::vector<double> HydroMechanicsLocalAssemblerFracture<
+    ShapeFunctionDisplacement, ShapeFunctionPressure, IntegrationMethod,
+    DisplacementDim>::getSigma() const
+{
+    return ProcessLib::getIntegrationPointVectorData<DisplacementDim>(
+        _ip_data, &IntegrationPointDataType::sigma_eff);
 }
 
 }  // namespace HydroMechanics

@@ -46,6 +46,13 @@ public:
         _local_J.resize(_local_u.size(), _local_u.size());
     }
 
+    virtual std::size_t setIPDataInitialConditions(
+        std::string const& name, double const* values,
+        int const integration_order) = 0;
+
+    virtual std::vector<double> getSigma() const = 0;
+
+
     void assemble(double const /*t*/, double const /*dt*/,
                   std::vector<double> const& /*local_x*/,
                   std::vector<double> const& /*local_xdot*/,

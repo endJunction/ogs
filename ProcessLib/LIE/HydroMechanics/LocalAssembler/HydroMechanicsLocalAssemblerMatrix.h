@@ -97,6 +97,13 @@ protected:
         double const t, Eigen::Ref<Eigen::VectorXd> p);
     void setPressureDotOfInactiveNodes(Eigen::Ref<Eigen::VectorXd> p_dot);
 
+    std::size_t setIPDataInitialConditions(
+        std::string const& name, double const* values,
+        int const integration_order) override;
+
+    std::size_t setSigma(double const* values);
+    std::vector<double> getSigma() const override;
+
     // Types for displacement.
     using ShapeMatricesTypeDisplacement =
         ShapeMatrixPolicyType<ShapeFunctionDisplacement, GlobalDim>;
