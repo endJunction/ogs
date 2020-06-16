@@ -51,13 +51,13 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
           ShapeFunctionDisplacement::NPOINTS * GlobalDim +
               ShapeFunctionPressure::NPOINTS,
           dofIndex_to_localIndex),
-      _process_data(process_data)
+      _process_data(process_data),
+      _integration_method(integration_order)
 {
     assert(e.getDimension() == GlobalDim - 1);
 
-    IntegrationMethod integration_method(integration_order);
     unsigned const n_integration_points =
-        integration_method.getNumberOfPoints();
+        _integration_method.getNumberOfPoints();
 
     _ip_data.reserve(n_integration_points);
 
@@ -65,12 +65,12 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         initShapeMatrices<ShapeFunctionDisplacement,
                           ShapeMatricesTypeDisplacement, IntegrationMethod,
                           GlobalDim>(e, is_axially_symmetric,
-                                     integration_method);
+                                     _integration_method);
 
     auto const shape_matrices_p =
         initShapeMatrices<ShapeFunctionPressure, ShapeMatricesTypePressure,
                           IntegrationMethod, GlobalDim>(e, is_axially_symmetric,
-                                                        integration_method);
+                                                        _integration_method);
 
     auto const& frac_prop = *_process_data.fracture_property;
 
@@ -92,7 +92,7 @@ HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
         auto& ip_data = _ip_data[ip];
         ip_data.integration_weight =
             sm_u.detJ * sm_u.integralMeasure *
-            integration_method.getWeightedPoint(ip).getWeight();
+            _integration_method.getWeightedPoint(ip).getWeight();
 
         ip_data.H_u.setZero(GlobalDim,
                             ShapeFunctionDisplacement::NPOINTS * GlobalDim);

@@ -120,6 +120,8 @@ protected:
                 Eigen::aligned_allocator<IntegrationPointDataType>>
         _ip_data;
 
+    IntegrationMethod _integration_method;
+
     static const int pressure_index = 0;
     static const int pressure_size = ShapeFunctionPressure::NPOINTS;
     static const int displacement_index = ShapeFunctionPressure::NPOINTS;

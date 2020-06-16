@@ -44,11 +44,11 @@ HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
           (n_variables - 1) * ShapeFunctionDisplacement::NPOINTS * GlobalDim +
               ShapeFunctionPressure::NPOINTS,
           dofIndex_to_localIndex),
-      _process_data(process_data)
+      _process_data(process_data),
+      _integration_method(integration_order)
 {
-    IntegrationMethod integration_method(integration_order);
     unsigned const n_integration_points =
-        integration_method.getNumberOfPoints();
+        _integration_method.getNumberOfPoints();
 
     _ip_data.reserve(n_integration_points);
 
@@ -56,12 +56,12 @@ HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
         initShapeMatrices<ShapeFunctionDisplacement,
                           ShapeMatricesTypeDisplacement, IntegrationMethod,
                           GlobalDim>(e, is_axially_symmetric,
-                                     integration_method);
+                                     _integration_method);
 
     auto const shape_matrices_p =
         initShapeMatrices<ShapeFunctionPressure, ShapeMatricesTypePressure,
                           IntegrationMethod, GlobalDim>(e, is_axially_symmetric,
-                                                        integration_method);
+                                                        _integration_method);
 
     auto& solid_material = MaterialLib::Solids::selectSolidConstitutiveRelation(
         _process_data.solid_materials, _process_data.material_ids, e.getID());
@@ -78,7 +78,7 @@ HydroMechanicsLocalAssemblerMatrix<ShapeFunctionDisplacement,
         auto const& sm_p = shape_matrices_p[ip];
         ip_data.integration_weight =
             sm_u.detJ * sm_u.integralMeasure *
-            integration_method.getWeightedPoint(ip).getWeight();
+            _integration_method.getWeightedPoint(ip).getWeight();
         ip_data.darcy_velocity.setZero();
 
         ip_data.N_u = sm_u.N;
