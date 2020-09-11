@@ -13,6 +13,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 #include <variant>
 
 namespace MaterialPropertyLib
