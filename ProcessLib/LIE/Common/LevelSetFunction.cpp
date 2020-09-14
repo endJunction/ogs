@@ -22,7 +22,7 @@ namespace
 // Heaviside step function
 inline double Heaviside(double v)
 {
-    return (v < 0.0) ? 0.0 : 1.0;
+    return (v < 0.0) ? -0.5 : 0.5;
 }
 
 }  // namespace
