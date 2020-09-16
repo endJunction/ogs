@@ -138,16 +138,27 @@
             <value>1</value>
         </parameter>
         <parameter>
-            <name>displacement_x</name>
-            <type>CurveScaled</type>
-            <curve>timeRamp_displacement_x</curve>
-            <parameter>displacement_unit</parameter>
+            <name>displacement_unit_n</name>
+            <type>Constant</type>
+            <value>-1</value>
         </parameter>
         <parameter>
             <name>displacement_y</name>
             <type>CurveScaled</type>
             <curve>timeRamp_displacement_y</curve>
             <parameter>displacement_unit</parameter>
+        </parameter>
+        <parameter>
+            <name>traction_p</name>
+            <type>CurveScaled</type>
+            <curve>timeRamp_traction</curve>
+            <parameter>displacement_unit</parameter>
+        </parameter>
+        <parameter>
+            <name>traction_n</name>
+            <type>CurveScaled</type>
+            <curve>timeRamp_traction</curve>
+            <parameter>displacement_unit_n</parameter>
         </parameter>
         <parameter>
             <name>zero_u</name>
@@ -166,6 +177,11 @@
             <coords>0 1      10  </coords>
             <values>0 -1e-6 -1e-6</values>
         </curve>
+        <curve>
+            <name>timeRamp_traction</name>
+            <coords>0 1 2    4     10  </coords>
+            <values>0 0 20e3 -30e3 -30e3</values>
+        </curve>
     </curves>
     <process_variables>
         <process_variable>
@@ -176,10 +192,24 @@
             <boundary_conditions>
                 <boundary_condition>
                     <geometrical_set>DoubleEdgeCrack</geometrical_set>
+                    <geometry>PLY_LEFT</geometry>
+                    <type>Neumann</type>
+                    <component>1</component>
+                    <parameter>traction_n</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>DoubleEdgeCrack</geometrical_set>
+                    <geometry>PLY_RIGHT</geometry>
+                    <type>Neumann</type>
+                    <component>1</component>
+                    <parameter>traction_p</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>DoubleEdgeCrack</geometrical_set>
                     <geometry>PLY_TOP</geometry>
-                    <type>Dirichlet</type>
+                    <type>Neumann</type>
                     <component>0</component>
-                    <parameter>displacement_x</parameter>
+                    <parameter>traction_p</parameter>
                 </boundary_condition>
                 <boundary_condition>
                     <geometrical_set>DoubleEdgeCrack</geometrical_set>
