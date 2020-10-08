@@ -10,9 +10,9 @@
 #include "LevelSetFunction.h"
 
 #include <boost/math/special_functions/sign.hpp>
+#include <numeric>
 
 #include "BaseLib/Algorithm.h"
-
 #include "BranchProperty.h"
 #include "FractureProperty.h"
 #include "JunctionProperty.h"
