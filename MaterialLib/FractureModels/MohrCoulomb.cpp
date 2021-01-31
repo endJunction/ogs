@@ -124,7 +124,7 @@ void MohrCoulomb<DisplacementDim>::computeConstitutiveRelation(
 
     {  // Exit if still in elastic range by checking the shear yield function.
         double const Fs = yield_function(sigma);
-        material_state_variables.setShearYieldFunctionValue(Fs);
+        material_state_variables.setShearYieldFunctionValue(state.w_p_prev.dot(state.w_p_prev));
         if (Fs < .0)
         {
             Kep = Ke;
@@ -204,7 +204,7 @@ void MohrCoulomb<DisplacementDim>::computeConstitutiveRelation(
 
     {  // Update material state shear yield function value.
         double const Fs = yield_function(sigma);
-        material_state_variables.setShearYieldFunctionValue(Fs);
+        material_state_variables.setShearYieldFunctionValue(state.w_p_prev.dot(state.w_p_prev));
     }
 
     Ke(index_ns, index_ns) *=
