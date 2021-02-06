@@ -1291,6 +1291,32 @@
        <components>3</components>
        <order>2</order>
        <initial_condition>displacement0</initial_condition>
+       <boundary_conditions>
+        <boundary_condition>
+           <mesh>TaskB_3D_PLY_FFRONT</mesh>
+           <type>Dirichlet</type>
+           <component>0</component>
+           <parameter>zero_u</parameter>
+         </boundary_condition>
+         <boundary_condition>
+           <mesh>TaskB_3D_PLY_FBACK</mesh>
+           <type>Dirichlet</type>
+           <component>0</component>
+           <parameter>zero_u</parameter>
+         </boundary_condition>
+         <boundary_condition>
+           <mesh>TaskB_3D_PLY_FBOTTOM</mesh>
+           <type>Dirichlet</type>
+           <component>2</component>
+           <parameter>zero_u</parameter>
+         </boundary_condition>
+         <boundary_condition>
+           <mesh>TaskB_3D_PLY_FTOP</mesh>
+           <type>Dirichlet</type>
+           <component>2</component>
+           <parameter>zero_u</parameter>
+         </boundary_condition>
+        </boundary_conditions> 
      </process_variable>
    </process_variables>
    <nonlinear_solvers>
@@ -1306,7 +1332,7 @@
             <name>general_linear_solver</name>
             <eigen>
                 <solver_type>PardisoLU</solver_type>
-                <precon_type>NONE</precon_type>
+                <scaling>1</scaling>
             </eigen>
         </linear_solver>
     </linear_solvers>
