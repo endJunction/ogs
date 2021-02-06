@@ -267,7 +267,7 @@ void HydroMechanicsLocalAssemblerFracture<ShapeFunctionDisplacement,
             {
                 cubic_law_after_shear_slip->setShearSlipState(
                     *ip_data.permeability_state,
-                    state.getShearYieldFunctionValue() >= 0);
+                    state.getShearYieldFunctionValue() > 1.e-14);
             }
         }
 
