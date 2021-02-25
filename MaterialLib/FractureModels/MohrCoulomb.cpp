@@ -110,6 +110,7 @@ void MohrCoulomb<DisplacementDim>::computeConstitutiveRelation(
         Kep.setZero();
         sigma.setZero();
         material_state_variables.setTensileStress(true);
+        state.w_p = w;
         return;
 
         // TODO (nagel); Update w_p for fracture opening and closing.
